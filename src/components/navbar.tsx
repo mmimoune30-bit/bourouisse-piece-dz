@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, ShoppingCart, User, Menu, X, Car, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Settings, Wrench, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
@@ -22,7 +22,7 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [currentLang, setCurrentLang] = useState("FR");
+  const [currentLang, setCurrentLang] = useState("AR");
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,46 +71,46 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-md py-2" : "bg-transparent py-4"
+        "bg-black shadow-xl py-3 border-b border-secondary/20"
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-2 rounded-lg text-white">
-            <Car size={24} className="group-hover:rotate-12 transition-transform" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="bg-secondary p-2.5 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+            <Settings size={28} className="animate-spin-slow" />
           </div>
-          <span className="font-headline font-bold text-xl tracking-tight text-primary">
-            Bourouisse <span className="text-secondary">PieceDz</span>
+          <span className="font-headline font-black text-2xl md:text-3xl tracking-tighter text-secondary uppercase italic">
+            Bourouisse <span className="text-white">PieceDz</span>
           </span>
         </Link>
 
-        <div className="hidden md:flex flex-1 max-w-xl relative" ref={searchRef}>
+        <div className="hidden md:flex flex-1 max-w-xl relative mx-8" ref={searchRef}>
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search parts (e.g. BMW E46 oil filter)"
-              className="pl-10 h-11 bg-white border-muted focus:ring-secondary focus:border-secondary transition-all"
+              placeholder="ابحث عن قطع الغيار (مثل: فلاتر زيت، فرامل...)"
+              className="pl-10 h-11 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => query.length > 2 && setShowSuggestions(true)}
             />
           </div>
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border p-2 animate-in fade-in slide-in-from-top-2">
-              <div className="text-[10px] uppercase font-bold text-muted-foreground px-3 mb-2 flex items-center gap-2">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white">
+              <div className="text-[10px] uppercase font-bold text-secondary px-3 mb-2 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-                AI Powered Suggestions
+                اقتراحات الذكاء الاصطناعي
               </div>
               {suggestions.map((s, i) => (
                 <button
                   key={i}
-                  className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg text-sm transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center gap-2"
                   onClick={() => {
                     setQuery(s);
                     setShowSuggestions(false);
                   }}
                 >
-                  <Search size={14} className="text-muted-foreground" />
+                  <Search size={14} className="text-secondary" />
                   {s}
                 </button>
               ))}
@@ -118,23 +118,23 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0">
-                <Languages size={20} className="text-primary" />
-                <span className="text-[10px] font-medium leading-none text-primary">langue</span>
+              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0 text-white hover:bg-zinc-800">
+                <Languages size={22} className="text-secondary" />
+                <span className="text-[10px] font-bold leading-none mt-1">langue</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Select Language</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+            <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white">
+              <DropdownMenuLabel>اختر اللغة</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
               {languages.map((lang) => (
                 <DropdownMenuItem 
                   key={lang.code} 
                   onClick={() => setCurrentLang(lang.code)}
-                  className={cn(currentLang === lang.code && "bg-muted font-bold")}
+                  className={cn("hover:bg-zinc-800", currentLang === lang.code && "bg-zinc-800 font-bold text-secondary")}
                 >
                   <span className="mr-2">{lang.flag}</span>
                   {lang.name}
@@ -144,39 +144,36 @@ export default function Navbar() {
           </DropdownMenu>
 
           <Link href="/catalog">
-            <Button variant="ghost" className="hidden lg:flex">Browse Catalog</Button>
+            <Button variant="ghost" className="hidden lg:flex text-white hover:text-secondary hover:bg-zinc-800 font-bold">تصفح الكل</Button>
           </Link>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex gap-2 items-center">
+              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black">
                 <LayoutDashboard size={18} />
-                <span className="hidden sm:inline">Seller Portal</span>
+                <span className="hidden sm:inline">بوابة البائع</span>
                 <ChevronDown size={14} className="opacity-50" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Business</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/seller/dashboard">Dashboard</Link>
+            <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800 text-white">
+              <DropdownMenuLabel>أعمالي</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem asChild className="hover:bg-zinc-800">
+                <Link href="/seller/dashboard">لوحة التحكم</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/seller/listings/new">Add New Listing</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/seller/orders">Track Sales</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800">
+                <Link href="/seller/listings/new">إضافة إعلان جديد</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="relative">
-            <ShoppingCart size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full border-2 border-white" />
+          <Button variant="ghost" size="icon" className="relative text-white hover:bg-zinc-800">
+            <ShoppingCart size={22} />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-secondary rounded-full border-2 border-black" />
           </Button>
 
-          <Button variant="primary" size="icon" className="rounded-full">
-            <User size={20} />
+          <Button variant="secondary" size="icon" className="rounded-full shadow-lg shadow-secondary/10">
+            <User size={22} />
           </Button>
         </div>
       </div>
