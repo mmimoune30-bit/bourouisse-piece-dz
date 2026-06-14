@@ -26,9 +26,9 @@
     },
     {
       "id": "hero-parts",
-      "description": "Collection of premium auto parts and cars",
-      "imageUrl": "https://picsum.photos/seed/hero-auto/1200/800",
-      "imageHint": "auto parts"
+      "description": "Auto parts yard landscape with road",
+      "imageUrl": "https://picsum.photos/seed/auto-landscape/1200/1600",
+      "imageHint": "auto scrapyard road"
     },
     {
       "id": "steering-wheel",

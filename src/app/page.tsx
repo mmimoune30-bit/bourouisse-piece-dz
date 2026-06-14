@@ -56,6 +56,8 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
+  const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[4].imageUrl;
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
@@ -93,10 +95,10 @@ export default function Home() {
               <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">جديد</span>
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold text-primary leading-[1.1] animate-in fade-in slide-in-from-bottom-4 duration-700">
-              اعثر على <span className="text-secondary italic">القطعة</span> المثالية لسيارتك.
+              بورويس <span className="text-secondary italic">لقطع الغيار</span> والسيارات.
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-              Bourouisse-PieceDz هي وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
+              Bourouisse-PieceDz وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
             </p>
             <div className="flex flex-col sm:flex-row-reverse gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 group">
@@ -119,7 +121,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="flex-1 relative w-full aspect-square lg:aspect-[1.1/1]">
+          <div className="flex-1 relative w-full aspect-[4/5] lg:aspect-[3/4] max-w-md mx-auto lg:max-w-none">
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-secondary/20 rounded-full blur-3xl animate-pulse-soft" />
             <div className="absolute -bottom-20 -left-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse-soft delay-1000" />
             
@@ -127,12 +129,12 @@ export default function Home() {
             <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] shadow-2xl border-4 border-white z-10">
               <div className="relative w-full h-full animate-ken-burns">
                 <Image
-                  src={PlaceHolderImages[4].imageUrl}
-                  alt="Auto parts and car selection"
+                  src={heroImage}
+                  alt="Auto parts yard and landscape"
                   fill
                   className="object-cover"
                   priority
-                  data-ai-hint="auto parts cars"
+                  data-ai-hint="auto yard road"
                 />
               </div>
             </div>
