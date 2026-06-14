@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -95,7 +96,7 @@ export default function Home() {
               اعثر على <span className="text-secondary italic">القطعة</span> المثالية لسيارتك.
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-              AutoPièces DZ هي وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
+              Bourouisse-PieceDz هي وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
             </p>
             <div className="flex flex-col sm:flex-row-reverse gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 group">
@@ -198,7 +199,7 @@ export default function Home() {
                 />
             </div>
             <div className="relative z-20 p-8 md:p-20 max-w-2xl text-white text-right ml-auto">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">كن بائعاً معتمداً في AutoPièces DZ</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">كن بائعاً معتمداً في Bourouisse-PieceDz</h2>
               <p className="text-lg text-blue-100/70 mb-8 leading-relaxed">
                 صل إلى آلاف المشترين عبر الجزائر. أدر مخزونك، تتبع مبيعاتك، ونمِ عملك في قطاع السيارات باستخدام أدواتنا الاحترافية.
               </p>

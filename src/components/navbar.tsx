@@ -80,7 +80,7 @@ export default function Navbar() {
             <Car size={24} className="group-hover:rotate-12 transition-transform" />
           </div>
           <span className="font-headline font-bold text-xl tracking-tight text-primary">
-            AutoPièces <span className="text-secondary">DZ</span>
+            Bourouisse <span className="text-secondary">PieceDz</span>
           </span>
         </Link>
 

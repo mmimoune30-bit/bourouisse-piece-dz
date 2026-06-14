@@ -13,7 +13,7 @@ export default function Footer() {
                 <Car size={24} />
               </div>
               <span className="font-headline font-bold text-xl tracking-tight">
-                AutoPièces <span className="text-secondary">DZ</span>
+                Bourouisse <span className="text-secondary">PieceDz</span>
               </span>
             </Link>
             <p className="text-blue-100/70 text-sm leading-relaxed">
@@ -53,7 +53,7 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-blue-100/70">
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-secondary" />
-                <span>support@autopiecesdz.com</span>
+                <span>support@bourouisse-piecedz.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={16} className="text-secondary" />
@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-blue-100/40">
-          <p>© 2024 AutoPièces DZ. All rights reserved.</p>
+          <p>© 2024 Bourouisse-PieceDz. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-white">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
