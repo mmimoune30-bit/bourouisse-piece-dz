@@ -62,7 +62,7 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-20">
-        {/* Enlarge and Colorize Categories Bar */}
+        {/* Categories Bar */}
         <section className="bg-destructive border-b-4 border-secondary sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-xl py-4">
           <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-8 md:gap-16 whitespace-nowrap">
             <div className="flex flex-row-reverse items-center">
@@ -104,9 +104,11 @@ export default function Home() {
               Bourouisse-PieceDz وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
             </p>
             <div className="flex flex-col sm:flex-row-reverse gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 group">
-                استكشف الكتالوج <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-              </Button>
+              <Link href="/catalog">
+                <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 group w-full sm:w-auto">
+                  استكشف الكتالوج <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                </Button>
+              </Link>
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold">
                 بع قطع غيارك
               </Button>
@@ -165,27 +167,37 @@ export default function Home() {
 
         {/* Featured Products */}
         <section className="container mx-auto px-4 py-24 border-t">
-          <div className="flex flex-row-reverse justify-between items-end mb-12">
-            <div className="text-right">
-              <h2 className="text-3xl font-bold text-primary mb-2">إعلانات مميزة</h2>
-              <p className="text-muted-foreground">قطع غيار مختارة بعناية من أفضل البائعين الموثوقين.</p>
+          {/* Featured Ads Red Bar Header */}
+          <div className="bg-destructive border-r-8 border-secondary p-8 mb-12 rounded-3xl shadow-2xl flex flex-col md:flex-row-reverse justify-between items-center gap-6 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="text-right z-10">
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-2 uppercase tracking-tighter">إعلانات مميزة</h2>
+              <p className="text-white/80 text-lg font-medium">قطع غيار مختارة بعناية من أفضل البائعين الموثوقين في الجزائر.</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" className="rounded-full">
-                <ArrowRight size={18} />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <ArrowLeft size={18} />
-              </Button>
+            <div className="flex items-center gap-4 z-10">
+              <Link href="/catalog">
+                <Button variant="secondary" size="lg" className="rounded-full px-10 h-14 font-black text-lg shadow-lg hover:scale-105 transition-transform">
+                  تصفح الكل
+                </Button>
+              </Link>
+              <div className="hidden sm:flex gap-2">
+                <Button variant="outline" size="icon" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white hover:text-destructive">
+                  <ArrowRight size={20} />
+                </Button>
+                <Button variant="outline" size="icon" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white hover:text-destructive">
+                  <ArrowLeft size={20} />
+                </Button>
+              </div>
             </div>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {FEATURED_PRODUCTS.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
           <div className="mt-16 flex justify-center">
-            <Button variant="outline" size="lg" className="rounded-full px-12 h-14 font-bold hover:bg-primary hover:text-white transition-all">
+            <Button variant="outline" size="lg" className="rounded-full px-12 h-14 font-bold border-2 hover:bg-primary hover:text-white transition-all">
               عرض كل الإعلانات (50,000+)
             </Button>
           </div>
