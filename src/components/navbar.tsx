@@ -21,15 +21,8 @@ export default function Navbar() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [currentLang, setCurrentLang] = useState("AR");
   const searchRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -102,23 +95,21 @@ export default function Navbar() {
             />
           </div>
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white text-right">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white text-right z-50">
               <div className="text-[10px] uppercase font-bold text-secondary px-3 mb-2 flex items-center justify-end gap-2">
                 اقتراحات الذكاء الاصطناعي
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
               </div>
               {suggestions.map((s, i) => (
-                <button
+                <Link
                   key={i}
-                  className="w-full text-right px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center justify-end gap-2"
-                  onClick={() => {
-                    setQuery(s);
-                    setShowSuggestions(false);
-                  }}
+                  href={`/catalog?query=${encodeURIComponent(s)}`}
+                  className="w-full text-right px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center justify-end gap-2 block"
+                  onClick={() => setShowSuggestions(false)}
                 >
                   {s}
                   <Search size={14} className="text-secondary" />
-                </button>
+                </Link>
               ))}
             </div>
           )}
@@ -172,13 +163,10 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="relative text-white hover:bg-zinc-800">
-            <ShoppingCart size={22} />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-secondary rounded-full border-2 border-black" />
-          </Button>
-
-          <Button variant="secondary" size="icon" className="rounded-full shadow-lg shadow-secondary/10">
-            <User size={22} />
+          <Button variant="secondary" size="icon" className="rounded-full shadow-lg shadow-secondary/10" asChild>
+            <Link href="/buyer/register">
+              <User size={22} />
+            </Link>
           </Button>
         </div>
       </div>

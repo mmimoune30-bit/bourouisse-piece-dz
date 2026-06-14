@@ -36,11 +36,11 @@ export default function Footer() {
           <div className="text-right">
             <h4 className="font-headline font-bold mb-6 text-lg border-r-4 border-secondary pr-4">تسوق حسب الفئة</h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
-              <li><Link href="/catalog?cat=engine" className="hover:text-secondary transition-colors">المحرك ونظام الحركة</Link></li>
-              <li><Link href="/catalog?cat=brakes" className="hover:text-secondary transition-colors">الفرامل ونظام التعليق</Link></li>
-              <li><Link href="/catalog?cat=electrical" className="hover:text-secondary transition-colors">الكهرباء والإضاءة</Link></li>
-              <li><Link href="/catalog?cat=body" className="hover:text-secondary transition-colors">قطع الهيكل والمرايا</Link></li>
-              <li><Link href="/catalog?cat=interior" className="hover:text-secondary transition-colors">الإكسسوارات الداخلية</Link></li>
+              <li><Link href="/catalog?category=قطع المحرك" className="hover:text-secondary transition-colors">المحرك ونظام الحركة</Link></li>
+              <li><Link href="/catalog?category=الفرامل" className="hover:text-secondary transition-colors">الفرامل ونظام التعليق</Link></li>
+              <li><Link href="/catalog?category=الكهرباء" className="hover:text-secondary transition-colors">الكهرباء والإضاءة</Link></li>
+              <li><Link href="/catalog?category=الهيكل" className="hover:text-secondary transition-colors">قطع الهيكل والمرايا</Link></li>
+              <li><Link href="/catalog?category=الإكسسوارات" className="hover:text-secondary transition-colors">الإكسسوارات الداخلية</Link></li>
             </ul>
           </div>
 
@@ -48,10 +48,9 @@ export default function Footer() {
             <h4 className="font-headline font-bold mb-6 text-lg border-r-4 border-secondary pr-4">روابط سريعة</h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
               <li><Link href="/seller/register" className="hover:text-secondary transition-colors">كن بائعاً معنا</Link></li>
-              <li><Link href="/how-it-works" className="hover:text-secondary transition-colors">كيف يعمل الموقع</Link></li>
-              <li><Link href="/shipping" className="hover:text-secondary transition-colors">معلومات الشحن</Link></li>
-              <li><Link href="/faq" className="hover:text-secondary transition-colors">الأسئلة الشائعة</Link></li>
-              <li><Link href="/support" className="hover:text-secondary transition-colors">الدعم الفني</Link></li>
+              <li><Link href="/catalog" className="hover:text-secondary transition-colors">تصفح الكتالوج</Link></li>
+              <li><Link href="/buyer/register" className="hover:text-secondary transition-colors">حساب جديد</Link></li>
+              <li><Link href="/seller/dashboard" className="hover:text-secondary transition-colors">لوحة التحكم</Link></li>
             </ul>
           </div>
 
@@ -77,8 +76,8 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4 text-sm text-blue-100/40">
           <p className="font-bold">© 2024 Bourouisse PieceDz. جميع الحقوق محفوظة.</p>
           <div className="flex gap-6">
-            <Link href="/terms" className="hover:text-white">شروط الخدمة</Link>
-            <Link href="/privacy" className="hover:text-white">سياسة الخصوصية</Link>
+            <span className="cursor-default">شروط الخدمة</span>
+            <span className="cursor-default">سياسة الخصوصية</span>
           </div>
         </div>
       </div>

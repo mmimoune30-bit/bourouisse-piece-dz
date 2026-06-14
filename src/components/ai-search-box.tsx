@@ -45,9 +45,9 @@ export default function AISearchBox() {
   }, []);
 
   const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?cat=scrapped" },
-    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?cat=full-engines" },
-    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?cat=half-engines" },
+    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?category=خارج الخدمة" },
+    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?category=قطع المحرك" },
+    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?category=قطع المحرك" },
   ];
 
   return (
@@ -102,17 +102,15 @@ export default function AISearchBox() {
               </div>
               <div className="grid grid-cols-1 gap-0.5">
                 {suggestions.map((s, i) => (
-                  <button
+                  <Link
                     key={i}
-                    className="w-full text-right px-3 py-2.5 hover:bg-secondary hover:text-black rounded-lg text-sm font-bold transition-all flex items-center justify-end gap-2.5 group/item"
-                    onClick={() => {
-                      setQuery(s);
-                      setShowSuggestions(false);
-                    }}
+                    href={`/catalog?query=${encodeURIComponent(s)}`}
+                    className="w-full text-right px-3 py-2.5 hover:bg-secondary hover:text-black rounded-lg text-sm font-bold transition-all flex items-center justify-end gap-2.5 group/item block"
+                    onClick={() => setShowSuggestions(false)}
                   >
                     {s}
                     <Search size={14} className="text-secondary group-hover/item:text-black" />
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>

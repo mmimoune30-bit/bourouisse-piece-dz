@@ -24,7 +24,7 @@ const FEATURED_PRODUCTS = [
     name: "طقم فرامل سيراميك كربون",
     price: 120000,
     image: PlaceHolderImages[1].imageUrl,
-    category: "أنظمة الفرامل",
+    category: "الفرامل",
     seller: "SpeedHub Algiers",
     condition: "New" as const
   },
@@ -33,7 +33,7 @@ const FEATURED_PRODUCTS = [
     name: "إطارات الطرق الوعرة (طقم 4)",
     price: 85000,
     image: PlaceHolderImages[2].imageUrl,
-    category: "الإطارات والجنوط",
+    category: "الإطارات",
     seller: "DesertRoad Parts",
     condition: "New" as const
   },
@@ -53,9 +53,7 @@ const TICKER_ADS = [
   { id: "p2", name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15, image: PlaceHolderImages[1].imageUrl },
   { id: "p4", name: "بطارية أصلية 75Ah", price: "19,800 DZD", qty: 10, image: PlaceHolderImages[3].imageUrl },
   { id: "p3", name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8, image: PlaceHolderImages[2].imageUrl },
-  { id: "p1", name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3, image: PlaceHolderImages[0].imageUrl },
-  { id: "p4", name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10, image: PlaceHolderImages[4].imageUrl },
-  { id: "p2", name: "بواجي ليزر إيريديوم", price: "9,000 DZD", qty: 12, image: PlaceHolderImages[1].imageUrl },
+  { id: "p5", name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3, image: PlaceHolderImages[0].imageUrl },
 ];
 
 const CATEGORIES = [
@@ -85,7 +83,7 @@ export default function Home() {
             {CATEGORIES.map((cat, i) => (
               <Link
                 key={i}
-                href={`/catalog?category=${cat.name}`}
+                href={`/catalog?category=${encodeURIComponent(cat.name)}`}
                 className="flex flex-row-reverse items-center gap-2.5 group transition-all"
               >
                 <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
@@ -106,7 +104,7 @@ export default function Home() {
         <section className="h-14 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/20 shadow-xl relative z-30 group">
           <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
             {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (
-              <Link key={i} href={`/products/${ad.id}`} className="flex items-center gap-5 px-10 text-white hover:bg-white/10 transition-colors h-full">
+              <Link key={i} href={`/catalog`} className="flex items-center gap-5 px-10 text-white hover:bg-white/10 transition-colors h-full">
                 <div className="flex items-center gap-3">
                   <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-secondary/50 shrink-0 shadow-md">
                     <Image
@@ -171,9 +169,11 @@ export default function Home() {
                   استكشف الكتالوج <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold">
-                بع قطع غيارك
-              </Button>
+              <Link href="/seller/register">
+                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold w-full sm:w-auto">
+                  بع قطع غيارك
+                </Button>
+              </Link>
             </div>
 
             <div className="flex items-center justify-end gap-6 pt-2 opacity-80">
@@ -242,9 +242,11 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-8 flex justify-center">
-            <Button variant="outline" size="lg" className="rounded-full px-10 h-12 font-bold border-2 hover:bg-primary hover:text-white transition-all">
-              عرض كل الإعلانات (50,000+)
-            </Button>
+            <Link href="/catalog">
+              <Button variant="outline" size="lg" className="rounded-full px-10 h-12 font-bold border-2 hover:bg-primary hover:text-white transition-all">
+                عرض كل الإعلانات (50,000+)
+              </Button>
+            </Link>
           </div>
         </section>
 
@@ -266,10 +268,12 @@ export default function Home() {
                 انضم إلى أكبر منصة لقطع الغيار في الجزائر وقم ببيع منتجاتك لآلاف المشترين يومياً.
               </p>
               <div className="flex flex-col sm:flex-row-reverse gap-3">
-                <Button size="lg" variant="secondary" className="h-12 px-8 text-base font-bold shadow-lg">
-                  ابدأ مجاناً
-                </Button>
-                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold border-white/20 text-white">
+                <Link href="/seller/register">
+                  <Button size="lg" variant="secondary" className="h-12 px-8 text-base font-bold shadow-lg w-full sm:w-auto">
+                    ابدأ مجاناً
+                  </Button>
+                </Link>
+                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold border-white/20 text-white w-full sm:w-auto">
                   تعرف على المميزات
                 </Button>
               </div>
