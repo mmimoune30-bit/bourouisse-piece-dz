@@ -122,8 +122,9 @@ export default function Navbar() {
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0">
                 <Languages size={20} className="text-primary" />
+                <span className="text-[10px] font-medium leading-none text-primary">langue</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
