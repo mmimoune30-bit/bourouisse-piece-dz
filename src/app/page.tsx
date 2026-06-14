@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -47,13 +48,13 @@ const FEATURED_PRODUCTS = [
 ];
 
 const TICKER_ADS = [
-  { name: "شاحن توربيني GT20", price: "85,000 DZD", qty: 5 },
-  { name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15 },
-  { name: "زيت محرك 5W30", price: "4,800 DZD", qty: 24 },
-  { name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8 },
-  { name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3 },
-  { name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10 },
-  { name: "بواجي ليزر إيريديوم", price: "9,000 DZD", qty: 12 },
+  { id: "p1", name: "شاحن توربيني GT20", price: "85,000 DZD", qty: 5, image: PlaceHolderImages[0].imageUrl },
+  { id: "p2", name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15, image: PlaceHolderImages[1].imageUrl },
+  { id: "p4", name: "زيت محرك 5W30", price: "4,800 DZD", qty: 24, image: PlaceHolderImages[3].imageUrl },
+  { id: "p3", name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8, image: PlaceHolderImages[2].imageUrl },
+  { id: "p1", name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3, image: PlaceHolderImages[0].imageUrl },
+  { id: "p4", name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10, image: PlaceHolderImages[3].imageUrl },
+  { id: "p2", name: "بواجي ليزر إيريديوم", price: "9,000 DZD", qty: 12, image: PlaceHolderImages[1].imageUrl },
 ];
 
 const CATEGORIES = [
@@ -101,23 +102,32 @@ export default function Home() {
         </section>
 
         {/* Dynamic Ticker Bar - Horizontally Scrolling Ads */}
-        <section className="h-12 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/30 shadow-2xl relative z-30">
-          <div className="flex whitespace-nowrap animate-scroll-left">
+        <section className="h-16 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/30 shadow-2xl relative z-30 group">
+          <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
             {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (
-              <div key={i} className="flex items-center gap-6 px-12 text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.8)]" />
-                  <span className="text-sm font-black uppercase tracking-tight">{ad.name}</span>
+              <Link key={i} href={`/products/${ad.id}`} className="flex items-center gap-6 px-12 text-white hover:bg-white/10 transition-colors h-full">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border-2 border-secondary/50 shrink-0">
+                    <Image
+                      src={ad.image}
+                      alt={ad.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm font-black uppercase tracking-tight text-white">{ad.name}</span>
+                    <div className="flex items-center gap-3 mt-0.5">
+                       <span className="text-[10px] font-bold text-white/60">
+                        الكمية: <span className="text-white">{ad.qty}</span>
+                      </span>
+                      <span className="text-[11px] font-black text-secondary bg-black/40 px-2 py-0.5 rounded border border-secondary/20">
+                        {ad.price}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-secondary bg-black/40 px-3 py-1 rounded-full border border-secondary/20">
-                    {ad.price}
-                  </span>
-                  <span className="text-[10px] font-bold text-white/60">
-                    الكمية: <span className="text-white">{ad.qty}</span>
-                  </span>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
