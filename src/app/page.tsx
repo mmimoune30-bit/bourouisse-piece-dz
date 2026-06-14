@@ -65,37 +65,37 @@ export default function Home() {
         <section className="container mx-auto px-4 py-12 lg:py-20 flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1 space-y-8">
             <div className="inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-border animate-in slide-in-from-left duration-500">
-              <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">New</span>
-              <span className="text-sm font-medium text-muted-foreground">AI Search is now available!</span>
+              <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">جديد</span>
+              <span className="text-sm font-medium text-muted-foreground">البحث المدعوم بالذكاء الاصطناعي متاح الآن!</span>
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold text-primary leading-[1.1]">
-              Find the Perfect <span className="text-secondary italic">Part</span> for Your Ride.
+              اعثر على <span className="text-secondary italic">القطعة</span> المثالية لسيارتك.
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
-              AutoPièces DZ is Algeria's premium destination for high-quality automotive components. Genuine parts, verified sellers, and nation-wide delivery.
+              AutoPièces DZ هي وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2">
-                Explore Catalog <ArrowRight size={20} />
+                استكشف الكتالوج <ArrowRight size={20} />
               </Button>
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold">
-                Sell Your Parts
+                بع قطع غيارك
               </Button>
             </div>
             <div className="flex items-center gap-8 pt-4">
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-primary">50k+</span>
-                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Active Listings</span>
+                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">إعلان نشط</span>
               </div>
               <div className="w-px h-10 bg-border" />
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-primary">12k+</span>
-                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Happy Clients</span>
+                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">عميل سعيد</span>
               </div>
               <div className="w-px h-10 bg-border" />
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-primary">2.5k+</span>
-                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Top Sellers</span>
+                <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">بائع موثوق</span>
               </div>
             </div>
           </div>
@@ -104,10 +104,11 @@ export default function Home() {
             <div className="absolute inset-0 overflow-hidden rounded-3xl shadow-2xl animate-in fade-in zoom-in duration-1000">
               <Image
                 src={PlaceHolderImages[4].imageUrl}
-                alt="Modern car interior"
+                alt="Auto parts and car selection"
                 fill
                 className="object-cover"
                 priority
+                data-ai-hint="auto parts"
               />
             </div>
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-border hidden md:block animate-bounce-slow">
@@ -116,8 +117,8 @@ export default function Home() {
                   <CheckCircle2 size={24} />
                 </div>
                 <div>
-                  <p className="font-bold text-primary">Verified Quality</p>
-                  <p className="text-sm text-muted-foreground text-nowrap">All parts are inspected</p>
+                  <p className="font-bold text-primary">جودة مضمونة</p>
+                  <p className="text-sm text-muted-foreground text-nowrap">جميع القطع مفحوصة</p>
                 </div>
               </div>
             </div>
@@ -129,11 +130,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-end mb-12">
               <div>
-                <h2 className="text-3xl font-bold text-primary mb-2">Shop by Category</h2>
-                <p className="text-muted-foreground">Quickly find the parts you need by system.</p>
+                <h2 className="text-3xl font-bold text-primary mb-2">تسوق حسب الفئة</h2>
+                <p className="text-muted-foreground">اعثر بسرعة على القطع التي تحتاجها.</p>
               </div>
               <Button variant="link" className="text-secondary font-bold gap-1">
-                View All Categories <ArrowRight size={16} />
+                عرض كل الفئات <ArrowRight size={16} />
               </Button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -147,7 +148,7 @@ export default function Home() {
                     {cat.icon}
                   </div>
                   <h3 className="font-bold text-primary group-hover:text-white transition-colors mb-1">{cat.name}</h3>
-                  <p className="text-xs text-muted-foreground group-hover:text-blue-100/60 transition-colors">{cat.count} Items</p>
+                  <p className="text-xs text-muted-foreground group-hover:text-blue-100/60 transition-colors">{cat.count} قطعة</p>
                 </Link>
               ))}
             </div>
@@ -158,8 +159,8 @@ export default function Home() {
         <section className="container mx-auto px-4 py-20">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-primary mb-2">Featured Listings</h2>
-              <p className="text-muted-foreground">Curated premium parts from our top-rated sellers.</p>
+              <h2 className="text-3xl font-bold text-primary mb-2">إعلانات مميزة</h2>
+              <p className="text-muted-foreground">قطع غيار مختارة بعناية من أفضل البائعين لدينا.</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="icon" className="rounded-full">
@@ -177,7 +178,7 @@ export default function Home() {
           </div>
           <div className="mt-16 flex justify-center">
             <Button variant="outline" size="lg" className="rounded-full px-12 h-14 font-bold">
-              View All 50,000+ Listings
+              عرض كل الإعلانات (50,000+)
             </Button>
           </div>
         </section>
@@ -192,17 +193,17 @@ export default function Home() {
               fill
               className="object-cover object-right"
             />
-            <div className="relative z-20 p-8 md:p-16 max-w-2xl text-white">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Become an AutoPièces DZ Verified Seller</h2>
+            <div className="relative z-20 p-8 md:p-16 max-w-2xl text-white text-right">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">كن بائعاً معتمداً في AutoPièces DZ</h2>
               <p className="text-lg text-blue-100/70 mb-8 leading-relaxed">
-                Reach thousands of buyers across Algeria. Manage your inventory, track sales, and grow your automotive business with our professional tools.
+                صل إلى آلاف المشترين عبر الجزائر. أدر مخزونك، تتبع مبيعاتك، ونمِ عملك في قطاع السيارات باستخدام أدواتنا الاحترافية.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row-reverse gap-4">
                 <Button size="lg" variant="secondary" className="h-14 px-8 text-lg font-bold">
-                  Get Started for Free
+                  ابدأ مجاناً
                 </Button>
                 <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold border-white/20 text-white hover:bg-white/10">
-                  Read Case Studies
+                  اقرأ قصص النجاح
                 </Button>
               </div>
             </div>

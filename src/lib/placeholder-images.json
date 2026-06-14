@@ -25,10 +25,10 @@
       "imageHint": "oil filter"
     },
     {
-      "id": "led-headlight",
-      "description": "Modern LED headlight assembly",
-      "imageUrl": "https://picsum.photos/seed/light5/800/600",
-      "imageHint": "car headlight"
+      "id": "hero-parts",
+      "description": "Collection of premium auto parts and cars",
+      "imageUrl": "https://picsum.photos/seed/hero-auto/1200/800",
+      "imageHint": "auto parts"
     },
     {
       "id": "steering-wheel",
