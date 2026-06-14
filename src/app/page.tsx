@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
+import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { ArrowLeft, ArrowRight, CheckCircle2, Package, Truck, Zap, Gauge, Settings } from "lucide-react";
@@ -132,16 +133,14 @@ export default function Home() {
           </div>
         </section>
 
+        {/* NEW AI SEARCH BOX - Positioned under Ads, far left, large size */}
+        <AISearchBox />
+
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 lg:py-24 flex flex-col lg:flex-row items-center gap-16 relative">
           <div className="flex-1 space-y-8 z-20 text-right lg:text-right flex flex-col items-end">
-            {/* AI Search Badge */}
-            <div className="inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-border animate-in slide-in-from-right duration-500">
-              <span className="text-sm font-medium text-muted-foreground">البحث المدعوم بالذكاء الاصطناعي متاح الآن!</span>
-              <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">جديد</span>
-            </div>
-
-            {/* NEW: Dynamic Gold Brand Section - Centered with Icon */}
+            
+            {/* Dynamic Gold Brand Section - Centered with Icon */}
             <div className="bg-black border-2 border-secondary/30 p-8 rounded-3xl shadow-2xl relative overflow-hidden group/gold-brand w-full max-w-xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
                <div className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-transparent to-secondary/10 animate-pulse" />
                <div className="relative z-10 flex flex-col items-center text-center">
