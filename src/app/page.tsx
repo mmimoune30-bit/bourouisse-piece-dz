@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -48,11 +47,11 @@ const FEATURED_PRODUCTS = [
 ];
 
 const CATEGORIES = [
-  { name: "قطع المحرك", icon: <Zap size={18} className="text-secondary" />, count: 1240 },
-  { name: "ناقل الحركة", icon: <Settings size={18} className="text-secondary" />, count: 850 },
-  { name: "الكهرباء", icon: <Gauge size={18} className="text-secondary" />, count: 2100 },
-  { name: "الفرامل", icon: <CheckCircle2 size={18} className="text-secondary" />, count: 640 },
-  { name: "الإطارات", icon: <Truck size={18} className="text-secondary" />, count: 320 },
+  { name: "قطع المحرك", icon: <Zap size={24} className="text-secondary" />, count: 1240 },
+  { name: "ناقل الحركة", icon: <Settings size={24} className="text-secondary" />, count: 850 },
+  { name: "الكهرباء", icon: <Gauge size={24} className="text-secondary" />, count: 2100 },
+  { name: "الفرامل", icon: <CheckCircle2 size={24} className="text-secondary" />, count: 640 },
+  { name: "الإطارات", icon: <Truck size={24} className="text-secondary" />, count: 320 },
 ];
 
 export default function Home() {
@@ -63,25 +62,29 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-20">
-        {/* Compact Quick Categories Bar at the top */}
-        <section className="bg-white/80 backdrop-blur-md border-b sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-sm">
-          <div className="container mx-auto px-4 py-3 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
-            <span className="text-[10px] font-bold text-destructive border border-destructive px-2 py-0.5 rounded ml-2 uppercase tracking-tight hidden sm:block">اختيار الفئة:</span>
+        {/* Enlarge and Colorize Categories Bar */}
+        <section className="bg-destructive border-b-4 border-secondary sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-xl py-4">
+          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-8 md:gap-16 whitespace-nowrap">
+            <div className="flex flex-row-reverse items-center">
+              <span className="text-lg font-black text-white bg-primary/20 border-2 border-secondary px-5 py-2 rounded-xl ml-4 uppercase tracking-tighter shadow-inner">
+                اختيار الفئة:
+              </span>
+            </div>
             {CATEGORIES.map((cat, i) => (
               <Link
                 key={i}
                 href={`/catalog?category=${cat.name}`}
-                className="flex flex-row-reverse items-center gap-2 group transition-all"
+                className="flex flex-row-reverse items-center gap-3 group transition-all"
               >
-                <div className="p-1.5 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-all group-hover:scale-110">
+                <div className="p-2.5 rounded-xl bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-125 shadow-sm">
                   {cat.icon}
                 </div>
-                <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors">
+                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors">
                   {cat.name}
                 </span>
               </Link>
             ))}
-            <Link href="/catalog" className="text-xs font-bold text-secondary border-r pr-6 mr-2 hover:underline">
+            <Link href="/catalog" className="text-sm font-black text-secondary border-r-2 border-secondary/30 pr-8 mr-4 hover:underline hover:scale-105 transition-transform">
               عرض الكل
             </Link>
           </div>
