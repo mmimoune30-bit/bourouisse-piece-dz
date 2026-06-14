@@ -152,8 +152,8 @@ export default function Home() {
                     BOUROUISSE PIECE DZ
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-transparent via-secondary to-transparent mb-4 rounded-full" />
-                  <p className="text-xl md:text-2xl font-black text-secondary tracking-widest leading-none">
-                    لقطع الغيار و السيارات
+                  <p className="text-lg md:text-xl font-black text-secondary tracking-tight leading-tight">
+                    لقطع غيار السيارات و المركبات و الألات الجديدة و المستعملة
                   </p>
                </div>
             </div>
