@@ -10,48 +10,48 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Package, Truck, Zap, Gauge, Settin
 const FEATURED_PRODUCTS = [
   {
     id: "p1",
-    name: "Precision V8 Engine Block",
+    name: "كتلة محرك V8 دقيقة",
     price: 450000,
     image: PlaceHolderImages[0].imageUrl,
-    category: "Engine Parts",
+    category: "قطع المحرك",
     seller: "EliteMotors DZ",
     condition: "New" as const
   },
   {
     id: "p2",
-    name: "Carbon Ceramic Brake Kit",
+    name: "طقم فرامل سيراميك كربون",
     price: 120000,
     image: PlaceHolderImages[1].imageUrl,
-    category: "Braking Systems",
+    category: "أنظمة الفرامل",
     seller: "SpeedHub Algiers",
     condition: "New" as const
   },
   {
     id: "p3",
-    name: "All-Terrain Rugged Tires (Set of 4)",
+    name: "إطارات الطرق الوعرة (طقم 4)",
     price: 85000,
     image: PlaceHolderImages[2].imageUrl,
-    category: "Tires & Rims",
+    category: "الإطارات والجنوط",
     seller: "DesertRoad Parts",
     condition: "New" as const
   },
   {
     id: "p4",
-    name: "High-Efficiency Oil Filter",
+    name: "فلتر زيت عالي الكفاءة",
     price: 2500,
     image: PlaceHolderImages[3].imageUrl,
-    category: "Maintenance",
+    category: "الصيانة العامة",
     seller: "Maintenance Pros",
     condition: "New" as const
   }
 ];
 
 const CATEGORIES = [
-  { name: "Engine Parts", icon: <Zap className="text-secondary" />, count: 1240 },
-  { name: "Transmission", icon: <Settings className="text-secondary" />, count: 850 },
-  { name: "Electrical", icon: <Gauge className="text-secondary" />, count: 2100 },
-  { name: "Braking", icon: <CheckCircle2 className="text-secondary" />, count: 640 },
-  { name: "Tires & Rims", icon: <Truck className="text-secondary" />, count: 320 },
+  { name: "قطع المحرك", icon: <Zap size={18} className="text-secondary" />, count: 1240 },
+  { name: "ناقل الحركة", icon: <Settings size={18} className="text-secondary" />, count: 850 },
+  { name: "الكهرباء", icon: <Gauge size={18} className="text-secondary" />, count: 2100 },
+  { name: "الفرامل", icon: <CheckCircle2 size={18} className="text-secondary" />, count: 640 },
+  { name: "الإطارات", icon: <Truck size={18} className="text-secondary" />, count: 320 },
 ];
 
 export default function Home() {
@@ -59,7 +59,31 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-24">
+      <main className="flex-grow pt-20">
+        {/* Compact Quick Categories Bar at the top */}
+        <section className="bg-white/80 backdrop-blur-md border-b sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-sm">
+          <div className="container mx-auto px-4 py-3 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
+            <span className="text-[10px] font-black text-primary/40 ml-2 uppercase tracking-tight hidden sm:block">الفئات السريعة:</span>
+            {CATEGORIES.map((cat, i) => (
+              <Link
+                key={i}
+                href={`/catalog?category=${cat.name}`}
+                className="flex flex-row-reverse items-center gap-2 group transition-all"
+              >
+                <div className="p-1.5 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-all group-hover:scale-110">
+                  {cat.icon}
+                </div>
+                <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors">
+                  {cat.name}
+                </span>
+              </Link>
+            ))}
+            <Link href="/catalog" className="text-xs font-bold text-secondary border-r pr-6 mr-2 hover:underline">
+              عرض الكل
+            </Link>
+          </div>
+        </section>
+
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 lg:py-24 flex flex-col lg:flex-row items-center gap-16 relative">
           <div className="flex-1 space-y-8 z-20 text-right lg:text-right">
@@ -95,7 +119,6 @@ export default function Home() {
           </div>
           
           <div className="flex-1 relative w-full aspect-square lg:aspect-[1.1/1]">
-            {/* Background Decorative Elements */}
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-secondary/20 rounded-full blur-3xl animate-pulse-soft" />
             <div className="absolute -bottom-20 -left-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse-soft delay-1000" />
             
@@ -113,7 +136,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Floating UI Elements */}
             <div className="absolute -bottom-8 -right-8 bg-white p-5 rounded-2xl shadow-2xl border border-border z-20 animate-float">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
@@ -135,39 +157,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Grid */}
-        <section className="bg-white py-24">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-row-reverse justify-between items-end mb-12">
-              <div className="text-right">
-                <h2 className="text-3xl font-bold text-primary mb-2">تسوق حسب الفئة</h2>
-                <p className="text-muted-foreground">اعثر بسرعة على القطع التي تحتاجها لسيارتك.</p>
-              </div>
-              <Button variant="link" className="text-secondary font-bold gap-2 group">
-                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> عرض كل الفئات
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {CATEGORIES.map((cat, i) => (
-                <Link
-                  key={i}
-                  href={`/catalog?category=${cat.name}`}
-                  className="group p-8 rounded-2xl border border-border bg-background hover:bg-primary hover:border-primary transition-all duration-500 text-center relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="mb-4 flex justify-center scale-125 group-hover:scale-150 group-hover:rotate-6 transition-transform duration-500">
-                    {cat.icon}
-                  </div>
-                  <h3 className="font-bold text-primary group-hover:text-white transition-colors mb-1 relative z-10">{cat.name}</h3>
-                  <p className="text-xs text-muted-foreground group-hover:text-blue-100/60 transition-colors relative z-10">{cat.count} قطعة</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Featured Products */}
-        <section className="container mx-auto px-4 py-24">
+        <section className="container mx-auto px-4 py-24 border-t">
           <div className="flex flex-row-reverse justify-between items-end mb-12">
             <div className="text-right">
               <h2 className="text-3xl font-bold text-primary mb-2">إعلانات مميزة</h2>
