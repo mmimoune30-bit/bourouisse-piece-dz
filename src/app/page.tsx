@@ -134,22 +134,25 @@ export default function Home() {
 
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 lg:py-24 flex flex-col lg:flex-row items-center gap-16 relative">
-          <div className="flex-1 space-y-6 z-20 text-right lg:text-right">
+          <div className="flex-1 space-y-8 z-20 text-right lg:text-right flex flex-col items-end">
             {/* AI Search Badge */}
             <div className="inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-border animate-in slide-in-from-right duration-500">
               <span className="text-sm font-medium text-muted-foreground">البحث المدعوم بالذكاء الاصطناعي متاح الآن!</span>
               <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">جديد</span>
             </div>
 
-            {/* NEW: Dynamic Gold Brand Section */}
-            <div className="bg-black border-l-4 border-secondary p-6 rounded-2xl shadow-2xl relative overflow-hidden group/gold-brand max-w-xl animate-in fade-in slide-in-from-right duration-700 delay-200">
-               <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5 animate-pulse" />
-               <div className="relative z-10 flex flex-col items-end">
-                  <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase mb-1 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]">
+            {/* NEW: Dynamic Gold Brand Section - Centered with Icon */}
+            <div className="bg-black border-2 border-secondary/30 p-8 rounded-3xl shadow-2xl relative overflow-hidden group/gold-brand w-full max-w-xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
+               <div className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-transparent to-secondary/10 animate-pulse" />
+               <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="bg-secondary/10 p-4 rounded-2xl mb-4 border border-secondary/20 group-hover/gold-brand:rotate-12 transition-transform duration-500">
+                    <Settings className="text-secondary animate-spin-slow" size={40} />
+                  </div>
+                  <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase mb-2 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(212,175,55,0.4)]">
                     BOUROUISSE PIECE DZ
                   </h2>
-                  <div className="h-0.5 w-32 bg-secondary mb-3 rounded-full" />
-                  <p className="text-xl md:text-2xl font-bold text-secondary tracking-widest leading-none">
+                  <div className="h-1 w-32 bg-gradient-to-r from-transparent via-secondary to-transparent mb-4 rounded-full" />
+                  <p className="text-xl md:text-2xl font-black text-secondary tracking-widest leading-none">
                     لقطع الغيار و السيارات
                   </p>
                </div>
