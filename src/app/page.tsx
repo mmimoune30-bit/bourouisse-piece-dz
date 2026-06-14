@@ -46,6 +46,16 @@ const FEATURED_PRODUCTS = [
   }
 ];
 
+const TICKER_ADS = [
+  { name: "شاحن توربيني GT20", price: "85,000 DZD", qty: 5 },
+  { name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15 },
+  { name: "زيت محرك 5W30", price: "4,800 DZD", qty: 24 },
+  { name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8 },
+  { name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3 },
+  { name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10 },
+  { name: "بواجي ليزر إيريديوم", price: "9,000 DZD", qty: 12 },
+];
+
 const CATEGORIES = [
   { name: "قطع المحرك", icon: <Zap size={24} className="text-secondary" />, count: 1240 },
   { name: "ناقل الحركة", icon: <Settings size={24} className="text-secondary" />, count: 850 },
@@ -87,6 +97,28 @@ export default function Home() {
             <Link href="/catalog" className="text-sm font-black text-secondary border-r-2 border-secondary/30 pr-8 mr-4 hover:underline hover:scale-105 transition-transform">
               عرض الكل
             </Link>
+          </div>
+        </section>
+
+        {/* Dynamic Ticker Bar - Horizontally Scrolling Ads */}
+        <section className="h-12 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/30 shadow-2xl relative z-30">
+          <div className="flex whitespace-nowrap animate-scroll-left">
+            {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (
+              <div key={i} className="flex items-center gap-6 px-12 text-white">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.8)]" />
+                  <span className="text-sm font-black uppercase tracking-tight">{ad.name}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-secondary bg-black/40 px-3 py-1 rounded-full border border-secondary/20">
+                    {ad.price}
+                  </span>
+                  <span className="text-[10px] font-bold text-white/60">
+                    الكمية: <span className="text-white">{ad.qty}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
