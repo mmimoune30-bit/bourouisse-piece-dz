@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, ShoppingCart, User, Menu, X, Car, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Car, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
@@ -22,6 +22,7 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentLang, setCurrentLang] = useState("FR");
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,6 +60,12 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const languages = [
+    { code: "AR", name: "العربية", flag: "🇩🇿" },
+    { code: "FR", name: "Français", flag: "🇫🇷" },
+    { code: "EN", name: "English", flag: "🇺🇸" },
+  ];
 
   return (
     <nav
@@ -112,6 +119,29 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Languages size={20} className="text-primary" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {languages.map((lang) => (
+                <DropdownMenuItem 
+                  key={lang.code} 
+                  onClick={() => setCurrentLang(lang.code)}
+                  className={cn(currentLang === lang.code && "bg-muted font-bold")}
+                >
+                  <span className="mr-2">{lang.flag}</span>
+                  {lang.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link href="/catalog">
             <Button variant="ghost" className="hidden lg:flex">Browse Catalog</Button>
           </Link>
