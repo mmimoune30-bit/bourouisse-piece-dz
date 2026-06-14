@@ -95,7 +95,7 @@ export default function Home() {
               <span className="bg-secondary text-primary font-bold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest">جديد</span>
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold text-primary leading-[1.1] animate-in fade-in slide-in-from-bottom-4 duration-700">
-              بورويس <span className="text-secondary italic">لقطع الغيار</span> والسيارات.
+              Bourouisse <span className="text-secondary italic">PieceDz</span> لقطع الغيار والسيارات.
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-6 duration-1000">
               Bourouisse-PieceDz وجهتكم الأولى في الجزائر لقطع غيار السيارات عالية الجودة. قطع أصلية، بائعون موثوقون، وتوصيل لكافة الولايات.
