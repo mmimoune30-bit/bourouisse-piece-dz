@@ -79,9 +79,14 @@ export default function Navbar() {
           <div className="bg-secondary p-2.5 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
             <Settings size={28} className="animate-spin-slow" />
           </div>
-          <span className="font-headline font-black text-2xl md:text-3xl tracking-tighter text-secondary uppercase italic">
-            Bourouisse <span className="text-white">PieceDz</span>
-          </span>
+          <div className="flex flex-col">
+            <span className="font-headline font-black text-2xl md:text-3xl tracking-tighter text-secondary uppercase italic leading-none">
+              Bourouisse <span className="text-white">PieceDz</span>
+            </span>
+            <span className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+              Pièces & Automobiles
+            </span>
+          </div>
         </Link>
 
         <div className="hidden md:flex flex-1 max-w-xl relative mx-8" ref={searchRef}>
@@ -89,29 +94,30 @@ export default function Navbar() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="ابحث عن قطع الغيار (مثل: فلاتر زيت، فرامل...)"
-              className="pl-10 h-11 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all"
+              className="pl-10 h-11 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all text-right"
+              dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => query.length > 2 && setShowSuggestions(true)}
             />
           </div>
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white">
-              <div className="text-[10px] uppercase font-bold text-secondary px-3 mb-2 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white text-right">
+              <div className="text-[10px] uppercase font-bold text-secondary px-3 mb-2 flex items-center justify-end gap-2">
                 اقتراحات الذكاء الاصطناعي
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
               </div>
               {suggestions.map((s, i) => (
                 <button
                   key={i}
-                  className="w-full text-left px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center gap-2"
+                  className="w-full text-right px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center justify-end gap-2"
                   onClick={() => {
                     setQuery(s);
                     setShowSuggestions(false);
                   }}
                 >
-                  <Search size={14} className="text-secondary" />
                   {s}
+                  <Search size={14} className="text-secondary" />
                 </button>
               ))}
             </div>
@@ -119,7 +125,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0 text-white hover:bg-zinc-800">
