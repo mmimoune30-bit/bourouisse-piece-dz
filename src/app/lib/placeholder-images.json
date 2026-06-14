@@ -3,38 +3,44 @@
   "placeholderImages": [
     {
       "id": "engine-part",
-      "description": "Powerful car engine component",
-      "imageUrl": "https://picsum.photos/seed/engine1/800/600",
+      "description": "Powerful V8 car engine component",
+      "imageUrl": "https://picsum.photos/seed/engine-real/800/600",
       "imageHint": "car engine"
     },
     {
       "id": "brake-pads",
-      "description": "High-performance brake pads set",
-      "imageUrl": "https://picsum.photos/seed/brakes2/800/600",
+      "description": "High-performance ceramic brake set",
+      "imageUrl": "https://picsum.photos/seed/brakes-real/800/600",
       "imageHint": "brake pads"
     },
     {
       "id": "tires-set",
-      "description": "Brand new all-season tires",
-      "imageUrl": "https://picsum.photos/seed/tires3/800/600",
+      "description": "Brand new all-terrain car tires",
+      "imageUrl": "https://picsum.photos/seed/tires-real/800/600",
       "imageHint": "car tires"
+    },
+    {
+      "id": "battery-car",
+      "description": "Heavy duty 12V car battery",
+      "imageUrl": "https://picsum.photos/seed/battery-real/800/600",
+      "imageHint": "car battery"
     },
     {
       "id": "oil-filter",
       "description": "Premium quality oil filter",
-      "imageUrl": "https://picsum.photos/seed/oil4/800/600",
+      "imageUrl": "https://picsum.photos/seed/oil-real/800/600",
       "imageHint": "oil filter"
     },
     {
       "id": "hero-parts",
-      "description": "Collection of premium auto parts and cars",
-      "imageUrl": "https://picsum.photos/seed/hero-auto/1200/800",
+      "description": "Modern auto parts warehouse and yard",
+      "imageUrl": "https://picsum.photos/seed/auto-hero-real/1200/800",
       "imageHint": "auto parts"
     },
     {
       "id": "steering-wheel",
-      "description": "Leather sports steering wheel",
-      "imageUrl": "https://picsum.photos/seed/steering6/800/600",
+      "description": "Leather sports steering wheel accessory",
+      "imageUrl": "https://picsum.photos/seed/steering-real/800/600",
       "imageHint": "steering wheel"
     }
   ]

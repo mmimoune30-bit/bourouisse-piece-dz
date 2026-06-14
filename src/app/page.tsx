@@ -39,11 +39,11 @@ const FEATURED_PRODUCTS = [
   },
   {
     id: "p4",
-    name: "فلتر زيت عالي الكفاءة",
-    price: 2500,
+    name: "بطارية سيارة 12 فولت شديدة التحمل",
+    price: 18500,
     image: PlaceHolderImages[3].imageUrl,
-    category: "الصيانة العامة",
-    seller: "Maintenance Pros",
+    category: "الكهرباء",
+    seller: "Energy Dz",
     condition: "New" as const
   }
 ];
@@ -51,10 +51,10 @@ const FEATURED_PRODUCTS = [
 const TICKER_ADS = [
   { id: "p1", name: "شاحن توربيني GT20", price: "85,000 DZD", qty: 5, image: PlaceHolderImages[0].imageUrl },
   { id: "p2", name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15, image: PlaceHolderImages[1].imageUrl },
-  { id: "p4", name: "زيت محرك 5W30", price: "4,800 DZD", qty: 24, image: PlaceHolderImages[3].imageUrl },
+  { id: "p4", name: "بطارية أصلية 75Ah", price: "19,800 DZD", qty: 10, image: PlaceHolderImages[3].imageUrl },
   { id: "p3", name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8, image: PlaceHolderImages[2].imageUrl },
   { id: "p1", name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3, image: PlaceHolderImages[0].imageUrl },
-  { id: "p4", name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10, image: PlaceHolderImages[3].imageUrl },
+  { id: "p4", name: "فلتر هواء رياضي", price: "6,500 DZD", qty: 10, image: PlaceHolderImages[4].imageUrl },
   { id: "p2", name: "بواجي ليزر إيريديوم", price: "9,000 DZD", qty: 12, image: PlaceHolderImages[1].imageUrl },
 ];
 
@@ -67,7 +67,7 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[4].imageUrl;
+  const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[5].imageUrl;
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
@@ -198,7 +198,7 @@ export default function Home() {
               <div className="relative w-full h-full animate-ken-burns">
                 <Image
                   src={heroImage}
-                  alt="Auto parts yard"
+                  alt="Auto parts warehouse"
                   fill
                   className="object-cover"
                   priority
@@ -254,8 +254,8 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-l from-primary via-primary/80 to-transparent z-10" />
             <div className="absolute inset-0 overflow-hidden">
                 <Image
-                  src={PlaceHolderImages[5].imageUrl}
-                  alt="Steering wheel"
+                  src={PlaceHolderImages[6].imageUrl}
+                  alt="Car accessories"
                   fill
                   className="object-cover scale-110"
                 />
