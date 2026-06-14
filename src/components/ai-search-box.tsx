@@ -44,47 +44,47 @@ export default function AISearchBox() {
   }, []);
 
   return (
-    <div className="w-full bg-zinc-950/50 border-b border-secondary/10 py-6" ref={searchRef}>
+    <div className="w-full bg-zinc-950/40 border-b border-secondary/5 py-4" ref={searchRef}>
       <div className="container mx-auto px-4 flex justify-start">
         <div className="w-full max-w-2xl relative">
-          <div className="absolute -top-6 left-0 flex items-center gap-2">
-            <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] bg-black px-2 py-0.5 rounded border border-secondary/20 flex items-center gap-1">
+          <div className="absolute -top-5 left-0 flex items-center gap-1.5">
+            <span className="text-[9px] font-black text-secondary uppercase tracking-[0.15em] bg-black px-2 py-0.5 rounded border border-secondary/20 flex items-center gap-1">
               <Sparkles size={10} className="animate-pulse" />
               AI Powered Search
             </span>
           </div>
           
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary w-6 h-6 group-focus-within:scale-110 transition-transform" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary w-5 h-5 group-focus-within:scale-110 transition-transform" />
             <Input
               placeholder="ابحث بذكاء عن أي قطعة غيار أو مركبة..."
-              className="pl-14 h-16 bg-black border-2 border-secondary/30 text-white text-xl placeholder:text-zinc-600 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-2xl"
+              className="pl-12 h-14 bg-black border border-secondary/30 text-white text-lg placeholder:text-zinc-600 focus:ring-secondary focus:border-secondary transition-all text-right rounded-xl shadow-xl"
               dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => query.length > 2 && setShowSuggestions(true)}
             />
-            <div className="absolute inset-0 bg-secondary/5 blur-xl rounded-2xl -z-10 group-focus-within:opacity-100 opacity-0 transition-opacity" />
+            <div className="absolute inset-0 bg-secondary/5 blur-lg rounded-xl -z-10 group-focus-within:opacity-100 opacity-0 transition-opacity" />
           </div>
 
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-3 bg-zinc-900 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-secondary/20 p-3 animate-in fade-in slide-in-from-top-4 z-50 text-white text-right">
-              <div className="text-[10px] uppercase font-black text-secondary px-4 mb-3 flex items-center justify-end gap-2 border-b border-white/5 pb-2">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.4)] border border-secondary/20 p-2 animate-in fade-in slide-in-from-top-2 z-50 text-white text-right">
+              <div className="text-[9px] uppercase font-black text-secondary px-3 mb-2 flex items-center justify-end gap-2 border-b border-white/5 pb-1.5">
                 اقتراحات البحث الذكي
-                <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
               </div>
-              <div className="grid grid-cols-1 gap-1">
+              <div className="grid grid-cols-1 gap-0.5">
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
-                    className="w-full text-right px-4 py-3 hover:bg-secondary hover:text-black rounded-xl text-base font-bold transition-all flex items-center justify-end gap-3 group/item"
+                    className="w-full text-right px-3 py-2.5 hover:bg-secondary hover:text-black rounded-lg text-sm font-bold transition-all flex items-center justify-end gap-2.5 group/item"
                     onClick={() => {
                       setQuery(s);
                       setShowSuggestions(false);
                     }}
                   >
                     {s}
-                    <Search size={16} className="text-secondary group-hover/item:text-black" />
+                    <Search size={14} className="text-secondary group-hover/item:text-black" />
                   </button>
                 ))}
               </div>

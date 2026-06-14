@@ -73,12 +73,12 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-[72px]">
         {/* Categories Bar */}
-        <section className="bg-destructive border-b-4 border-secondary sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-xl py-4">
-          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-8 md:gap-16 whitespace-nowrap">
+        <section className="bg-destructive border-b-2 border-secondary sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
+          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
             <div className="flex flex-row-reverse items-center">
-              <span className="text-lg font-black text-white bg-primary/20 border-2 border-secondary px-5 py-2 rounded-xl ml-4 uppercase tracking-tighter shadow-inner">
+              <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
                 اختيار الفئة:
               </span>
             </div>
@@ -86,9 +86,9 @@ export default function Home() {
               <Link
                 key={i}
                 href={`/catalog?category=${cat.name}`}
-                className="flex flex-row-reverse items-center gap-3 group transition-all"
+                className="flex flex-row-reverse items-center gap-2.5 group transition-all"
               >
-                <div className="p-2.5 rounded-xl bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-125 shadow-sm">
+                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
                   {cat.icon}
                 </div>
                 <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors">
@@ -96,19 +96,19 @@ export default function Home() {
                 </span>
               </Link>
             ))}
-            <Link href="/catalog" className="text-sm font-black text-secondary border-r-2 border-secondary/30 pr-8 mr-4 hover:underline hover:scale-105 transition-transform">
+            <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline">
               عرض الكل
             </Link>
           </div>
         </section>
 
-        {/* Dynamic Ticker Bar - Horizontally Scrolling Ads */}
-        <section className="h-16 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/30 shadow-2xl relative z-30 group">
+        {/* Dynamic Ticker Bar */}
+        <section className="h-14 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/20 shadow-xl relative z-30 group">
           <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
             {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (
-              <Link key={i} href={`/products/${ad.id}`} className="flex items-center gap-6 px-12 text-white hover:bg-white/10 transition-colors h-full">
-                <div className="flex items-center gap-4">
-                  <div className="relative w-10 h-10 rounded-lg overflow-hidden border-2 border-secondary/50 shrink-0">
+              <Link key={i} href={`/products/${ad.id}`} className="flex items-center gap-5 px-10 text-white hover:bg-white/10 transition-colors h-full">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-secondary/50 shrink-0 shadow-md">
                     <Image
                       src={ad.image}
                       alt={ad.name}
@@ -117,12 +117,12 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-sm font-black uppercase tracking-tight text-white">{ad.name}</span>
+                    <span className="text-xs font-black uppercase tracking-tight text-white">{ad.name}</span>
                     <div className="flex items-center gap-3 mt-0.5">
                        <span className="text-[10px] font-bold text-white/60">
                         الكمية: <span className="text-white">{ad.qty}</span>
                       </span>
-                      <span className="text-[11px] font-black text-secondary bg-black/40 px-2 py-0.5 rounded border border-secondary/20">
+                      <span className="text-[10px] font-black text-secondary bg-black/40 px-2 py-0.5 rounded border border-secondary/20">
                         {ad.price}
                       </span>
                     </div>
@@ -133,161 +133,144 @@ export default function Home() {
           </div>
         </section>
 
-        {/* NEW AI SEARCH BOX - Positioned under Ads, far left, large size */}
+        {/* AI SEARCH BOX */}
         <AISearchBox />
 
         {/* Hero Section */}
-        <section className="container mx-auto px-4 py-12 lg:py-24 flex flex-col lg:flex-row items-center gap-16 relative">
-          <div className="flex-1 space-y-8 z-20 text-right lg:text-right flex flex-col items-end">
+        <section className="container mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row items-center gap-10 relative">
+          <div className="flex-1 space-y-6 z-20 text-right lg:text-right flex flex-col items-end">
             
-            {/* Dynamic Gold Brand Section - Centered with Icon */}
-            <div className="bg-black border-2 border-secondary/30 p-8 rounded-3xl shadow-2xl relative overflow-hidden group/gold-brand w-full max-w-xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
-               <div className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-transparent to-secondary/10 animate-pulse" />
+            {/* Dynamic Gold Brand Section */}
+            <div className="bg-black border border-secondary/20 p-6 rounded-2xl shadow-xl relative overflow-hidden group/gold-brand w-full max-w-lg animate-in fade-in slide-in-from-bottom duration-500 delay-100">
+               <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5 animate-pulse" />
                <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="bg-secondary/10 p-4 rounded-2xl mb-4 border border-secondary/20 group-hover/gold-brand:rotate-12 transition-transform duration-500">
-                    <Settings className="text-secondary animate-spin-slow" size={40} />
+                  <div className="bg-secondary/10 p-3 rounded-xl mb-3 border border-secondary/10 group-hover/gold-brand:rotate-6 transition-transform duration-500">
+                    <Settings className="text-secondary animate-spin-slow" size={32} />
                   </div>
-                  <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase mb-2 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(212,175,55,0.4)]">
+                  <h2 className="text-2xl md:text-4xl font-black italic tracking-tighter uppercase mb-1 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]">
                     BOUROUISSE PIECE DZ
                   </h2>
-                  <div className="h-1 w-32 bg-gradient-to-r from-transparent via-secondary to-transparent mb-4 rounded-full" />
-                  <p className="text-lg md:text-xl font-black text-secondary tracking-tight leading-tight">
+                  <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-secondary to-transparent mb-3 rounded-full" />
+                  <p className="text-base md:text-lg font-black text-secondary tracking-tight leading-tight">
                     لقطع غيار السيارات و المركبات و الألات الجديدة و المستعملة
                   </p>
                </div>
             </div>
 
-            <h1 className="text-4xl lg:text-6xl font-bold text-primary leading-[1.2] animate-in fade-in slide-in-from-bottom-4 duration-700">
-              وجهتكم الأولى لقطع الغيار <span className="text-secondary italic">في الجزائر</span>.
+            <h1 className="text-3xl lg:text-5xl font-bold text-primary leading-[1.15] animate-in fade-in slide-in-from-bottom-2 duration-500">
+              وجهتكم الأولى لقطع الغيار <span className="text-secondary italic">في الجزائر</span>
             </h1>
             
-            <p className="text-lg text-muted-foreground max-w-lg leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-              Bourouisse PieceDz توفر لكم قطع غيار أصلية ومضمونة من أفضل البائعين المعتمدين. جودة عالية وتوصيل سريع لجميع الولايات.
+            <p className="text-base text-muted-foreground max-w-md leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              نضمن لكم أفضل جودة وأسرع توصيل في الجزائر. تصفح آلاف الإعلانات من بائعين معتمدين.
             </p>
             
-            <div className="flex flex-col sm:flex-row-reverse gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div className="flex flex-col sm:flex-row-reverse gap-3 animate-in fade-in slide-in-from-bottom-6 duration-700">
               <Link href="/catalog">
-                <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 group w-full sm:w-auto">
-                  استكشف الكتالوج <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                <Button size="lg" className="h-12 px-8 text-base font-bold gap-2 group w-full sm:w-auto">
+                  استكشف الكتالوج <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold">
+              <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold">
                 بع قطع غيارك
               </Button>
             </div>
 
-            <div className="flex items-center justify-end gap-8 pt-4 opacity-70">
+            <div className="flex items-center justify-end gap-6 pt-2 opacity-80">
               <div className="flex flex-col items-end">
-                <span className="text-2xl font-bold text-primary">50k+</span>
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">إعلان نشط</span>
+                <span className="text-xl font-bold text-primary">50k+</span>
+                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">إعلان نشط</span>
               </div>
-              <div className="w-px h-10 bg-border" />
+              <div className="w-px h-8 bg-border" />
               <div className="flex flex-col items-end">
-                <span className="text-2xl font-bold text-primary">12k+</span>
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">عميل سعيد</span>
+                <span className="text-xl font-bold text-primary">12k+</span>
+                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">عميل سعيد</span>
               </div>
             </div>
           </div>
           
-          <div className="flex-1 relative w-full aspect-[4/5] lg:aspect-[3/4] max-w-md mx-auto lg:max-w-none">
-            <div className="absolute -top-10 -right-10 w-64 h-64 bg-secondary/20 rounded-full blur-3xl animate-pulse-soft" />
-            <div className="absolute -bottom-20 -left-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse-soft delay-1000" />
+          <div className="flex-1 relative w-full aspect-video lg:aspect-square max-w-md mx-auto lg:max-w-none">
+            <div className="absolute -top-6 -right-6 w-48 h-48 bg-secondary/10 rounded-full blur-3xl animate-pulse-soft" />
+            <div className="absolute -bottom-10 -left-6 w-56 h-56 bg-primary/5 rounded-full blur-3xl animate-pulse-soft delay-1000" />
             
-            <div className="absolute inset-0 bg-secondary/5 rounded-[2.5rem] rotate-3 transition-transform hover:rotate-0 duration-700" />
-            <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] shadow-2xl border-4 border-white z-10">
+            <div className="absolute inset-0 bg-secondary/5 rounded-3xl rotate-2 transition-transform hover:rotate-0 duration-500" />
+            <div className="absolute inset-0 overflow-hidden rounded-3xl shadow-xl border-2 border-white z-10">
               <div className="relative w-full h-full animate-ken-burns">
                 <Image
                   src={heroImage}
-                  alt="Auto parts yard and landscape"
+                  alt="Auto parts yard"
                   fill
                   className="object-cover"
                   priority
-                  data-ai-hint="auto yard road"
                 />
               </div>
             </div>
 
-            <div className="absolute -bottom-8 -right-8 bg-white p-5 rounded-2xl shadow-2xl border border-border z-20 animate-float">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                  <CheckCircle2 size={24} />
+            <div className="absolute -bottom-6 -right-4 bg-white p-3 rounded-xl shadow-xl border border-border z-20 animate-float">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                  <CheckCircle2 size={20} />
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-primary text-sm">جودة مضمونة</p>
-                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">قطع غيار مفحوصة وموثوقة</p>
+                  <p className="font-bold text-primary text-xs">جودة مضمونة</p>
+                  <p className="text-[9px] text-muted-foreground whitespace-nowrap">قطع غيار موثوقة</p>
                 </div>
-              </div>
-            </div>
-
-            <div className="absolute -top-6 -left-6 bg-primary text-white p-4 rounded-2xl shadow-xl z-20 animate-float-delayed hidden md:block">
-              <div className="flex items-center gap-3">
-                <Truck className="text-secondary" size={20} />
-                <span className="text-xs font-bold">توصيل سريع لـ 58 ولاية</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Featured Products */}
-        <section className="container mx-auto px-4 py-24 border-t">
-          <div className="bg-destructive border-r-8 border-secondary p-8 mb-12 rounded-3xl shadow-2xl flex flex-col md:flex-row-reverse justify-between items-center gap-6 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <section className="container mx-auto px-4 py-12 border-t">
+          <div className="bg-destructive border-r-4 border-secondary p-6 mb-8 rounded-2xl shadow-lg flex flex-col md:flex-row-reverse justify-between items-center gap-4 relative overflow-hidden group">
             <div className="text-right z-10">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-2 uppercase tracking-tighter">إعلانات مميزة</h2>
-              <p className="text-white/80 text-lg font-medium">قطع غيار مختارة بعناية من أفضل البائعين الموثوقين في الجزائر.</p>
+              <h2 className="text-2xl md:text-3xl font-black text-white mb-1 uppercase tracking-tighter">إعلانات مميزة</h2>
+              <p className="text-white/80 text-sm font-medium">قطع غيار مختارة بعناية من بائعين موثوقين.</p>
             </div>
-            <div className="flex items-center gap-4 z-10">
+            <div className="flex items-center gap-3 z-10">
               <Link href="/catalog">
-                <Button variant="secondary" size="lg" className="rounded-full px-10 h-14 font-black text-lg shadow-lg hover:scale-105 transition-transform">
+                <Button variant="secondary" size="sm" className="rounded-full px-6 h-10 font-black text-sm shadow-md hover:scale-105 transition-transform">
                   تصفح الكل
                 </Button>
               </Link>
-              <div className="hidden sm:flex gap-2">
-                <Button variant="outline" size="icon" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white hover:text-destructive">
-                  <ArrowRight size={20} />
-                </Button>
-                <Button variant="outline" size="icon" className="rounded-full bg-white/10 border-white/20 text-white hover:bg-white hover:text-destructive">
-                  <ArrowLeft size={20} />
-                </Button>
-              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {FEATURED_PRODUCTS.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
-          <div className="mt-16 flex justify-center">
-            <Button variant="outline" size="lg" className="rounded-full px-12 h-14 font-bold border-2 hover:bg-primary hover:text-white transition-all">
+          <div className="mt-8 flex justify-center">
+            <Button variant="outline" size="lg" className="rounded-full px-10 h-12 font-bold border-2 hover:bg-primary hover:text-white transition-all">
               عرض كل الإعلانات (50,000+)
             </Button>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="container mx-auto px-4 py-24 mb-20">
-          <div className="bg-primary rounded-[3rem] overflow-hidden relative min-h-[450px] flex items-center shadow-2xl">
+        <section className="container mx-auto px-4 py-12 mb-10">
+          <div className="bg-primary rounded-3xl overflow-hidden relative min-h-[350px] flex items-center shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-l from-primary via-primary/80 to-transparent z-10" />
             <div className="absolute inset-0 overflow-hidden">
                 <Image
                   src={PlaceHolderImages[5].imageUrl}
                   alt="Steering wheel"
                   fill
-                  className="object-cover object-center scale-110 animate-ken-burns"
+                  className="object-cover scale-110"
                 />
             </div>
-            <div className="relative z-20 p-8 md:p-20 max-w-2xl text-white text-right ml-auto">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">كن بائعاً معتمداً في Bourouisse PieceDz</h2>
-              <p className="text-lg text-blue-100/70 mb-8 leading-relaxed">
-                صل إلى آلاف المشترين عبر الجزائر. أدر مخزونك، تتبع مبيعاتك، ونمِ عملك في قطاع السيارات باستخدام أدواتنا الاحترافية.
+            <div className="relative z-20 p-8 md:p-12 max-w-xl text-white text-right ml-auto">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">كن بائعاً معتمداً معنا</h2>
+              <p className="text-base text-blue-100/70 mb-6 leading-relaxed">
+                انضم إلى أكبر منصة لقطع الغيار في الجزائر وقم ببيع منتجاتك لآلاف المشترين يومياً.
               </p>
-              <div className="flex flex-col sm:flex-row-reverse gap-4">
-                <Button size="lg" variant="secondary" className="h-14 px-10 text-lg font-bold shadow-lg shadow-secondary/20">
+              <div className="flex flex-col sm:flex-row-reverse gap-3">
+                <Button size="lg" variant="secondary" className="h-12 px-8 text-base font-bold shadow-lg">
                   ابدأ مجاناً
                 </Button>
-                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold border-white/20 text-white hover:bg-white/10">
-                  اقرأ قصص النجاح
+                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold border-white/20 text-white">
+                  تعرف على المميزات
                 </Button>
               </div>
             </div>
