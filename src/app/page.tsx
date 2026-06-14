@@ -64,7 +64,7 @@ export default function Home() {
         {/* Compact Quick Categories Bar at the top */}
         <section className="bg-white/80 backdrop-blur-md border-b sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-sm">
           <div className="container mx-auto px-4 py-3 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
-            <span className="text-[10px] font-black text-primary/40 ml-2 uppercase tracking-tight hidden sm:block">الفئات السريعة:</span>
+            <span className="text-[10px] font-bold text-destructive border border-destructive px-2 py-0.5 rounded ml-2 uppercase tracking-tight hidden sm:block">اختيار الفئة:</span>
             {CATEGORIES.map((cat, i) => (
               <Link
                 key={i}
