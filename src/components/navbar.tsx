@@ -56,13 +56,13 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="#" className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
-              <Facebook size={20} />
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
+              <Facebook size={24} />
             </Link>
-            <Link href="#" className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
               <TikTokIcon />
             </Link>
-            <Link href="#" className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-md">
               <ViberIcon />
             </Link>
           </div>
@@ -74,7 +74,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="bg-secondary p-2.5 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-              <Settings size={32} className="animate-spin-slow" />
+              <Settings size={36} className="animate-spin-slow" />
             </div>
             <div className="flex flex-col">
               <span className="font-headline font-black text-xl md:text-3xl tracking-tighter text-secondary uppercase italic leading-none">
@@ -93,8 +93,8 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-                <div className="bg-zinc-800 p-3 rounded-2xl group-hover:bg-secondary group-hover:text-black transition-all shadow-lg border border-white/5">
-                  <Languages size={32} className="text-secondary group-hover:text-black" />
+                <div className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border border-white/10 group-hover:bg-zinc-100 transition-all">
+                  <Languages size={32} />
                 </div>
                 <span className="text-[12px] font-black text-secondary uppercase tracking-tight">اللغة</span>
               </div>
@@ -149,15 +149,18 @@ export default function Navbar() {
 
           {/* Back Button */}
           {pathname !== "/" && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14 bg-white border-2 border-white text-primary hover:bg-zinc-100 hover:text-primary transition-all shadow-2xl rounded-xl"
-              onClick={() => router.back()}
-              title="رجوع"
-            >
-              <ArrowRight size={28} />
-            </Button>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-14 w-14 bg-white border-2 border-white text-primary hover:bg-zinc-100 hover:text-primary transition-all shadow-2xl rounded-xl"
+                onClick={() => router.back()}
+                title="رجوع"
+              >
+                <ArrowRight size={28} />
+              </Button>
+              <span className="text-[12px] font-black text-secondary uppercase tracking-tight">رجوع</span>
+            </div>
           )}
         </div>
       </div>
