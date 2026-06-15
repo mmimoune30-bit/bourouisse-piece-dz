@@ -48,6 +48,12 @@
       "description": "Aerial view of Bourouisse scrapyard and road",
       "imageUrl": "https://picsum.photos/seed/bourouisse-scrapyard/1200/800",
       "imageHint": "aerial scrapyard"
+    },
+    {
+      "id": "site-qr-code",
+      "description": "QR Code for Bourouisse Piece-Dz site",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://bourouisse-piecedz.com",
+      "imageHint": "qr code"
     }
   ]
 }

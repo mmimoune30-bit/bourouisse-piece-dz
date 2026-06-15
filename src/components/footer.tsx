@@ -1,12 +1,18 @@
+
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings } from "lucide-react";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Footer() {
+  const qrCode = PlaceHolderImages.find(img => img.id === "site-qr-code")?.imageUrl;
+
   return (
     <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-secondary/30">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+          {/* Brand Info & QR Code */}
+          <div className="space-y-6 lg:col-span-1">
             <Link href="/" className="flex flex-col items-start gap-1 group">
               <div className="flex items-center gap-3">
                 <div className="bg-secondary p-2 rounded-xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
@@ -22,10 +28,24 @@ export default function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-blue-100/70 text-sm leading-relaxed text-right">
-              المنصة الرائدة في الجزائر لبيع وشراء قطع غيار السيارات المميزة. نربط بين البائعين الموثوقين وعشاق السيارات والمحترفين في جميع أنحاء الوطن.
-            </p>
-            <div className="flex gap-4 pt-2 justify-end">
+            
+            <div className="flex flex-col items-center md:items-start gap-4">
+              <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Scan to visit / امسح للزيارة</p>
+              <div className="bg-white p-2 rounded-2xl shadow-2xl border-2 border-secondary/20 transform hover:scale-105 transition-transform cursor-pointer">
+                {qrCode && (
+                  <Image 
+                    src={qrCode} 
+                    alt="Bourouisse QR Code" 
+                    width={120} 
+                    height={120} 
+                    className="rounded-lg"
+                    data-ai-hint="qr code"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-2 justify-start md:justify-end">
               <Facebook size={20} className="hover:text-secondary cursor-pointer transition-colors" />
               <Twitter size={20} className="hover:text-secondary cursor-pointer transition-colors" />
               <Instagram size={20} className="hover:text-secondary cursor-pointer transition-colors" />
@@ -53,7 +73,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="text-right">
+          <div className="text-right lg:col-span-2">
             <h4 className="font-headline font-bold mb-6 text-lg border-r-4 border-secondary pr-4">اتصل بنا</h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
               <li className="flex items-center justify-end gap-3">
