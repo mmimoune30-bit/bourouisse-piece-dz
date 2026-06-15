@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -21,7 +20,7 @@ export default function BuyerRegister() {
               <div className="mx-auto w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center text-secondary mb-2">
                 <UserPlus size={24} />
               </div>
-              <CardTitle className="text-2xl font-black text-primary">حساب مشترٍ جديد</CardTitle>
+              <CardTitle className="text-2xl font-black text-primary">سجل معنا كمشتري</CardTitle>
               <CardDescription>انضم إلينا لتتمكن من الشراء وحفظ الإعلانات</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 text-right" dir="rtl">
