@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -72,9 +71,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[112px]">
-        {/* Categories Bar */}
-        <section className="bg-destructive border-b-2 border-secondary sticky top-[112px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
+      <main className="flex-grow pt-[146px]">
+        {/* Categories Bar - Sticky to show after the Navbar */}
+        <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
           <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
             <div className="flex flex-row-reverse items-center">
               <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
