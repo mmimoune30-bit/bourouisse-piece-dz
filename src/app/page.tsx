@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -71,9 +72,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[72px]">
+      <main className="flex-grow pt-[112px]">
         {/* Categories Bar */}
-        <section className="bg-destructive border-b-2 border-secondary sticky top-[72px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
+        <section className="bg-destructive border-b-2 border-secondary sticky top-[112px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
           <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
             <div className="flex flex-row-reverse items-center">
               <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
@@ -100,7 +101,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Dynamic Ticker Bar - Updated Size and Color */}
+        {/* Dynamic Ticker Bar */}
         <section className="h-24 flex items-center bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 animate-gradient-dynamic overflow-hidden border-b border-sky-300/30 shadow-xl relative z-30 group">
           <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
             {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (

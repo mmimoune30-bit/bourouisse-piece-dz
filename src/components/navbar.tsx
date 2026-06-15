@@ -3,10 +3,8 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages, ArrowRight } from "lucide-react";
+import { User, Settings, LayoutDashboard, ChevronDown, Languages, ArrowRight, Phone, Mail, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,41 +19,7 @@ import { useRouter, usePathname } from "next/navigation";
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentLang, setCurrentLang] = useState("AR");
-  const searchRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (query.length > 2) {
-        try {
-          const res = await generateSearchSuggestions({ query });
-          setSuggestions(res.suggestions);
-          setShowSuggestions(true);
-        } catch (error) {
-          console.error("Failed to fetch AI suggestions", error);
-        }
-      } else {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    };
-
-    const timer = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const languages = [
     { code: "AR", name: "العربية", flag: "🇩🇿" },
@@ -63,82 +27,81 @@ export default function Navbar() {
     { code: "EN", name: "English", flag: "🇺🇸" },
   ];
 
+  // Custom SVGs for TikTok and Viber since they are not in Lucide
+  const TikTokIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.25-.23 2.48-.91 3.51-.89 1.4-2.39 2.34-4.04 2.39-1.52.05-3.08-.43-4.24-1.41-1.39-1.14-2.15-2.92-2-4.69.11-1.92 1.3-3.75 3.09-4.52.48-.21 1-.34 1.52-.39v4.03c-.48.08-1 .31-1.35.66-.41.4-.64.97-.62 1.54.02.66.42 1.3 1.02 1.57.51.24 1.1.28 1.62.1.66-.23 1.13-.88 1.13-1.58V.02z" />
+    </svg>
+  );
+
+  const ViberIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.34 1.32C17.14.34 14.54 0 12 0 6.64 0 2.27 4.37 2.27 9.73c0 2.61 1.02 5.09 2.87 6.94l-1.07 3.9c-.11.41.24.78.65.67l3.9-1.07c1.85 1.85 4.33 2.87 6.94 2.87 5.36 0 9.73-4.37 9.73-9.73 0-2.54-.34-5.14-1.32-7.34l-.6.35c.82 1.83 1.1 4 1.1 6.12 0 4.93-4.01 8.93-8.93 8.93-2.33 0-4.6-.9-6.32-2.52l-.46-.46-3.23.88.88-3.23-.46-.46c-1.62-1.72-2.52-3.99-2.52-6.32 0-4.93 4.01-8.93 8.93-8.93 2.12 0 4.29.28 6.12 1.1l.35-.6zM15.54 13.52c-.34.34-.84.45-1.28.29-.44-.16-.83-.49-1.12-.89-.29-.4-.52-.86-.67-1.36-.15-.5-.22-1.01-.22-1.52 0-.34.03-.68.08-1.01l1.54.34c-.04.22-.06.45-.06.67 0 .34.05.68.15 1.01.1.33.25.64.44.91.19.27.42.5.68.68.26.18.55.32.86.41.31.09.64.13.97.13.15 0 .29-.01.44-.04l.34 1.54c-.22.03-.45.05-.67.06-.51 0-1.02-.07-1.52-.22-.5-.15-.96-.38-1.36-.67-.4-.29-.73-.68-.89-1.12-.16-.44-.05-.94.29-1.28l-.34-1.54-.34 1.54z" />
+    </svg>
+  );
+
   return (
-    <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        "bg-black shadow-xl py-2 border-b border-secondary/20"
-      )}
-    >
-      <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl border-b-2 border-secondary/30">
+      {/* Top Bar: Contact & Social Info */}
+      <div className="bg-zinc-900/80 border-b border-white/5 py-1.5">
+        <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4">
+          <div className="flex flex-row-reverse items-center gap-6 text-white/80">
+            <span className="text-[10px] font-black text-secondary uppercase tracking-widest ml-2">للاستفسار:</span>
+            <div className="flex flex-row-reverse items-center gap-2 text-[11px] font-bold">
+              <Phone size={14} className="text-secondary" />
+              <span dir="ltr">+213 778 42 89 77</span>
+            </div>
+            <div className="flex flex-row-reverse items-center gap-2 text-[11px] font-bold hidden sm:flex">
+              <Mail size={14} className="text-secondary" />
+              <span>support@bourouisse-piece-dz.com</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 text-white/60">
+            <Link href="#" className="hover:text-secondary transition-colors"><Facebook size={16} /></Link>
+            <Link href="#" className="hover:text-secondary transition-colors"><TikTokIcon /></Link>
+            <Link href="#" className="hover:text-secondary transition-colors"><ViberIcon /></Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
         {/* Left Side: Logo */}
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-              <Settings size={24} className="animate-spin-slow" />
+            <div className="bg-secondary p-2.5 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+              <Settings size={28} className="animate-spin-slow" />
             </div>
             <div className="flex flex-col">
-              <span className="font-headline font-black text-xl md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
+              <span className="font-headline font-black text-xl md:text-3xl tracking-tighter text-secondary uppercase italic leading-none">
                 Bourouisse <span className="text-white">Piece-Dz</span>
               </span>
-              <span className="text-[9px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+              <span className="text-[10px] font-bold text-white/50 tracking-[0.25em] uppercase mt-1.5">
                 Pièces & Automobiles
               </span>
             </div>
           </Link>
         </div>
 
-        {/* AI Search Bar (Centered) */}
-        <div className="hidden md:flex flex-1 max-w-xl relative mx-8" ref={searchRef}>
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="ابحث عن قطع الغيار (مثل: فلاتر زيت، فرامل...)"
-              className="pl-10 h-10 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all text-right text-xs"
-              dir="rtl"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => query.length > 2 && setShowSuggestions(true)}
-            />
-          </div>
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-2 animate-in fade-in slide-in-from-top-2 text-white text-right z-50">
-              <div className="text-[10px] uppercase font-bold text-secondary px-3 mb-2 flex items-center justify-end gap-2">
-                اقتراحات الذكاء الاصطناعي
-                <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-              </div>
-              {suggestions.map((s, i) => (
-                <Link
-                  key={i}
-                  href={`/catalog?query=${encodeURIComponent(s)}`}
-                  className="w-full text-right px-3 py-2 hover:bg-zinc-800 rounded-lg text-sm transition-colors flex items-center justify-end gap-2 block"
-                  onClick={() => setShowSuggestions(false)}
-                >
-                  {s}
-                  <Search size={14} className="text-secondary" />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Portals Section & Back Button */}
-        <div className="flex items-center gap-3">
+        {/* Portals Section & Language */}
+        <div className="flex items-center gap-4">
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-9 w-9 p-0 text-white hover:bg-zinc-800 transition-colors">
-                <Languages size={20} className="text-secondary" />
-              </Button>
+              <div className="flex flex-col items-center gap-1 cursor-pointer group">
+                <div className="bg-zinc-800 p-2 rounded-xl group-hover:bg-secondary group-hover:text-black transition-all">
+                  <Languages size={22} className="text-secondary group-hover:text-black" />
+                </div>
+                <span className="text-[10px] font-black text-secondary/80 group-hover:text-secondary uppercase">اللغة</span>
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white">
-              <DropdownMenuLabel>اختر اللغة</DropdownMenuLabel>
+              <DropdownMenuLabel>اختر اللغة / Choisir la langue</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
               {languages.map((lang) => (
                 <DropdownMenuItem 
                   key={lang.code} 
                   onClick={() => setCurrentLang(lang.code)}
-                  className={cn("hover:bg-zinc-800", currentLang === lang.code && "bg-zinc-800 font-bold text-secondary")}
+                  className={cn("hover:bg-zinc-800 cursor-pointer", currentLang === lang.code && "bg-zinc-800 font-bold text-secondary")}
                 >
                   <span className="mr-2">{lang.flag}</span>
                   {lang.name}
@@ -148,47 +111,47 @@ export default function Navbar() {
           </DropdownMenu>
 
           {/* Buyer Portal */}
-          <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9 transition-all" asChild>
+          <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
             <Link href="/buyer/register">
-              <User size={16} />
-              <span className="hidden sm:inline">بوابة المشتري</span>
+              <User size={20} />
+              <span className="hidden md:inline">بوابة المشتري</span>
             </Link>
           </Button>
           
           {/* Seller Portal (Dropdown) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9 transition-all">
-                <LayoutDashboard size={16} />
-                <span className="hidden sm:inline">بوابة البائع</span>
-                <ChevronDown size={12} className="opacity-50" />
+              <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl border-l-2 border-secondary/20">
+                <LayoutDashboard size={20} />
+                <span className="hidden md:inline">بوابة البائع</span>
+                <ChevronDown size={14} className="opacity-50" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800 text-white">
-              <DropdownMenuLabel>أعمالي</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-64 bg-zinc-900 border-zinc-800 text-white p-2">
+              <DropdownMenuLabel className="text-secondary">إدارة الأعمال</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
-                <Link href="/seller/dashboard" className="w-full">لوحة التحكم</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
+                <Link href="/seller/dashboard" className="w-full font-bold">لوحة التحكم الإحصائية</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
-                <Link href="/seller/listings/new" className="w-full">إضافة إعلان جديد</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
+                <Link href="/seller/listings/new" className="w-full font-bold">إضافة إعلان جديد</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
-                <Link href="/seller/register" className="w-full">فتح متجر جديد</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
+                <Link href="/seller/register" className="w-full font-bold text-secondary">فتح متجر احترافي</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Back Button (Now on the Right) */}
+          {/* Back Button */}
           {pathname !== "/" && (
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9 bg-white border-2 border-white text-primary hover:bg-white/90 hover:text-primary transition-all shadow-lg"
+              className="h-12 w-12 bg-white border-2 border-white text-primary hover:bg-zinc-100 hover:text-primary transition-all shadow-xl rounded-xl"
               onClick={() => router.back()}
               title="رجوع"
             >
-              <ArrowRight size={20} />
+              <ArrowRight size={24} />
             </Button>
           )}
         </div>
