@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use } from "react";
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Phone, Mail, MapPin, ShieldCheck, Truck, Clock, MessageSquare, Share2, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, Truck, Clock, MessageSquare, Share2, Heart, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
