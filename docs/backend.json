@@ -6,26 +6,45 @@
       "description": "بيانات تفصيلية لقطعة غيار أو مركبة معروضة للبيع",
       "type": "object",
       "properties": {
+        "listingType": { 
+          "type": "string", 
+          "enum": ["part", "vhs", "accidented", "for_parts"],
+          "description": "نوع الإعلان: قطعة منفردة، مركبة خارج الخدمة، مركبة مصدومة، مركبة للقطع"
+        },
         "category": { "type": "string", "description": "الفئة الرئيسية (مثال: محرك، مركبات خارج الخدمة)" },
         "partType": { "type": "string", "description": "نوع القطعة أو نوع المركبة" },
         "manualPartName": { "type": "string", "description": "اسم القطعة المدخل يدوياً" },
         "brand": { "type": "string", "description": "العلامة التجارية للمركبة" },
         "model": { "type": "string", "description": "موديل المركبة" },
         "year": { "type": "string", "description": "سنة الصنع" },
-        "motorisation": { "type": "string", "description": "نوع المحرك/الوقود" },
-        "generation": { "type": "string", "description": "جيل المركبة" },
+        "motorisation": { "type": "string", "description": "نوع المحرك" },
+        "fuelType": { "type": "string", "enum": ["Essence", "Diesel", "GPL", "Hybride", "Électrique"] },
+        "gearbox": { "type": "string", "enum": ["Manuelle", "Automatique"] },
+        "mileage": { "type": "number", "description": "المسافة المقطوعة بالكيلومتر" },
+        "vehicleStatus": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "حالة المركبة (مصدومة، عطل محرك، إلخ)" 
+        },
+        "paperStatus": { "type": "string", "enum": ["Sans papiers", "Avec papiers"] },
+        "availableParts": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "القطع المتاحة في المركبة" 
+        },
         "condition": { "type": "string", "enum": ["new", "used", "damaged"], "description": "حالة القطعة أو المركبة" },
-        "damagePercentage": { "type": "number", "description": "نسبة التحطم للمركبات خارج الخدمة (0-100)" },
-        "vehicleConditionDetail": { "type": "string", "description": "وصف دقيق لحالة المركبة أو القطعة" },
+        "damagePercentage": { "type": "number", "description": "نسبة التحطم (0-100)" },
         "price": { "type": "number", "description": "السعر بالدينار الجزائري" },
+        "priceNegotiable": { "type": "boolean", "description": "السعر قابل للتفاوض" },
         "wilaya": { "type": "string", "description": "ولاية البائع" },
         "commune": { "type": "string", "description": "بلدية البائع" },
         "description": { "type": "string", "description": "وصف إضافي" },
         "images": { "type": "array", "items": { "type": "string" }, "description": "روابط صور القطعة" },
+        "phone": { "type": "string", "description": "رقم الهاتف للتواصل" },
         "sellerId": { "type": "string", "description": "معرف البائع صاحب الإعلان" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["category", "partType", "brand", "model", "price", "wilaya"]
+      "required": ["listingType", "brand", "model", "price", "wilaya"]
     },
     "Seller": {
       "title": "بائع",

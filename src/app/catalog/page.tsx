@@ -11,111 +11,114 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle } from "lucide-react";
+import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle, Car, Settings, Fuel } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", seller: "EliteMotors DZ", condition: "New" as const },
-  { id: "p2", name: "طقم فرامل سيراميك كربون", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Carrosserie (الهيكل)", seller: "SpeedHub Algiers", condition: "New" as const },
-  { id: "p3", name: "إطارات الطرق الوعرة (طقم 4)", price: 85000, image: PlaceHolderImages[2].imageUrl, category: "Pneumatiques (الإطارات)", seller: "DesertRoad Parts", condition: "New" as const },
-  { id: "p4", name: "بطارية سيارة 12 فولت شديدة التحمل", price: 18500, image: PlaceHolderImages[3].imageUrl, category: "Électricité (الكهرباء)", seller: "Energy Dz", condition: "New" as const },
-  { id: "v1", name: "سيارة Renault Clio مصدومة", price: 850000, image: PlaceHolderImages[5].imageUrl, category: "Véhicules hors service (مركبات خارج الخدمة)", seller: "Salvage Parts", condition: "Damaged" as const, damagePercentage: 45 },
+  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", seller: "EliteMotors DZ", condition: "New" as const, listingType: "part" },
+  { id: "p2", name: "طقم فرامل سيراميك", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Carrosserie (الهيكل)", seller: "SpeedHub Algiers", condition: "New" as const, listingType: "part" },
+  { id: "v1", name: "سيارة Renault Clio مصدومة", price: 850000, image: PlaceHolderImages[5].imageUrl, category: "مركبات خارج الخدمة", seller: "Salvage Parts", condition: "Damaged" as const, listingType: "accidented", brand: "Renault", fuelType: "Diesel", damagePercentage: 45 },
+  { id: "v2", name: "VW Golf 7 للقطع", price: 1200000, image: PlaceHolderImages[4].imageUrl, category: "مركبات خارج الخدمة", seller: "GermanParts Dz", condition: "Damaged" as const, listingType: "for_parts", brand: "Volkswagen", fuelType: "Essence" },
 ];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
+  const [activeTab, setActiveTab] = useState<string>("all");
   const [damageFilter, setDamageFilter] = useState<number>(100);
 
   const filteredProducts = useMemo(() => {
     let result = ALL_PRODUCTS;
+    if (activeTab !== "all") {
+      result = result.filter(p => p.listingType === activeTab);
+    }
     if (categoryFilter && categoryFilter !== "all") {
       result = result.filter(p => p.category === categoryFilter);
     }
-    if (categoryFilter === "Véhicules hors service (مركبات خارج الخدمة)") {
-      result = result.filter(p => (p.damagePercentage || 0) <= damageFilter);
-    }
     return result;
-  }, [categoryFilter, damageFilter]);
+  }, [categoryFilter, activeTab]);
 
-  const categories = [
-    "Moteur (المحرك)",
-    "Électricité (الكهرباء)",
-    "Suspension et Direction (التوازي والتوازن)",
-    "Pneumatiques (الإطارات)",
-    "Carrosserie (الهيكل)",
-    "Accessoires (الأكسسوارات)",
-    "Véhicules hors service (مركبات خارج الخدمة)"
-  ];
+  const brands = ["Renault", "Peugeot", "Volkswagen", "Hyundai", "Dacia"];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-grow pt-32 pb-12">
         <div className="container mx-auto px-4">
+          
+          <div className="flex flex-col md:flex-row-reverse justify-between items-center gap-6 mb-8">
+            <h1 className="text-3xl font-black text-primary">الكتالوج الشامل</h1>
+            <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl" className="w-full md:w-auto">
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 h-auto p-1 bg-white border">
+                <TabsTrigger value="all" className="py-2 text-xs font-bold">الكل</TabsTrigger>
+                <TabsTrigger value="part" className="py-2 text-xs font-bold">قطع منفردة</TabsTrigger>
+                <TabsTrigger value="accidented" className="py-2 text-xs font-bold">مصدومة</TabsTrigger>
+                <TabsTrigger value="for_parts" className="py-2 text-xs font-bold">للقطع</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
           <div className="flex flex-col md:flex-row-reverse gap-8">
             {/* Sidebar Filters */}
-            <aside className="w-full md:w-64 space-y-6">
-              <Card className="border-none shadow-sm">
+            <aside className="w-full md:w-72 space-y-6">
+              <Card className="border-none shadow-sm sticky top-32">
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
                     <h3 className="font-bold text-lg">تصفية النتائج</h3>
                     <Filter size={18} className="text-secondary" />
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="text-sm font-black">الفئات</Label>
-                    <div className="space-y-2">
-                      {categories.map((cat, i) => (
-                        <div key={i} className="flex items-center justify-end gap-2">
-                          <Label htmlFor={`cat-${i}`} className="text-sm cursor-pointer">{cat}</Label>
-                          <Checkbox id={`cat-${i}`} checked={categoryFilter === cat} />
+                  {/* Vehicle Specific Filters */}
+                  {(activeTab !== "part") && (
+                    <div className="space-y-6 animate-in fade-in duration-300">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-black flex items-center justify-end gap-2">
+                          <Car size={16} /> الماركة
+                        </Label>
+                        <div className="grid grid-cols-1 gap-2">
+                          {brands.map(b => (
+                            <div key={b} className="flex items-center justify-end gap-2">
+                              <Label className="text-xs cursor-pointer">{b}</Label>
+                              <Checkbox />
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
 
-                  {categoryFilter === "Véhicules hors service (مركبات خارج الخدمة)" && (
-                    <div className="space-y-4 pt-4 border-t">
-                      <div className="flex items-center justify-end gap-2 text-destructive mb-2">
-                        <AlertTriangle size={16} />
-                        <Label className="text-sm font-black">نسبة التحطم القصوى</Label>
+                      <div className="space-y-3 pt-4 border-t">
+                        <Label className="text-sm font-black flex items-center justify-end gap-2">
+                          <Fuel size={16} /> الوقود
+                        </Label>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {["Essence", "Diesel", "GPL"].map(f => (
+                            <Badge key={f} variant="outline" className="cursor-pointer hover:bg-secondary transition-colors">{f}</Badge>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center text-xs font-bold text-primary mb-1">
-                        <span>{damageFilter}%</span>
-                        <span>0%</span>
+
+                      <div className="space-y-4 pt-4 border-t">
+                        <Label className="text-sm font-black flex items-center justify-end gap-2 text-destructive">
+                          <AlertTriangle size={16} /> نسبة التحطم
+                        </Label>
+                        <Slider value={[damageFilter]} max={100} onValueChange={(v) => setDamageFilter(v[0])} />
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span>{damageFilter}%</span>
+                          <span>0%</span>
+                        </div>
                       </div>
-                      <Slider 
-                        value={[damageFilter]} 
-                        max={100} 
-                        step={5} 
-                        onValueChange={(vals) => setDamageFilter(vals[0])}
-                      />
                     </div>
                   )}
 
-                  <div className="space-y-4 pt-4 border-t">
-                    <Label className="text-sm font-black">الحالة</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-end gap-2">
-                        <Label htmlFor="cond-new" className="text-sm cursor-pointer">جديد</Label>
-                        <Checkbox id="cond-new" />
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <Label htmlFor="cond-used" className="text-sm cursor-pointer">مستعمل</Label>
-                        <Checkbox id="cond-used" />
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <Label htmlFor="cond-damaged" className="text-sm cursor-pointer">مصدومة</Label>
-                        <Checkbox id="cond-damaged" />
-                      </div>
-                    </div>
+                  <div className="space-y-3 pt-4 border-t">
+                    <Label className="text-sm font-black">الولاية</Label>
+                    <Select>
+                      <SelectTrigger><SelectValue placeholder="كل الولايات" /></SelectTrigger>
+                    </Select>
                   </div>
 
-                  <div className="pt-4 border-t">
-                    <Button className="w-full font-bold">تطبيق الفلاتر</Button>
-                  </div>
+                  <Button className="w-full font-bold h-12">تطبيق الفلاتر</Button>
                 </CardContent>
               </Card>
             </aside>
@@ -126,14 +129,9 @@ function CatalogContent() {
                 <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
                   <span className="text-primary">{filteredProducts.length}</span> إعلان متاح
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative w-48 hidden sm:block">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                    <Input placeholder="ابحث في النتائج..." className="pr-10 h-10 text-right" dir="rtl" />
-                  </div>
-                  <Button variant="outline" size="sm" className="gap-2 font-bold">
-                    <ArrowUpDown size={14} /> ترتيب
-                  </Button>
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                  <Input placeholder="بحث دقيق..." className="pr-10 h-11 text-right" dir="rtl" />
                 </div>
               </div>
 
@@ -144,10 +142,10 @@ function CatalogContent() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed">
-                  <Search size={48} className="text-muted-foreground mb-4 opacity-20" />
-                  <h3 className="text-xl font-bold text-primary">لا توجد نتائج مطابقة</h3>
-                  <p className="text-muted-foreground">حاول تغيير الفلاتر أو البحث عن كلمة أخرى.</p>
+                <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-2 border-dashed">
+                  <Search size={48} className="text-muted-foreground mb-4 opacity-10" />
+                  <h3 className="text-xl font-bold text-primary">لم نجد أي نتائج</h3>
+                  <p className="text-muted-foreground text-sm">حاول تغيير الفلاتر أو نوع الإعلان.</p>
                 </div>
               )}
             </div>
@@ -161,8 +159,16 @@ function CatalogContent() {
 
 export default function CatalogPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black">جاري التحميل...</div>}>
       <CatalogContent />
     </Suspense>
+  );
+}
+
+function Badge({ children, variant, className }: { children: React.ReactNode, variant?: any, className?: string }) {
+  return (
+    <div className={`px-3 py-1 rounded-full border text-[10px] font-bold ${className}`}>
+      {children}
+    </div>
   );
 }
