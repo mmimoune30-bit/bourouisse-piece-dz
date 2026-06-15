@@ -5,10 +5,11 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImagePlus, CheckCircle2, AlertCircle, Trash2 } from "lucide-react";
+import { ImagePlus, AlertCircle, Sparkles } from "lucide-react";
 import { useState, useMemo } from "react";
 
 const CATEGORY_DATA = {
@@ -20,7 +21,7 @@ const CATEGORY_DATA = {
   "Électricité (الكهرباء)": [
     "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
     "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
-    "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
+    "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignطant", "Klaxon"
   ],
   "Suspension et Direction (التوازي والتوازن)": [
     "Amortisseur", "Ressort", "Triangle de suspension", "Rotule", "Biellette de direction", 
@@ -30,7 +31,7 @@ const CATEGORY_DATA = {
     "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveur", "Valve", "Capteur pression pneu", "Roue complète"
   ],
   "Carrosserie (الهيكل)": [
-    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
+    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Portه arrière", 
     "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
   ],
   "Accessoires (الأكسسوارات)": [
@@ -46,7 +47,6 @@ const WILAYAS = ["01 - Adrar", "02 - Chlef", "06 - Béjaïa", "09 - Blida", "13 
 export default function NewListing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedPart, setSelectedPart] = useState<string>("");
-  const [images, setImages] = useState<string[]>([]);
 
   const partsList = useMemo(() => {
     return selectedCategory ? CATEGORY_DATA[selectedCategory as keyof typeof CATEGORY_DATA] : [];
@@ -54,7 +54,7 @@ export default function NewListing() {
 
   const handleCategoryChange = (val: string) => {
     setSelectedCategory(val);
-    setSelectedPart(""); // Reset part when category changes
+    setSelectedPart("");
   };
 
   return (
@@ -91,14 +91,14 @@ export default function NewListing() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="font-bold">نوع القطعة</Label>
+                      <Label className="font-bold">نوع القطعة (من القائمة)</Label>
                       <Select 
                         disabled={!selectedCategory} 
                         value={selectedPart} 
                         onValueChange={setSelectedPart}
                       >
                         <SelectTrigger className="h-12 border-2 focus:ring-secondary">
-                          <SelectValue placeholder={selectedCategory ? "اختر القطعة من القائمة" : "اختر الفئة أولاً"} />
+                          <SelectValue placeholder={selectedCategory ? "اختر القطعة" : "اختر الفئة أولاً"} />
                         </SelectTrigger>
                         <SelectContent>
                           {partsList.map((part) => (
@@ -107,6 +107,21 @@ export default function NewListing() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+
+                  {/* Manual Entry Field */}
+                  <div className="pt-4 border-t space-y-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles size={16} className="text-secondary" />
+                      <Label className="font-bold">اسم القطعة يدوياً (في حال عدم وجودها في القائمة)</Label>
+                    </div>
+                    <Input 
+                      placeholder="أدخل اسم القطعة بدقة هنا..." 
+                      className="h-12 border-2 focus:ring-secondary"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      * استخدم هذا الحقل فقط إذا لم تجد اسم القطعة المناسب في القائمة المنسدلة أعلاه.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -131,17 +146,7 @@ export default function NewListing() {
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">الموديل (Modèle)</Label>
-                      <Select>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="اختر الموديل" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="clio">Clio</SelectItem>
-                          <SelectItem value="208">208</SelectItem>
-                          <SelectItem value="golf">Golf</SelectItem>
-                          <SelectItem value="accent">Accent</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input placeholder="مثال: Clio 4, Golf 7..." className="h-12" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">السنة (Année)</Label>
@@ -172,10 +177,10 @@ export default function NewListing() {
                     <div className="space-y-2">
                       <Label className="font-bold">السعر (دج)</Label>
                       <div className="relative">
-                        <input 
+                        <Input 
                           type="number" 
                           placeholder="0.00" 
-                          className="w-full h-12 pr-4 pl-12 rounded-md border border-input bg-background focus:ring-2 focus:ring-secondary outline-none" 
+                          className="w-full h-12 pr-4 pl-12" 
                         />
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">DZD</span>
                       </div>
@@ -204,15 +209,7 @@ export default function NewListing() {
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">البلدية (Commune)</Label>
-                      <Select>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="اختر البلدية" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="commune1">وسط المدينة</SelectItem>
-                          <SelectItem value="commune2">البلدية المجاورة</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input placeholder="أدخل اسم البلدية" className="h-12" />
                     </div>
                   </div>
                 </CardContent>
@@ -227,7 +224,7 @@ export default function NewListing() {
                   <div className="space-y-2">
                     <Label className="font-bold">وصف تفصيلي (اختياري)</Label>
                     <Textarea 
-                      placeholder="هنا فقط يمكنك كتابة تفاصيل إضافية مثل: الضمان، سبب البيع، أو توافق القطعة مع موديلات أخرى..." 
+                      placeholder="أضف تفاصيل أخرى مثل: الضمان، سبب البيع، التوافق..." 
                       className="min-h-[120px] focus:ring-secondary" 
                     />
                   </div>
@@ -278,7 +275,7 @@ export default function NewListing() {
                 <div className="text-right">
                   <h4 className="font-black text-sm text-primary">نظام الإعلانات الموحد</h4>
                   <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-                    استخدام القوائم المنسدلة يساعد المشترين في العثور على قطعتك بسرعة ودقة عبر فلاتر البحث المتقدمة.
+                    استخدام القوائم المنسدلة يساعد المشترين في العثور على قطعتك بسرعة ودقة، بينما يسمح الحقل اليدوي بإضافة قطع نادرة أو جديدة.
                   </p>
                 </div>
               </div>
