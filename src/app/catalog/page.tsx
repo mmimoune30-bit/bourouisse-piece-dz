@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -12,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle, Car, Settings, Fuel } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
@@ -115,6 +115,12 @@ function CatalogContent() {
                     <Label className="text-sm font-black">الولاية</Label>
                     <Select>
                       <SelectTrigger><SelectValue placeholder="كل الولايات" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الولايات</SelectItem>
+                        <SelectItem value="16">16 - الجزائر</SelectItem>
+                        <SelectItem value="31">31 - وهران</SelectItem>
+                        <SelectItem value="19">19 - سطيف</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
 
