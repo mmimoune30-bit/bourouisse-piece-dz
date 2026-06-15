@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -45,9 +44,9 @@ export default function AISearchBox() {
   }, []);
 
   const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={32} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
-    { name: "محركات كاملة", icon: <Settings size={32} />, href: "/catalog?category=Moteur (المحرك)" },
-    { name: "نصف محرك", icon: <Layers size={32} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "مركبات خارج الخدمة", icon: <Car size={36} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
+    { name: "محركات كاملة", icon: <Settings size={36} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "نصف محرك", icon: <Layers size={36} />, href: "/catalog?category=Moteur (المحرك)" },
   ];
 
   return (
@@ -62,10 +61,10 @@ export default function AISearchBox() {
               href={cat.href}
               className="flex flex-col items-center gap-3 group shrink-0"
             >
-              <div className="w-20 h-20 rounded-2xl bg-black border-2 border-secondary/30 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-black transition-all shadow-2xl">
+              <div className="w-24 h-24 rounded-2xl bg-black border-2 border-secondary/30 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-black transition-all shadow-2xl">
                 {cat.icon}
               </div>
-              <span className="text-sm md:text-base font-black text-secondary group-hover:text-white transition-colors text-center whitespace-nowrap uppercase tracking-tighter">
+              <span className="text-base md:text-lg font-black text-secondary group-hover:text-white transition-colors text-center whitespace-nowrap uppercase tracking-tighter">
                 {cat.name}
               </span>
             </Link>
@@ -73,7 +72,7 @@ export default function AISearchBox() {
         </div>
 
         {/* Left Side: AI Search Box */}
-        <div className="w-full max-w-2xl relative">
+        <div className="w-full max-w-xl relative">
           <div className="absolute -top-6 left-0 flex items-center gap-2">
             <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] bg-black px-3 py-1 rounded border border-secondary/20 flex items-center gap-1.5">
               <Sparkles size={12} className="animate-pulse" />
@@ -82,10 +81,10 @@ export default function AISearchBox() {
           </div>
           
           <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary w-6 h-6 group-focus-within:scale-110 transition-transform" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary w-5 h-5 group-focus-within:scale-110 transition-transform" />
             <Input
               placeholder="ابحث بذكاء عن أي قطعة غيار أو مركبة..."
-              className="pl-14 h-16 bg-black border-2 border-secondary/30 text-white text-xl placeholder:text-zinc-600 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-2xl"
+              className="pl-14 h-14 bg-black border-2 border-secondary/30 text-white text-lg placeholder:text-zinc-600 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-2xl"
               dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
