@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -15,10 +16,16 @@ import {
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 
+const translations = {
+  AR: { buyer: "بوابة المشتري", seller: "بوابة البائع", stats: "لوحة التحكم الإحصائية", new: "إضافة إعلان جديد", store: "فتح متجر احترافي", back: "رجوع", contact: "للاستفسار:" },
+  FR: { buyer: "Portail Acheteur", seller: "Portail Vendeur", stats: "Tableau de bord", new: "Nouvelle annonce", store: "Ouvrir une boutique", back: "Retour", contact: "Contact:" },
+  EN: { buyer: "Buyer Portal", seller: "Seller Portal", stats: "Dashboard", new: "New Listing", store: "Open Pro Shop", back: "Back", contact: "Contact:" }
+};
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [currentLang, setCurrentLang] = useState("AR");
+  const [currentLang, setCurrentLang] = useState<keyof typeof translations>("AR");
 
   const languages = [
     { code: "AR", name: "العربية", flag: "🇩🇿" },
@@ -26,7 +33,8 @@ export default function Navbar() {
     { code: "EN", name: "English", flag: "🇺🇸" },
   ];
 
-  // Custom SVGs for TikTok and Viber
+  const t = translations[currentLang];
+
   const TikTokIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.25-.23 2.48-.91 3.51-.89 1.4-2.39 2.34-4.04 2.39-1.52.05-3.08-.43-4.24-1.41-1.39-1.14-2.15-2.92-2-4.69.11-1.92 1.3-3.75 3.09-4.52.48-.21 1-.34 1.52-.39v4.03c-.48.08-1 .31-1.35.66-.41.4-.64.97-.62 1.54.02.66.42 1.3 1.02 1.57.51.24 1.1.28 1.62.1.66-.23 1.13-.88 1.13-1.58V.02z" />
@@ -45,7 +53,7 @@ export default function Navbar() {
       <div className="bg-zinc-900/80 border-b border-white/5 py-2">
         <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4">
           <div className="flex flex-row-reverse items-center gap-6 text-white/80">
-            <span className="text-[11px] font-black text-secondary uppercase tracking-widest ml-2">للاستفسار:</span>
+            <span className="text-[11px] font-black text-secondary uppercase tracking-widest ml-2">{t.contact}</span>
             <div className="flex flex-row-reverse items-center gap-2 text-[12px] font-bold">
               <Phone size={16} className="text-secondary" />
               <span dir="ltr">+213 778 42 89 77</span>
@@ -56,13 +64,13 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="#" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
-              <Facebook size={28} />
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+              <Facebook size={24} />
             </Link>
-            <Link href="#" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
               <TikTokIcon />
             </Link>
-            <Link href="#" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
               <ViberIcon />
             </Link>
           </div>
@@ -94,7 +102,7 @@ export default function Navbar() {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="outline" 
-                className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border-2 border-white/20 cursor-pointer font-black text-lg min-w-[140px] hover:bg-zinc-100 transition-all hover:text-primary"
+                className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border-2 border-white/20 cursor-pointer font-black text-lg min-w-[140px] hover:bg-zinc-100 transition-all hover:text-primary uppercase"
               >
                 {languages.find(l => l.code === currentLang)?.name || "اللغة"}
               </Button>
@@ -105,7 +113,7 @@ export default function Navbar() {
               {languages.map((lang) => (
                 <DropdownMenuItem 
                   key={lang.code} 
-                  onClick={() => setCurrentLang(lang.code)}
+                  onSelect={() => setCurrentLang(lang.code as any)}
                   className={cn("hover:bg-zinc-800 cursor-pointer h-10 rounded-lg", currentLang === lang.code && "bg-secondary/10 font-bold text-secondary")}
                 >
                   <span className="mr-2">{lang.flag}</span>
@@ -119,7 +127,7 @@ export default function Navbar() {
           <Button variant="default" className="flex gap-3 items-center bg-white text-primary hover:bg-zinc-100 font-black text-base h-14 px-8 rounded-xl transition-all shadow-2xl border border-white/10" asChild>
             <Link href="/buyer/register">
               <User size={24} />
-              <span className="hidden lg:inline">بوابة المشتري</span>
+              <span className="hidden lg:inline">{t.buyer}</span>
             </Link>
           </Button>
           
@@ -128,7 +136,7 @@ export default function Navbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="default" className="flex gap-3 items-center bg-white text-primary hover:bg-zinc-100 font-black text-base h-14 px-8 rounded-xl transition-all shadow-2xl border border-white/10">
                 <LayoutDashboard size={24} />
-                <span className="hidden lg:inline">بوابة البائع</span>
+                <span className="hidden lg:inline">{t.seller}</span>
                 <ChevronDown size={16} className="opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -136,13 +144,13 @@ export default function Navbar() {
               <DropdownMenuLabel className="text-secondary">إدارة الأعمال</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/dashboard" className="w-full font-bold">لوحة التحكم الإحصائية</Link>
+                <Link href="/seller/dashboard" className="w-full font-bold">{t.stats}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/listings/new" className="w-full font-bold">إضافة إعلان جديد</Link>
+                <Link href="/seller/listings/new" className="w-full font-bold">{t.new}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/register" className="w-full font-bold text-secondary">فتح متجر احترافي</Link>
+                <Link href="/seller/register" className="w-full font-bold text-secondary">{t.store}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -154,7 +162,7 @@ export default function Navbar() {
               size="icon"
               className="h-14 w-14 bg-destructive border-2 border-destructive text-white hover:bg-red-700 transition-all shadow-2xl rounded-xl"
               onClick={() => router.back()}
-              title="رجوع"
+              title={t.back}
             >
               <ArrowRight size={32} />
             </Button>

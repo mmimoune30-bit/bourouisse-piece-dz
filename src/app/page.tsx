@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -119,59 +120,54 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[160px]">
-        {/* Categories & Brands Bar - Sticky */}
-        <section className="bg-destructive border-b-2 border-secondary sticky top-[160px] z-40 overflow-hidden shadow-lg py-3">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6 md:gap-8">
-            
-            {/* Left Side: Brand Logos */}
-            <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-2 md:pb-0">
-              {BRANDS.map((brand, i) => (
-                <Link 
-                  key={i} 
-                  href={`/catalog?brand=${brand.slug}`}
-                  className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110"
-                >
-                  <div className="text-white hover:text-secondary transition-colors drop-shadow-lg">
-                    {brand.icon}
-                  </div>
-                  <span className="text-[10px] md:hidden font-bold text-white mt-1 uppercase tracking-tighter">
-                    {brand.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Middle: Category Links */}
-            <div className="flex flex-row-reverse items-center gap-6 md:gap-10 overflow-x-auto no-scrollbar flex-grow justify-center">
-              <div className="flex flex-row-reverse items-center">
-                <span className="text-sm font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner whitespace-nowrap">
-                  الفئة:
+      {/* Categories & Brands Bar - Fixed below Navbar */}
+      <section className="bg-destructive border-b-2 border-secondary fixed top-[160px] left-0 right-0 z-40 overflow-hidden shadow-lg py-3 h-[75px]">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between h-full gap-4">
+          
+          {/* Left Side: Brand Logos */}
+          <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
+            {BRANDS.map((brand, i) => (
+              <Link 
+                key={i} 
+                href={`/catalog?brand=${brand.slug}`}
+                className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110 shrink-0"
+              >
+                <div className="text-white hover:text-secondary transition-colors drop-shadow-lg">
+                  {brand.icon}
+                </div>
+                <span className="text-[10px] md:hidden font-bold text-white mt-1 uppercase tracking-tighter">
+                  {brand.name}
                 </span>
-              </div>
-              {CATEGORIES.map((cat, i) => (
-                <Link
-                  key={i}
-                  href={`/catalog?category=${encodeURIComponent(cat.name)}`}
-                  className="flex flex-row-reverse items-center gap-2.5 group transition-all shrink-0"
-                >
-                  <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
-                    {cat.icon}
-                  </div>
-                  <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
-                    {cat.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Right Side: Quick Link */}
-            <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline whitespace-nowrap hidden lg:block">
-              عرض الكل
-            </Link>
+              </Link>
+            ))}
           </div>
-        </section>
 
+          {/* Middle: Category Links */}
+          <div className="flex flex-row-reverse items-center gap-6 md:gap-10 overflow-x-auto no-scrollbar flex-grow justify-center">
+            {CATEGORIES.map((cat, i) => (
+              <Link
+                key={i}
+                href={`/catalog?category=${encodeURIComponent(cat.name)}`}
+                className="flex flex-row-reverse items-center gap-2.5 group transition-all shrink-0"
+              >
+                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
+                  {cat.icon}
+                </div>
+                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
+                  {cat.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Right Side: Quick Link */}
+          <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline whitespace-nowrap hidden lg:block">
+            عرض الكل
+          </Link>
+        </div>
+      </section>
+
+      <main className="flex-grow pt-[235px]">
         {/* Dynamic Ticker Bar */}
         <section className="h-24 flex items-center bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 animate-gradient-dynamic overflow-hidden border-b border-sky-300/30 shadow-xl relative z-30 group">
           <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
@@ -222,7 +218,7 @@ export default function Home() {
 
           <div className="container mx-auto px-4 z-10 flex flex-col items-center">
             <div className="bg-white border-2 border-white p-6 md:p-10 rounded-sm shadow-[0_10px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in duration-700">
-               <h1 className="text-3xl md:text-6xl font-black text-destructive tracking-tighter text-center">
+               <h1 className="text-3xl md:text-6xl font-black text-destructive tracking-tighter text-center uppercase">
                  بورويس لقطع الغيار
                </h1>
             </div>
