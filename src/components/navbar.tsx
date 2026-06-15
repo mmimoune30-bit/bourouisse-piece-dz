@@ -162,10 +162,10 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0.5 text-white hover:bg-zinc-800 transition-colors group/user" asChild>
+          <Button variant="outline" className="h-auto py-1.5 px-3 flex flex-col items-center gap-0.5 text-white border-white/20 hover:bg-zinc-800 transition-colors group/user" asChild>
             <Link href="/buyer/register">
-              <User size={22} className="text-secondary group-hover/user:scale-110 transition-transform" />
-              <span className="text-[9px] font-black leading-none uppercase tracking-tighter">سجل معنا كمشتري</span>
+              <User size={24} className="text-secondary group-hover/user:scale-110 transition-transform" />
+              <span className="text-[10px] font-black leading-none uppercase tracking-tighter">بوابة المشتري</span>
             </Link>
           </Button>
         </div>
