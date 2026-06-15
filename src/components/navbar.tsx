@@ -2,8 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,10 +17,58 @@ import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 
 const translations = {
-  AR: { buyer: "بوابة المشتري", seller: "بوابة البائع", stats: "لوحة التحكم الإحصائية", new: "إضافة إعلان جديد", store: "فتح متجر احترافي", back: "رجوع", contact: "للاستفسار:" },
-  FR: { buyer: "Portail Acheteur", seller: "Portail Vendeur", stats: "Tableau de bord", new: "Nouvelle annonce", store: "Ouvrir une boutique", back: "Retour", contact: "Contact:" },
-  EN: { buyer: "Buyer Portal", seller: "Seller Portal", stats: "Dashboard", new: "New Listing", store: "Open Pro Shop", back: "Back", contact: "Contact:" }
+  AR: { 
+    buyer: "بوابة المشتري", 
+    seller: "بوابة البائع", 
+    stats: "لوحة التحكم", 
+    new: "إعلان جديد", 
+    store: "فتح متجر", 
+    back: "رجوع", 
+    contact: "للاستفسار:",
+    all: "عرض الكل",
+    categories: ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"]
+  },
+  FR: { 
+    buyer: "Portail Acheteur", 
+    seller: "Portail Vendeur", 
+    stats: "Tableau de bord", 
+    new: "Nouvelle annonce", 
+    store: "Ouvrir boutique", 
+    back: "Retour", 
+    contact: "Contact:",
+    all: "Voir tout",
+    categories: ["Carrosserie", "Moteur", "Suspension", "Électricité", "Pneus", "Accessoires"]
+  },
+  EN: { 
+    buyer: "Buyer Portal", 
+    seller: "Seller Portal", 
+    stats: "Dashboard", 
+    new: "New Listing", 
+    store: "Open Pro Shop", 
+    back: "Back", 
+    contact: "Contact:",
+    all: "View All",
+    categories: ["Body", "Engine", "Suspension", "Electricity", "Tires", "Accessories"]
+  }
 };
+
+const CATEGORY_ICONS = [
+  <Car size={24} className="text-secondary" />,
+  <Zap size={24} className="text-secondary" />,
+  <Scale size={24} className="text-secondary" />,
+  <Plug size={24} className="text-secondary" />,
+  <Disc size={24} className="text-secondary" />,
+  <Sparkles size={24} className="text-secondary" />,
+];
+
+const BRANDS = [
+  { name: "Mercedes", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5 0 .23-.01.46-.03.68l-8.47-4.88V3.5zm-1 5.37l-7.53 4.34c.3-.59.66-1.15 1.08-1.66l6.45-3.71v1.03zm2 0v1.03l6.45 3.71c.42.51.78 1.07 1.08 1.66l-7.53-4.34zm-8.47 5.75l8.47 4.88v4.32c-4.69 0-8.5-3.81-8.5-8.5 0-.23.01-.46.03-.7zm9.47 4.88l8.47-4.88c.02.24.03.47.03.7 0 4.69-3.81 8.5-8.5 8.5v-4.32z" /></svg> },
+  { name: "Volkswagen", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm0 1.5l-2 5.5h4l-2-5.5zm-3 8.5l2 5.5h2l2-5.5h-1.5l-1.25 3.5h-1.5l-1.25-3.5H9z" /></svg> },
+  { name: "Hyundai", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C5.37 2 0 6.48 0 12s5.37 10 12 10 12-4.48 12-10S18.63 2 12 2zm3.32 15.11l-1.01-4.22h-4.62l1.01 4.22H8.38l-1.63-6.83h2.32l1.01 4.22h4.62l-1.01-4.22h2.32l1.63 6.83h-2.32z" /></svg> },
+  { name: "Peugeot", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 6v12l8 4 8-4V6l-8-4zm6 15l-6 3-6-3V7l6-3 6 3v10zM12 8l-4 2v4l4 2 4-2v-4l-4-2z" /></svg> },
+  { name: "Renault", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L5 12l7 10 7-10-7-10zm0 3.5L16.5 12 12 18.5 7.5 12 12 5.5z" /></svg> },
+  { name: "Kia", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm3.5 11l-1.5-4-1.5 4h3zm-5.5 0h-2l1-4 1 4z" /></svg> }
+];
 
 export default function Navbar() {
   const router = useRouter();
@@ -48,7 +96,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl border-b-2 border-secondary/30 h-[160px]">
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl h-[235px]">
       {/* Top Bar: Contact & Social Info */}
       <div className="bg-zinc-900/80 border-b border-white/5 py-2">
         <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4">
@@ -64,31 +112,31 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
-              <Facebook size={24} />
+            <Link href="#" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+              <Facebook size={18} />
             </Link>
-            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+            <Link href="#" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
               <TikTokIcon />
             </Link>
-            <Link href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
+            <Link href="#" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
               <ViberIcon />
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-5 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4 h-[100px]">
         {/* Left Side: Logo */}
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-secondary p-2.5 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-              <Settings size={36} className="animate-spin-slow" />
+            <div className="bg-secondary p-2 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+              <Settings size={28} className="animate-spin-slow" />
             </div>
             <div className="flex flex-col">
-              <span className="font-headline font-black text-xl md:text-3xl tracking-tighter text-secondary uppercase italic leading-none">
+              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
                 Bourouisse <span className="text-white">Piece-Dz</span>
               </span>
-              <span className="text-[11px] font-bold text-white/50 tracking-[0.25em] uppercase mt-1.5">
+              <span className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
                 Pièces & Automobiles
               </span>
             </div>
@@ -96,19 +144,19 @@ export default function Navbar() {
         </div>
 
         {/* Portals Section & Language */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="outline" 
-                className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border-2 border-white/20 cursor-pointer font-black text-lg min-w-[140px] hover:bg-zinc-100 transition-all hover:text-primary uppercase"
+                className="bg-white h-12 px-6 rounded-xl flex items-center justify-center text-primary shadow-xl border-2 border-white/20 font-black text-sm min-w-[120px] hover:bg-zinc-100 transition-all uppercase"
               >
                 {languages.find(l => l.code === currentLang)?.name || "اللغة"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white p-2">
-              <DropdownMenuLabel className="text-center">اختر اللغة / Choisir la langue</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-center">Language / اللغة</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
               {languages.map((lang) => (
                 <DropdownMenuItem 
@@ -123,25 +171,23 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Buyer Portal */}
-          <Button variant="default" className="flex gap-3 items-center bg-white text-primary hover:bg-zinc-100 font-black text-base h-14 px-8 rounded-xl transition-all shadow-2xl border border-white/10" asChild>
+          <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
             <Link href="/buyer/register">
-              <User size={24} />
+              <User size={20} />
               <span className="hidden lg:inline">{t.buyer}</span>
             </Link>
           </Button>
           
-          {/* Seller Portal (Dropdown) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="default" className="flex gap-3 items-center bg-white text-primary hover:bg-zinc-100 font-black text-base h-14 px-8 rounded-xl transition-all shadow-2xl border border-white/10">
-                <LayoutDashboard size={24} />
+              <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl">
+                <LayoutDashboard size={20} />
                 <span className="hidden lg:inline">{t.seller}</span>
-                <ChevronDown size={16} className="opacity-50" />
+                <ChevronDown size={14} className="opacity-50" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 bg-zinc-900 border-zinc-800 text-white p-2">
-              <DropdownMenuLabel className="text-secondary">إدارة الأعمال</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-secondary">{t.seller}</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
                 <Link href="/seller/dashboard" className="w-full font-bold">{t.stats}</Link>
@@ -155,20 +201,64 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Back Button */}
           {pathname !== "/" && (
             <Button
               variant="default"
               size="icon"
-              className="h-14 w-14 bg-destructive border-2 border-destructive text-white hover:bg-red-700 transition-all shadow-2xl rounded-xl"
+              className="h-12 w-12 bg-destructive border-2 border-destructive text-white hover:bg-red-700 transition-all shadow-xl rounded-xl"
               onClick={() => router.back()}
               title={t.back}
             >
-              <ArrowRight size={32} />
+              <ArrowRight size={24} />
             </Button>
           )}
         </div>
       </div>
+
+      {/* FIXED RED BAR - Brands & Categories */}
+      <section className="bg-destructive border-b-2 border-secondary h-[75px] w-full flex items-center overflow-hidden shadow-lg">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between h-full gap-4">
+          {/* Brand Logos */}
+          <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
+            {BRANDS.map((brand, i) => (
+              <Link 
+                key={i} 
+                href={`/catalog?brand=${brand.name}`}
+                className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110 shrink-0"
+              >
+                <div className="text-white hover:text-secondary transition-colors drop-shadow-lg">
+                  {brand.icon}
+                </div>
+                <span className="text-[10px] md:hidden font-bold text-white mt-1 uppercase tracking-tighter">
+                  {brand.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Category Links */}
+          <div className="flex flex-row-reverse items-center gap-6 md:gap-10 overflow-x-auto no-scrollbar flex-grow justify-center">
+            {t.categories.map((catName, i) => (
+              <Link
+                key={i}
+                href={`/catalog?category=${encodeURIComponent(catName)}`}
+                className="flex flex-row-reverse items-center gap-2.5 group transition-all shrink-0"
+              >
+                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
+                  {CATEGORY_ICONS[i]}
+                </div>
+                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
+                  {catName}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline whitespace-nowrap hidden lg:block">
+            {t.all}
+          </Link>
+        </div>
+      </section>
     </nav>
   );
 }
