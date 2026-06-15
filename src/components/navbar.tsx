@@ -67,6 +67,7 @@ export default function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+        {/* Logo Section */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
             <Settings size={24} className="animate-spin-slow" />
@@ -81,6 +82,7 @@ export default function Navbar() {
           </div>
         </Link>
 
+        {/* AI Search Bar (Centered) */}
         <div className="hidden md:flex flex-1 max-w-xl relative mx-8" ref={searchRef}>
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -114,12 +116,13 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Portals Section */}
+        <div className="flex items-center gap-3">
+          {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0.5 text-white hover:bg-zinc-800 transition-colors">
+              <Button variant="ghost" className="h-9 w-9 p-0 text-white hover:bg-zinc-800 transition-colors">
                 <Languages size={20} className="text-secondary" />
-                <span className="text-[10px] font-bold leading-none">langue</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white">
@@ -138,13 +141,18 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/catalog" className="hidden lg:block">
-            <Button variant="ghost" className="text-white hover:text-secondary hover:bg-zinc-800 font-bold text-xs h-auto py-2">تصفح الكل</Button>
-          </Link>
+          {/* Buyer Portal (Styled to match Seller) */}
+          <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9 transition-all" asChild>
+            <Link href="/buyer/register">
+              <User size={16} />
+              <span className="hidden sm:inline">بوابة المشتري</span>
+            </Link>
+          </Button>
           
+          {/* Seller Portal (Dropdown) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9">
+              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9 transition-all">
                 <LayoutDashboard size={16} />
                 <span className="hidden sm:inline">بوابة البائع</span>
                 <ChevronDown size={12} className="opacity-50" />
@@ -153,21 +161,17 @@ export default function Navbar() {
             <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800 text-white">
               <DropdownMenuLabel>أعمالي</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem asChild className="hover:bg-zinc-800">
-                <Link href="/seller/dashboard">لوحة التحكم</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
+                <Link href="/seller/dashboard" className="w-full">لوحة التحكم</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-zinc-800">
-                <Link href="/seller/listings/new">إضافة إعلان جديد</Link>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
+                <Link href="/seller/listings/new" className="w-full">إضافة إعلان جديد</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer">
+                <Link href="/seller/register" className="w-full">فتح متجر جديد</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Button variant="outline" className="h-auto py-1.5 px-3 flex flex-col items-center gap-0.5 text-white border-white/20 hover:bg-zinc-800 transition-colors group/user" asChild>
-            <Link href="/buyer/register">
-              <User size={24} className="text-secondary group-hover/user:scale-110 transition-transform" />
-              <span className="text-[10px] font-black leading-none uppercase tracking-tighter">بوابة المشتري</span>
-            </Link>
-          </Button>
         </div>
       </div>
     </nav>
