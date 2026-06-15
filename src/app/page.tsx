@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -100,13 +101,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Dynamic Ticker Bar */}
-        <section className="h-14 flex items-center bg-gradient-to-r from-primary via-destructive to-black animate-gradient-dynamic overflow-hidden border-b border-secondary/20 shadow-xl relative z-30 group">
+        {/* Dynamic Ticker Bar - Updated Size and Color */}
+        <section className="h-24 flex items-center bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 animate-gradient-dynamic overflow-hidden border-b border-sky-300/30 shadow-xl relative z-30 group">
           <div className="flex whitespace-nowrap animate-scroll-left group-hover:[animation-play-state:paused] cursor-pointer">
             {[...TICKER_ADS, ...TICKER_ADS].map((ad, i) => (
-              <Link key={i} href={`/catalog`} className="flex items-center gap-5 px-10 text-white hover:bg-white/10 transition-colors h-full">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-secondary/50 shrink-0 shadow-md">
+              <Link key={i} href={`/catalog`} className="flex items-center gap-6 px-12 text-white hover:bg-white/20 transition-all h-full transform hover:scale-105">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-white/50 shrink-0 shadow-xl">
                     <Image
                       src={ad.image}
                       alt={ad.name}
@@ -115,12 +116,12 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-xs font-black uppercase tracking-tight text-white">{ad.name}</span>
-                    <div className="flex items-center gap-3 mt-0.5">
-                       <span className="text-[10px] font-bold text-white/60">
-                        الكمية: <span className="text-white">{ad.qty}</span>
+                    <span className="text-sm font-black uppercase tracking-tight text-white drop-shadow-md">{ad.name}</span>
+                    <div className="flex items-center gap-4 mt-1">
+                       <span className="text-[11px] font-bold text-sky-100">
+                        الكمية: <span className="text-white font-black">{ad.qty}</span>
                       </span>
-                      <span className="text-[10px] font-black text-secondary bg-black/40 px-2 py-0.5 rounded border border-secondary/20">
+                      <span className="text-[11px] font-black text-primary bg-white px-3 py-1 rounded-full border border-sky-200 shadow-sm">
                         {ad.price}
                       </span>
                     </div>
