@@ -72,7 +72,7 @@ export default function AISearchBox() {
         </div>
 
         {/* Left Side: AI Search Box */}
-        <div className="w-full max-w-xl relative">
+        <div className="w-full max-w-md relative">
           <div className="absolute -top-6 left-0 flex items-center gap-2">
             <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] bg-black px-3 py-1 rounded border border-secondary/20 flex items-center gap-1.5">
               <Sparkles size={12} className="animate-pulse" />
@@ -81,10 +81,10 @@ export default function AISearchBox() {
           </div>
           
           <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary w-5 h-5 group-focus-within:scale-110 transition-transform" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary w-6 h-6 group-focus-within:scale-110 transition-transform z-10" />
             <Input
               placeholder="ابحث بذكاء عن أي قطعة غيار أو مركبة..."
-              className="pl-14 h-14 bg-black border-2 border-secondary/30 text-white text-lg placeholder:text-zinc-600 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-2xl"
+              className="pl-14 h-12 bg-white border-2 border-secondary/30 text-primary text-xl font-bold placeholder:text-zinc-400 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-2xl"
               dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
