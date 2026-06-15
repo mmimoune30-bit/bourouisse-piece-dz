@@ -1,0 +1,69 @@
+
+{
+  "entities": {
+    "Listing": {
+      "title": "إعلان قطعة غيار",
+      "description": "بيانات تفصيلية لقطعة غيار معروضة للبيع",
+      "type": "object",
+      "properties": {
+        "category": { "type": "string", "description": "الفئة الرئيسية للقطعة" },
+        "partType": { "type": "string", "description": "نوع القطعة من القائمة" },
+        "manualPartName": { "type": "string", "description": "اسم القطعة المدخل يدوياً" },
+        "brand": { "type": "string", "description": "العلامة التجارية للمركبة" },
+        "model": { "type": "string", "description": "موديل المركبة" },
+        "year": { "type": "string", "description": "سنة الصنع" },
+        "motorisation": { "type": "string", "description": "نوع المحرك/الوقود" },
+        "generation": { "type": "string", "description": "جيل المركبة" },
+        "condition": { "type": "string", "enum": ["new", "used"], "description": "حالة القطعة" },
+        "price": { "type": "number", "description": "السعر بالدينار الجزائري" },
+        "wilaya": { "type": "string", "description": "ولاية البائع" },
+        "commune": { "type": "string", "description": "بلدية البائع" },
+        "description": { "type": "string", "description": "وصف إضافي" },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "روابط صور القطعة" },
+        "sellerId": { "type": "string", "description": "معرف البائع صاحب الإعلان" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["category", "partType", "brand", "model", "price", "wilaya"]
+    },
+    "Seller": {
+      "title": "بائع",
+      "description": "بيانات حساب التاجر أو البائع",
+      "type": "object",
+      "properties": {
+        "shopName": { "type": "string", "description": "اسم المتجر" },
+        "phone": { "type": "string", "description": "رقم الهاتف" },
+        "wilaya": { "type": "string", "description": "مقر النشاط" },
+        "email": { "type": "string", "format": "email" },
+        "userId": { "type": "string", "description": "معرف المستخدم المرتبط" }
+      }
+    },
+    "Buyer": {
+      "title": "مشتري",
+      "description": "بيانات حساب المشتري",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "userId": { "type": "string" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password", "google.com"]
+  },
+  "firestore": {
+    "/listings/{listingId}": {
+      "schema": "Listing",
+      "description": "مجموعة الإعلانات العامة"
+    },
+    "/sellers/{sellerId}": {
+      "schema": "Seller",
+      "description": "بيانات البائعين"
+    },
+    "/buyers/{buyerId}": {
+      "schema": "Buyer",
+      "description": "بيانات المشترين"
+    }
+  }
+}
