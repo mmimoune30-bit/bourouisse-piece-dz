@@ -45,27 +45,27 @@ export default function AISearchBox() {
   }, []);
 
   const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
-    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?category=Moteur (المحرك)" },
-    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "مركبات خارج الخدمة", icon: <Car size={28} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
+    { name: "محركات كاملة", icon: <Settings size={28} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "نصف محرك", icon: <Layers size={28} />, href: "/catalog?category=Moteur (المحرك)" },
   ];
 
   return (
-    <div className="w-full bg-zinc-950/40 border-b border-secondary/5 py-4" ref={searchRef}>
-      <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
+    <div className="w-full bg-zinc-950/40 border-b border-secondary/5 py-6" ref={searchRef}>
+      <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-8">
         
         {/* Right Side: Special Categories */}
-        <div className="flex flex-row-reverse items-center gap-4 w-full md:w-auto overflow-x-auto no-scrollbar pb-2 md:pb-0">
+        <div className="flex flex-row-reverse items-center gap-6 w-full md:w-auto overflow-x-auto no-scrollbar pb-2 md:pb-0">
           {SPECIAL_CATEGORIES.map((cat, i) => (
             <Link
               key={i}
               href={cat.href}
-              className="flex flex-col items-center gap-1.5 group shrink-0"
+              className="flex flex-col items-center gap-2 group shrink-0"
             >
-              <div className="w-12 h-12 rounded-xl bg-black border border-secondary/20 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-black transition-all shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-black border border-secondary/20 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-black transition-all shadow-xl">
                 {cat.icon}
               </div>
-              <span className="text-[10px] font-black text-white/80 group-hover:text-secondary transition-colors text-center whitespace-nowrap">
+              <span className="text-xs md:text-sm font-black text-destructive group-hover:text-secondary transition-colors text-center whitespace-nowrap uppercase tracking-tighter">
                 {cat.name}
               </span>
             </Link>
