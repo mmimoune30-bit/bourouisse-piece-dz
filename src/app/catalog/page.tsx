@@ -15,14 +15,14 @@ import { Search, Filter, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { Suspense, useMemo } from "react";
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "قطع المحرك", seller: "EliteMotors DZ", condition: "New" as const },
-  { id: "p2", name: "طقم فرامل سيراميك كربون", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "الفرامل", seller: "SpeedHub Algiers", condition: "New" as const },
+  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "المحرك", seller: "EliteMotors DZ", condition: "New" as const },
+  { id: "p2", name: "طقم فرامل سيراميك كربون", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "الهيكل", seller: "SpeedHub Algiers", condition: "New" as const },
   { id: "p3", name: "إطارات الطرق الوعرة (طقم 4)", price: 85000, image: PlaceHolderImages[2].imageUrl, category: "الإطارات", seller: "DesertRoad Parts", condition: "New" as const },
   { id: "p4", name: "بطارية سيارة 12 فولت شديدة التحمل", price: 18500, image: PlaceHolderImages[3].imageUrl, category: "الكهرباء", seller: "Energy Dz", condition: "New" as const },
-  { id: "p5", name: "شاحن توربيني GT20", price: 85000, image: PlaceHolderImages[5].imageUrl, category: "قطع المحرك", seller: "Turbo Dz", condition: "New" as const },
-  { id: "p6", name: "ناقل حركة أوتوماتيكي", price: 150000, image: PlaceHolderImages[6].imageUrl, category: "ناقل الحركة", seller: "GearBox Master", condition: "Used" as const },
+  { id: "p5", name: "شاحن توربيني GT20", price: 85000, image: PlaceHolderImages[5].imageUrl, category: "المحرك", seller: "Turbo Dz", condition: "New" as const },
+  { id: "p6", name: "ناقل حركة أوتوماتيكي", price: 150000, image: PlaceHolderImages[6].imageUrl, category: "المحرك", seller: "GearBox Master", condition: "Used" as const },
   { id: "p7", name: "أضواء LED أمامية", price: 18000, image: PlaceHolderImages[2].imageUrl, category: "الكهرباء", seller: "Light Dz", condition: "New" as const },
-  { id: "p8", name: "مضخة وقود أصلية", price: 32000, image: PlaceHolderImages[0].imageUrl, category: "قطع المحرك", seller: "Fuel Parts", condition: "New" as const },
+  { id: "p8", name: "مضخة وقود أصلية", price: 32000, image: PlaceHolderImages[0].imageUrl, category: "المحرك", seller: "Fuel Parts", condition: "New" as const },
 ];
 
 function CatalogContent() {
@@ -34,7 +34,7 @@ function CatalogContent() {
     return ALL_PRODUCTS.filter(p => p.category === categoryFilter || categoryFilter === "all");
   }, [categoryFilter]);
 
-  const categories = ["قطع المحرك", "ناقل الحركة", "الكهرباء", "الفرامل", "الإطارات"];
+  const categories = ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

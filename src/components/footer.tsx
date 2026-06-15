@@ -36,11 +36,11 @@ export default function Footer() {
           <div className="text-right">
             <h4 className="font-headline font-bold mb-6 text-lg border-r-4 border-secondary pr-4">تسوق حسب الفئة</h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
-              <li><Link href="/catalog?category=قطع المحرك" className="hover:text-secondary transition-colors">المحرك ونظام الحركة</Link></li>
-              <li><Link href="/catalog?category=الفرامل" className="hover:text-secondary transition-colors">الفرامل ونظام التعليق</Link></li>
-              <li><Link href="/catalog?category=الكهرباء" className="hover:text-secondary transition-colors">الكهرباء والإضاءة</Link></li>
-              <li><Link href="/catalog?category=الهيكل" className="hover:text-secondary transition-colors">قطع الهيكل والمرايا</Link></li>
-              <li><Link href="/catalog?category=الإكسسوارات" className="hover:text-secondary transition-colors">الإكسسوارات الداخلية</Link></li>
+              <li><Link href="/catalog?category=الهيكل" className="hover:text-secondary transition-colors">الهيكل</Link></li>
+              <li><Link href="/catalog?category=المحرك" className="hover:text-secondary transition-colors">المحرك</Link></li>
+              <li><Link href="/catalog?category=التوازي و التوازن" className="hover:text-secondary transition-colors">التوازي و التوازن</Link></li>
+              <li><Link href="/catalog?category=الكهرباء" className="hover:text-secondary transition-colors">الكهرباء</Link></li>
+              <li><Link href="/catalog?category=الأكسيسوارات" className="hover:text-secondary transition-colors">الأكسيسوارات</Link></li>
             </ul>
           </div>
 

@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -7,7 +6,7 @@ import ProductCard from "@/components/product-card";
 import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, ArrowRight, CheckCircle2, Package, Truck, Zap, Gauge, Settings } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Package, Truck, Zap, Gauge, Settings, Car, Disc, Sparkles, Plug, Scale } from "lucide-react";
 
 const FEATURED_PRODUCTS = [
   {
@@ -15,7 +14,7 @@ const FEATURED_PRODUCTS = [
     name: "كتلة محرك V8 دقيقة",
     price: 450000,
     image: PlaceHolderImages[0].imageUrl,
-    category: "قطع المحرك",
+    category: "المحرك",
     seller: "EliteMotors DZ",
     condition: "New" as const
   },
@@ -24,7 +23,7 @@ const FEATURED_PRODUCTS = [
     name: "طقم فرامل سيراميك كربون",
     price: 120000,
     image: PlaceHolderImages[1].imageUrl,
-    category: "الفرامل",
+    category: "الهيكل",
     seller: "SpeedHub Algiers",
     condition: "New" as const
   },
@@ -57,11 +56,12 @@ const TICKER_ADS = [
 ];
 
 const CATEGORIES = [
-  { name: "قطع المحرك", icon: <Zap size={24} className="text-secondary" />, count: 1240 },
-  { name: "ناقل الحركة", icon: <Settings size={24} className="text-secondary" />, count: 850 },
-  { name: "الكهرباء", icon: <Gauge size={24} className="text-secondary" />, count: 2100 },
-  { name: "الفرامل", icon: <CheckCircle2 size={24} className="text-secondary" />, count: 640 },
-  { name: "الإطارات", icon: <Truck size={24} className="text-secondary" />, count: 320 },
+  { name: "الهيكل", icon: <Car size={24} className="text-secondary" />, count: 1500 },
+  { name: "المحرك", icon: <Zap size={24} className="text-secondary" />, count: 1240 },
+  { name: "التوازي و التوازن", icon: <Scale size={24} className="text-secondary" />, count: 850 },
+  { name: "الكهرباء", icon: <Plug size={24} className="text-secondary" />, count: 2100 },
+  { name: "الإطارات", icon: <Disc size={24} className="text-secondary" />, count: 900 },
+  { name: "الأكسيسوارات", icon: <Sparkles size={24} className="text-secondary" />, count: 1100 },
 ];
 
 export default function Home() {
@@ -149,7 +149,7 @@ export default function Home() {
                     BOUROUISSE PIECE DZ
                   </h2>
                   <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-secondary to-transparent mb-3 rounded-full" />
-                  <p className="text-base md:text-lg font-black text-secondary tracking-tight leading-tight">
+                  <p className="text-base md:text-lg font-black text-secondary tracking-tight leading-tight text-center">
                     لقطع غيار السيارات و المركبات و الألات الجديدة و المستعملة
                   </p>
                </div>

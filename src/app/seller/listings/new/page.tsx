@@ -15,6 +15,8 @@ import { useState } from "react";
 export default function NewListing() {
   const [images, setImages] = useState<string[]>([]);
 
+  const categories = ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -45,10 +47,9 @@ export default function NewListing() {
                           <SelectValue placeholder="اختر الفئة" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="engine">المحرك</SelectItem>
-                          <SelectItem value="brakes">الفرامل</SelectItem>
-                          <SelectItem value="tires">الإطارات</SelectItem>
-                          <SelectItem value="full-car">مركبة كاملة</SelectItem>
+                          {categories.map((cat, i) => (
+                            <SelectItem key={i} value={cat}>{cat}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
