@@ -74,7 +74,7 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-headline font-black text-xl md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
-              Bourouisse <span className="text-white">PieceDz</span>
+              Bourouisse <span className="text-white">Piece-Dz</span>
             </span>
             <span className="text-[9px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
               Pièces & Automobiles
@@ -141,7 +141,7 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Buyer Portal (Styled to match Seller) */}
+          {/* Buyer Portal */}
           <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9 transition-all" asChild>
             <Link href="/buyer/register">
               <User size={16} />

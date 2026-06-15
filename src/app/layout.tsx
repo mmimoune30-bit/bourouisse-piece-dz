@@ -1,10 +1,9 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Bourouisse PieceDz | Premium Auto Parts Marketplace',
+  title: 'Bourouisse Piece-Dz | Premium Auto Parts Marketplace',
   description: 'Find genuine and high-quality auto parts in Algeria. Connect with verified sellers across the nation.',
 };
 

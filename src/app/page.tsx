@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -7,7 +6,7 @@ import ProductCard from "@/components/product-card";
 import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, ArrowRight, CheckCircle2, Package, Truck, Zap, Gauge, Settings, Car, Disc, Sparkles, Plug, Scale } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Zap, Settings, Car, Disc, Sparkles, Plug, Scale } from "lucide-react";
 
 const FEATURED_PRODUCTS = [
   {
@@ -147,7 +146,7 @@ export default function Home() {
                     <Settings className="text-secondary animate-spin-slow" size={32} />
                   </div>
                   <h2 className="text-2xl md:text-4xl font-black italic tracking-tighter uppercase mb-1 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]">
-                    BOUROUISSE PIECE DZ
+                    BOUROUISSE PIECE-DZ
                   </h2>
                   <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-secondary to-transparent mb-3 rounded-full" />
                   <p className="text-base md:text-lg font-black text-secondary tracking-tight leading-tight text-center">

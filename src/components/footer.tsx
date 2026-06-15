@@ -1,6 +1,5 @@
-
 import Link from "next/link";
-import { Car, Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings } from "lucide-react";
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -14,7 +13,7 @@ export default function Footer() {
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
                 <span className="font-headline font-black text-2xl tracking-tighter uppercase italic">
-                  Bourouisse <span className="text-secondary">PieceDz</span>
+                  Bourouisse <span className="text-secondary">Piece-Dz</span>
                 </span>
               </div>
               <div className="pr-1">
@@ -74,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4 text-sm text-blue-100/40">
-          <p className="font-bold">© 2024 Bourouisse PieceDz. جميع الحقوق محفوظة.</p>
+          <p className="font-bold">© 2024 Bourouisse Piece-Dz. جميع الحقوق محفوظة.</p>
           <div className="flex gap-6">
             <span className="cursor-default">شروط الخدمة</span>
             <span className="cursor-default">سياسة الخصوصية</span>
