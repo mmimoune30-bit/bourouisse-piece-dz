@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages, ArrowLeft } from "lucide-react";
+import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
@@ -71,20 +71,8 @@ export default function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between gap-4">
-        {/* Left Side: Back Button and Logo */}
+        {/* Left Side: Logo */}
         <div className="flex items-center gap-4">
-          {pathname !== "/" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 text-white hover:bg-zinc-800 transition-colors"
-              onClick={() => router.back()}
-              title="رجوع"
-            >
-              <ArrowLeft size={24} className="text-secondary" />
-            </Button>
-          )}
-          
           <Link href="/" className="flex items-center gap-3 group">
             <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
               <Settings size={24} className="animate-spin-slow" />
@@ -134,7 +122,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Portals Section */}
+        {/* Portals Section & Back Button */}
         <div className="flex items-center gap-3">
           {/* Language Switcher */}
           <DropdownMenu>
@@ -190,6 +178,19 @@ export default function Navbar() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Back Button (Now on the Right) */}
+          {pathname !== "/" && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 bg-white border-2 border-white text-primary hover:bg-white/90 hover:text-primary transition-all shadow-lg"
+              onClick={() => router.back()}
+              title="رجوع"
+            >
+              <ArrowRight size={20} />
+            </Button>
+          )}
         </div>
       </div>
     </nav>
