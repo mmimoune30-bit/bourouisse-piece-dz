@@ -114,7 +114,7 @@ const BRANDS = [
 ];
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[5].imageUrl;
+  const brandBanner = PlaceHolderImages.find(img => img.id === "brand-banner-bourouisse")?.imageUrl || PlaceHolderImages[5].imageUrl;
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
@@ -125,7 +125,7 @@ export default function Home() {
         <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-hidden shadow-lg py-3">
           <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6 md:gap-8">
             
-            {/* Left Side: Brand Logos (Now dynamic and ordered) */}
+            {/* Left Side: Brand Logos */}
             <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-2 md:pb-0">
               {BRANDS.map((brand, i) => (
                 <Link 
@@ -207,87 +207,50 @@ export default function Home() {
         {/* AI SEARCH BOX */}
         <AISearchBox />
 
-        {/* Hero Section */}
-        <section className="container mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row items-center gap-10 relative">
-          <div className="flex-1 space-y-6 z-20 text-right lg:text-right flex flex-col items-end">
-            
-            {/* Dynamic Gold Brand Section */}
-            <div className="bg-black border border-secondary/20 p-6 rounded-2xl shadow-xl relative overflow-hidden group/gold-brand w-full max-w-lg animate-in fade-in slide-in-from-bottom duration-500 delay-100">
-               <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5 animate-pulse" />
-               <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="bg-secondary/10 p-3 rounded-xl mb-3 border border-secondary/10 group-hover/gold-brand:rotate-6 transition-transform duration-500">
-                    <Settings className="text-secondary animate-spin-slow" size={32} />
-                  </div>
-                  <h2 className="text-2xl md:text-4xl font-black italic tracking-tighter uppercase mb-1 bg-gradient-to-r from-[#D4AF37] via-[#FFF5D1] to-[#D4AF37] bg-[length:200%_auto] animate-gradient-dynamic bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]">
-                    BOUROUISSE PIECE-DZ
-                  </h2>
-                  <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-secondary to-transparent mb-3 rounded-full" />
-                  <p className="text-base md:text-lg font-black text-secondary tracking-tight leading-tight text-center">
-                    لقطع غيار السيارات و المركبات و الألات الجديدة و المستعملة
-                  </p>
-               </div>
-            </div>
-
-            <h1 className="text-3xl lg:text-5xl font-bold text-primary leading-[1.15] animate-in fade-in slide-in-from-bottom-2 duration-500">
-              وجهتكم الأولى لقطع الغيار <span className="text-secondary italic">في الجزائر</span>
-            </h1>
-            
-            <p className="text-base text-muted-foreground max-w-md leading-relaxed mr-auto lg:mr-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              نضمن لكم أفضل جودة وأسرع توصيل في الجزائر. تصفح آلاف الإعلانات من بائعين معتمدين.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row-reverse gap-3 animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <Link href="/catalog">
-                <Button size="lg" className="h-12 px-8 text-base font-bold gap-2 group w-full sm:w-auto">
-                  استكشف الكتالوج <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/seller/register">
-                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold w-full sm:w-auto">
-                  بع قطع غيارك
-                </Button>
-              </Link>
-            </div>
-
-            <div className="flex items-center justify-end gap-6 pt-2 opacity-80">
-              <div className="flex flex-col items-end">
-                <span className="text-xl font-bold text-primary">50k+</span>
-                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">إعلان نشط</span>
-              </div>
-              <div className="w-px h-8 bg-border" />
-              <div className="flex flex-col items-end">
-                <span className="text-xl font-bold text-primary">12k+</span>
-                <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">عميل سعيد</span>
-              </div>
-            </div>
+        {/* Hero Section with New Background Image */}
+        <section className="relative w-full min-h-[500px] lg:min-h-[700px] flex items-start justify-center pt-20 lg:pt-32">
+          {/* Background Image Container */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={brandBanner}
+              alt="Bourouisse Scrapyard Background"
+              fill
+              className="object-cover"
+              priority
+              data-ai-hint="aerial scrapyard"
+            />
+            {/* Overlay for readability if needed, but keeping it clear as per request */}
+            <div className="absolute inset-0 bg-black/10" />
           </div>
-          
-          <div className="flex-1 relative w-full aspect-video lg:aspect-square max-w-md mx-auto lg:max-w-none">
-            <div className="absolute -top-6 -right-6 w-48 h-48 bg-secondary/10 rounded-full blur-3xl animate-pulse-soft" />
-            <div className="absolute -bottom-10 -left-6 w-56 h-56 bg-primary/5 rounded-full blur-3xl animate-pulse-soft delay-1000" />
-            
-            <div className="absolute inset-0 bg-secondary/5 rounded-3xl rotate-2 transition-transform hover:rotate-0 duration-500" />
-            <div className="absolute inset-0 overflow-hidden rounded-3xl shadow-xl border-2 border-white z-10">
-              <div className="relative w-full h-full animate-ken-burns">
-                <Image
-                  src={heroImage}
-                  alt="Auto parts warehouse"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+
+          {/* Content Area */}
+          <div className="container mx-auto px-4 z-10 flex flex-col items-center">
+            {/* Main Brand Box (Recreating the style from the image) */}
+            <div className="bg-white border-2 border-white p-6 md:p-10 rounded-sm shadow-[0_10px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in duration-700">
+               <h1 className="text-3xl md:text-6xl font-black text-destructive tracking-tighter text-center">
+                 بورويس لقطع الغيار
+               </h1>
             </div>
 
-            <div className="absolute -bottom-6 -right-4 bg-white p-3 rounded-xl shadow-xl border border-border z-20 animate-float">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                  <CheckCircle2 size={20} />
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-primary text-xs">جودة مضمونة</p>
-                  <p className="text-[9px] text-muted-foreground whitespace-nowrap">قطع غيار موثوقة</p>
-                </div>
+            {/* Additional Hero Content */}
+            <div className="mt-12 text-center max-w-2xl bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl animate-in fade-in slide-in-from-bottom duration-1000">
+              <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight mb-4">
+                وجهتكم الأولى لقطع الغيار <span className="text-secondary italic">في الجزائر</span>
+              </h2>
+              <p className="text-base md:text-lg text-white/80 leading-relaxed mb-8">
+                نضمن لكم أفضل جودة وأسرع توصيل في الجزائر. تصفح آلاف الإعلانات من بائعين معتمدين.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href="/catalog">
+                  <Button size="lg" className="h-14 px-10 text-lg font-black gap-2 group shadow-xl bg-secondary text-primary hover:bg-white transition-all">
+                    استكشف الكتالوج <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="/seller/register">
+                  <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all shadow-xl">
+                    بع قطع غيارك
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

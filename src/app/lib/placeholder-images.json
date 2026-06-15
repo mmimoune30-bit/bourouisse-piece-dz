@@ -42,6 +42,12 @@
       "description": "Leather sports steering wheel accessory",
       "imageUrl": "https://picsum.photos/seed/steering-real/800/600",
       "imageHint": "steering wheel"
+    },
+    {
+      "id": "brand-banner-bourouisse",
+      "description": "Aerial view of Bourouisse scrapyard and road",
+      "imageUrl": "https://picsum.photos/seed/bourouisse-scrapyard/1200/800",
+      "imageHint": "aerial scrapyard"
     }
   ]
 }
