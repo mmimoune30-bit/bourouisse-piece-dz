@@ -45,9 +45,9 @@ export default function AISearchBox() {
   }, []);
 
   const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?category=خارج الخدمة" },
-    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?category=قطع المحرك" },
-    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?category=قطع المحرك" },
+    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
+    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?category=Moteur (المحرك)" },
   ];
 
   return (

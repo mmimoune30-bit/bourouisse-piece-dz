@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImagePlus, AlertCircle, Sparkles, CarFront } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ImagePlus, AlertCircle, Sparkles, CarFront, AlertTriangle } from "lucide-react";
 import { useState, useMemo } from "react";
 
 const CATEGORY_DATA = {
@@ -21,11 +22,11 @@ const CATEGORY_DATA = {
   "Électricité (الكهرباء)": [
     "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
     "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
-    "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignطant", "Klaxon"
+    "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
   ],
   "Suspension et Direction (التوازي والتوازن)": [
     "Amortisseur", "Ressort", "Triangle de suspension", "Rotule", "Biellette de direction", 
-    "Crémaillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
+    "Créماillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
   ],
   "Pneumatiques (الإطارات)": [
     "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveur", "Valve", "Capteur pression pneu", "Roue complète"
@@ -37,6 +38,9 @@ const CATEGORY_DATA = {
   "Accessoires (الأكسسوارات)": [
     "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
     "Chargeur USB", "Support téléphone", "Alarme", "GPS", "Barre de toit", "Attelage", "Climatisation"
+  ],
+  "Véhicules hors service (مركبات خارج الخدمة)": [
+    "Voiture accidentée (سيارة مصدومة)", "Voiture pour pièces (سيارة للقطع)", "Moteur HS", "Châssis seul", "Véhicule brûlé", "Épave complète"
   ]
 };
 
@@ -63,7 +67,7 @@ const BRAND_MODELS = {
   "Chevrolet": ["Aveo", "Spark", "Cruze", "Captiva"]
 };
 
-const MOTORISATIONS = ["Essence", "Diesel", "GPL", "Hybride", "Électrique"];
+const MOTORISATIONS = ["Essence", "Diesel", "GPL", "Hybride", "Électريك"];
 const YEARS = Array.from({ length: 2025 - 1980 + 1 }, (_, i) => (2025 - i).toString());
 
 const WILAYAS = [
@@ -86,6 +90,7 @@ export default function NewListing() {
   const [selectedPart, setSelectedPart] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [damagePercentage, setDamagePercentage] = useState<number>(0);
 
   const partsList = useMemo(() => {
     return selectedCategory ? CATEGORY_DATA[selectedCategory as keyof typeof CATEGORY_DATA] : [];
@@ -94,6 +99,8 @@ export default function NewListing() {
   const modelsList = useMemo(() => {
     return selectedBrand ? BRAND_MODELS[selectedBrand as keyof typeof BRAND_MODELS] : [];
   }, [selectedBrand]);
+
+  const isOutOfService = selectedCategory === "Véhicules hors service (مركبات خارج الخدمة)";
 
   const handleCategoryChange = (val: string) => {
     setSelectedCategory(val);
@@ -120,7 +127,7 @@ export default function NewListing() {
               {/* Main Classification */}
               <Card className="border-none shadow-sm">
                 <CardHeader className="bg-primary text-white border-b rounded-t-lg">
-                  <CardTitle className="text-lg text-right">تصنيف القطعة</CardTitle>
+                  <CardTitle className="text-lg text-right">تصنيف القطعة أو المركبة</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,14 +146,14 @@ export default function NewListing() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="font-bold">نوع القطعة (من القائمة)</Label>
+                      <Label className="font-bold">نوع القطعة / المركبة</Label>
                       <Select 
                         disabled={!selectedCategory} 
                         value={selectedPart} 
                         onValueChange={setSelectedPart}
                       >
                         <SelectTrigger className="h-12 border-2 focus:ring-secondary">
-                          <SelectValue placeholder={selectedCategory ? "اختر القطعة" : "اختر الفئة أولاً"} />
+                          <SelectValue placeholder={selectedCategory ? "اختر النوع" : "اختر الفئة أولاً"} />
                         </SelectTrigger>
                         <SelectContent>
                           {partsList.map((part) => (
@@ -157,20 +164,50 @@ export default function NewListing() {
                     </div>
                   </div>
 
-                  {/* Manual Entry Field */}
-                  <div className="pt-4 border-t space-y-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Sparkles size={16} className="text-secondary" />
-                      <Label className="font-bold">اسم القطعة يدوياً (في حال عدم وجودها في القائمة)</Label>
+                  {/* Damage Info for Out of Service Vehicles */}
+                  {isOutOfService && (
+                    <div className="pt-6 border-t space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                      <div className="flex flex-row-reverse items-center gap-2 mb-2 text-destructive">
+                        <AlertTriangle size={20} />
+                        <h3 className="font-black text-lg">تفاصيل حالة المركبة</h3>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-black text-primary bg-secondary/20 px-3 py-1 rounded-full">{damagePercentage}%</span>
+                          <Label className="font-bold">نسبة التحطم التقديرية</Label>
+                        </div>
+                        <Slider 
+                          value={[damagePercentage]} 
+                          max={100} 
+                          step={1} 
+                          onValueChange={(vals) => setDamagePercentage(vals[0])}
+                          className="py-4"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="font-bold">وصف دقيق لحالة المركبة (الأجزاء المتضررة/السليمة)</Label>
+                        <Textarea 
+                          placeholder="مثال: الواجهة الأمامية محطمة بالكامل، المحرك سليم، الأبواب الخلفية بحالة جيدة..." 
+                          className="min-h-[100px] border-2 border-destructive/20 focus:ring-destructive"
+                        />
+                      </div>
                     </div>
-                    <Input 
-                      placeholder="أدخل اسم القطعة بدقة هنا..." 
-                      className="h-12 border-2 focus:ring-secondary"
-                    />
-                    <p className="text-[10px] text-muted-foreground">
-                      * استخدم هذا الحقل فقط إذا لم تجد اسم القطعة المناسب في القائمة المنسدلة أعلاه.
-                    </p>
-                  </div>
+                  )}
+
+                  {!isOutOfService && (
+                    <div className="pt-4 border-t space-y-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Sparkles size={16} className="text-secondary" />
+                        <Label className="font-bold">اسم القطعة يدوياً (اختياري)</Label>
+                      </div>
+                      <Input 
+                        placeholder="أدخل اسم القطعة بدقة هنا..." 
+                        className="h-12 border-2 focus:ring-secondary"
+                      />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -178,7 +215,7 @@ export default function NewListing() {
               <Card className="border-none shadow-sm">
                 <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                   <CarFront size={20} className="text-primary" />
-                  <CardTitle className="text-lg text-right">معلومات المركبة</CardTitle>
+                  <CardTitle className="text-lg text-right">معلومات المركبة الأصلية</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -186,7 +223,7 @@ export default function NewListing() {
                       <Label className="font-bold">العلامة التجارية (Marque)</Label>
                       <Select onValueChange={handleBrandChange}>
                         <SelectTrigger className="h-12">
-                          <SelectValue placeholder="اختر العلامة (Renault, BMW...)" />
+                          <SelectValue placeholder="اختر العلامة" />
                         </SelectTrigger>
                         <SelectContent>
                           {Object.keys(BRAND_MODELS).map(brand => (
@@ -238,21 +275,22 @@ export default function NewListing() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label className="font-bold">الجيل (Génération - اختياري)</Label>
-                      <Input placeholder="مثال: Phase 2, LCI..." className="h-12" />
+                      <Label className="font-bold">الجيل (Génération)</Label>
+                      <Input placeholder="Phase 2, LCI..." className="h-12" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                     <div className="space-y-2">
-                      <Label className="font-bold">حالة القطعة (État)</Label>
+                      <Label className="font-bold">حالة القطعة / المركبة</Label>
                       <Select>
                         <SelectTrigger className="h-12">
-                          <SelectValue placeholder="جديد أم مستعمل؟" />
+                          <SelectValue placeholder="الحالة" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="new">Neuf (جديد)</SelectItem>
                           <SelectItem value="used">Occasion (مستعمل)</SelectItem>
+                          {isOutOfService && <SelectItem value="damaged">Accidentée (مصدومة)</SelectItem>}
                         </SelectContent>
                       </Select>
                     </div>
@@ -304,9 +342,9 @@ export default function NewListing() {
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="space-y-2">
-                    <Label className="font-bold">وصف تفصيلي (اختياري)</Label>
+                    <Label className="font-bold">وصف إضافي (اختياري)</Label>
                     <Textarea 
-                      placeholder="أضف تفاصيل أخرى مثل: الضمان، سبب البيع، التوافق..." 
+                      placeholder="أضف أي تفاصيل أخرى ترغب في مشاركتها..." 
                       className="min-h-[120px] focus:ring-secondary" 
                     />
                   </div>
@@ -340,11 +378,6 @@ export default function NewListing() {
                       <span className="text-primary font-bold">30 يوم</span>
                       <span className="text-muted-foreground">مدة العرض</span>
                     </div>
-                    <div className="pt-3 border-t">
-                       <p className="text-[11px] text-muted-foreground leading-relaxed text-right">
-                         بمجرد النشر، سيخضع إعلانك للمراجعة للتأكد من مطابقة الصور والبيانات المختارة.
-                       </p>
-                    </div>
                   </div>
                   <Button className="w-full h-14 text-lg font-black shadow-lg shadow-primary/20">
                     نشر الإعلان الآن
@@ -355,9 +388,9 @@ export default function NewListing() {
               <div className="bg-secondary/10 p-5 rounded-2xl border border-secondary/20 flex flex-row-reverse gap-4">
                 <AlertCircle className="text-secondary shrink-0" size={24} />
                 <div className="text-right">
-                  <h4 className="font-black text-sm text-primary">نظام الإعلانات الموحد</h4>
+                  <h4 className="font-black text-sm text-primary">نصيحة للبائع</h4>
                   <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-                    استخدام القوائم المنسدلة المترابطة يساعد المشترين في العثور على قطعتك بسرعة ودقة بناءً على العلامة التجارية والموديل.
+                    الإعلانات التي تحتوي على وصف دقيق وصور واضحة من جميع الزوايا تحصل على اهتمام أكبر بنسبة 70%.
                   </p>
                 </div>
               </div>

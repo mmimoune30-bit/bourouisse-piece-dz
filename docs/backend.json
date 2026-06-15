@@ -2,19 +2,21 @@
 {
   "entities": {
     "Listing": {
-      "title": "إعلان قطعة غيار",
-      "description": "بيانات تفصيلية لقطعة غيار معروضة للبيع",
+      "title": "إعلان قطعة غيار أو مركبة",
+      "description": "بيانات تفصيلية لقطعة غيار أو مركبة معروضة للبيع",
       "type": "object",
       "properties": {
-        "category": { "type": "string", "description": "الفئة الرئيسية للقطعة" },
-        "partType": { "type": "string", "description": "نوع القطعة من القائمة" },
+        "category": { "type": "string", "description": "الفئة الرئيسية (مثال: محرك، مركبات خارج الخدمة)" },
+        "partType": { "type": "string", "description": "نوع القطعة أو نوع المركبة" },
         "manualPartName": { "type": "string", "description": "اسم القطعة المدخل يدوياً" },
         "brand": { "type": "string", "description": "العلامة التجارية للمركبة" },
         "model": { "type": "string", "description": "موديل المركبة" },
         "year": { "type": "string", "description": "سنة الصنع" },
         "motorisation": { "type": "string", "description": "نوع المحرك/الوقود" },
         "generation": { "type": "string", "description": "جيل المركبة" },
-        "condition": { "type": "string", "enum": ["new", "used"], "description": "حالة القطعة" },
+        "condition": { "type": "string", "enum": ["new", "used", "damaged"], "description": "حالة القطعة أو المركبة" },
+        "damagePercentage": { "type": "number", "description": "نسبة التحطم للمركبات خارج الخدمة (0-100)" },
+        "vehicleConditionDetail": { "type": "string", "description": "وصف دقيق لحالة المركبة أو القطعة" },
         "price": { "type": "number", "description": "السعر بالدينار الجزائري" },
         "wilaya": { "type": "string", "description": "ولاية البائع" },
         "commune": { "type": "string", "description": "بلدية البائع" },

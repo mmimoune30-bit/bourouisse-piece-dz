@@ -10,31 +10,44 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, SlidersHorizontal, ArrowUpDown } from "lucide-react";
-import { Suspense, useMemo } from "react";
+import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle } from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "المحرك", seller: "EliteMotors DZ", condition: "New" as const },
-  { id: "p2", name: "طقم فرامل سيراميك كربون", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "الهيكل", seller: "SpeedHub Algiers", condition: "New" as const },
-  { id: "p3", name: "إطارات الطرق الوعرة (طقم 4)", price: 85000, image: PlaceHolderImages[2].imageUrl, category: "الإطارات", seller: "DesertRoad Parts", condition: "New" as const },
-  { id: "p4", name: "بطارية سيارة 12 فولت شديدة التحمل", price: 18500, image: PlaceHolderImages[3].imageUrl, category: "الكهرباء", seller: "Energy Dz", condition: "New" as const },
-  { id: "p5", name: "شاحن توربيني GT20", price: 85000, image: PlaceHolderImages[5].imageUrl, category: "المحرك", seller: "Turbo Dz", condition: "New" as const },
-  { id: "p6", name: "ناقل حركة أوتوماتيكي", price: 150000, image: PlaceHolderImages[6].imageUrl, category: "المحرك", seller: "GearBox Master", condition: "Used" as const },
-  { id: "p7", name: "أضواء LED أمامية", price: 18000, image: PlaceHolderImages[2].imageUrl, category: "الكهرباء", seller: "Light Dz", condition: "New" as const },
-  { id: "p8", name: "مضخة وقود أصلية", price: 32000, image: PlaceHolderImages[0].imageUrl, category: "المحرك", seller: "Fuel Parts", condition: "New" as const },
+  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", seller: "EliteMotors DZ", condition: "New" as const },
+  { id: "p2", name: "طقم فرامل سيراميك كربون", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Carrosserie (الهيكل)", seller: "SpeedHub Algiers", condition: "New" as const },
+  { id: "p3", name: "إطارات الطرق الوعرة (طقم 4)", price: 85000, image: PlaceHolderImages[2].imageUrl, category: "Pneumatiques (الإطارات)", seller: "DesertRoad Parts", condition: "New" as const },
+  { id: "p4", name: "بطارية سيارة 12 فولت شديدة التحمل", price: 18500, image: PlaceHolderImages[3].imageUrl, category: "Électricité (الكهرباء)", seller: "Energy Dz", condition: "New" as const },
+  { id: "v1", name: "سيارة Renault Clio مصدومة", price: 850000, image: PlaceHolderImages[5].imageUrl, category: "Véhicules hors service (مركبات خارج الخدمة)", seller: "Salvage Parts", condition: "Damaged" as const, damagePercentage: 45 },
 ];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
+  const [damageFilter, setDamageFilter] = useState<number>(100);
 
   const filteredProducts = useMemo(() => {
-    if (!categoryFilter) return ALL_PRODUCTS;
-    return ALL_PRODUCTS.filter(p => p.category === categoryFilter || categoryFilter === "all");
-  }, [categoryFilter]);
+    let result = ALL_PRODUCTS;
+    if (categoryFilter && categoryFilter !== "all") {
+      result = result.filter(p => p.category === categoryFilter);
+    }
+    if (categoryFilter === "Véhicules hors service (مركبات خارج الخدمة)") {
+      result = result.filter(p => (p.damagePercentage || 0) <= damageFilter);
+    }
+    return result;
+  }, [categoryFilter, damageFilter]);
 
-  const categories = ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"];
+  const categories = [
+    "Moteur (المحرك)",
+    "Électricité (الكهرباء)",
+    "Suspension et Direction (التوازي والتوازن)",
+    "Pneumatiques (الإطارات)",
+    "Carrosserie (الهيكل)",
+    "Accessoires (الأكسسوارات)",
+    "Véhicules hors service (مركبات خارج الخدمة)"
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -63,6 +76,25 @@ function CatalogContent() {
                     </div>
                   </div>
 
+                  {categoryFilter === "Véhicules hors service (مركبات خارج الخدمة)" && (
+                    <div className="space-y-4 pt-4 border-t">
+                      <div className="flex items-center justify-end gap-2 text-destructive mb-2">
+                        <AlertTriangle size={16} />
+                        <Label className="text-sm font-black">نسبة التحطم القصوى</Label>
+                      </div>
+                      <div className="flex justify-between items-center text-xs font-bold text-primary mb-1">
+                        <span>{damageFilter}%</span>
+                        <span>0%</span>
+                      </div>
+                      <Slider 
+                        value={[damageFilter]} 
+                        max={100} 
+                        step={5} 
+                        onValueChange={(vals) => setDamageFilter(vals[0])}
+                      />
+                    </div>
+                  )}
+
                   <div className="space-y-4 pt-4 border-t">
                     <Label className="text-sm font-black">الحالة</Label>
                     <div className="space-y-2">
@@ -74,6 +106,10 @@ function CatalogContent() {
                         <Label htmlFor="cond-used" className="text-sm cursor-pointer">مستعمل</Label>
                         <Checkbox id="cond-used" />
                       </div>
+                      <div className="flex items-center justify-end gap-2">
+                        <Label htmlFor="cond-damaged" className="text-sm cursor-pointer">مصدومة</Label>
+                        <Checkbox id="cond-damaged" />
+                      </div>
                     </div>
                   </div>
 
@@ -82,12 +118,6 @@ function CatalogContent() {
                   </div>
                 </CardContent>
               </Card>
-
-              <div className="bg-primary p-6 rounded-2xl text-white text-right space-y-4">
-                <h4 className="font-bold text-sm text-secondary">إعلان ممول</h4>
-                <p className="text-xs text-blue-100/70">احصل على قطع غيار أصلية بضمان يصل إلى سنة كاملة.</p>
-                <Button variant="secondary" size="sm" className="w-full font-bold">اكتشف المزيد</Button>
-              </div>
             </aside>
 
             {/* Main Products Grid */}
@@ -95,11 +125,6 @@ function CatalogContent() {
               <div className="flex flex-col sm:flex-row-reverse justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border">
                 <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
                   <span className="text-primary">{filteredProducts.length}</span> إعلان متاح
-                  {categoryFilter && categoryFilter !== "all" && (
-                    <span className="bg-secondary/20 text-primary px-3 py-1 rounded-full text-[10px] mr-2">
-                      {categoryFilter}
-                    </span>
-                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="relative w-48 hidden sm:block">
