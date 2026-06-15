@@ -65,11 +65,33 @@ const CATEGORIES = [
   { name: "الأكسيسوارات", icon: <Sparkles size={24} className="text-secondary" />, count: 1100 },
 ];
 
-const F1Logo = () => (
-  <svg width="60" height="24" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 animate-pulse">
-    <path d="M0 0H100L85 40H0L15 0Z" fill="white" />
-    <text x="25" y="30" fill="#e11d48" fontSize="28" fontWeight="900" fontFamily="sans-serif" fontStyle="italic">F1</text>
-  </svg>
+const CarBrandsLogos = () => (
+  <div className="flex items-center gap-4 px-4 opacity-80 hover:opacity-100 transition-opacity">
+    {/* Mercedes */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5 0 .23-.01.46-.03.68l-8.47-4.88V3.5zm-1 5.37l-7.53 4.34c.3-.59.66-1.15 1.08-1.66l6.45-3.71v1.03zm2 0v1.03l6.45 3.71c.42.51.78 1.07 1.08 1.66l-7.53-4.34zm-8.47 5.75l8.47 4.88v4.32c-4.69 0-8.5-3.81-8.5-8.5 0-.23.01-.46.03-.7zm9.47 4.88l8.47-4.88c.02.24.03.47.03.7 0 4.69-3.81 8.5-8.5 8.5v-4.32z" />
+    </svg>
+    {/* Hyundai */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M12 2C5.37 2 0 6.48 0 12s5.37 10 12 10 12-4.48 12-10S18.63 2 12 2zm3.32 15.11l-1.01-4.22h-4.62l1.01 4.22H8.38l-1.63-6.83h2.32l1.01 4.22h4.62l-1.01-4.22h2.32l1.63 6.83h-2.32z" />
+    </svg>
+    {/* VW (Golf) */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm0 1.5l-2 5.5h4l-2-5.5zm-3 8.5l2 5.5h2l2-5.5h-1.5l-1.25 3.5h-1.5l-1.25-3.5H9z" />
+    </svg>
+    {/* Peugeot */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M12 2L4 6v12l8 4 8-4V6l-8-4zm6 15l-6 3-6-3V7l6-3 6 3v10zM12 8l-4 2v4l4 2 4-2v-4l-4-2z" />
+    </svg>
+    {/* Renault */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M12 2L5 12l7 10 7-10-7-10zm0 3.5L16.5 12 12 18.5 7.5 12 12 5.5z" />
+    </svg>
+    {/* Kia */}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M2.5 7h3L7.5 12 9.5 7h3L10 12l2.5 5h-3L7.5 12 5.5 17h-3L5 12 2.5 7zm11 0h3v10h-3V7zm4.5 0h3l1.5 3L24 7h3l-3 5 3 5h-3l-1.5-3L18 17h-3l3-5-3-5z" />
+    </svg>
+  </div>
 );
 
 export default function Home() {
@@ -82,8 +104,8 @@ export default function Home() {
       <main className="flex-grow pt-[146px]">
         {/* Categories Bar - Sticky and Always Fixed at the top when scrolling */}
         <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-hidden shadow-lg py-3">
-          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4 md:gap-12 whitespace-nowrap">
-            <F1Logo />
+          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4 md:gap-8 whitespace-nowrap">
+            <CarBrandsLogos />
             <div className="flex flex-row-reverse items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar flex-grow justify-center">
               <div className="flex flex-row-reverse items-center">
                 <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
@@ -108,7 +130,7 @@ export default function Home() {
                 عرض الكل
               </Link>
             </div>
-            <F1Logo />
+            <CarBrandsLogos />
           </div>
         </section>
 
