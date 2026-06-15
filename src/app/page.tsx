@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -72,7 +73,7 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[146px]">
-        {/* Categories Bar - Sticky to show after the Navbar */}
+        {/* Categories Bar - Sticky and Always Fixed at the top when scrolling */}
         <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
           <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
             <div className="flex flex-row-reverse items-center">
