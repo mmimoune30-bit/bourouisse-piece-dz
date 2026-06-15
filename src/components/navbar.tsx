@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
+import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
@@ -15,8 +16,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -67,20 +71,34 @@ export default function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between gap-4">
-        {/* Logo Section */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-            <Settings size={24} className="animate-spin-slow" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-headline font-black text-xl md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
-              Bourouisse <span className="text-white">Piece-Dz</span>
-            </span>
-            <span className="text-[9px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
-              Pièces & Automobiles
-            </span>
-          </div>
-        </Link>
+        {/* Left Side: Back Button and Logo */}
+        <div className="flex items-center gap-4">
+          {pathname !== "/" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 text-white hover:bg-zinc-800 transition-colors"
+              onClick={() => router.back()}
+              title="رجوع"
+            >
+              <ArrowLeft size={24} className="text-secondary" />
+            </Button>
+          )}
+          
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+              <Settings size={24} className="animate-spin-slow" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-headline font-black text-xl md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
+                Bourouisse <span className="text-white">Piece-Dz</span>
+              </span>
+              <span className="text-[9px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+                Pièces & Automobiles
+              </span>
+            </div>
+          </Link>
+        </div>
 
         {/* AI Search Bar (Centered) */}
         <div className="hidden md:flex flex-1 max-w-xl relative mx-8" ref={searchRef}>
