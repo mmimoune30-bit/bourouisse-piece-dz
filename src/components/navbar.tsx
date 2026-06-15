@@ -92,11 +92,8 @@ export default function Navbar() {
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex flex-col items-center gap-1.5 cursor-pointer group">
-                <div className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border border-white/10 group-hover:bg-zinc-100 transition-all">
-                  <Languages size={32} />
-                </div>
-                <span className="text-[12px] font-black text-secondary uppercase tracking-tight">اللغة</span>
+              <div className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border border-white/10 cursor-pointer group hover:bg-zinc-100 transition-all font-black text-base min-w-[120px]">
+                {languages.find(l => l.code === currentLang)?.name || "اللغة"}
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white p-2">
