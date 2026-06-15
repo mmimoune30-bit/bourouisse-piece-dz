@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +40,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl border-b-2 border-secondary/30">
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl border-b-2 border-secondary/30 h-[160px]">
       {/* Top Bar: Contact & Social Info */}
       <div className="bg-zinc-900/80 border-b border-white/5 py-2">
         <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4">
@@ -92,9 +92,12 @@ export default function Navbar() {
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border border-white/10 cursor-pointer group hover:bg-zinc-100 transition-all font-black text-lg min-w-[140px]">
+              <Button 
+                variant="outline" 
+                className="bg-white h-14 px-8 rounded-xl flex items-center justify-center text-primary shadow-2xl border-2 border-white/20 cursor-pointer font-black text-lg min-w-[140px] hover:bg-zinc-100 transition-all hover:text-primary"
+              >
                 {languages.find(l => l.code === currentLang)?.name || "اللغة"}
-              </div>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white p-2">
               <DropdownMenuLabel className="text-center">اختر اللغة / Choisir la langue</DropdownMenuLabel>

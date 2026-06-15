@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
@@ -7,7 +6,7 @@ import ProductCard from "@/components/product-card";
 import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, CheckCircle2, Zap, Settings, Car, Disc, Sparkles, Plug, Scale } from "lucide-react";
+import { ArrowLeft, Car, Zap, Disc, Sparkles, Plug, Scale } from "lucide-react";
 
 const FEATURED_PRODUCTS = [
   {
@@ -120,9 +119,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[146px]">
+      <main className="flex-grow pt-[160px]">
         {/* Categories & Brands Bar - Sticky */}
-        <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-hidden shadow-lg py-3">
+        <section className="bg-destructive border-b-2 border-secondary sticky top-[160px] z-40 overflow-hidden shadow-lg py-3">
           <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6 md:gap-8">
             
             {/* Left Side: Brand Logos */}
@@ -207,9 +206,8 @@ export default function Home() {
         {/* AI SEARCH BOX */}
         <AISearchBox />
 
-        {/* Hero Section with New Background Image */}
+        {/* Hero Section */}
         <section className="relative w-full min-h-[500px] lg:min-h-[700px] flex items-start justify-center pt-20 lg:pt-32">
-          {/* Background Image Container */}
           <div className="absolute inset-0 z-0">
             <Image
               src={brandBanner}
@@ -219,20 +217,16 @@ export default function Home() {
               priority
               data-ai-hint="aerial scrapyard"
             />
-            {/* Overlay for readability if needed, but keeping it clear as per request */}
             <div className="absolute inset-0 bg-black/10" />
           </div>
 
-          {/* Content Area */}
           <div className="container mx-auto px-4 z-10 flex flex-col items-center">
-            {/* Main Brand Box (Recreating the style from the image) */}
             <div className="bg-white border-2 border-white p-6 md:p-10 rounded-sm shadow-[0_10px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in duration-700">
                <h1 className="text-3xl md:text-6xl font-black text-destructive tracking-tighter text-center">
                  بورويس لقطع الغيار
                </h1>
             </div>
 
-            {/* Additional Hero Content */}
             <div className="mt-12 text-center max-w-2xl bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl animate-in fade-in slide-in-from-bottom duration-1000">
               <h2 className="text-2xl md:text-4xl font-bold text-white leading-tight mb-4">
                 وجهتكم الأولى لقطع الغيار <span className="text-secondary italic">في الجزائر</span>
@@ -276,44 +270,6 @@ export default function Home() {
             {FEATURED_PRODUCTS.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
-          </div>
-          <div className="mt-8 flex justify-center">
-            <Link href="/catalog">
-              <Button variant="outline" size="lg" className="rounded-full px-10 h-12 font-bold border-2 hover:bg-primary hover:text-white transition-all">
-                عرض كل الإعلانات (50,000+)
-              </Button>
-            </Link>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="container mx-auto px-4 py-12 mb-10">
-          <div className="bg-primary rounded-3xl overflow-hidden relative min-h-[350px] flex items-center shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-l from-primary via-primary/80 to-transparent z-10" />
-            <div className="absolute inset-0 overflow-hidden">
-                <Image
-                  src={PlaceHolderImages[6].imageUrl}
-                  alt="Car accessories"
-                  fill
-                  className="object-cover scale-110"
-                />
-            </div>
-            <div className="relative z-20 p-8 md:p-12 max-w-xl text-white text-right ml-auto">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">كن بائعاً معتمداً معنا</h2>
-              <p className="text-base text-blue-100/70 mb-6 leading-relaxed">
-                انضم إلى أكبر منصة لقطع الغيار في الجزائر وقم ببيع منتجاتك لآلاف المشترين يومياً.
-              </p>
-              <div className="flex flex-col sm:flex-row-reverse gap-3">
-                <Link href="/seller/register">
-                  <Button size="lg" variant="secondary" className="h-12 px-8 text-base font-bold shadow-lg w-full sm:w-auto">
-                    ابدأ مجاناً
-                  </Button>
-                </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8 text-base font-bold border-white/20 text-white w-full sm:w-auto">
-                  تعرف على المميزات
-                </Button>
-              </div>
-            </div>
           </div>
         </section>
       </main>
