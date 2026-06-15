@@ -65,6 +65,13 @@ const CATEGORIES = [
   { name: "الأكسيسوارات", icon: <Sparkles size={24} className="text-secondary" />, count: 1100 },
 ];
 
+const F1Logo = () => (
+  <svg width="60" height="24" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 animate-pulse">
+    <path d="M0 0H100L85 40H0L15 0Z" fill="white" />
+    <text x="25" y="30" fill="#e11d48" fontSize="28" fontWeight="900" fontFamily="sans-serif" fontStyle="italic">F1</text>
+  </svg>
+);
+
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[5].imageUrl;
 
@@ -74,30 +81,34 @@ export default function Home() {
 
       <main className="flex-grow pt-[146px]">
         {/* Categories Bar - Sticky and Always Fixed at the top when scrolling */}
-        <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-x-auto no-scrollbar shadow-lg py-3">
-          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-start md:justify-center gap-6 md:gap-12 whitespace-nowrap">
-            <div className="flex flex-row-reverse items-center">
-              <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
-                اختيار الفئة:
-              </span>
-            </div>
-            {CATEGORIES.map((cat, i) => (
-              <Link
-                key={i}
-                href={`/catalog?category=${encodeURIComponent(cat.name)}`}
-                className="flex flex-row-reverse items-center gap-2.5 group transition-all"
-              >
-                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
-                  {cat.icon}
-                </div>
-                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors">
-                  {cat.name}
+        <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-hidden shadow-lg py-3">
+          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4 md:gap-12 whitespace-nowrap">
+            <F1Logo />
+            <div className="flex flex-row-reverse items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar flex-grow justify-center">
+              <div className="flex flex-row-reverse items-center">
+                <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
+                  اختيار الفئة:
                 </span>
+              </div>
+              {CATEGORIES.map((cat, i) => (
+                <Link
+                  key={i}
+                  href={`/catalog?category=${encodeURIComponent(cat.name)}`}
+                  className="flex flex-row-reverse items-center gap-2.5 group transition-all"
+                >
+                  <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
+                    {cat.icon}
+                  </div>
+                  <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors">
+                    {cat.name}
+                  </span>
+                </Link>
+              ))}
+              <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline">
+                عرض الكل
               </Link>
-            ))}
-            <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline">
-              عرض الكل
-            </Link>
+            </div>
+            <F1Logo />
           </div>
         </section>
 
