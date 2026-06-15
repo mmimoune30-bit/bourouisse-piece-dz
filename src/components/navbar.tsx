@@ -1,9 +1,8 @@
-
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Search, ShoppingCart, User, Menu, X, Settings, Wrench, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
+import { Search, User, Settings, LayoutDashboard, ChevronDown, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
@@ -64,19 +63,19 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        "bg-black shadow-xl py-3 border-b border-secondary/20"
+        "bg-black shadow-xl py-2 border-b border-secondary/20"
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="bg-secondary p-2.5 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-            <Settings size={28} className="animate-spin-slow" />
+          <div className="bg-secondary p-2 rounded-xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+            <Settings size={24} className="animate-spin-slow" />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline font-black text-2xl md:text-3xl tracking-tighter text-secondary uppercase italic leading-none">
+            <span className="font-headline font-black text-xl md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
               Bourouisse <span className="text-white">PieceDz</span>
             </span>
-            <span className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+            <span className="text-[9px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
               Pièces & Automobiles
             </span>
           </div>
@@ -87,7 +86,7 @@ export default function Navbar() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="ابحث عن قطع الغيار (مثل: فلاتر زيت، فرامل...)"
-              className="pl-10 h-11 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all text-right"
+              className="pl-10 h-10 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-secondary focus:border-secondary transition-all text-right text-xs"
               dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -115,12 +114,12 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0 text-white hover:bg-zinc-800">
-                <Languages size={22} className="text-secondary" />
-                <span className="text-[10px] font-bold leading-none mt-1">langue</span>
+              <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0.5 text-white hover:bg-zinc-800 transition-colors">
+                <Languages size={20} className="text-secondary" />
+                <span className="text-[10px] font-bold leading-none">langue</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-white">
@@ -139,16 +138,16 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/catalog">
-            <Button variant="ghost" className="hidden lg:flex text-white hover:text-secondary hover:bg-zinc-800 font-bold">تصفح الكل</Button>
+          <Link href="/catalog" className="hidden lg:block">
+            <Button variant="ghost" className="text-white hover:text-secondary hover:bg-zinc-800 font-bold text-xs h-auto py-2">تصفح الكل</Button>
           </Link>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black">
-                <LayoutDashboard size={18} />
+              <Button variant="outline" className="flex gap-2 items-center bg-transparent border-secondary text-secondary hover:bg-secondary hover:text-black font-black text-xs h-9">
+                <LayoutDashboard size={16} />
                 <span className="hidden sm:inline">بوابة البائع</span>
-                <ChevronDown size={14} className="opacity-50" />
+                <ChevronDown size={12} className="opacity-50" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800 text-white">
@@ -163,9 +162,10 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="secondary" size="icon" className="rounded-full shadow-lg shadow-secondary/10" asChild>
+          <Button variant="ghost" className="h-auto py-1 px-2 flex flex-col items-center gap-0.5 text-white hover:bg-zinc-800 transition-colors group/user" asChild>
             <Link href="/buyer/register">
-              <User size={22} />
+              <User size={22} className="text-secondary group-hover/user:scale-110 transition-transform" />
+              <span className="text-[9px] font-black leading-none uppercase tracking-tighter">سجل معنا كمشتري</span>
             </Link>
           </Button>
         </div>
