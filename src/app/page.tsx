@@ -65,34 +65,53 @@ const CATEGORIES = [
   { name: "الأكسيسوارات", icon: <Sparkles size={24} className="text-secondary" />, count: 1100 },
 ];
 
-const CarBrandsLogos = () => (
-  <div className="flex items-center gap-4 px-4 opacity-80 hover:opacity-100 transition-opacity">
-    {/* Mercedes */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5 0 .23-.01.46-.03.68l-8.47-4.88V3.5zm-1 5.37l-7.53 4.34c.3-.59.66-1.15 1.08-1.66l6.45-3.71v1.03zm2 0v1.03l6.45 3.71c.42.51.78 1.07 1.08 1.66l-7.53-4.34zm-8.47 5.75l8.47 4.88v4.32c-4.69 0-8.5-3.81-8.5-8.5 0-.23.01-.46.03-.7zm9.47 4.88l8.47-4.88c.02.24.03.47.03.7 0 4.69-3.81 8.5-8.5 8.5v-4.32z" />
-    </svg>
-    {/* Hyundai */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2C5.37 2 0 6.48 0 12s5.37 10 12 10 12-4.48 12-10S18.63 2 12 2zm3.32 15.11l-1.01-4.22h-4.62l1.01 4.22H8.38l-1.63-6.83h2.32l1.01 4.22h4.62l-1.01-4.22h2.32l1.63 6.83h-2.32z" />
-    </svg>
-    {/* VW (Golf) */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm0 1.5l-2 5.5h4l-2-5.5zm-3 8.5l2 5.5h2l2-5.5h-1.5l-1.25 3.5h-1.5l-1.25-3.5H9z" />
-    </svg>
-    {/* Peugeot */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2L4 6v12l8 4 8-4V6l-8-4zm6 15l-6 3-6-3V7l6-3 6 3v10zM12 8l-4 2v4l4 2 4-2v-4l-4-2z" />
-    </svg>
-    {/* Renault */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M12 2L5 12l7 10 7-10-7-10zm0 3.5L16.5 12 12 18.5 7.5 12 12 5.5z" />
-    </svg>
-    {/* Kia */}
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M2.5 7h3L7.5 12 9.5 7h3L10 12l2.5 5h-3L7.5 12 5.5 17h-3L5 12 2.5 7zm11 0h3v10h-3V7zm4.5 0h3l1.5 3L24 7h3l-3 5 3 5h-3l-1.5-3L18 17h-3l3-5-3-5z" />
-    </svg>
-  </div>
-);
+const BRANDS = [
+  { 
+    name: "Mercedes-Benz", 
+    slug: "Mercedes",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5 0 .23-.01.46-.03.68l-8.47-4.88V3.5zm-1 5.37l-7.53 4.34c.3-.59.66-1.15 1.08-1.66l6.45-3.71v1.03zm2 0v1.03l6.45 3.71c.42.51.78 1.07 1.08 1.66l-7.53-4.34zm-8.47 5.75l8.47 4.88v4.32c-4.69 0-8.5-3.81-8.5-8.5 0-.23.01-.46.03-.7zm9.47 4.88l8.47-4.88c.02.24.03.47.03.7 0 4.69-3.81 8.5-8.5 8.5v-4.32z" />
+      </svg>
+    )
+  },
+  { 
+    name: "Volkswagen", 
+    slug: "Volkswagen",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm0 1.5l-2 5.5h4l-2-5.5zm-3 8.5l2 5.5h2l2-5.5h-1.5l-1.25 3.5h-1.5l-1.25-3.5H9z" />
+      </svg>
+    )
+  },
+  { 
+    name: "Hyundai", 
+    slug: "Hyundai",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C5.37 2 0 6.48 0 12s5.37 10 12 10 12-4.48 12-10S18.63 2 12 2zm3.32 15.11l-1.01-4.22h-4.62l1.01 4.22H8.38l-1.63-6.83h2.32l1.01 4.22h4.62l-1.01-4.22h2.32l1.63 6.83h-2.32z" />
+      </svg>
+    )
+  },
+  { 
+    name: "Peugeot", 
+    slug: "Peugeot",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L4 6v12l8 4 8-4V6l-8-4zm6 15l-6 3-6-3V7l6-3 6 3v10zM12 8l-4 2v4l4 2 4-2v-4l-4-2z" />
+      </svg>
+    )
+  },
+  { 
+    name: "Renault", 
+    slug: "Renault",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L5 12l7 10 7-10-7-10zm0 3.5L16.5 12 12 18.5 7.5 12 12 5.5z" />
+      </svg>
+    )
+  }
+];
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === "hero-parts")?.imageUrl || PlaceHolderImages[5].imageUrl;
@@ -102,35 +121,55 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[146px]">
-        {/* Categories Bar - Sticky and Always Fixed at the top when scrolling */}
+        {/* Categories & Brands Bar - Sticky */}
         <section className="bg-destructive border-b-2 border-secondary sticky top-[146px] z-40 overflow-hidden shadow-lg py-3">
-          <div className="container mx-auto px-4 flex flex-row-reverse items-center justify-between gap-4 md:gap-8 whitespace-nowrap">
-            <CarBrandsLogos />
-            <div className="flex flex-row-reverse items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar flex-grow justify-center">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6 md:gap-8">
+            
+            {/* Left Side: Brand Logos (Now dynamic and ordered) */}
+            <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+              {BRANDS.map((brand, i) => (
+                <Link 
+                  key={i} 
+                  href={`/catalog?brand=${brand.slug}`}
+                  className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110"
+                >
+                  <div className="text-white hover:text-secondary transition-colors drop-shadow-lg">
+                    {brand.icon}
+                  </div>
+                  <span className="text-[10px] md:hidden font-bold text-white mt-1 uppercase tracking-tighter">
+                    {brand.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Middle: Category Links */}
+            <div className="flex flex-row-reverse items-center gap-6 md:gap-10 overflow-x-auto no-scrollbar flex-grow justify-center">
               <div className="flex flex-row-reverse items-center">
-                <span className="text-base font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner">
-                  اختيار الفئة:
+                <span className="text-sm font-black text-white bg-primary/20 border border-secondary px-4 py-1.5 rounded-lg ml-3 uppercase tracking-tighter shadow-inner whitespace-nowrap">
+                  الفئة:
                 </span>
               </div>
               {CATEGORIES.map((cat, i) => (
                 <Link
                   key={i}
                   href={`/catalog?category=${encodeURIComponent(cat.name)}`}
-                  className="flex flex-row-reverse items-center gap-2.5 group transition-all"
+                  className="flex flex-row-reverse items-center gap-2.5 group transition-all shrink-0"
                 >
                   <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
                     {cat.icon}
                   </div>
-                  <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors">
+                  <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
                     {cat.name}
                   </span>
                 </Link>
               ))}
-              <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline">
-                عرض الكل
-              </Link>
             </div>
-            <CarBrandsLogos />
+
+            {/* Right Side: Quick Link */}
+            <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline whitespace-nowrap hidden lg:block">
+              عرض الكل
+            </Link>
           </div>
         </section>
 
