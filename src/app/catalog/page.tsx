@@ -9,140 +9,94 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle, Car, Settings, Fuel } from "lucide-react";
-import { Suspense, useMemo, useState } from "react";
+import { Search, Filter, Car, Settings, Fuel, AlertTriangle, Layers, ChevronRight } from "lucide-react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 
-const ALL_PRODUCTS = [
-  { 
-    id: "p1", 
-    name: "كتلة محرك V8 دقيقة أصلية", 
-    price: 450000, 
-    image: PlaceHolderImages[0].imageUrl, 
-    category: "Moteur (المحرك)", 
-    seller: "EliteMotors DZ", 
-    condition: "New" as const, 
-    listingType: "part",
-    brand: "BMW" 
-  },
-  { 
-    id: "p2", 
-    name: "طقم فرامل سيراميك عالي الأداء", 
-    price: 120000, 
-    image: PlaceHolderImages[1].imageUrl, 
-    category: "Carrosserie (الهيكل)", 
-    seller: "SpeedHub Algiers", 
-    condition: "New" as const, 
-    listingType: "part" 
-  },
-  { 
-    id: "p3", 
-    name: "شاحن توربيني (Turbo) Mercedes AMG", 
-    price: 280000, 
-    image: PlaceHolderImages[5].imageUrl, 
-    category: "Moteur (المحرك)", 
-    seller: "BenzParts Algiers", 
-    condition: "Used" as const, 
-    listingType: "part",
-    brand: "Mercedes" 
-  },
-  { 
-    id: "p4", 
-    name: "كمبيوتر محرك Hyundai Accent (ECU)", 
-    price: 65000, 
-    image: PlaceHolderImages[6].imageUrl, 
-    category: "Électricité (الكهرباء)", 
-    seller: "KoreanParts DZ", 
-    condition: "Used" as const, 
-    listingType: "part",
-    brand: "Hyundai" 
-  },
-  { 
-    id: "p5", 
-    name: "مضخة بنزين Peugeot 301", 
-    price: 18500, 
-    image: PlaceHolderImages[3].imageUrl, 
-    category: "Moteur (المحرك)", 
-    seller: "Lion Parts", 
-    condition: "New" as const, 
-    listingType: "part",
-    brand: "Peugeot" 
-  },
-  { 
-    id: "v1", 
-    name: "سيارة Renault Clio مصدومة", 
-    price: 850000, 
-    image: PlaceHolderImages[5].imageUrl, 
-    category: "مركبات خارج الخدمة", 
-    seller: "Salvage Parts", 
-    condition: "Damaged" as const, 
-    listingType: "accidented", 
-    brand: "Renault", 
-    fuelType: "Diesel", 
-    damagePercentage: 45 
-  },
-  { 
-    id: "v2", 
-    name: "VW Golf 7 للقطع - حادث أمامي", 
-    price: 1200000, 
-    image: PlaceHolderImages[4].imageUrl, 
-    category: "مركبات خارج الخدمة", 
-    seller: "GermanParts Dz", 
-    condition: "Damaged" as const, 
-    listingType: "for_parts", 
-    brand: "Volkswagen", 
-    fuelType: "Essence" 
-  },
-];
+// --- Data Constants ---
+const BRAND_MODELS: Record<string, string[]> = {
+  "Renault": ["Clio", "Symbol", "Megane", "Scenic", "Kangoo", "Express", "Laguna", "Fluence", "19", "21", "Master", "Trafic"],
+  "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy", "Solenza"],
+  "Peugeot": ["206", "207", "208", "301", "307", "308", "406", "407", "Partner", "Expert", "Boxer", "508"],
+  "Citroën": ["C3", "C4", "C5", "Berlingo", "Xsara", "Saxo", "Jumper", "Jumpy"],
+  "Fiat": ["Punto", "Doblo", "Panda", "Tipo", "500", "Ducato", "Fiorino", "Palio", "Uno"],
+  "Volkswagen": ["Golf 4", "Golf 5", "Golf 6", "Golf 7", "Polo", "Passat", "Tiguan", "Touran", "Caddy"],
+  "Audi": ["A3", "A4", "A5", "A6", "Q3", "Q5", "Q7"],
+  "BMW": ["Série 1", "Série 3", "Série 5", "X1", "X3", "X5", "X6"],
+  "Mercedes-Benz": ["Classe A", "Classe C", "Classe E", "Sprinter", "Vito", "Classe S", "ML"],
+  "Opel": ["Corsa", "Astra", "Vectra", "Zafira", "Insignia", "Meriva"],
+  "Hyundai": ["Accent", "i10", "i20", "Tucson", "Santa Fe", "Atos", "i30", "Elantra", "H1"],
+  "Kia": ["Picanto", "Rio", "Cerato", "Sportage", "Sorento", "K2700"],
+  "Toyota": ["Yaris", "Corolla", "Hilux", "Rav4", "Land Cruiser", "Avensis"],
+  "Nissan": ["Micra", "Sunny", "Qashqai", "Navara", "Patrol", "X-Trail"],
+  "Suzuki": ["Swift", "Alto", "Vitara", "Jimny", "Celerio", "Dzire"],
+  "Hyundai-Truck": ["HD35", "HD65", "HD72", "HD120"],
+  "Isuzu": ["D-Max", "NPR", "NQR"],
+  "Chery": ["QQ", "Tiggo", "Fulwin", "Arrizo"],
+  "Geely": ["Emgrand", "GX3", "GC6"],
+  "JAC": ["J3", "J5", "S3", "T6", "1040"],
+  "DFSK": ["Glory", "Mini Truck", "K01", "V21"],
+  "Lada": ["Niva", "Granta", "Vesta"]
+};
+
+const CATEGORY_DATA: Record<string, string[]> = {
+  "Moteur (المحرك)": ["Moteur complet", "Culasse", "Injecteurs", "Turbo", "Pompe à eau", "Radiateur", "Alternateur", "Démarreur", "Kit d'embrayage", "Courroie"],
+  "Carrosserie (الهيكل)": ["Capot", "Pare-chocs", "Ailes", "Phares", "Feux", "Portières", "Coffre", "Rétroviseurs", "Pare-brise"],
+  "Suspension et Direction (التوازي و التوازن)": ["Amortisseurs", "Triangles", "Crémaillère", "Rotules", "Cardans", "Disques de frein", "Plaquettes"],
+  "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Faisceau", "Boîte à fusibles", "Capteurs", "Commodo"],
+  "Accessoires (الأكسيسوارات)": ["Autoradio", "Tapis", "Housses", "Caméra de recul", "Climatisation"]
+};
 
 const WILAYAS = [
-  "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna",
-  "06 - Béjaïa", "07 - Biskra", "08 - Béchar", "09 - Blida", "10 - Bouira",
-  "11 - Tamanrasset", "12 - Téبessa", "13 - Tlemcen", "14 - Tiaret", "15 - Tizi Ouzou",
-  "16 - Alger", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda",
-  "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine",
-  "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla",
-  "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès",
-  "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela",
-  "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma",
-  "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - Timimoun", "50 - Bordj Badji Mokhtar",
-  "51 - Ouled Djellal", "52 - Béni Abbès", "53 - In Salah", "54 - In Guezzam", "55 - Touggourt",
-  "56 - Djanet", "57 - El M'Ghair", "58 - El Meniaa"
+  "16 - Alger", "06 - Béjaïa", "19 - Sétif", "31 - Oran", "25 - Constantine", "09 - Blida", "15 - Tizi Ouzou", "35 - Boumerdès"
+];
+
+const ALL_PRODUCTS = [
+  { id: "p1", name: "كتلة محرك V8 BMW", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", condition: "New" as const, listingType: "part", seller: "EliteMotors DZ" },
+  { id: "p2", name: "طقم فرامل سيراميك", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Suspension et Direction (التوازي و التوازن)", partType: "Plaquettes", brand: "Audi", model: "A4", condition: "New" as const, listingType: "part", seller: "SpeedHub Algiers" },
+  { id: "p3", name: "شاحن توربيني Mercedes", price: 280000, image: PlaceHolderImages[5].imageUrl, category: "Moteur (المحرك)", partType: "Turbo", brand: "Mercedes-Benz", model: "Classe C", condition: "Used" as const, listingType: "part", seller: "BenzParts Algiers" },
+  { id: "v1", name: "Clio 4 للقطع", price: 850000, image: PlaceHolderImages[6].imageUrl, category: "مركبات خارج الخدمة", partType: "للقطع", brand: "Renault", model: "Clio", condition: "Damaged" as const, listingType: "accidented", seller: "Salvage Parts" },
 ];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
-  const categoryFilter = searchParams.get("category");
-  const brandFilter = searchParams.get("brand");
+  
+  // States for hierarchical filters
+  const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get("brand") || "");
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
+  const [selectedPart, setSelectedPart] = useState<string>("");
+  
   const [activeTab, setActiveTab] = useState<string>("all");
   const [damageFilter, setDamageFilter] = useState<number>(100);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
+
+  // Update brand/category if URL changes
+  useEffect(() => {
+    const brand = searchParams.get("brand");
+    const category = searchParams.get("category");
+    if (brand) setSelectedBrand(brand);
+    if (category) setSelectedCategory(category);
+  }, [searchParams]);
+
+  const modelsList = useMemo(() => selectedBrand ? BRAND_MODELS[selectedBrand] || [] : [], [selectedBrand]);
+  const partsList = useMemo(() => selectedCategory ? CATEGORY_DATA[selectedCategory] || [] : [], [selectedCategory]);
 
   const filteredProducts = useMemo(() => {
     let result = ALL_PRODUCTS;
     
-    // Filter by Tab (Listing Type)
-    if (activeTab !== "all") {
-      result = result.filter(p => p.listingType === activeTab);
-    }
-    
-    // Filter by Category from URL
-    if (categoryFilter && categoryFilter !== "all") {
-      result = result.filter(p => p.category.includes(categoryFilter));
-    }
-
-    // Filter by Brand from URL
-    if (brandFilter) {
-      result = result.filter(p => p.brand === brandFilter);
-    }
+    if (activeTab !== "all") result = result.filter(p => p.listingType === activeTab);
+    if (selectedBrand) result = result.filter(p => p.brand === selectedBrand);
+    if (selectedModel && selectedModel !== "all") result = result.filter(p => p.model === selectedModel);
+    if (selectedCategory) result = result.filter(p => p.category.includes(selectedCategory));
+    if (selectedPart && selectedPart !== "all") result = result.filter(p => p.partType === selectedPart);
+    if (searchQuery) result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return result;
-  }, [categoryFilter, brandFilter, activeTab]);
-
-  const brands = ["Renault", "Peugeot", "Volkswagen", "Hyundai", "Dacia", "Mercedes"];
+  }, [activeTab, selectedBrand, selectedModel, selectedCategory, selectedPart, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -151,109 +105,181 @@ function CatalogContent() {
         <div className="container mx-auto px-4">
           
           <div className="flex flex-col md:flex-row-reverse justify-between items-center gap-6 mb-8">
-            <h1 className="text-3xl font-black text-primary">الكتالوج الشامل</h1>
+            <div className="text-right">
+              <h1 className="text-4xl font-black text-primary">الكتالوج الشامل</h1>
+              <p className="text-muted-foreground font-bold">ابحث عن قطع الغيار بدقة متناهية</p>
+            </div>
             <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl" className="w-full md:w-auto">
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 h-auto p-1 bg-white border">
-                <TabsTrigger value="all" className="py-2 text-xs font-bold">الكل</TabsTrigger>
-                <TabsTrigger value="part" className="py-2 text-xs font-bold">قطع منفردة</TabsTrigger>
-                <TabsTrigger value="accidented" className="py-2 text-xs font-bold">مصدومة</TabsTrigger>
-                <TabsTrigger value="for_parts" className="py-2 text-xs font-bold">للقطع</TabsTrigger>
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 h-auto p-1 bg-white border-2 border-primary/10">
+                <TabsTrigger value="all" className="py-2 text-xs font-black">الكل</TabsTrigger>
+                <TabsTrigger value="part" className="py-2 text-xs font-black">قطع منفردة</TabsTrigger>
+                <TabsTrigger value="accidented" className="py-2 text-xs font-black">مصدومة</TabsTrigger>
+                <TabsTrigger value="for_parts" className="py-2 text-xs font-black">للقطع</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
           <div className="flex flex-col md:flex-row-reverse gap-8">
             {/* Sidebar Filters */}
-            <aside className="w-full md:w-72 space-y-6">
-              <Card className="border-none shadow-sm sticky top-[250px]">
+            <aside className="w-full md:w-80 space-y-6">
+              <Card className="border-none shadow-xl sticky top-[250px]">
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
-                    <h3 className="font-bold text-lg">تصفية النتائج</h3>
-                    <Filter size={18} className="text-secondary" />
+                    <h3 className="font-black text-xl text-primary">محرك البحث الدقيق</h3>
+                    <Filter size={20} className="text-secondary" />
                   </div>
 
-                  {/* Vehicle Specific Filters */}
-                  {(activeTab !== "part") && (
-                    <div className="space-y-6 animate-in fade-in duration-300">
-                      <div className="space-y-3">
-                        <Label className="text-sm font-black flex items-center justify-end gap-2">
-                          <Car size={16} /> الماركة
-                        </Label>
-                        <div className="grid grid-cols-1 gap-2">
-                          {brands.map(b => (
-                            <div key={b} className="flex items-center justify-end gap-2">
-                              <Label className="text-xs cursor-pointer">{b}</Label>
-                              <Checkbox checked={brandFilter === b} />
-                            </div>
+                  {/* Hierarchical Filter 1: Brand -> Model */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black flex items-center justify-end gap-2">
+                        <Car size={16} className="text-secondary" /> ماركة السيارة
+                      </Label>
+                      <Select value={selectedBrand} onValueChange={(v) => { setSelectedBrand(v); setSelectedModel(""); }}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(BRAND_MODELS).sort().map(b => (
+                            <SelectItem key={b} value={b}>{b}</SelectItem>
                           ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 pt-4 border-t">
-                        <Label className="text-sm font-black flex items-center justify-end gap-2">
-                          <Fuel size={16} /> الوقود
-                        </Label>
-                        <div className="flex flex-wrap justify-end gap-2">
-                          {["Essence", "Diesel", "GPL"].map(f => (
-                            <Badge key={f} variant="outline" className="cursor-pointer hover:bg-secondary transition-colors">{f}</Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 pt-4 border-t">
-                        <Label className="text-sm font-black flex items-center justify-end gap-2 text-destructive">
-                          <AlertTriangle size={16} /> نسبة التحطم
-                        </Label>
-                        <Slider value={[damageFilter]} max={100} onValueChange={(v) => setDamageFilter(v[0])} />
-                        <div className="flex justify-between text-[10px] font-bold">
-                          <span>{damageFilter}%</span>
-                          <span>0%</span>
-                        </div>
-                      </div>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
 
-                  <div className="space-y-3 pt-4 border-t">
-                    <Label className="text-sm font-black">الولاية</Label>
-                    <Select>
-                      <SelectTrigger><SelectValue placeholder="كل الولايات" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">كل الولايات</SelectItem>
-                        {WILAYAS.map(wilaya => (
-                          <SelectItem key={wilaya} value={wilaya}>{wilaya}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black">الموديل</Label>
+                      <Select 
+                        disabled={!selectedBrand} 
+                        value={selectedModel} 
+                        onValueChange={setSelectedModel}
+                      >
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الموديلات</SelectItem>
+                          {modelsList.map(m => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <Button className="w-full font-bold h-12">تطبيق الفلاتر</Button>
+                  <div className="h-px bg-border my-2" />
+
+                  {/* Hierarchical Filter 2: Category -> Part Type */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black flex items-center justify-end gap-2">
+                        <Layers size={16} className="text-secondary" /> فئة القطعة
+                      </Label>
+                      <Select value={selectedCategory} onValueChange={(v) => { setSelectedCategory(v); setSelectedPart(""); }}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الفئة" /></SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(CATEGORY_DATA).map(cat => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black">نوع القطعة</Label>
+                      <Select 
+                        disabled={!selectedCategory} 
+                        value={selectedPart} 
+                        onValueChange={setSelectedPart}
+                      >
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر نوع القطعة" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل الأنواع</SelectItem>
+                          {partsList.map(p => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border my-2" />
+
+                  <div className="space-y-4">
+                    <Label className="text-sm font-black flex items-center justify-end gap-2">
+                      <Fuel size={16} className="text-secondary" /> الوقود
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {["Essence", "Diesel", "GPL", "Hybride"].map(f => (
+                        <Button key={f} variant="outline" size="sm" className="text-[10px] font-bold h-8">{f}</Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                    <Label className="text-sm font-black flex items-center justify-end gap-2 text-destructive">
+                      <AlertTriangle size={16} /> نسبة التحطم (للمصدومة)
+                    </Label>
+                    <Slider value={[damageFilter]} max={100} onValueChange={(v) => setDamageFilter(v[0])} />
+                    <div className="flex justify-between text-[10px] font-bold text-muted-foreground">
+                      <span>{damageFilter}%</span>
+                      <span>0%</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    variant="outline" 
+                    className="w-full font-black h-12 text-destructive border-destructive/20 hover:bg-destructive/5"
+                    onClick={() => {
+                      setSelectedBrand("");
+                      setSelectedModel("");
+                      setSelectedCategory("");
+                      setSelectedPart("");
+                    }}
+                  >
+                    إعادة ضبط الفلاتر
+                  </Button>
                 </CardContent>
               </Card>
             </aside>
 
             {/* Main Products Grid */}
             <div className="flex-1 space-y-6">
-              <div className="flex flex-col sm:flex-row-reverse justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border">
-                <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
-                  <span className="text-primary">{filteredProducts.length}</span> إعلان متاح
+              <div className="flex flex-col sm:flex-row-reverse justify-between items-center gap-4 bg-white p-4 rounded-3xl shadow-lg border-2 border-primary/5">
+                <div className="flex items-center gap-2 text-sm font-black">
+                  <span className="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+                    {filteredProducts.length}
+                  </span> 
+                  إعلان متاح
                 </div>
-                <div className="relative w-full sm:max-w-xs">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                  <Input placeholder="بحث دقيق..." className="pr-10 h-11 text-right" dir="rtl" />
+                <div className="relative w-full sm:max-w-md">
+                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                  <Input 
+                    placeholder="بحث في النتائج..." 
+                    className="pr-12 h-12 text-right rounded-2xl border-2 focus:border-secondary transition-all" 
+                    dir="rtl"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </div>
 
               {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   {filteredProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border-2 border-dashed">
-                  <Search size={48} className="text-muted-foreground mb-4 opacity-10" />
-                  <h3 className="text-xl font-bold text-primary">لم نجد أي نتائج</h3>
-                  <p className="text-muted-foreground text-sm">حاول تغيير الفلاتر أو نوع الإعلان.</p>
+                <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[40px] border-4 border-dashed border-primary/5">
+                  <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+                    <Search size={48} className="text-muted-foreground opacity-20" />
+                  </div>
+                  <h3 className="text-2xl font-black text-primary mb-2">عذراً، لم نجد نتائج تطابق بحثك</h3>
+                  <p className="text-muted-foreground font-bold">حاول تخفيف الفلاتر أو تغيير ماركة السيارة.</p>
+                  <Button className="mt-8 font-black rounded-full px-10 h-12" onClick={() => {
+                    setSelectedBrand("");
+                    setSelectedModel("");
+                    setSelectedCategory("");
+                    setSelectedPart("");
+                    setSearchQuery("");
+                  }}>عرض كافة الإعلانات</Button>
                 </div>
               )}
             </div>
@@ -267,16 +293,8 @@ function CatalogContent() {
 
 export default function CatalogPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black">جاري التحميل...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse">جاري التحميل...</div>}>
       <CatalogContent />
     </Suspense>
-  );
-}
-
-function Badge({ children, variant, className }: { children: React.ReactNode, variant?: any, className?: string }) {
-  return (
-    <div className={`px-3 py-1 rounded-full border text-[10px] font-bold ${className}`}>
-      {children}
-    </div>
   );
 }
