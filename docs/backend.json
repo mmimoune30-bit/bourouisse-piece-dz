@@ -68,6 +68,29 @@
         "phone": { "type": "string" },
         "userId": { "type": "string" }
       }
+    },
+    "Payment": {
+      "title": "عملية دفع",
+      "description": "بيانات عملية الدفع مقابل اشتراك أو خدمة",
+      "type": "object",
+      "properties": {
+        "paymentId": { "type": "string" },
+        "userId": { "type": "string", "description": "مرجع المستخدم صاحب العملية" },
+        "storeId": { "type": "string", "description": "مرجع المتجر المرتبط (إن وجد)" },
+        "amount": { "type": "number", "description": "المبلغ بالدينار الجزائري" },
+        "paymentMethod": { "type": "string", "description": "وسيلة الدفع (CCP, Baridimob, CIB, etc.)" },
+        "paymentDate": { "type": "string", "format": "date-time" },
+        "receiptImage": { "type": "string", "description": "رابط صورة وصل الدفع المرفوع" },
+        "status": { 
+          "type": "string", 
+          "enum": ["Pending", "Approved", "Rejected", "Refunded"],
+          "description": "حالة العملية المالية"
+        },
+        "approvedBy": { "type": "string", "description": "معرف المسؤول الذي قام بمراجعة العملية" },
+        "approvalDate": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string", "description": "ملاحظات إضافية حول العملية" }
+      },
+      "required": ["userId", "amount", "paymentMethod", "status"]
     }
   },
   "auth": {
@@ -85,6 +108,10 @@
     "/buyers/{buyerId}": {
       "schema": "Buyer",
       "description": "بيانات المشترين"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "سجل عمليات الدفع والتحويلات المالية في المنصة"
     }
   }
 }
