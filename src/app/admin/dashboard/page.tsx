@@ -13,7 +13,9 @@ import {
   ArrowDownRight,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  FileText
 } from "lucide-react";
 import {
   Table,
@@ -24,31 +26,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const STATS = [
-  { label: "Total Users", value: "12,450", trend: "+12%", up: true, icon: Users, color: "bg-blue-500" },
-  { label: "Active Stores", value: "854", trend: "+5%", up: true, icon: Store, color: "bg-secondary" },
-  { label: "Live Products", value: "45,210", trend: "+18%", up: true, icon: Package, color: "bg-purple-500" },
-  { label: "Monthly Sales", value: "4.2M DZD", trend: "-2%", up: false, icon: ShoppingBag, color: "bg-green-500" },
+  { label: "إجمالي المستخدمين", value: "1,250", trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
+  { label: "المتاجر النشطة", value: "72", trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
+  { label: "قطع الغيار", value: "8,450", trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
+  { label: "المبيعات الإجمالية", value: "24.5M DZD", trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
 ];
 
-const RECENT_STORES = [
-  { name: "Auto Pièces Chlef", owner: "Mohamed B.", status: "Pending", date: "2024-05-18" },
-  { name: "EliteMotors DZ", owner: "Ahmed R.", status: "Approved", date: "2024-05-17" },
-  { name: "Pièces Renault DZ", owner: "Sara K.", status: "Rejected", date: "2024-05-16" },
-  { name: "Braking Masters", owner: "Karim L.", status: "Approved", date: "2024-05-15" },
+const RECENT_TRANSACTIONS = [
+  { id: "PAY001", store: "Auto Chlef", amount: "5,000 DZD", status: "Approved", method: "CCP" },
+  { id: "PAY002", store: "Renault DZ", amount: "12,000 DZD", status: "Pending", method: "Edahabia" },
+  { id: "PAY003", store: "Hyundai Parts", amount: "8,000 DZD", status: "Approved", method: "Bank" },
+  { id: "PAY004", store: "Peugeot Store", amount: "15,000 DZD", status: "Rejected", method: "CIB" },
 ];
 
 export default function AdminDashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-right" dir="rtl">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-black text-primary">System Overview</h1>
-          <p className="text-muted-foreground">Real-time platform performance and metrics.</p>
+          <h1 className="text-3xl font-black text-primary">نظرة عامة على النظام</h1>
+          <p className="text-muted-foreground">متابعة الأداء الحي للمنصة والبيانات المالية.</p>
         </div>
         <Button className="font-bold gap-2 bg-primary">
-          <TrendingUp size={18} /> Export Report
+          <FileText size={18} /> تصدير تقرير شامل
         </Button>
       </div>
 
@@ -80,40 +83,38 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Store Management Mini-Table */}
+        {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between border-b">
-            <CardTitle className="text-xl font-black">Store Approvals</CardTitle>
-            <Button variant="ghost" className="text-secondary font-bold">View All</Button>
+            <CardTitle className="text-xl font-black">آخر عمليات الدفع</CardTitle>
+            <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-6">Store Name</TableHead>
-                  <TableHead>Owner</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Request Date</TableHead>
-                  <TableHead className="text-right pr-6">Action</TableHead>
+                  <TableHead className="text-right pr-6">رقم العملية</TableHead>
+                  <TableHead className="text-right">المتجر</TableHead>
+                  <TableHead className="text-right">المبلغ</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-left pl-6">الوسيلة</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {RECENT_STORES.map((store, i) => (
+                {RECENT_TRANSACTIONS.map((tx, i) => (
                   <TableRow key={i}>
-                    <TableCell className="pl-6 font-bold">{store.name}</TableCell>
-                    <TableCell className="text-sm">{store.owner}</TableCell>
+                    <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
+                    <TableCell className="font-bold">{tx.store}</TableCell>
+                    <TableCell className="font-black text-green-600">{tx.amount}</TableCell>
                     <TableCell>
                       <Badge variant={
-                        store.status === 'Approved' ? 'default' : 
-                        store.status === 'Pending' ? 'secondary' : 'destructive'
+                        tx.status === 'Approved' ? 'default' : 
+                        tx.status === 'Pending' ? 'secondary' : 'destructive'
                       } className="font-bold">
-                        {store.status}
+                        {tx.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{store.date}</TableCell>
-                    <TableCell className="text-right pr-6">
-                      <Button variant="outline" size="sm" className="font-bold">Review</Button>
-                    </TableCell>
+                    <TableCell className="text-left pl-6 text-muted-foreground">{tx.method}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -121,42 +122,34 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* System Health */}
+        {/* System & Staff Activity */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-black">System Status</CardTitle>
+              <CardTitle className="text-lg font-black">نشاط الطاقم الإداري</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-100">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="text-green-600" size={20} />
-                  <span className="text-sm font-bold text-green-900">Payment Gateway</span>
+              {[
+                { name: "ميمون محمد", action: "قبول متجر جديد", time: "منذ 10 دقائق" },
+                { name: "سميرة بوحفص", action: "قبول عملية دفع", time: "منذ 25 دقيقة" },
+                { name: "يوسف حمدي", action: "حظر منتج مخالف", time: "منذ ساعة" },
+              ].map((log, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border">
+                  <div>
+                    <p className="text-sm font-bold text-primary">{log.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{log.action}</p>
+                  </div>
+                  <span className="text-[10px] text-zinc-400">{log.time}</span>
                 </div>
-                <Badge className="bg-green-600">Active</Badge>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
-                <div className="flex items-center gap-3">
-                  <Clock className="text-amber-600" size={20} />
-                  <span className="text-sm font-bold text-amber-900">Search Indexing</span>
-                </div>
-                <Badge className="bg-amber-600">Syncing</Badge>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="text-red-600" size={20} />
-                  <span className="text-sm font-bold text-red-900">Email Server</span>
-                </div>
-                <Badge className="bg-red-600">Issue</Badge>
-              </div>
+              ))}
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-sm bg-primary text-white overflow-hidden relative">
             <CardContent className="p-6 relative z-10">
-              <h3 className="font-black text-xl mb-2">Platform Growth</h3>
-              <p className="text-blue-100/70 text-sm mb-4">You have <span className="text-secondary font-bold">42 pending</span> store applications today. Review them to boost GMV.</p>
-              <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">Start Review</Button>
+              <h3 className="font-black text-xl mb-2 text-secondary">عمولات المنصة</h3>
+              <p className="text-blue-100/70 text-sm mb-4">تم تحصيل <span className="text-white font-black">1,229,000 دج</span> كعمولات خلال الشهر الحالي.</p>
+              <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">مراجعة التقارير المالية</Button>
             </CardContent>
             <TrendingUp className="absolute -bottom-4 -right-4 w-32 h-32 text-white/5" />
           </Card>
@@ -164,8 +157,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }
