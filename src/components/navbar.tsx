@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug } from "lucide-react";
+import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ const translations = {
     stats: "لوحة التحكم", 
     new: "إعلان جديد", 
     store: "فتح متجر", 
+    admin: "لوحة المسؤول (Admin)",
     back: "رجوع", 
     contact: "للاستفسار:",
     all: "عرض الكل",
@@ -34,6 +35,7 @@ const translations = {
     stats: "Tableau de bord", 
     new: "Nouvelle annonce", 
     store: "Ouvrir boutique", 
+    admin: "Portail Admin",
     back: "Retour", 
     contact: "Contact:",
     all: "Voir tout",
@@ -45,6 +47,7 @@ const translations = {
     stats: "Dashboard", 
     new: "New Listing", 
     store: "Open Pro Shop", 
+    admin: "Admin Portal",
     back: "Back", 
     contact: "Contact:",
     all: "View All",
@@ -67,6 +70,18 @@ const WhatsappIcon = ({ size = 24, className = "" }: { size?: number, className?
   </svg>
 );
 
+const ViberIcon = ({ size, className }: { size?: number, className?: string }) => (
+  <svg width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M19.34 1.32C17.14.34 14.54 0 12 0 6.64 0 2.27 4.37 2.27 9.73c0 2.61 1.02 5.09 2.87 6.94l-1.07 3.9c-.11.41.24.78.65.67l3.9-1.07c1.85 1.85 4.33 2.87 6.94 2.87 5.36 0 9.73-4.37 9.73-9.73 0-2.54-.34-5.14-1.32-7.34l-.6.35c.82 1.83 1.1 4 1.1 6.12 0 4.93-4.01 8.93-8.93 8.93-2.33 0-4.6-.9-6.32-2.52l-.46-.46-3.23.88.88-3.23-.46-.46-3.23.88.88-3.23-.46-.46c-1.62-1.72-2.52-3.99-2.52-6.32 0-4.93 4.01-8.93 8.93-8.93 2.12 0 4.29.28 6.12 1.1l.35-.6z" />
+  </svg>
+);
+
+const TikTokIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.25-.23 2.48-.91 3.51-.89 1.4-2.39 2.34-4.04 2.39-1.52.05-3.08-.43-4.24-1.41-1.39-1.14-2.15-2.92-2-4.69.11-1.92 1.3-3.75 3.09-4.52.48-.21 1-.34 1.52-.39v4.03c-.48.08-1 .31-1.35.66-.41.4-.64.97-.62 1.54.02.66.42 1.3 1.02 1.57.51.24 1.1.28 1.62.1.66-.23 1.13-.88 1.13-1.58V.02z" />
+  </svg>
+);
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -79,12 +94,6 @@ export default function Navbar() {
   ];
 
   const t = translations[currentLang];
-
-  const TikTokIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.25-.23 2.48-.91 3.51-.89 1.4-2.39 2.34-4.04 2.39-1.52.05-3.08-.43-4.24-1.41-1.39-1.14-2.15-2.92-2-4.69.11-1.92 1.3-3.75 3.09-4.52.48-.21 1-.34 1.52-.39v4.03c-.48.08-1 .31-1.35.66-.41.4-.64.97-.62 1.54.02.66.42 1.3 1.02 1.57.51.24 1.1.28 1.62.1.66-.23 1.13-.88 1.13-1.58V.02z" />
-    </svg>
-  );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl h-[235px]">
@@ -195,7 +204,14 @@ export default function Navbar() {
                 <Link href="/seller/listings/new" className="w-full font-bold">{t.new}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/register" className="w-full font-bold text-secondary">{t.store}</Link>
+                <Link href="/seller/register" className="w-full font-bold">{t.store}</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer h-12 rounded-lg mt-1 border border-secondary/20">
+                <Link href="/admin/dashboard" className="w-full font-black text-secondary flex items-center gap-2">
+                  <ShieldAlert size={18} />
+                  {t.admin}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <div className="p-2 flex items-center justify-around">
@@ -213,7 +229,7 @@ export default function Navbar() {
               onClick={() => router.back()}
               title={t.back}
             >
-              <ArrowRight size={24} />
+              <ArrowRight size={24} className="w-8 h-8" />
             </Button>
           )}
         </div>
@@ -246,13 +262,5 @@ export default function Navbar() {
         </div>
       </section>
     </nav>
-  );
-}
-
-function ViberIcon({ size, className }: { size?: number, className?: string }) {
-  return (
-    <svg width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19.34 1.32C17.14.34 14.54 0 12 0 6.64 0 2.27 4.37 2.27 9.73c0 2.61 1.02 5.09 2.87 6.94l-1.07 3.9c-.11.41.24.78.65.67l3.9-1.07c1.85 1.85 4.33 2.87 6.94 2.87 5.36 0 9.73-4.37 9.73-9.73 0-2.54-.34-5.14-1.32-7.34l-.6.35c.82 1.83 1.1 4 1.1 6.12 0 4.93-4.01 8.93-8.93 8.93-2.33 0-4.6-.9-6.32-2.52l-.46-.46-3.23.88.88-3.23-.46-.46-3.23.88.88-3.23-.46-.46c-1.62-1.72-2.52-3.99-2.52-6.32 0-4.93 4.01-8.93 8.93-8.93 2.12 0 4.29.28 6.12 1.1l.35-.6z" />
-    </svg>
   );
 }
