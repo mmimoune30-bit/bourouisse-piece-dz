@@ -24,7 +24,8 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { 
   ShieldAlert, 
@@ -44,7 +45,8 @@ import {
   Send,
   Mail,
   MessageCircle,
-  Copy
+  Copy,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -88,20 +90,12 @@ export default function ComplaintsManagement() {
     }
   };
 
-  const handleSendResponse = () => {
-    if (!responseMsg) return;
-    // Simulate sending
-    toast({ title: "تم إرسال الرد", description: "تم إشعار المستخدم برد الإدارة." });
-    setResponseMsg("");
-    handleUpdateStatus(selectedComplaint.id, "In Progress");
-  };
-
-  const handleShareResponse = (platform: 'whatsapp' | 'sms' | 'email' | 'copy') => {
-    if (!responseMsg || !selectedComplaint) {
-      toast({ variant: "destructive", title: "تنبيه", description: "يرجى كتابة الرد أولاً قبل المشاركة." });
+  const handleSendResponse = (platform: 'system' | 'whatsapp' | 'sms' | 'email' | 'copy' = 'system') => {
+    if (!responseMsg) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى كتابة الرد أولاً." });
       return;
     }
-    
+
     const fullText = `رد الإدارة بخصوص بلاغكم رقم ${selectedComplaint.id}:\n\n${responseMsg}\n\nتحياتنا، إدارة Bourouisse Piece-Dz`;
     const encodedText = encodeURIComponent(fullText);
     const phone = selectedComplaint.phone;
@@ -119,8 +113,13 @@ export default function ComplaintsManagement() {
       case 'copy':
         navigator.clipboard.writeText(fullText);
         toast({ title: "تم النسخ", description: "تم نسخ نص الرد إلى الحافظة." });
-        break;
+        return; // Don't proceed to update status just for copying
     }
+
+    // Simulate sending in system
+    toast({ title: "تم إرسال الرد", description: `تم إشعار المستخدم عبر ${platform === 'system' ? 'النظام' : platform}.` });
+    setResponseMsg("");
+    handleUpdateStatus(selectedComplaint.id, "In Progress");
   };
 
   // --- Filtering & Stats ---
@@ -240,7 +239,10 @@ export default function ComplaintsManagement() {
                   <TableCell className="text-left pl-6 space-x-2 space-x-reverse">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2" onClick={() => setSelectedComplaint(c)}>
+                        <Button variant="outline" size="sm" className="gap-2" onClick={() => {
+                          setSelectedComplaint(c);
+                          setResponseMsg("");
+                        }}>
                           <MessageSquare size={14} /> رد ومعالجة
                         </Button>
                       </DialogTrigger>
@@ -279,39 +281,19 @@ export default function ComplaintsManagement() {
 
                           <div className="space-y-3">
                              <div className="flex justify-between items-center">
-                               <Label className="font-black">إرسال رد رسمي:</Label>
-                               <DropdownMenu>
-                                 <DropdownMenuTrigger asChild>
-                                   <Button variant="ghost" size="sm" className="gap-2 text-secondary hover:text-primary">
-                                     <Share2 size={16} /> مشاركة الرد
-                                   </Button>
-                                 </DropdownMenuTrigger>
-                                 <DropdownMenuContent align="end" className="w-48" dir="rtl">
-                                   <DropdownMenuItem onClick={() => handleShareResponse('whatsapp')} className="gap-2 justify-end cursor-pointer">
-                                     WhatsApp <MessageCircle size={14} className="text-green-500" />
-                                   </DropdownMenuItem>
-                                   <DropdownMenuItem onClick={() => handleShareResponse('sms')} className="gap-2 justify-end cursor-pointer">
-                                     SMS <Send size={14} className="text-blue-500" />
-                                   </DropdownMenuItem>
-                                   <DropdownMenuItem onClick={() => handleShareResponse('email')} className="gap-2 justify-end cursor-pointer">
-                                     البريد الإلكتروني <Mail size={14} className="text-red-500" />
-                                   </DropdownMenuItem>
-                                   <DropdownMenuItem onClick={() => handleShareResponse('copy')} className="gap-2 justify-end cursor-pointer border-t">
-                                     نسخ النص <Copy size={14} />
-                                   </DropdownMenuItem>
-                                 </DropdownMenuContent>
-                               </DropdownMenu>
+                               <Label className="font-black">اكتب الرد الرسمي:</Label>
+                               <span className="text-[10px] text-muted-foreground">سيتم إرسال هذا النص للمستخدم</span>
                              </div>
                              <Textarea 
-                              placeholder="اكتب ردك هنا ليرسل للمستخدم..." 
-                              className="min-h-[100px] text-right"
+                              placeholder="اكتب ردك هنا..." 
+                              className="min-h-[120px] text-right text-base leading-relaxed"
                               value={responseMsg}
                               onChange={(e) => setResponseMsg(e.target.value)}
                              />
                           </div>
 
                           <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
-                             <Label className="font-black whitespace-nowrap">تغيير الحالة إلى:</Label>
+                             <Label className="font-black whitespace-nowrap">تغيير حالة البلاغ:</Label>
                              <div className="flex gap-2">
                                <Button size="sm" variant={selectedComplaint?.status === 'In Progress' ? 'default' : 'outline'} onClick={() => handleUpdateStatus(selectedComplaint.id, 'In Progress')}>
                                  قيد المعالجة
@@ -324,9 +306,40 @@ export default function ComplaintsManagement() {
                         </div>
 
                         <DialogFooter className="gap-2 sm:justify-start">
-                          <Button className="font-black gap-2" onClick={handleSendResponse}>
-                            إرسال الرد وتحديث <MessageSquare size={16} />
-                          </Button>
+                          <div className="flex w-full sm:w-auto gap-1">
+                            <Button 
+                              className="flex-grow font-black gap-2 rounded-l-none" 
+                              onClick={() => handleSendResponse('system')}
+                            >
+                              إرسال وتحديث <Send size={16} />
+                            </Button>
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button className="px-3 rounded-r-none border-r border-white/20">
+                                  <ChevronDown size={16} />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start" className="w-56" dir="rtl">
+                                <DropdownMenuLabel className="text-right">اختر وسيلة الإرسال</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleSendResponse('whatsapp')} className="gap-3 justify-end cursor-pointer py-3">
+                                   إرسال عبر WhatsApp <MessageCircle size={18} className="text-green-500" />
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSendResponse('sms')} className="gap-3 justify-end cursor-pointer py-3">
+                                   إرسال عبر رسالة SMS <Send size={18} className="text-blue-500" />
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSendResponse('email')} className="gap-3 justify-end cursor-pointer py-3">
+                                   إرسال عبر البريد الإلكتروني <Mail size={18} className="text-red-500" />
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleSendResponse('copy')} className="gap-3 justify-end cursor-pointer py-3 font-bold">
+                                   نسخ نص الرد فقط <Copy size={18} />
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                          
                           <DialogClose asChild>
                             <Button variant="outline">إغلاق</Button>
                           </DialogClose>
