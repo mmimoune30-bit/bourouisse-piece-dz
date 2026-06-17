@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -17,10 +18,85 @@ import { Search, Filter, SlidersHorizontal, ArrowUpDown, AlertTriangle, Car, Set
 import { Suspense, useMemo, useState } from "react";
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "كتلة محرك V8 دقيقة", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", seller: "EliteMotors DZ", condition: "New" as const, listingType: "part" },
-  { id: "p2", name: "طقم فرامل سيراميك", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Carrosserie (الهيكل)", seller: "SpeedHub Algiers", condition: "New" as const, listingType: "part" },
-  { id: "v1", name: "سيارة Renault Clio مصدومة", price: 850000, image: PlaceHolderImages[5].imageUrl, category: "مركبات خارج الخدمة", seller: "Salvage Parts", condition: "Damaged" as const, listingType: "accidented", brand: "Renault", fuelType: "Diesel", damagePercentage: 45 },
-  { id: "v2", name: "VW Golf 7 للقطع", price: 1200000, image: PlaceHolderImages[4].imageUrl, category: "مركبات خارج الخدمة", seller: "GermanParts Dz", condition: "Damaged" as const, listingType: "for_parts", brand: "Volkswagen", fuelType: "Essence" },
+  { 
+    id: "p1", 
+    name: "كتلة محرك V8 دقيقة أصلية", 
+    price: 450000, 
+    image: PlaceHolderImages[0].imageUrl, 
+    category: "Moteur (المحرك)", 
+    seller: "EliteMotors DZ", 
+    condition: "New" as const, 
+    listingType: "part",
+    brand: "BMW" 
+  },
+  { 
+    id: "p2", 
+    name: "طقم فرامل سيراميك عالي الأداء", 
+    price: 120000, 
+    image: PlaceHolderImages[1].imageUrl, 
+    category: "Carrosserie (الهيكل)", 
+    seller: "SpeedHub Algiers", 
+    condition: "New" as const, 
+    listingType: "part" 
+  },
+  { 
+    id: "p3", 
+    name: "شاحن توربيني (Turbo) Mercedes AMG", 
+    price: 280000, 
+    image: PlaceHolderImages[5].imageUrl, 
+    category: "Moteur (المحرك)", 
+    seller: "BenzParts Algiers", 
+    condition: "Used" as const, 
+    listingType: "part",
+    brand: "Mercedes" 
+  },
+  { 
+    id: "p4", 
+    name: "كمبيوتر محرك Hyundai Accent (ECU)", 
+    price: 65000, 
+    image: PlaceHolderImages[6].imageUrl, 
+    category: "Électricité (الكهرباء)", 
+    seller: "KoreanParts DZ", 
+    condition: "Used" as const, 
+    listingType: "part",
+    brand: "Hyundai" 
+  },
+  { 
+    id: "p5", 
+    name: "مضخة بنزين Peugeot 301", 
+    price: 18500, 
+    image: PlaceHolderImages[3].imageUrl, 
+    category: "Moteur (المحرك)", 
+    seller: "Lion Parts", 
+    condition: "New" as const, 
+    listingType: "part",
+    brand: "Peugeot" 
+  },
+  { 
+    id: "v1", 
+    name: "سيارة Renault Clio مصدومة", 
+    price: 850000, 
+    image: PlaceHolderImages[5].imageUrl, 
+    category: "مركبات خارج الخدمة", 
+    seller: "Salvage Parts", 
+    condition: "Damaged" as const, 
+    listingType: "accidented", 
+    brand: "Renault", 
+    fuelType: "Diesel", 
+    damagePercentage: 45 
+  },
+  { 
+    id: "v2", 
+    name: "VW Golf 7 للقطع - حادث أمامي", 
+    price: 1200000, 
+    image: PlaceHolderImages[4].imageUrl, 
+    category: "مركبات خارج الخدمة", 
+    seller: "GermanParts Dz", 
+    condition: "Damaged" as const, 
+    listingType: "for_parts", 
+    brand: "Volkswagen", 
+    fuelType: "Essence" 
+  },
 ];
 
 const WILAYAS = [
@@ -41,21 +117,32 @@ const WILAYAS = [
 function CatalogContent() {
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
+  const brandFilter = searchParams.get("brand");
   const [activeTab, setActiveTab] = useState<string>("all");
   const [damageFilter, setDamageFilter] = useState<number>(100);
 
   const filteredProducts = useMemo(() => {
     let result = ALL_PRODUCTS;
+    
+    // Filter by Tab (Listing Type)
     if (activeTab !== "all") {
       result = result.filter(p => p.listingType === activeTab);
     }
+    
+    // Filter by Category from URL
     if (categoryFilter && categoryFilter !== "all") {
-      result = result.filter(p => p.category === categoryFilter);
+      result = result.filter(p => p.category.includes(categoryFilter));
     }
-    return result;
-  }, [categoryFilter, activeTab]);
 
-  const brands = ["Renault", "Peugeot", "Volkswagen", "Hyundai", "Dacia"];
+    // Filter by Brand from URL
+    if (brandFilter) {
+      result = result.filter(p => p.brand === brandFilter);
+    }
+
+    return result;
+  }, [categoryFilter, brandFilter, activeTab]);
+
+  const brands = ["Renault", "Peugeot", "Volkswagen", "Hyundai", "Dacia", "Mercedes"];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -96,7 +183,7 @@ function CatalogContent() {
                           {brands.map(b => (
                             <div key={b} className="flex items-center justify-end gap-2">
                               <Label className="text-xs cursor-pointer">{b}</Label>
-                              <Checkbox />
+                              <Checkbox checked={brandFilter === b} />
                             </div>
                           ))}
                         </div>
