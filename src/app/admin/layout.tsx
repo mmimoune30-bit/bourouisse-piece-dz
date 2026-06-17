@@ -17,7 +17,10 @@ import {
   Menu,
   X,
   Bell,
-  Search
+  Search,
+  Ticket,
+  TrendingUp,
+  PlusCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,9 +33,10 @@ const ADMIN_MENU = [
   { name: "Stores", href: "/admin/stores", icon: Store },
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
+  { name: "Subscriptions", href: "/admin/subscriptions", icon: Ticket },
+  { name: "Plans", href: "/admin/plans", icon: Settings },
   { name: "Complaints", href: "/admin/complaints", icon: ShieldAlert },
   { name: "Reports", href: "/admin/reports", icon: FileText },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -19,20 +19,20 @@ import {
 } from "@/components/ui/dialog";
 import { 
   CreditCard, 
-  Eye, 
   CheckCircle2, 
-  XCircle, 
   FileDown, 
   Search, 
   AlertCircle,
   TrendingUp,
   Clock,
   Ban,
-  Receipt
+  Receipt,
+  PlusCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 // --- Mock Data for Demo ---
 const INITIAL_PAYMENTS = [
@@ -128,11 +128,13 @@ export default function PaymentManagement() {
           <p className="text-muted-foreground">تتبع، توثيق، والموافقة على التحويلات المالية في المنصة.</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/admin/payments/create">
+            <Button className="gap-2 font-bold bg-secondary text-primary hover:bg-white">
+              <PlusCircle size={18} /> إنشاء عملية دفع
+            </Button>
+          </Link>
           <Button variant="outline" className="gap-2 font-bold">
             <FileDown size={18} /> تصدير Excel
-          </Button>
-          <Button variant="outline" className="gap-2 font-bold">
-            <FileDown size={18} /> تصدير PDF
           </Button>
         </div>
       </div>
