@@ -59,6 +59,24 @@
         "subscriptionActive": { "type": "boolean", "description": "حالة الاشتراك" }
       }
     },
+    "Subscription": {
+      "title": "اشتراك متجر",
+      "description": "بيانات اشتراك المتجر في المنصة",
+      "type": "object",
+      "properties": {
+        "storeId": { "type": "string" },
+        "storeName": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "plan": { "type": "string", "enum": ["Free", "Silver", "Gold", "Professional"] },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["Active", "Expired", "Suspended", "Cancelled", "Pending"] },
+        "amount": { "type": "number" },
+        "notes": { "type": "string" },
+        "lastUpdatedBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
     "Buyer": {
       "title": "مشتري",
       "description": "بيانات حساب المشتري",
@@ -117,6 +135,10 @@
     "/sellers/{sellerId}": {
       "schema": "Seller",
       "description": "بيانات البائعين"
+    },
+    "/subscriptions/{subId}": {
+      "schema": "Subscription",
+      "description": "سجل اشتراكات المتاجر"
     },
     "/buyers/{buyerId}": {
       "schema": "Buyer",
