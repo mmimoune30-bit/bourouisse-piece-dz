@@ -27,7 +27,7 @@ const translations = {
     back: "رجوع", 
     contact: "للاستفسار:",
     all: "عرض الكل",
-    login: "دخول",
+    login: "الدخول إلى حسابي",
     join: "انضم إلينا",
     categories: ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"]
   }
@@ -66,14 +66,7 @@ export default function Navbar() {
               <span dir="ltr">+213 778 42 89 77</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-             <Link href="/login" className="text-white text-xs font-black hover:text-secondary flex items-center gap-1">
-                <LogIn size={14} className="text-secondary" /> {t.login}
-             </Link>
-             <Link href="/join" className="text-white text-xs font-black hover:text-secondary flex items-center gap-1">
-                <UserPlus size={14} className="text-secondary" /> {t.join}
-             </Link>
-          </div>
+          {/* Removed login/join links from here as requested */}
         </div>
       </div>
 
@@ -97,6 +90,15 @@ export default function Navbar() {
 
         {/* Action Buttons Section */}
         <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
+              <Link href="/login">
+                <LogIn size={20} />
+                <span className="hidden lg:inline">{t.login}</span>
+              </Link>
+            </Button>
+          </div>
+
           <div className="flex items-center gap-2">
             <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
               <Link href="/join">
