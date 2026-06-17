@@ -21,6 +21,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { 
   ShieldAlert, 
   MessageSquare, 
   CheckCircle, 
@@ -33,7 +39,12 @@ import {
   AlertCircle,
   MoreVertical,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Share2,
+  Send,
+  Mail,
+  MessageCircle,
+  Copy
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -83,6 +94,33 @@ export default function ComplaintsManagement() {
     toast({ title: "تم إرسال الرد", description: "تم إشعار المستخدم برد الإدارة." });
     setResponseMsg("");
     handleUpdateStatus(selectedComplaint.id, "In Progress");
+  };
+
+  const handleShareResponse = (platform: 'whatsapp' | 'sms' | 'email' | 'copy') => {
+    if (!responseMsg || !selectedComplaint) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى كتابة الرد أولاً قبل المشاركة." });
+      return;
+    }
+    
+    const fullText = `رد الإدارة بخصوص بلاغكم رقم ${selectedComplaint.id}:\n\n${responseMsg}\n\nتحياتنا، إدارة Bourouisse Piece-Dz`;
+    const encodedText = encodeURIComponent(fullText);
+    const phone = selectedComplaint.phone;
+
+    switch (platform) {
+      case 'whatsapp':
+        window.open(`https://wa.me/${phone.startsWith('0') ? '213' + phone.substring(1) : phone}?text=${encodedText}`, '_blank');
+        break;
+      case 'sms':
+        window.open(`sms:${phone}?body=${encodedText}`, '_blank');
+        break;
+      case 'email':
+        window.open(`mailto:?subject=رد على بلاغ رقم ${selectedComplaint.id}&body=${encodedText}`, '_blank');
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(fullText);
+        toast({ title: "تم النسخ", description: "تم نسخ نص الرد إلى الحافظة." });
+        break;
+    }
   };
 
   // --- Filtering & Stats ---
@@ -240,7 +278,30 @@ export default function ComplaintsManagement() {
                           </div>
 
                           <div className="space-y-3">
-                             <Label className="font-black">إرسال رد رسمي:</Label>
+                             <div className="flex justify-between items-center">
+                               <Label className="font-black">إرسال رد رسمي:</Label>
+                               <DropdownMenu>
+                                 <DropdownMenuTrigger asChild>
+                                   <Button variant="ghost" size="sm" className="gap-2 text-secondary hover:text-primary">
+                                     <Share2 size={16} /> مشاركة الرد
+                                   </Button>
+                                 </DropdownMenuTrigger>
+                                 <DropdownMenuContent align="end" className="w-48" dir="rtl">
+                                   <DropdownMenuItem onClick={() => handleShareResponse('whatsapp')} className="gap-2 justify-end cursor-pointer">
+                                     WhatsApp <MessageCircle size={14} className="text-green-500" />
+                                   </DropdownMenuItem>
+                                   <DropdownMenuItem onClick={() => handleShareResponse('sms')} className="gap-2 justify-end cursor-pointer">
+                                     SMS <Send size={14} className="text-blue-500" />
+                                   </DropdownMenuItem>
+                                   <DropdownMenuItem onClick={() => handleShareResponse('email')} className="gap-2 justify-end cursor-pointer">
+                                     البريد الإلكتروني <Mail size={14} className="text-red-500" />
+                                   </DropdownMenuItem>
+                                   <DropdownMenuItem onClick={() => handleShareResponse('copy')} className="gap-2 justify-end cursor-pointer border-t">
+                                     نسخ النص <Copy size={14} />
+                                   </DropdownMenuItem>
+                                 </DropdownMenuContent>
+                               </DropdownMenu>
+                             </div>
                              <Textarea 
                               placeholder="اكتب ردك هنا ليرسل للمستخدم..." 
                               className="min-h-[100px] text-right"
