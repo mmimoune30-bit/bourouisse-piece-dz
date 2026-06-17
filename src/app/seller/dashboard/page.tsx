@@ -1,9 +1,10 @@
+
 "use client";
 
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { 
-  BarChart3, 
   Package, 
   Plus, 
   TrendingUp, 
@@ -25,69 +25,67 @@ import {
   MoreVertical,
   Clock,
   CheckCircle,
-  AlertCircle
+  Eye,
+  Heart,
+  MessageSquare,
+  BarChart3,
+  Filter
 } from "lucide-react";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 const STATS = [
-  { label: "Total Revenue", value: "2,450,000 DZD", trend: "+12.5%", icon: <TrendingUp className="text-green-500" /> },
-  { label: "Active Listings", value: "128", trend: "+4 this week", icon: <Package className="text-secondary" /> },
-  { label: "Orders Monthly", value: "45", trend: "+8.2%", icon: <BarChart3 className="text-blue-500" /> },
-  { label: "Client Satisfaction", value: "4.9/5", trend: "Top Tier", icon: <Users className="text-purple-500" /> },
+  { label: "إجمالي الإعلانات", value: "128", icon: <Package className="text-secondary" />, trend: "+4 هذا الأسبوع", up: true },
+  { label: "الإعلانات النشطة", value: "115", icon: <CheckCircle className="text-green-500" />, trend: "90% من الإجمالي", up: true },
+  { label: "قطع تم بيعها", value: "42", icon: <TrendingUp className="text-blue-500" />, trend: "بإجمالي 2.4M دج", up: true },
+  { label: "مشاهدات متجرك", value: "8.4K", icon: <Eye className="text-purple-500" />, trend: "+12% نمو", up: true },
+];
+
+const QUICK_ACTIONS = [
+  { label: "المفضلات", value: "240", icon: <Heart className="text-red-500" /> },
+  { label: "رسائل العملاء", value: "12", icon: <MessageSquare className="text-blue-500" /> },
 ];
 
 const RECENT_LISTINGS = [
-  { id: "L001", name: "OEM Turbocharger GT20", price: "85,000 DZD", status: "Active", views: 420, date: "2024-05-15" },
-  { id: "L002", name: "Bosch Injector Set (4pcs)", price: "42,000 DZD", status: "Active", views: 185, date: "2024-05-14" },
-  { id: "L003", name: "Ceramic Brake Pads - Front", price: "12,500 DZD", status: "Low Stock", views: 98, date: "2024-05-12" },
-  { id: "L004", name: "Engine Control Unit (ECU)", price: "120,000 DZD", status: "Sold", views: 240, date: "2024-05-10" },
-];
-
-const RECENT_ORDERS = [
-  { id: "ORD-9921", buyer: "Karim B.", amount: "15,000 DZD", status: "Processing", time: "2 hours ago" },
-  { id: "ORD-9918", buyer: "Sarah M.", amount: "42,000 DZD", status: "Shipped", time: "5 hours ago" },
-  { id: "ORD-9915", buyer: "Ahmed R.", amount: "8,500 DZD", status: "Delivered", time: "1 day ago" },
+  { id: "L001", name: "محرك كامل Clio 4", price: "450,000 دج", status: "Active", views: 420, date: "2024-05-15" },
+  { id: "L002", name: "مصباح أمامي LED", price: "12,000 دج", status: "Active", views: 185, date: "2024-05-14" },
+  { id: "L003", name: "رادياتور تبريد", price: "8,500 دج", status: "Sold", views: 98, date: "2024-05-12" },
 ];
 
 export default function SellerDashboard() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
 
       <main className="flex-grow container mx-auto px-4 pt-[235px] pb-12">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Seller Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, <span className="font-bold text-secondary">EliteMotors DZ</span>. Here's your business at a glance.</p>
+        <header className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-6 mb-10">
+          <div className="text-right">
+            <h1 className="text-4xl font-black text-primary mb-1">لوحة تحكم المتجر</h1>
+            <p className="text-muted-foreground font-bold">مرحباً بك، <span className="text-secondary">EliteMotors DZ</span> (المعرف: BR-S-9918)</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline">Download Reports</Button>
             <Link href="/seller/listings/new">
-              <Button className="gap-2 font-bold">
-                <Plus size={18} /> New Listing
+              <Button className="h-14 px-8 text-lg font-black gap-2 shadow-xl bg-primary hover:bg-secondary hover:text-primary transition-all rounded-2xl">
+                <Plus size={24} /> إضافة إعلان جديد
               </Button>
             </Link>
+            <Button variant="outline" className="h-14 px-6 font-bold rounded-2xl border-2">تحميل تقارير المبيعات</Button>
           </div>
         </header>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {STATS.map((stat, i) => (
-            <Card key={i} className="border-none shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-muted rounded-xl">
+            <Card key={i} className="border-none shadow-sm overflow-hidden group hover:shadow-xl transition-all bg-white rounded-3xl">
+              <CardContent className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-4 bg-zinc-50 rounded-2xl group-hover:bg-primary/5 transition-colors">
                     {stat.icon}
                   </div>
-                  <span className={cn(
-                    "text-xs font-bold px-2 py-1 rounded-full",
-                    stat.trend.startsWith('+') ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
-                  )}>
-                    {stat.trend}
-                  </span>
+                  <Badge variant="outline" className="font-black text-[10px] uppercase border-zinc-100">{stat.trend}</Badge>
                 </div>
-                <p className="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
+                <p className="text-xs font-black text-muted-foreground mb-1 uppercase tracking-widest text-right">{stat.label}</p>
+                <h3 className="text-3xl font-black text-primary text-right">{stat.value}</h3>
               </CardContent>
             </Card>
           ))}
@@ -95,112 +93,101 @@ export default function SellerDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Listings Table */}
-          <Card className="lg:col-span-2 border-none shadow-sm overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between border-b bg-white">
-              <div>
-                <CardTitle>Recent Listings</CardTitle>
-                <CardDescription>Manage your active inventory.</CardDescription>
+          <Card className="lg:col-span-2 border-none shadow-xl overflow-hidden bg-white rounded-[40px]">
+            <CardHeader className="flex flex-row-reverse items-center justify-between border-b p-8 bg-zinc-50/50">
+              <div className="text-right">
+                <CardTitle className="text-2xl font-black">إعلاناتك الأخيرة</CardTitle>
+                <CardDescription className="font-bold">إدارة مخزونك الحالي المتاح للبيع</CardDescription>
               </div>
-              <Button variant="ghost" className="text-secondary gap-1">
-                View All <ChevronRight size={16} />
-              </Button>
+              <div className="relative w-64 hidden md:block">
+                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                 <Input placeholder="بحث في إعلاناتي..." className="pr-10 h-11 rounded-xl border-2" dir="rtl" />
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-zinc-50">
                   <TableRow>
-                    <TableHead className="pl-6">Listing</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Views</TableHead>
-                    <TableHead className="text-right pr-6">Action</TableHead>
+                    <TableHead className="text-right pr-8">الإعلان</TableHead>
+                    <TableHead className="text-right">السعر</TableHead>
+                    <TableHead className="text-right">الحالة</TableHead>
+                    <TableHead className="text-right">المشاهدات</TableHead>
+                    <TableHead className="text-left pl-8">إجراء</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {RECENT_LISTINGS.map((item) => (
-                    <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
-                      <TableCell className="font-medium pl-6">
-                        <div className="flex flex-col">
-                          <span>{item.name}</span>
+                    <TableRow key={item.id} className="hover:bg-zinc-50/50 transition-colors border-b">
+                      <TableCell className="font-bold pr-8">
+                        <div className="flex flex-col text-right">
+                          <span className="text-primary">{item.name}</span>
                           <span className="text-[10px] text-muted-foreground font-mono">{item.id}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{item.price}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right font-black text-secondary">{item.price}</TableCell>
+                      <TableCell className="text-right">
                         <Badge 
-                          variant={item.status === 'Active' ? 'default' : item.status === 'Sold' ? 'outline' : 'secondary'}
                           className={cn(
-                            item.status === 'Low Stock' && "bg-amber-100 text-amber-700 border-amber-200"
+                            "font-black",
+                            item.status === 'Active' ? "bg-green-600" : "bg-zinc-400"
                           )}
                         >
-                          {item.status}
+                          {item.status === 'Active' ? 'نشط' : 'تم البيع'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{item.views}</TableCell>
-                      <TableCell className="text-right pr-6">
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical size={16} />
-                        </Button>
+                      <TableCell className="text-right font-bold text-muted-foreground">{item.views}</TableCell>
+                      <TableCell className="text-left pl-8">
+                        <div className="flex gap-2">
+                           <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/5"><MoreVertical size={18} /></Button>
+                           <Button variant="outline" size="sm" className="font-bold rounded-lg border-primary/20 text-primary">تعديل</Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+              <div className="p-6 text-center border-t">
+                 <Button variant="ghost" className="font-black text-secondary gap-2">عرض كافة الإعلانات <ChevronRight size={18} /></Button>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Side Panel Orders */}
+          {/* Sidebar Stats */}
           <div className="space-y-8">
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex justify-between items-center">
-                  Recent Orders
-                  <Badge variant="outline" className="bg-secondary text-primary font-bold">New</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {RECENT_ORDERS.map((order) => (
-                  <div key={order.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border cursor-pointer">
-                    <div className={cn(
-                      "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                      order.status === 'Processing' ? "bg-amber-100 text-amber-600" : 
-                      order.status === 'Shipped' ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
-                    )}>
-                      {order.status === 'Processing' ? <Clock size={20} /> : 
-                       order.status === 'Shipped' ? <Package size={20} /> : <CheckCircle size={20} />}
+            <div className="grid grid-cols-2 gap-4">
+               {QUICK_ACTIONS.map((action, i) => (
+                 <Card key={i} className="border-none shadow-sm p-6 text-center bg-white rounded-3xl">
+                    <div className="mx-auto w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center mb-4">
+                       {action.icon}
                     </div>
-                    <div className="flex-grow min-w-0">
-                      <div className="flex justify-between items-center mb-0.5">
-                        <h4 className="font-bold text-sm text-primary truncate">{order.buyer}</h4>
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground">{order.id}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">{order.time}</span>
-                        <span className="font-bold text-secondary text-xs">{order.amount}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <Button className="w-full mt-4" variant="outline">
-                  View All Orders
-                </Button>
-              </CardContent>
+                    <p className="text-2xl font-black text-primary">{action.value}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">{action.label}</p>
+                 </Card>
+               ))}
+            </div>
+
+            <Card className="border-none shadow-xl bg-primary text-white rounded-[40px] overflow-hidden relative">
+              <div className="p-8 relative z-10 text-right">
+                 <h3 className="text-xl font-black mb-4 flex items-center justify-end gap-2 text-secondary">
+                   تحليل الأداء <BarChart3 />
+                 </h3>
+                 <p className="text-blue-100/70 text-sm leading-relaxed mb-6 font-medium">
+                   إعلانات المحركات لديك حصدت <span className="text-secondary font-black">2.4K مشاهدة</span> جديدة هذا الشهر. نقترح إضافة صور أكثر لزيادة المبيعات.
+                 </p>
+                 <Button variant="secondary" className="w-full h-12 font-black rounded-xl">مشاهدة الإحصائيات التفصيلية</Button>
+              </div>
+              <div className="absolute -bottom-10 -left-10 opacity-10">
+                 <BarChart3 size={200} />
+              </div>
             </Card>
 
-            <Card className="border-none shadow-sm bg-primary text-white">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <AlertCircle size={20} className="text-secondary" />
-                  Seller Tips
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-blue-100/70 leading-relaxed mb-4">
-                  Listings with high-quality images of the actual part sell <span className="text-secondary font-bold">3.5x faster</span> than stock photos.
-                </p>
-                <Button variant="secondary" className="w-full font-bold">Update Images</Button>
-              </CardContent>
-            </Card>
+            <div className="bg-amber-50 border-2 border-amber-100 p-6 rounded-[32px] text-right" dir="rtl">
+               <h4 className="font-black text-amber-800 mb-2 flex items-center justify-end gap-2">تنبيه النظام <Clock size={16} /></h4>
+               <p className="text-xs text-amber-700 font-bold leading-relaxed">
+                 اشتراكك الحالي "Gold" ينتهي خلال 5 أيام. يرجى التجديد لضمان استمرار ظهور إعلاناتك في مقدمة البحث.
+               </p>
+               <Button variant="link" className="text-amber-800 font-black p-0 mt-2">تجديد الاشتراك الآن</Button>
+            </div>
           </div>
         </div>
       </main>
