@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -29,7 +28,7 @@ const CATEGORY_DATA = {
     "Turbo", "Injecteurs", "Bougies", "Filtre à huile", "Filtre à air", "Filtre à carburant", "Courroie de distribution"
   ],
   "Électricité (الكهرباء)": [
-    "Alternateur", "Déمارreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
+    "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
     "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
     "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
   ],
@@ -38,10 +37,10 @@ const CATEGORY_DATA = {
     "Crémaillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
   ],
   "Pneumatiques (الإطارات)": [
-    "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveور", "Valve", "Capteur pression pneu", "Roue complète"
+    "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveur", "Valve", "Capteur pression pneu", "Roue complète"
   ],
   "Carrosserie (الهيكل)": [
-    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Portه arrière", 
+    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
     "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
   ],
   "Accessoires (الأكسسوارات)": [
@@ -95,7 +94,7 @@ const WILAYAS = [
   "16 - Alger", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda",
   "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine",
   "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla",
-  "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerدès",
+  "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès",
   "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela",
   "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma",
   "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - Timimoun", "50 - Bordj Badji Mokhtar",
@@ -124,7 +123,7 @@ export default function NewListing() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 pt-32 pb-12">
+      <main className="flex-grow container mx-auto px-4 pt-[235px] pb-12">
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="flex flex-row-reverse items-center justify-between bg-white p-6 rounded-3xl shadow-sm border border-border">
             <h1 className="text-3xl font-black text-primary">إضافة إعلان جديد</h1>
@@ -354,7 +353,7 @@ export default function NewListing() {
             </div>
 
             <div className="space-y-8">
-              <Card className="border-none shadow-xl sticky top-32 overflow-hidden">
+              <Card className="border-none shadow-xl sticky top-[250px] overflow-hidden">
                 <CardHeader className="bg-primary text-white text-right p-6">
                   <CardTitle className="text-xl font-black">نشر الإعلان</CardTitle>
                 </CardHeader>

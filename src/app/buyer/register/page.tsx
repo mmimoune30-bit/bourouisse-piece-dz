@@ -13,7 +13,7 @@ export default function BuyerRegister() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-32 pb-12 flex items-center justify-center">
+      <main className="flex-grow pt-[235px] pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl">
             <CardHeader className="text-center space-y-2">
