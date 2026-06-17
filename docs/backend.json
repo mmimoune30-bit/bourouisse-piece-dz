@@ -55,7 +55,8 @@
         "phone": { "type": "string", "description": "رقم الهاتف" },
         "wilaya": { "type": "string", "description": "مقر النشاط" },
         "email": { "type": "string", "format": "email" },
-        "userId": { "type": "string", "description": "معرف المستخدم المرتبط" }
+        "userId": { "type": "string", "description": "معرف المستخدم المرتبط" },
+        "subscriptionActive": { "type": "boolean", "description": "حالة الاشتراك" }
       }
     },
     "Buyer": {
@@ -86,11 +87,23 @@
           "enum": ["Pending", "Approved", "Rejected", "Refunded"],
           "description": "حالة العملية المالية"
         },
-        "approvedBy": { "type": "string", "description": "معرف المسؤول الذي قام بمراجعة العملية" },
+        "approvedBy": { "type": "string", "description": "اسم المسؤول الذي قام بالمراجعة" },
         "approvalDate": { "type": "string", "format": "date-time" },
-        "notes": { "type": "string", "description": "ملاحظات إضافية حول العملية" }
+        "notes": { "type": "string", "description": "ملاحظات إضافية أو سبب الرفض" }
       },
       "required": ["userId", "amount", "paymentMethod", "status"]
+    },
+    "AuditLog": {
+      "title": "سجل النشاط",
+      "description": "سجل العمليات الإدارية والمالية",
+      "type": "object",
+      "properties": {
+        "adminId": { "type": "string" },
+        "action": { "type": "string" },
+        "targetId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "details": { "type": "string" }
+      }
     }
   },
   "auth": {
@@ -112,6 +125,10 @@
     "/payments/{paymentId}": {
       "schema": "Payment",
       "description": "سجل عمليات الدفع والتحويلات المالية في المنصة"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "سجل مراقبة العمليات الإدارية"
     }
   }
 }

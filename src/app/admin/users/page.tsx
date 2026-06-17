@@ -23,7 +23,8 @@ import {
   Key, 
   Mail,
   Filter,
-  UserPlus
+  UserPlus,
+  ShieldAlert
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -60,6 +61,10 @@ export default function UserManagement() {
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
+  // Simulated access check for UI
+  const currentUserRole = "Super Admin";
+  const canDeleteUsers = currentUserRole === "Super Admin";
+
   return (
     <div className="space-y-8 text-right" dir="rtl">
       <div className="flex flex-row-reverse justify-between items-center gap-4">
@@ -87,6 +92,10 @@ export default function UserManagement() {
               <div className="grid gap-2">
                 <Label htmlFor="name">الاسم الكامل</Label>
                 <Input id="name" placeholder="الاسم هنا" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Input id="email" type="email" placeholder="email@example.com" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="role">الدور الوظيفي</Label>
@@ -132,7 +141,12 @@ export default function UserManagement() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="font-black text-[10px] uppercase">{user.role}</Badge>
+                    <Badge variant="outline" className={cn(
+                      "font-black text-[10px] uppercase",
+                      user.role === 'Financial Officer' ? "text-blue-600 border-blue-200" : ""
+                    )}>
+                      {user.role}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge className="bg-green-600 font-bold">{user.status}</Badge>
@@ -145,7 +159,9 @@ export default function UserManagement() {
                       <DropdownMenuContent align="start">
                         <DropdownMenuItem className="text-right justify-end">تعديل الصلاحيات</DropdownMenuItem>
                         <DropdownMenuItem className="text-right justify-end">سجل النشاط</DropdownMenuItem>
-                        <DropdownMenuItem className="text-right justify-end text-destructive">حظر الحساب</DropdownMenuItem>
+                        {canDeleteUsers && (
+                          <DropdownMenuItem className="text-right justify-end text-destructive font-bold">حظر الحساب</DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
