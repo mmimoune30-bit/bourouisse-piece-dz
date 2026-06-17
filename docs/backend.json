@@ -59,33 +59,27 @@
         "subscriptionActive": { "type": "boolean", "description": "حالة الاشتراك" }
       }
     },
-    "Subscription": {
-      "title": "اشتراك متجر",
-      "description": "بيانات اشتراك المتجر في المنصة",
+    "Complaint": {
+      "title": "شكوى",
+      "description": "بيانات شكوى مقدمة من مشتري أو بائع",
       "type": "object",
       "properties": {
-        "storeId": { "type": "string" },
-        "storeName": { "type": "string" },
-        "ownerName": { "type": "string" },
-        "plan": { "type": "string", "enum": ["Free", "Silver", "Gold", "Professional"] },
-        "startDate": { "type": "string", "format": "date-time" },
-        "endDate": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["Active", "Expired", "Suspended", "Cancelled", "Pending"] },
-        "amount": { "type": "number" },
-        "notes": { "type": "string" },
-        "lastUpdatedBy": { "type": "string" },
-        "updatedAt": { "type": "string", "format": "date-time" }
-      }
-    },
-    "Buyer": {
-      "title": "مشتري",
-      "description": "بيانات حساب المشتري",
-      "type": "object",
-      "properties": {
-        "fullName": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
+        "complaintNumber": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userType": { "type": "string", "enum": ["customer", "seller"] },
         "phone": { "type": "string" },
-        "userId": { "type": "string" }
+        "email": { "type": "string" },
+        "orderNumber": { "type": "string" },
+        "storeName": { "type": "string" },
+        "category": { "type": "string" },
+        "subject": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["New", "Under Review", "Waiting Customer", "Waiting Seller", "Resolved", "Closed"] },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High", "Urgent"] },
+        "assignedTo": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "attachments": { "type": "array", "items": { "type": "string" } }
       }
     },
     "Payment": {
@@ -94,34 +88,18 @@
       "type": "object",
       "properties": {
         "paymentId": { "type": "string" },
-        "userId": { "type": "string", "description": "مرجع المستخدم صاحب العملية" },
-        "storeId": { "type": "string", "description": "مرجع المتجر المرتبط (إن وجد)" },
-        "amount": { "type": "number", "description": "المبلغ بالدينار الجزائري" },
-        "paymentMethod": { "type": "string", "description": "وسيلة الدفع (CCP, Baridimob, CIB, etc.)" },
+        "userId": { "type": "string" },
+        "storeId": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
         "paymentDate": { "type": "string", "format": "date-time" },
-        "receiptImage": { "type": "string", "description": "رابط صورة وصل الدفع المرفوع" },
-        "status": { 
-          "type": "string", 
-          "enum": ["Pending", "Approved", "Rejected", "Refunded"],
-          "description": "حالة العملية المالية"
-        },
-        "approvedBy": { "type": "string", "description": "اسم المسؤول الذي قام بالمراجعة" },
+        "receiptImage": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected", "Refunded"] },
+        "approvedBy": { "type": "string" },
         "approvalDate": { "type": "string", "format": "date-time" },
-        "notes": { "type": "string", "description": "ملاحظات إضافية أو سبب الرفض" }
+        "notes": { "type": "string" }
       },
       "required": ["userId", "amount", "paymentMethod", "status"]
-    },
-    "AuditLog": {
-      "title": "سجل النشاط",
-      "description": "سجل العمليات الإدارية والمالية",
-      "type": "object",
-      "properties": {
-        "adminId": { "type": "string" },
-        "action": { "type": "string" },
-        "targetId": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "details": { "type": "string" }
-      }
     }
   },
   "auth": {
@@ -136,21 +114,13 @@
       "schema": "Seller",
       "description": "بيانات البائعين"
     },
-    "/subscriptions/{subId}": {
-      "schema": "Subscription",
-      "description": "سجل اشتراكات المتاجر"
-    },
-    "/buyers/{buyerId}": {
-      "schema": "Buyer",
-      "description": "بيانات المشترين"
+    "/complaints/{complaintId}": {
+      "schema": "Complaint",
+      "description": "سجل الشكاوى والدعم الفني"
     },
     "/payments/{paymentId}": {
       "schema": "Payment",
-      "description": "سجل عمليات الدفع والتحويلات المالية في المنصة"
-    },
-    "/auditLogs/{logId}": {
-      "schema": "AuditLog",
-      "description": "سجل مراقبة العمليات الإدارية"
+      "description": "سجل عمليات الدفع والتحويلات المالية"
     }
   }
 }
