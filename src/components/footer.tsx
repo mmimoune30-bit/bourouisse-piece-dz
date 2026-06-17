@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings } from "lucide-react";
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings, ShieldAlert } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Footer() {
@@ -55,11 +55,11 @@ export default function Footer() {
           <div className="text-right">
             <h4 className="font-headline font-bold mb-6 text-lg border-r-4 border-secondary pr-4">تسوق حسب الفئة</h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
-              <li><Link href="/catalog?category=الهيكل" className="hover:text-secondary transition-colors">الهيكل</Link></li>
-              <li><Link href="/catalog?category=المحرك" className="hover:text-secondary transition-colors">المحرك</Link></li>
-              <li><Link href="/catalog?category=التوازي و التوازن" className="hover:text-secondary transition-colors">التوازي و التوازن</Link></li>
-              <li><Link href="/catalog?category=الكهرباء" className="hover:text-secondary transition-colors">الكهرباء</Link></li>
-              <li><Link href="/catalog?category=الأكسيسوارات" className="hover:text-secondary transition-colors">الأكسيسوارات</Link></li>
+              <li><Link href="/catalog?category=Carrosserie" className="hover:text-secondary transition-colors">الهيكل</Link></li>
+              <li><Link href="/catalog?category=Moteur" className="hover:text-secondary transition-colors">المحرك</Link></li>
+              <li><Link href="/catalog?category=Suspension" className="hover:text-secondary transition-colors">التوازي و التوازن</Link></li>
+              <li><Link href="/catalog?category=Électricité" className="hover:text-secondary transition-colors">الكهرباء</Link></li>
+              <li><Link href="/catalog?category=Accessoires" className="hover:text-secondary transition-colors">الأكسيسوارات</Link></li>
             </ul>
           </div>
 
@@ -87,6 +87,14 @@ export default function Footer() {
               <li className="flex items-center justify-end gap-3">
                 <span>الجزائر العاصمة، الجزائر</span>
                 <MapPin size={16} className="text-secondary" />
+              </li>
+              <li className="pt-4 border-t border-white/5">
+                <Link href="/customer/complaints/new" className="flex items-center justify-end gap-3 group/link">
+                  <span className="font-black text-secondary group-hover:text-white transition-colors">تقديم الشكاوى و الملاحظات</span>
+                  <div className="bg-secondary/20 p-2 rounded-lg group-hover:bg-secondary group-hover:text-primary transition-all">
+                    <ShieldAlert size={18} />
+                  </div>
+                </Link>
               </li>
             </ul>
           </div>
