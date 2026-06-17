@@ -13,7 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, Car, Settings, Fuel, AlertTriangle, Layers, ChevronRight } from "lucide-react";
+import { Search, Filter, Car, Settings, Fuel, AlertTriangle, Layers, ShieldCheck } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 
 // --- Data Constants ---
@@ -47,18 +47,16 @@ const CATEGORY_DATA: Record<string, string[]> = {
   "Carrosserie (الهيكل)": ["Capot", "Pare-chocs", "Ailes", "Phares", "Feux", "Portières", "Coffre", "Rétroviseurs", "Pare-brise"],
   "Suspension et Direction (التوازي و التوازن)": ["Amortisseurs", "Triangles", "Crémaillère", "Rotules", "Cardans", "Disques de frein", "Plaquettes"],
   "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Faisceau", "Boîte à fusibles", "Capteurs", "Commodo"],
-  "Accessoires (الأكسيسوارات)": ["Autoradio", "Tapis", "Housses", "Caméra de recul", "Climatisation"]
+  "Accessoires (الأكسيسوارات)": ["Autoradio", "Tapis", "Housses", "Camيرا de recul", "Climatisation"]
 };
-
-const WILAYAS = [
-  "16 - Alger", "06 - Béjaïa", "19 - Sétif", "31 - Oran", "25 - Constantine", "09 - Blida", "15 - Tizi Ouzou", "35 - Boumerdès"
-];
 
 const ALL_PRODUCTS = [
   { id: "p1", name: "كتلة محرك V8 BMW", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", condition: "New" as const, listingType: "part", seller: "EliteMotors DZ" },
   { id: "p2", name: "طقم فرامل سيراميك", price: 120000, image: PlaceHolderImages[1].imageUrl, category: "Suspension et Direction (التوازي و التوازن)", partType: "Plaquettes", brand: "Audi", model: "A4", condition: "New" as const, listingType: "part", seller: "SpeedHub Algiers" },
   { id: "p3", name: "شاحن توربيني Mercedes", price: 280000, image: PlaceHolderImages[5].imageUrl, category: "Moteur (المحرك)", partType: "Turbo", brand: "Mercedes-Benz", model: "Classe C", condition: "Used" as const, listingType: "part", seller: "BenzParts Algiers" },
   { id: "v1", name: "Clio 4 للقطع", price: 850000, image: PlaceHolderImages[6].imageUrl, category: "مركبات خارج الخدمة", partType: "للقطع", brand: "Renault", model: "Clio", condition: "Damaged" as const, listingType: "accidented", seller: "Salvage Parts" },
+  { id: "p4", name: "كمبيوتر محرك Hyundai Accent", price: 35000, image: PlaceHolderImages[0].imageUrl, category: "Électricité (الكهرباء)", partType: "ECU (Cerveau)", brand: "Hyundai", model: "Accent", condition: "Used" as const, listingType: "part", seller: "AutoElectro DZ" },
+  { id: "p5", name: "مضخة بنزين Renault Symbol", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Injecteurs", brand: "Renault", model: "Symbol", condition: "New" as const, listingType: "part", seller: "PiecePro Alger" },
 ];
 
 function CatalogContent() {
@@ -69,6 +67,7 @@ function CatalogContent() {
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
   const [selectedPart, setSelectedPart] = useState<string>("");
+  const [selectedCondition, setSelectedCondition] = useState<string>("");
   
   const [activeTab, setActiveTab] = useState<string>("all");
   const [damageFilter, setDamageFilter] = useState<number>(100);
@@ -93,10 +92,11 @@ function CatalogContent() {
     if (selectedModel && selectedModel !== "all") result = result.filter(p => p.model === selectedModel);
     if (selectedCategory) result = result.filter(p => p.category.includes(selectedCategory));
     if (selectedPart && selectedPart !== "all") result = result.filter(p => p.partType === selectedPart);
+    if (selectedCondition && selectedCondition !== "all") result = result.filter(p => p.condition === selectedCondition);
     if (searchQuery) result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return result;
-  }, [activeTab, selectedBrand, selectedModel, selectedCategory, selectedPart, searchQuery]);
+  }, [activeTab, selectedBrand, selectedModel, selectedCategory, selectedPart, selectedCondition, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -201,6 +201,21 @@ function CatalogContent() {
 
                   <div className="h-px bg-border my-2" />
 
+                  {/* Filter 3: Condition */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-black flex items-center justify-end gap-2">
+                      <ShieldCheck size={16} className="text-secondary" /> حالة القطعة
+                    </Label>
+                    <Select value={selectedCondition} onValueChange={setSelectedCondition}>
+                      <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الحالة" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">الكل</SelectItem>
+                        <SelectItem value="New">جديد (New)</SelectItem>
+                        <SelectItem value="Used">مستعمل (Used)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-4">
                     <Label className="text-sm font-black flex items-center justify-end gap-2">
                       <Fuel size={16} className="text-secondary" /> الوقود
@@ -231,6 +246,7 @@ function CatalogContent() {
                       setSelectedModel("");
                       setSelectedCategory("");
                       setSelectedPart("");
+                      setSelectedCondition("");
                     }}
                   >
                     إعادة ضبط الفلاتر
@@ -278,6 +294,7 @@ function CatalogContent() {
                     setSelectedModel("");
                     setSelectedCategory("");
                     setSelectedPart("");
+                    setSelectedCondition("");
                     setSearchQuery("");
                   }}>عرض كافة الإعلانات</Button>
                 </div>
