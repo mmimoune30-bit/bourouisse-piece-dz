@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, LogIn, UserPlus } from "lucide-react";
+import { User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, LogIn, UserPlus, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,8 +18,8 @@ import { useRouter, usePathname } from "next/navigation";
 
 const translations = {
   AR: { 
-    buyer: "بوابة المشتري", 
-    seller: "بوابة البائع", 
+    buyer: "حساب جديد", 
+    seller: "كن بائعاً معنا", 
     stats: "لوحة التحكم", 
     new: "إعلان جديد", 
     store: "فتح متجر", 
@@ -95,54 +95,40 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Portals Section */}
+        {/* Action Buttons Section */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
-              <Link href="/customer/dashboard">
-                <User size={20} />
+              <Link href="/join">
+                <UserPlus size={20} />
                 <span className="hidden lg:inline">{t.buyer}</span>
               </Link>
             </Button>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="default" className="flex gap-2 items-center bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl">
-                <LayoutDashboard size={20} />
+          <div className="flex items-center gap-2">
+            <Button variant="default" className="flex gap-2 items-center bg-secondary text-primary hover:bg-white font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
+              <Link href="/seller/register">
+                <Store size={20} />
                 <span className="hidden lg:inline">{t.seller}</span>
-                <ChevronDown size={14} className="opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-zinc-900 border-zinc-800 text-white p-2">
-              <DropdownMenuLabel className="text-secondary">{t.seller}</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/dashboard" className="w-full font-bold">{t.stats}</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
-                <Link href="/seller/listings/new" className="w-full font-bold">{t.new}</Link>
-              </DropdownMenuItem>
-              
-              {isAdmin && (
-                <>
-                  <DropdownMenuSeparator className="bg-zinc-800" />
-                  <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer h-12 rounded-lg mt-1 border border-secondary/20">
-                    <Link href="/admin/dashboard" className="w-full font-black text-secondary flex items-center gap-2">
-                      <ShieldAlert size={18} />
-                      {t.admin}
-                    </Link>
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </Link>
+            </Button>
+          </div>
+
+          {isAdmin && (
+            <Button variant="default" className="flex gap-2 items-center bg-destructive text-white hover:bg-red-700 font-black text-sm h-12 px-6 rounded-xl transition-all shadow-xl" asChild>
+              <Link href="/admin/dashboard">
+                <ShieldAlert size={20} />
+                <span className="hidden lg:inline">Admin</span>
+              </Link>
+            </Button>
+          )}
 
           {pathname !== "/" && (
             <Button
               variant="default"
               size="icon"
-              className="h-12 w-12 bg-destructive border-2 border-destructive text-white hover:bg-red-700 transition-all shadow-xl rounded-xl"
+              className="h-12 w-12 bg-zinc-800 border-2 border-zinc-700 text-white hover:bg-zinc-700 transition-all shadow-xl rounded-xl"
               onClick={() => router.back()}
               title={t.back}
             >
