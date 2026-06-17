@@ -12,48 +12,47 @@ import { ArrowLeft } from "lucide-react";
 const FEATURED_PRODUCTS = [
   {
     id: "p1",
-    name: "كتلة محرك V8 دقيقة",
-    price: 450000,
-    image: PlaceHolderImages[0].imageUrl,
-    category: "المحرك",
-    seller: "EliteMotors DZ",
-    condition: "New" as const
-  },
-  {
-    id: "p2",
-    name: "طقم فرامل سيراميك كربون",
-    price: 120000,
-    image: PlaceHolderImages[1].imageUrl,
-    category: "الهيكل",
-    seller: "SpeedHub Algiers",
+    name: "مصباح أمامي أيمن Clio 4",
+    price: 8500,
+    image: PlaceHolderImages[5].imageUrl,
+    category: "إضاءة",
+    seller: "Auto Pièces Chlef",
     condition: "New" as const
   },
   {
     id: "p3",
-    name: "إطارات الطرق الوعرة (طقم 4)",
-    price: 85000,
-    image: PlaceHolderImages[2].imageUrl,
-    category: "الإطارات",
-    seller: "DesertRoad Parts",
+    name: "رادياتور Peugeot 208",
+    price: 12000,
+    image: PlaceHolderImages[4].imageUrl,
+    category: "المحرك",
+    seller: "Pièces Renault DZ",
     condition: "New" as const
   },
   {
+    id: "p2",
+    name: "باب أمامي أيسر Clio 4",
+    price: 25000,
+    image: PlaceHolderImages[6].imageUrl,
+    category: "هيكل",
+    seller: "Auto Pièces Chlef",
+    condition: "Used" as const
+  },
+  {
     id: "p4",
-    name: "بطارية سيارة 12 فولت شديدة التحمل",
-    price: 18500,
-    image: PlaceHolderImages[3].imageUrl,
-    category: "الكهرباء",
-    seller: "Energy Dz",
-    condition: "New" as const
+    name: "صدام أمامي Peugeot 301",
+    price: 18000,
+    image: PlaceHolderImages[5].imageUrl,
+    category: "هيكل",
+    seller: "Pièces Renault DZ",
+    condition: "Used" as const
   }
 ];
 
 const TICKER_ADS = [
-  { id: "p1", name: "شاحن توربيني GT20", price: "85,000 DZD", qty: 5, image: PlaceHolderImages[0].imageUrl },
-  { id: "p2", name: "طقم فحمات فرامل", price: "12,500 DZD", qty: 15, image: PlaceHolderImages[1].imageUrl },
-  { id: "p4", name: "بطارية أصلية 75Ah", price: "19,800 DZD", qty: 10, image: PlaceHolderImages[3].imageUrl },
-  { id: "p3", name: "أضواء LED أمامية", price: "18,000 DZD", qty: 8, image: PlaceHolderImages[2].imageUrl },
-  { id: "p5", name: "مضخة وقود أصلية", price: "32,000 DZD", qty: 3, image: PlaceHolderImages[0].imageUrl },
+  { id: "p1", name: "مصباح Clio 4", price: "8,500 DZD", qty: 5, image: PlaceHolderImages[5].imageUrl },
+  { id: "p3", name: "رادياتور 208", price: "12,000 DZD", qty: 10, image: PlaceHolderImages[4].imageUrl },
+  { id: "p5", name: "فلتر زيت Accent", price: "900 DZD", qty: 50, image: PlaceHolderImages[4].imageUrl },
+  { id: "p2", name: "باب Clio 4", price: "25,000 DZD", qty: 1, image: PlaceHolderImages[6].imageUrl },
 ];
 
 export default function Home() {
