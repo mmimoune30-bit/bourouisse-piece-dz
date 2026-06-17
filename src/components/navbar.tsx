@@ -61,13 +61,23 @@ const CATEGORY_ICONS = [
   <Sparkles size={24} className="text-secondary" />,
 ];
 
+// High-quality SVG Path Helper for Brands
+const BrandLogo = ({ name }: { name: string }) => {
+  // Common Car Icon as fallback with brand initial
+  return (
+    <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 shadow-lg group-hover:scale-110">
+      <span className="text-[10px] font-black text-white">{name.substring(0, 2).toUpperCase()}</span>
+    </div>
+  );
+};
+
 const BRANDS = [
-  { name: "Mercedes", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5 0 .23-.01.46-.03.68l-8.47-4.88V3.5zm-1 5.37l-7.53 4.34c.3-.59.66-1.15 1.08-1.66l6.45-3.71v1.03zm2 0v1.03l6.45 3.71c.42.51.78 1.07 1.08 1.66l-7.53-4.34zm-8.47 5.75l8.47 4.88v4.32c-4.69 0-8.5-3.81-8.5-8.5 0-.23.01-.46.03-.7zm9.47 4.88l8.47-4.88c.02.24.03.47.03.7 0 4.69-3.81 8.5-8.5 8.5v-4.32z" /></svg> },
-  { name: "Volkswagen", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm0 1.5l-2 5.5h4l-2-5.5zm-3 8.5l2 5.5h2l2-5.5h-1.5l-1.25 3.5h-1.5l-1.25-3.5H9z" /></svg> },
-  { name: "Hyundai", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C5.37 2 0 6.48 0 12s5.37 10 12 10 12-4.48 12-10S18.63 2 12 2zm3.32 15.11l-1.01-4.22h-4.62l1.01 4.22H8.38l-1.63-6.83h2.32l1.01 4.22h4.62l-1.01-4.22h2.32l1.63 6.83h-2.32z" /></svg> },
-  { name: "Peugeot", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 6v12l8 4 8-4V6l-8-4zm6 15l-6 3-6-3V7l6-3 6 3v10zM12 8l-4 2v4l4 2 4-2v-4l-4-2z" /></svg> },
-  { name: "Renault", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L5 12l7 10 7-10-7-10zm0 3.5L16.5 12 12 18.5 7.5 12 12 5.5z" /></svg> },
-  { name: "Kia", icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.69 0 8.5 3.81 8.5 8.5s-3.81 8.5-8.5 8.5-8.5-3.81-8.5-8.5 3.81-8.5 8.5-8.5zm3.5 11l-1.5-4-1.5 4h3zm-5.5 0h-2l1-4 1 4z" /></svg> }
+  { name: "Renault" }, { name: "Dacia" }, { name: "Peugeot" }, { name: "Citroën" }, { name: "Fiat" },
+  { name: "Volkswagen" }, { name: "Audi" }, { name: "BMW" }, { name: "Mercedes-Benz" }, { name: "Opel" },
+  { name: "Hyundai" }, { name: "Kia" }, { name: "Toyota" }, { name: "Nissan" }, { name: "Mitsubishi" },
+  { name: "Suzuki" }, { name: "Mazda" }, { name: "Honda" }, { name: "Ford" }, { name: "Chevrolet" },
+  { name: "Chery" }, { name: "Geely" }, { name: "JAC" }, { name: "DFSK" }, { name: "Great Wall" },
+  { name: "Haval" }, { name: "Changan" }, { name: "BAIC" }, { name: "Foton" }, { name: "Dongfeng" }, { name: "Lada" }
 ];
 
 const WhatsappIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
@@ -95,12 +105,6 @@ export default function Navbar() {
     </svg>
   );
 
-  const ViberIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19.34 1.32C17.14.34 14.54 0 12 0 6.64 0 2.27 4.37 2.27 9.73c0 2.61 1.02 5.09 2.87 6.94l-1.07 3.9c-.11.41.24.78.65.67l3.9-1.07c1.85 1.85 4.33 2.87 6.94 2.87 5.36 0 9.73-4.37 9.73-9.73 0-2.54-.34-5.14-1.32-7.34l-.6.35c.82 1.83 1.1 4 1.1 6.12 0 4.93-4.01 8.93-8.93 8.93-2.33 0-4.6-.9-6.32-2.52l-.46-.46-3.23.88.88-3.23-.46-.46-3.23.88.88-3.23-.46-.46c-1.62-1.72-2.52-3.99-2.52-6.32 0-4.93 4.01-8.93 8.93-8.93 2.12 0 4.29.28 6.12 1.1l.35-.6zM15.54 13.52c-.34.34-.84.45-1.28.29-.44-.16-.83-.49-1.12-.89-.29-.4-.52-.86-.67-1.36-.15-.5-.22-1.01-.22-1.52 0-.34.03-.68.08-1.01l1.54.34c-.04.22-.06.45-.06.67 0 .34.05.68.15 1.01.1.33.25.64.44.91.19.27.42.5.68.68.26.18.55.32.86.41.31.09.64.13.97.13.15 0 .29-.01.44-.04l.34 1.54c-.22.03-.45.05-.67.06-.51 0-1.02-.07-1.52-.22-.5-.15-.96-.38-1.36-.67-.4-.29-.73-.68-.89-1.12-.16-.44-.05-.94.29-1.28l-.34-1.54-.34 1.54z" />
-    </svg>
-  );
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl h-[235px]">
       {/* Top Bar: Contact & Social Info */}
@@ -125,7 +129,7 @@ export default function Navbar() {
               <TikTokIcon />
             </Link>
             <Link href="#" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary hover:bg-secondary hover:text-black transition-all shadow-xl">
-              <ViberIcon />
+              <ViberIcon size={18} className="text-primary" />
             </Link>
           </div>
         </div>
@@ -237,18 +241,16 @@ export default function Navbar() {
       {/* FIXED RED BAR - Brands & Categories */}
       <section className="bg-destructive border-b-2 border-secondary h-[75px] w-full flex items-center overflow-hidden shadow-lg">
         <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between h-full gap-4">
-          {/* Brand Logos */}
-          <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
+          {/* Brand Logos - Extended List */}
+          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 flex-grow max-w-[50%] justify-end">
             {BRANDS.map((brand, i) => (
               <Link 
                 key={i} 
                 href={`/catalog?brand=${brand.name}`}
-                className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110 shrink-0"
+                className="flex flex-col items-center group transition-all duration-300 transform hover:scale-110 shrink-0 min-w-[50px]"
               >
-                <div className="text-white hover:text-secondary transition-colors drop-shadow-lg">
-                  {brand.icon}
-                </div>
-                <span className="text-[10px] md:hidden font-bold text-white mt-1 uppercase tracking-tighter">
+                <BrandLogo name={brand.name} />
+                <span className="text-[9px] font-bold text-white mt-1 uppercase tracking-tighter opacity-70 group-hover:opacity-100 whitespace-nowrap">
                   {brand.name}
                 </span>
               </Link>
@@ -256,28 +258,36 @@ export default function Navbar() {
           </div>
 
           {/* Category Links */}
-          <div className="flex flex-row-reverse items-center gap-6 md:gap-10 overflow-x-auto no-scrollbar flex-grow justify-center">
+          <div className="flex flex-row-reverse items-center gap-4 md:gap-8 overflow-x-auto no-scrollbar justify-center">
             {t.categories.map((catName, i) => (
               <Link
                 key={i}
                 href={`/catalog?category=${encodeURIComponent(catName)}`}
-                className="flex flex-row-reverse items-center gap-2.5 group transition-all shrink-0"
+                className="flex flex-row-reverse items-center gap-2 group transition-all shrink-0"
               >
-                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
+                <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
                   {CATEGORY_ICONS[i]}
                 </div>
-                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
+                <span className="text-xs md:text-sm font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
                   {catName}
                 </span>
               </Link>
             ))}
           </div>
 
-          <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-6 mr-3 hover:underline whitespace-nowrap hidden lg:block">
+          <Link href="/catalog" className="text-xs font-black text-secondary border-r-2 border-secondary/30 pr-4 mr-2 hover:underline whitespace-nowrap hidden lg:block">
             {t.all}
           </Link>
         </div>
       </section>
     </nav>
+  );
+}
+
+function ViberIcon({ size, className }: { size?: number, className?: string }) {
+  return (
+    <svg width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M19.34 1.32C17.14.34 14.54 0 12 0 6.64 0 2.27 4.37 2.27 9.73c0 2.61 1.02 5.09 2.87 6.94l-1.07 3.9c-.11.41.24.78.65.67l3.9-1.07c1.85 1.85 4.33 2.87 6.94 2.87 5.36 0 9.73-4.37 9.73-9.73 0-2.54-.34-5.14-1.32-7.34l-.6.35c.82 1.83 1.1 4 1.1 6.12 0 4.93-4.01 8.93-8.93 8.93-2.33 0-4.6-.9-6.32-2.52l-.46-.46-3.23.88.88-3.23-.46-.46-3.23.88.88-3.23-.46-.46c-1.62-1.72-2.52-3.99-2.52-6.32 0-4.93 4.01-8.93 8.93-8.93 2.12 0 4.29.28 6.12 1.1l.35-.6z" />
+    </svg>
   );
 }
