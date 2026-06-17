@@ -107,7 +107,7 @@ export default function PaymentManagement() {
   };
 
   const handleReject = () => {
-    if (!rejectReason) return;
+    if (!rejectReason || !selectedPayment) return;
     setPayments(prev => prev.map(p => 
       p.id === selectedPayment.id ? { ...p, status: "Rejected", notes: rejectReason, rejectedBy: currentUser.name } : p
     ));
@@ -230,7 +230,9 @@ export default function PaymentManagement() {
                           <DialogDescription>رقم العملية: {p.id} - بائع: {p.userName}</DialogDescription>
                         </DialogHeader>
                         <div className="relative aspect-[3/4] w-full bg-zinc-100 rounded-xl overflow-hidden border-2 border-dashed">
-                          <Image src={p.receiptUrl} alt="Receipt" fill className="object-contain" />
+                          {p.receiptUrl && (
+                            <Image src={p.receiptUrl} alt="Receipt" fill className="object-contain" />
+                          )}
                         </div>
                         <DialogFooter className="gap-2 sm:justify-start">
                           <Button variant="outline">إغلاق</Button>
@@ -239,7 +241,7 @@ export default function PaymentManagement() {
                     </Dialog>
 
                     {canManagePayments && p.status === 'Pending' && (
-                      <>
+                      <div className="flex gap-2 mt-1">
                         <Button 
                           variant="default" 
                           size="sm" 
@@ -259,41 +261,42 @@ export default function PaymentManagement() {
                         >
                           <Ban size={14} /> رفض
                         </Button>
-                      </>
+                      </div>
                     )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-        {/* Reject Reason Dialog */}
-        <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
-          <DialogContent className="sm:max-w-md" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 justify-end">
-                <AlertCircle className="text-destructive" /> سبب الرفض
-              </DialogTitle>
-              <DialogDescription className="text-right">
-                يرجى كتابة سبب رفض العملية ليظهر للبائع في لوحة تحكمه.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <Label className="block mb-2 text-right">الملاحظات</Label>
-              <Input 
-                placeholder="مثلاً: الصورة غير واضحة، المبلغ ناقص..." 
-                className="text-right"
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-              />
-            </div>
-            <DialogFooter className="gap-2 sm:justify-start">
-              <Button variant="destructive" className="font-bold" onClick={handleReject}>تأكيد الرفض</Button>
-              <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>إلغاء</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+      {/* Reject Reason Dialog */}
+      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent className="sm:max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 justify-end">
+              <AlertCircle className="text-destructive" /> سبب الرفض
+            </DialogTitle>
+            <DialogDescription className="text-right">
+              يرجى كتابة سبب رفض العملية ليظهر للبائع في لوحة تحكمه.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label className="block mb-2 text-right">الملاحظات</Label>
+            <Input 
+              placeholder="مثلاً: الصورة غير واضحة، المبلغ ناقص..." 
+              className="text-right"
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button variant="destructive" className="font-bold" onClick={handleReject}>تأكيد الرفض</Button>
+            <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
