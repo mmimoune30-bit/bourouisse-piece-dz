@@ -22,7 +22,8 @@ import {
   Ban, 
   Key, 
   Mail,
-  Filter
+  Filter,
+  UserPlus
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -32,6 +33,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const USERS_DATA = [
   { id: "U001", name: "Karim Boualam", email: "karim@test.com", role: "Customer", status: "Active", joined: "2024-05-10" },
@@ -41,8 +54,17 @@ const USERS_DATA = [
   { id: "U005", name: "Finance Manager", email: "finance@site.com", role: "Financial Officer", status: "Active", joined: "2024-02-15" },
 ];
 
+const ROLES = ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Moderator", "Seller", "Customer"];
+
 export default function UserManagement() {
   const [search, setSearch] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Logic to add user would go here
+    setIsAddDialogOpen(false);
+  };
 
   return (
     <div className="space-y-8">
@@ -51,9 +73,57 @@ export default function UserManagement() {
           <h1 className="text-3xl font-black text-primary">User Management</h1>
           <p className="text-muted-foreground">Manage roles, permissions, and account status.</p>
         </div>
-        <Button className="font-bold gap-2">
-          <Plus size={18} /> Add New User
-        </Button>
+        
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="font-bold gap-2">
+              <Plus size={18} /> Add New User
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleAddUser}>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <UserPlus className="text-secondary" /> Add New User
+                </DialogTitle>
+                <DialogDescription>
+                  Create a new user account with specific roles and permissions.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" placeholder="John Doe" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" type="email" placeholder="john@example.com" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="role">Account Role</Label>
+                  <Select required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLES.map(role => (
+                        <SelectItem key={role} value={role}>{role}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Initial Password</Label>
+                  <Input id="password" type="password" required />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+                <Button type="submit">Create Account</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card className="border-none shadow-sm">
@@ -90,7 +160,7 @@ export default function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {USERS_DATA.map((user) => (
+              {USERS_DATA.filter(u => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())).map((user) => (
                 <TableRow key={user.id} className="group hover:bg-zinc-50 transition-colors">
                   <TableCell className="pl-6">
                     <div className="flex items-center gap-3">
@@ -154,8 +224,4 @@ export default function UserManagement() {
       </Card>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }

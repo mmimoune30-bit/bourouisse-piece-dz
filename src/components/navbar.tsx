@@ -86,6 +86,13 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [currentLang, setCurrentLang] = useState<keyof typeof translations>("AR");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Simulate admin check (In production this would use Firebase Auth roles)
+  useEffect(() => {
+    const adminCheck = localStorage.getItem("is_admin") === "true";
+    setIsAdmin(adminCheck);
+  }, []);
 
   const languages = [
     { code: "AR", name: "العربية", flag: "🇩🇿" },
@@ -206,13 +213,20 @@ export default function Navbar() {
               <DropdownMenuItem asChild className="hover:bg-zinc-800 cursor-pointer h-12 rounded-lg mt-1">
                 <Link href="/seller/register" className="w-full font-bold">{t.store}</Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-zinc-800" />
-              <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer h-12 rounded-lg mt-1 border border-secondary/20">
-                <Link href="/admin/dashboard" className="w-full font-black text-secondary flex items-center gap-2">
-                  <ShieldAlert size={18} />
-                  {t.admin}
-                </Link>
-              </DropdownMenuItem>
+              
+              {/* Only show Admin Portal if isAdmin is true */}
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator className="bg-zinc-800" />
+                  <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer h-12 rounded-lg mt-1 border border-secondary/20">
+                    <Link href="/admin/dashboard" className="w-full font-black text-secondary flex items-center gap-2">
+                      <ShieldAlert size={18} />
+                      {t.admin}
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
+              
               <DropdownMenuSeparator className="bg-zinc-800" />
               <div className="p-2 flex items-center justify-around">
                  <Link href="#" className="text-green-500 hover:scale-125 transition-transform"><WhatsappIcon size={24} /></Link>
