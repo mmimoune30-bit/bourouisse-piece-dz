@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, MessageSquare, CheckCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const COMPLAINTS = [
   { id: "CMP001", user: "كريم بوعلام", subject: "قطعة غير مطابقة للوصف", status: "Open", date: "2024-05-18", priority: "High" },

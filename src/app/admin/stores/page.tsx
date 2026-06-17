@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Store, CheckCircle, XCircle, Ban, Eye, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 const STORE_LIST = [
   "Auto Pièces Chlef", "Pièces Renault DZ", "Peugeot Center", "Hyundai Parts", 
