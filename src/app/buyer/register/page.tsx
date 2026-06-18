@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Mail, Phone, Lock, ArrowLeft, ShieldCheck, MapPin, User } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { UserPlus, Mail, Phone, Lock, ArrowLeft, MapPin, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -19,10 +20,15 @@ const WILAYAS = [
 
 export default function BuyerRegister() {
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const customerId = `BR-C-${Math.floor(1000 + Math.random() * 9000)}`;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يجب الموافقة على الشروط والأحكام أولاً." });
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -91,7 +97,21 @@ export default function BuyerRegister() {
                   </div>
                 </div>
 
-                <Button className="w-full h-16 text-xl font-black gap-3 shadow-xl rounded-2xl" disabled={loading}>
+                <div className="flex items-center justify-end gap-3 py-2">
+                  <Label htmlFor="terms" className="text-sm font-bold cursor-pointer">
+                    لقد قرأت <Link href="/privacy-policy" className="text-secondary underline">سياسة الخصوصية</Link> و <Link href="/terms-of-service" className="text-secondary underline">شروط الخدمة</Link> وأوافق عليهما.
+                  </Label>
+                  <Checkbox 
+                    id="terms" 
+                    checked={agreed} 
+                    onCheckedChange={(val) => setAgreed(!!val)} 
+                  />
+                </div>
+
+                <Button 
+                  className="w-full h-16 text-xl font-black gap-3 shadow-xl rounded-2xl" 
+                  disabled={loading || !agreed}
+                >
                   {loading ? "جاري إنشاء الحساب..." : "تأكيد التسجيل الآن"} <ArrowLeft size={24} />
                 </Button>
               </form>

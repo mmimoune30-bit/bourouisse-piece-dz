@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Store, ShieldCheck, Zap, ArrowRight, Facebook, ImagePlus, User, Phone, MapPin, Lock } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, MapPin, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -19,10 +20,15 @@ const WILAYAS = [
 
 export default function SellerRegister() {
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const storeId = `BR-S-${Math.floor(1000 + Math.random() * 9000)}`;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يجب الموافقة على الشروط والأحكام أولاً." });
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -65,7 +71,7 @@ export default function SellerRegister() {
             </div>
 
             {/* Form Side */}
-            <Card className="lg:col-span-2 border-none shadow-2xl order-1 lg:order-2">
+            <Card className="lg:col-span-2 border-none shadow-2xl order-1 lg:order-2 bg-white">
               <CardHeader className="bg-destructive text-white p-8 text-right rounded-t-lg">
                 <CardTitle className="text-3xl font-black flex items-center justify-end gap-3">
                   فتح متجر جديد <Store size={32} />
@@ -134,7 +140,22 @@ export default function SellerRegister() {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full h-16 text-xl font-black shadow-2xl rounded-2xl gap-3" disabled={loading}>
+                  <div className="flex items-center justify-end gap-3 py-2">
+                    <Label htmlFor="terms-seller" className="text-sm font-bold cursor-pointer">
+                      لقد قرأت <Link href="/privacy-policy" className="text-secondary underline">سياسة الخصوصية</Link> و <Link href="/terms-of-service" className="text-secondary underline">شروط الخدمة</Link> وأوافق عليهما.
+                    </Label>
+                    <Checkbox 
+                      id="terms-seller" 
+                      checked={agreed} 
+                      onCheckedChange={(val) => setAgreed(!!val)} 
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full h-16 text-xl font-black shadow-2xl rounded-2xl gap-3" 
+                    disabled={loading || !agreed}
+                  >
                     {loading ? "جاري إنشاء المتجر..." : "تسجيل وتفعيل المتجر"} <ArrowRight className="rotate-180" size={24} />
                   </Button>
                 </form>

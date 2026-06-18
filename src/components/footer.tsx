@@ -1,4 +1,6 @@
 
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings, ShieldAlert } from "lucide-react";
@@ -39,7 +41,6 @@ export default function Footer() {
                     width={120} 
                     height={120} 
                     className="rounded-lg"
-                    data-ai-hint="qr code"
                   />
                 )}
               </div>
@@ -103,8 +104,8 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4 text-sm text-blue-100/40">
           <p className="font-bold">© 2024 Bourouisse Piece-Dz. جميع الحقوق محفوظة.</p>
           <div className="flex gap-6">
-            <span className="cursor-default">شروط الخدمة</span>
-            <span className="cursor-default">سياسة الخصوصية</span>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">شروط الخدمة</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">سياسة الخصوصية</Link>
           </div>
         </div>
       </div>
