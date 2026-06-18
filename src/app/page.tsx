@@ -9,52 +9,87 @@ import ProductCard from "@/components/product-card";
 import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, UserPlus, Store, Search, ShieldCheck, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { ArrowLeft, UserPlus, Store, Search, ShieldCheck, MapPin, ChevronRight, ChevronLeft, LayoutGrid } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
 
 const BANNERS = [
   {
     id: 1,
     image: "https://picsum.photos/seed/auto-hero-1/1200/800",
+    link: "/seller/register",
     ar: {
-      title: "انضم إلى منصتنا اليوم",
-      description: "سجل متجرك لقطع غيار السيارات ووصل إلى آلاف العملاء في مختلف الولايات.",
-      button: "اشترك معنا"
+      title: "اشترك معنا واعرض منتجاتك",
+      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين.",
+      button: "سجل كبائع"
     },
     en: {
-      title: "Join Our Marketplace Today",
-      description: "Register your auto parts store and reach thousands of customers.",
-      button: "Join Us"
+      title: "Join Us & List Your Products",
+      description: "List new and used spare parts and reach thousands of buyers.",
+      button: "Register as Seller"
     }
   },
   {
     id: 2,
     image: "https://picsum.photos/seed/auto-hero-2/1200/800",
+    link: "/catalog",
     ar: {
       title: "ابحث عن قطع الغيار بسهولة",
-      description: "ابحث حسب نوع السيارة والموديل وسنة الصنع.",
+      description: "ابحث حسب الماركة والموديل وسنة الصنع.",
       button: "ابدأ البحث"
     },
     en: {
       title: "Find Auto Parts Easily",
-      description: "Search by vehicle brand, model and manufacturing year.",
+      description: "Search by brand, model and manufacturing year.",
       button: "Start Searching"
     }
   },
   {
     id: 3,
     image: "https://picsum.photos/seed/auto-hero-3/1200/800",
+    link: "/catalog",
     ar: {
-      title: "إعلانات مجانية للبائعين الجدد",
-      description: "أضف قطع الغيار الجديدة والمستعملة مجاناً خلال فترة الإطلاق.",
-      button: "أضف إعلانك الآن"
+      title: "آلاف قطع الغيار في مكان واحد",
+      description: "منتجات جديدة ومستعملة من مختلف ولايات الجزائر.",
+      button: "تصفح الإعلانات"
     },
     en: {
-      title: "Free Listings for New Sellers",
-      description: "Publish your new and used spare parts during the launch period.",
-      button: "Post Your Listing"
+      title: "Thousands of Parts in One Place",
+      description: "New and used products from various Algerian wilayas.",
+      button: "Browse Listings"
+    }
+  },
+  {
+    id: 4,
+    image: "https://picsum.photos/seed/auto-hero-4/1200/800",
+    link: "/catalog",
+    ar: {
+      title: "متاجر موثوقة ومعتمدة",
+      description: "اكتشف المتاجر الموثقة وتواصل مباشرة مع البائعين.",
+      button: "استكشف المتاجر"
+    },
+    en: {
+      title: "Trusted & Certified Stores",
+      description: "Discover verified stores and connect directly with sellers.",
+      button: "Explore Stores"
+    }
+  },
+  {
+    id: 5,
+    image: "https://picsum.photos/seed/auto-hero-5/1200/800",
+    link: "/join",
+    ar: {
+      title: "أنشئ حسابك مجاناً",
+      description: "سجل الآن كبائع أو مشتري واستفد من جميع خدمات المنصة.",
+      button: "اشترك معنا"
+    },
+    en: {
+      title: "Create Your Free Account",
+      description: "Register now as a seller or buyer and benefit from all platform services.",
+      button: "Join Us"
     }
   }
 ];
@@ -74,6 +109,8 @@ const FEATURED_STORES = [
 
 export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     const checkLang = () => {
@@ -86,6 +123,22 @@ export default function Home() {
     return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
+  useEffect(() => {
+    if (!api) return;
+    
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  const onDotButtonClick = useCallback(
+    (index: number) => {
+      if (!api) return;
+      api.scrollTo(index);
+    },
+    [api]
+  );
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
@@ -96,13 +149,24 @@ export default function Home() {
 
         {/* Dynamic Multi-language Hero Section */}
         <section className="relative w-full">
-          <Carousel className="w-full" opts={{ loop: true }}>
+          <Carousel 
+            setApi={setApi}
+            className="w-full" 
+            opts={{ 
+              loop: true,
+              duration: 50
+            }}
+            plugins={[
+              Autoplay({ delay: 5000, stopOnInteraction: true }),
+              Fade()
+            ]}
+          >
             <CarouselContent>
               {BANNERS.map((banner) => {
                 const content = lang === "AR" ? banner.ar : banner.en;
                 return (
                   <CarouselItem key={banner.id}>
-                    <div className="relative min-h-[600px] flex items-center justify-center py-20 overflow-hidden">
+                    <div className="relative min-h-[600px] lg:min-h-[700px] flex items-center justify-center py-20 overflow-hidden">
                       <div className="absolute inset-0 z-0">
                         <Image
                           src={banner.image}
@@ -111,32 +175,32 @@ export default function Home() {
                           className="object-cover animate-ken-burns"
                           priority
                         />
-                        <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" />
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
                       </div>
 
-                      <div className="container mx-auto px-4 z-10 text-center">
+                      <div className="container mx-auto px-4 z-10">
                         <div className={cn(
-                          "inline-block bg-white/10 backdrop-blur-xl border border-white/20 p-8 md:p-12 rounded-[40px] shadow-2xl animate-in fade-in zoom-in duration-700 max-w-4xl",
-                          lang === "AR" ? "text-right" : "text-left"
+                          "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100",
+                          lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
                           <h1 className="text-4xl md:text-7xl font-black text-white tracking-tighter mb-6 uppercase drop-shadow-2xl leading-tight">
                             {content.title}
                           </h1>
-                          <p className="text-xl md:text-2xl text-secondary font-bold italic mb-10 leading-relaxed max-w-2xl">
+                          <p className="text-xl md:text-2xl text-secondary font-bold italic mb-10 leading-relaxed max-w-2xl opacity-90">
                             {content.description}
                           </p>
                           <div className={cn(
                             "flex flex-col sm:flex-row gap-4",
-                            lang === "AR" ? "sm:justify-end" : "sm:justify-start"
+                            lang === "AR" ? "sm:justify-start" : "sm:justify-start"
                           )}>
-                            <Link href="/join">
+                            <Link href={banner.link}>
                               <Button size="lg" className="h-16 px-12 text-xl font-black gap-3 bg-secondary text-primary hover:bg-white transition-all rounded-2xl shadow-2xl">
-                                {content.button} {lang === 'AR' ? <UserPlus size={24} /> : null}
+                                {content.button} {lang === 'AR' ? <ArrowLeft size={24} /> : <ChevronRight size={24} />}
                               </Button>
                             </Link>
                             <Link href="/catalog">
                               <Button size="lg" variant="outline" className="h-16 px-12 text-xl font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-2xl shadow-2xl">
-                                {lang === 'AR' ? 'تصفح الإعلانات' : 'Browse Listings'}
+                                {lang === 'AR' ? 'تصفح كافة القطع' : 'Browse All Parts'}
                               </Button>
                             </Link>
                           </div>
@@ -147,8 +211,24 @@ export default function Home() {
                 );
               })}
             </CarouselContent>
-            <CarouselPrevious className={cn("hidden md:flex", lang === 'AR' ? "right-10" : "left-10")} />
-            <CarouselNext className={cn("hidden md:flex", lang === 'AR' ? "left-10" : "right-10")} />
+            
+            {/* Controls */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
+               <CarouselPrevious className="static translate-y-0 h-12 w-12 bg-white/20 border-white/20 text-white hover:bg-white hover:text-primary" />
+               <div className="flex gap-2">
+                 {BANNERS.map((_, index) => (
+                   <button
+                     key={index}
+                     onClick={() => onDotButtonClick(index)}
+                     className={cn(
+                       "w-3 h-3 rounded-full transition-all duration-300",
+                       current === index ? "bg-secondary w-8" : "bg-white/40 hover:bg-white/60"
+                     )}
+                   />
+                 ))}
+               </div>
+               <CarouselNext className="static translate-y-0 h-12 w-12 bg-white/20 border-white/20 text-white hover:bg-white hover:text-primary" />
+            </div>
           </Carousel>
         </section>
 
