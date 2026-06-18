@@ -52,7 +52,7 @@
     {
       "id": "site-qr-code",
       "description": "QR Code for Bourouisse Piece-Dz site",
-      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://bourouisse-piecedz.com",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://bourouisse-piecedz.com",
       "imageHint": "qr code"
     }
   ]

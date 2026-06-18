@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings, ShieldAlert } from "lucide-react";
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin, Settings, ShieldAlert, QrCode } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Footer() {
@@ -32,16 +32,23 @@ export default function Footer() {
             </Link>
             
             <div className="flex flex-col items-center md:items-start gap-4">
-              <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Scan to visit / امسح للزيارة</p>
-              <div className="bg-white p-2 rounded-2xl shadow-2xl border-2 border-secondary/20 transform hover:scale-105 transition-transform cursor-pointer">
+              <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                <QrCode size={14} /> Scan to visit / امسح للزيارة
+              </p>
+              <div className="bg-white p-3 rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-4 border-secondary/20 transform hover:scale-110 transition-all duration-500 cursor-pointer group/qr">
                 {qrCode && (
-                  <Image 
-                    src={qrCode} 
-                    alt="Bourouisse QR Code" 
-                    width={120} 
-                    height={120} 
-                    className="rounded-lg"
-                  />
+                  <div className="relative">
+                    <Image 
+                      src={qrCode} 
+                      alt="Bourouisse QR Code" 
+                      width={180} 
+                      height={180} 
+                      className="rounded-2xl grayscale group-hover/qr:grayscale-0 transition-all"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/qr:opacity-100 transition-opacity">
+                      <div className="bg-primary/90 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-lg">B-DZ</div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
