@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import Link from "next/navigation";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -20,7 +20,8 @@ import {
   Search,
   Ticket,
   TrendingUp,
-  PlusCircle
+  PlusCircle,
+  Layout as LayoutIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const ADMIN_MENU = [
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
   { name: "Subscriptions", href: "/admin/subscriptions", icon: Ticket },
   { name: "Plans", href: "/admin/plans", icon: Settings },
+  { name: "Banners", href: "/admin/banners", icon: LayoutIcon },
   { name: "Complaints", href: "/admin/complaints", icon: ShieldAlert },
   { name: "Reports", href: "/admin/reports", icon: FileText },
 ];
@@ -60,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
-              <Link
+              <a
                 key={item.name}
                 href={item.href}
                 className={cn(
@@ -72,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <Icon size={20} />
                 {isSidebarOpen && <span>{item.name}</span>}
-              </Link>
+              </a>
             );
           })}
         </nav>
