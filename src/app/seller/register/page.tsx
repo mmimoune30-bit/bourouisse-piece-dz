@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, MapPin, Lock } from "lucide-react";
+import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, MapPin, Lock, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 const WILAYAS = [
   "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", "09 - Blida", "16 - Alger", "31 - Oran"
@@ -21,7 +22,38 @@ const WILAYAS = [
 export default function SellerRegister() {
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const storeId = `BR-S-${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const handleLogoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "خطأ في الحجم",
+          description: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت.",
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLogoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,10 +165,42 @@ export default function SellerRegister() {
 
                   <div className="space-y-4">
                     <Label className="font-bold">شعار المتجر (Logo)</Label>
-                    <div className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group">
-                       <ImagePlus size={48} className="mb-4 group-hover:scale-110 transition-transform" />
-                       <span className="font-bold">اسحب أو انقر لرفع شعار متجرك</span>
-                       <span className="text-[10px] mt-2 tracking-widest opacity-50 uppercase">PNG, JPG, SVG</span>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={handleLogoChange}
+                    />
+                    <div 
+                      onClick={handleLogoClick}
+                      className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]"
+                    >
+                       {logoPreview ? (
+                         <div className="relative w-full h-full flex items-center justify-center">
+                           <Image 
+                            src={logoPreview} 
+                            alt="Store Logo Preview" 
+                            width={150} 
+                            height={150} 
+                            className="object-contain max-h-[180px] rounded-xl"
+                           />
+                           <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            className="absolute -top-2 -right-2 rounded-full h-8 w-8 shadow-lg"
+                            onClick={removeLogo}
+                           >
+                            <X size={16} />
+                           </Button>
+                         </div>
+                       ) : (
+                         <>
+                           <ImagePlus size={48} className="mb-4 group-hover:scale-110 transition-transform text-primary/40" />
+                           <span className="font-bold text-primary">انقر لرفع شعار متجرك</span>
+                           <span className="text-[10px] mt-2 tracking-widest opacity-50 uppercase">PNG, JPG (أقل من 2MB)</span>
+                         </>
+                       )}
                     </div>
                   </div>
 
