@@ -146,7 +146,6 @@ export default function NewListing() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
-              {/* Common Section for Brand/Model for all types */}
               <Card className="border-none shadow-sm">
                 <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                   <CarFront size={20} className="text-primary" />
@@ -279,7 +278,8 @@ export default function NewListing() {
                         ))}
                       </div>
                     </CardContent>
-                  </>
+                  </Card>
+                </>
               )}
 
               <Card className="border-none shadow-sm">
