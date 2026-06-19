@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
   Plus, Search, MoreVertical, ShieldCheck, Mail, Phone, 
-  UserPlus, UserCog, Ban, Key, Trash2 
+  UserPlus, UserCog, Ban, Key, Trash2, Calendar, Settings, CheckCircle2, Edit3
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,27 +31,67 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
-const EMPLOYEES = [
-  { id: "E001", name: "ميمون محمد", email: "maymoun@bourouisse.com", phone: "0555111111", role: "SuperAdmin", status: "Active" },
-  { id: "E002", name: "أحمد بن علي", email: "ahmed@bourouisse.com", phone: "0555222222", role: "Manager", status: "Active" },
-  { id: "E003", name: "سميرة بوحفص", email: "samira@bourouisse.com", phone: "0555333333", role: "FinancialOfficer", status: "Active" },
-  { id: "E004", name: "كريم قادري", email: "karim@bourouisse.com", phone: "0555444444", role: "CustomerService", status: "Active" },
+const INITIAL_EMPLOYEES = [
+  { id: "E001", name: "ميمون محمد", email: "maymoun@bourouisse.com", phone: "0555111111", role: "SuperAdmin", status: "Active", dateCreated: "2024-01-15" },
+  { id: "E002", name: "أحمد بن علي", email: "ahmed@bourouisse.com", phone: "0555222222", role: "Manager", status: "Active", dateCreated: "2024-02-10" },
+  { id: "E003", name: "سميرة بوحفص", email: "samira@bourouisse.com", phone: "0555333333", role: "FinancialOfficer", status: "Active", dateCreated: "2024-03-05" },
+  { id: "E004", name: "كريم قادري", email: "karim@bourouisse.com", phone: "0555444444", role: "CustomerService", status: "Inactive", dateCreated: "2024-04-20" },
 ];
 
 export default function EmployeeManagementPage() {
+  const [mounted, setMounted] = useState(false);
+  const [employees, setEmployees] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  // Fix Hydration: Only render content after mount
+  useEffect(() => {
+    setEmployees(INITIAL_EMPLOYEES);
+    setMounted(true);
+  }, []);
+
+  const handleToggleStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+    setEmployees(prev => prev.map(emp => emp.id === id ? { ...emp, status: newStatus } : emp));
+    toast({
+      title: "تحديث الحالة",
+      description: `تم تغيير حالة الموظف إلى ${newStatus === 'Active' ? 'نشط' : 'غير نشط'}`
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm("هل أنت متأكد من حذف هذا الموظف نهائياً؟")) {
+      setEmployees(prev => prev.filter(emp => emp.id !== id));
+      toast({
+        variant: "destructive",
+        title: "حذف موظف",
+        description: "تمت إزالة بيانات الموظف من النظام بنجاح."
+      });
+    }
+  };
+
+  const filteredEmployees = employees.filter(emp => 
+    emp.name.toLowerCase().includes(search.toLowerCase()) || 
+    emp.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (!mounted) {
+    return <div className="min-h-screen flex items-center justify-center font-black text-primary animate-pulse">جاري تحميل البيانات...</div>;
+  }
 
   return (
     <div className="space-y-8 text-right" dir="rtl">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
             <UserCog size={32} className="text-secondary" /> إدارة طاقم العمل والصلاحيات
           </h1>
           <p className="text-muted-foreground mt-1">إضافة موظفين، تعيين الأدوار، ومراقبة الصلاحيات الإدارية.</p>
         </div>
-        <Dialog>
+        
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button className="font-bold gap-2 h-12 px-8 bg-primary shadow-xl">
               <UserPlus size={18} /> إضافة موظف جديد
@@ -87,7 +127,10 @@ export default function EmployeeManagementPage() {
               </div>
             </div>
             <DialogFooter className="gap-2 sm:justify-start">
-              <Button type="submit" className="font-bold">حفظ وتفعيل الحساب</Button>
+              <Button type="submit" className="font-bold" onClick={() => {
+                toast({ title: "تم الحفظ", description: "جاري إنشاء الحساب الإداري..." });
+                setIsAddDialogOpen(false);
+              }}>حفظ وتفعيل الحساب</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -114,11 +157,12 @@ export default function EmployeeManagementPage() {
                 <TableHead className="text-right">بيانات الاتصال</TableHead>
                 <TableHead className="text-right">الدور الوظيفي</TableHead>
                 <TableHead className="text-right">الحالة</TableHead>
+                <TableHead className="text-right">تاريخ الإنشاء</TableHead>
                 <TableHead className="text-left pl-6">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {EMPLOYEES.map((emp) => (
+              {filteredEmployees.map((emp) => (
                 <TableRow key={emp.id} className="group">
                   <TableCell className="pr-6">
                     <div className="flex items-center gap-3 justify-end">
@@ -148,7 +192,17 @@ export default function EmployeeManagementPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge className="bg-green-600 font-bold">{emp.status}</Badge>
+                    <Badge className={cn(
+                      "font-bold",
+                      emp.status === "Active" ? "bg-green-600" : "bg-zinc-400"
+                    )}>
+                      {emp.status === "Active" ? "نشط" : "غير نشط"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 justify-end text-xs text-muted-foreground">
+                      <Calendar size={12} /> {emp.dateCreated}
+                    </div>
                   </TableCell>
                   <TableCell className="text-left pl-6">
                     <DropdownMenu>
@@ -158,16 +212,44 @@ export default function EmployeeManagementPage() {
                       <DropdownMenuContent align="start" className="w-56" dir="rtl">
                         <DropdownMenuLabel className="text-right">خيارات الإدارة</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer"><Settings size={16} /> تعديل الصلاحيات</DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer"><Key size={16} /> إعادة تعيين كلمة المرور</DropdownMenuItem>
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                          <Edit3 size={16} /> تعديل البيانات
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                          <UserCog size={16} /> تعيين دور وظيفي
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                          <Key size={16} /> إعادة تعيين كلمة المرور
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer text-amber-600"><Ban size={16} /> تعطيل الحساب مؤقتاً</DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer text-destructive font-bold"><Trash2 size={16} /> حذف الموظف نهائياً</DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="justify-end gap-2 cursor-pointer text-amber-600"
+                          onClick={() => handleToggleStatus(emp.id, emp.status)}
+                        >
+                          {emp.status === 'Active' ? (
+                            <><Ban size={16} /> تعطيل الحساب</>
+                          ) : (
+                            <><CheckCircle2 size={16} className="text-green-600" /> تفعيل الحساب</>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="justify-end gap-2 cursor-pointer text-destructive font-bold"
+                          onClick={() => handleDelete(emp.id)}
+                        >
+                          <Trash2 size={16} /> حذف الموظف نهائياً
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredEmployees.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">
+                    لا يوجد موظفون يطابقون بحثك.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
