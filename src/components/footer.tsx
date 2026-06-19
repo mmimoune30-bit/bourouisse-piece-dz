@@ -13,8 +13,7 @@ import {
   Settings, 
   ShieldAlert, 
   QrCode,
-  Lock,
-  ChevronLeft
+  Lock
 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useState, useEffect } from "react";
@@ -25,11 +24,15 @@ export default function Footer() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
-  useEffect(() => {
-    // Admin check
+  const checkAdminStatus = () => {
     const userRole = localStorage.getItem("user_role");
     const allowedRoles = ["SuperAdmin", "Manager", "FinancialOfficer", "CustomerService"];
     setIsAdmin(allowedRoles.includes(userRole || ""));
+  };
+
+  useEffect(() => {
+    // Initial checks
+    checkAdminStatus();
 
     // Language check
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
@@ -41,7 +44,12 @@ export default function Footer() {
     };
 
     window.addEventListener("languageChange", handleLangChange);
-    return () => window.removeEventListener("languageChange", handleLangChange);
+    window.addEventListener("authChange", checkAdminStatus); // Listen for auth changes
+    
+    return () => {
+      window.removeEventListener("languageChange", handleLangChange);
+      window.removeEventListener("authChange", checkAdminStatus);
+    };
   }, []);
 
   return (
@@ -89,7 +97,7 @@ export default function Footer() {
                 "flex items-center gap-3",
                 lang === 'AR' ? "flex-row-reverse" : "flex-row"
               )}>
-                <div className="bg-secondary p-2 rounded-xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
+                <div className="bg-secondary p-2 rounded-2xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
                 <span className="font-headline font-black text-2xl tracking-tighter uppercase italic">

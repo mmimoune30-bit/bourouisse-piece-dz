@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, Mail, Key, LogIn, Store, User, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Mail, Key, LogIn, User, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
@@ -22,10 +22,17 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate Login
+    
+    // Simulate Login and set role for demonstration
     setTimeout(() => {
       setLoading(false);
-      toast({ title: "تم تسجيل الدخول", description: "مرحباً بك مجدداً في بورويس." });
+      
+      // For the sake of prototype testing, we set the user as SuperAdmin
+      localStorage.setItem("user_role", "SuperAdmin");
+      // Dispatch a custom event to notify components (like footer) about the change
+      window.dispatchEvent(new Event("authChange"));
+      
+      toast({ title: "تم تسجيل الدخول", description: "مرحباً بك مجدداً في بورويس بصلاحيات المسؤول." });
       router.push("/");
     }, 1000);
   };
