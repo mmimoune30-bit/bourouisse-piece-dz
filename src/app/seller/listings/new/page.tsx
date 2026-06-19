@@ -11,8 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, AlertCircle, Sparkles, CarFront, AlertTriangle, Settings, FileText, CheckCircle2 } from "lucide-react";
+import { ImagePlus, AlertCircle, Sparkles, CarFront, AlertTriangle, Settings, FileText, CheckCircle2, Send } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const LISTING_TYPES = [
   { id: "part", label: "Pièce détachée (قطعة غيار منفردة)" },
@@ -41,9 +43,9 @@ const CATEGORY_DATA = {
   ],
   "Carrosserie (الهيكل)": [
     "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
-    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
+    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-بريس", "Vitre latérale", "Feu stop"
   ],
-  "Accessoires (الأكسسوارات)": [
+  "Accessoires (الأكسيسوارات)": [
     "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
     "Chargeur USB", "Support téléphone", "Alarme", "GPS", "Barre de toit", "Attelage", "Climatisation"
   ]
@@ -72,6 +74,10 @@ const BRAND_MODELS = {
   "Chevrolet": ["Aveo", "Spark", "Cruze", "Captiva"]
 };
 
+const WILAYAS = [
+  "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", "16 - Alger", "31 - Oran"
+];
+
 const FUEL_TYPES = ["Essence", "Diesel", "GPL", "Hybride", "Électrique"];
 const GEARBOX_TYPES = ["Manuelle", "Automatique"];
 const VEHICLE_STATUSES = [
@@ -87,30 +93,15 @@ const AVAILABLE_PARTS = [
   "Direction", "Électricité", "Carrosserie", "Intérieur", "Climatisation", "Pneumatiques", "Accessoires"
 ];
 
-const WILAYAS = [
-  "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna",
-  "06 - Béjaïa", "07 - Biskra", "08 - Béchar", "09 - Blida", "10 - Bouira",
-  "11 - Tamanrasset", "12 - Tébessa", "13 - Tlemcen", "14 - Tiaret", "15 - Tizi Ouzou",
-  "16 - Alger", "17 - Djelfa", "18 - Jijel", "19 - Sétif", "20 - Saïda",
-  "21 - Skikda", "22 - Sidi Bel Abbès", "23 - Annaba", "24 - Guelma", "25 - Constantine",
-  "26 - Médéa", "27 - Mostaganem", "28 - M'Sila", "29 - Mascara", "30 - Ouargla",
-  "31 - Oran", "32 - El Bayadh", "33 - Illizi", "34 - Bordj Bou Arréridj", "35 - Boumerdès",
-  "36 - El Tarf", "37 - Tindouf", "38 - Tissemsilt", "39 - El Oued", "40 - Khenchela",
-  "41 - Souk Ahras", "42 - Tipaza", "43 - Mila", "44 - Aïn Defla", "45 - Naâma",
-  "46 - Aïn Témouchent", "47 - Ghardaïa", "48 - Relizane", "49 - Timimoun", "50 - Bordj Badji Mokhtar",
-  "51 - Ouled Djellal", "52 - Béni Abbès", "53 - In Salah", "54 - In Guezzam", "55 - Touggourt",
-  "56 - Djanet", "57 - El M'Ghair", "58 - El Meniaa"
-];
-
 export default function NewListing() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [listingType, setListingType] = useState<string>("part");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedPart, setSelectedPart] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [damagePercentage, setDamagePercentage] = useState<number>(0);
-
-  const isVehicleListing = listingType !== "part";
 
   const partsList = useMemo(() => {
     return selectedCategory ? CATEGORY_DATA[selectedCategory as keyof typeof CATEGORY_DATA] : [];
@@ -120,14 +111,28 @@ export default function NewListing() {
     return selectedBrand ? BRAND_MODELS[selectedBrand as keyof typeof BRAND_MODELS] : [];
   }, [selectedBrand]);
 
+  const handlePostListing = () => {
+    setLoading(true);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      setLoading(false);
+      toast({
+        title: "تم نشر الإعلان بنجاح!",
+        description: "إعلانك الآن متاح للمشترين في كافة ولايات الجزائر.",
+      });
+      router.push("/seller/dashboard");
+    }, 2000);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 pt-[235px] pb-12">
         <div className="max-w-5xl mx-auto space-y-8">
-          <div className="flex flex-row-reverse items-center justify-between bg-white p-6 rounded-3xl shadow-sm border border-border">
+          <div className="flex flex-col md:flex-row-reverse items-center justify-between bg-white p-6 rounded-3xl shadow-sm border border-border gap-4">
             <h1 className="text-3xl font-black text-primary">إضافة إعلان جديد</h1>
-            <div className="w-64" dir="rtl">
+            <div className="w-full md:w-64" dir="rtl">
               <Label className="mb-2 block font-bold text-xs">اختر نوع الإعلان</Label>
               <Select value={listingType} onValueChange={setListingType}>
                 <SelectTrigger className="border-2 border-primary/20 h-11">
@@ -183,7 +188,6 @@ export default function NewListing() {
                 </Card>
               ) : (
                 <>
-                  {/* Vehicle Information Section */}
                   <Card className="border-none shadow-sm">
                     <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                       <CarFront size={20} className="text-primary" />
@@ -231,7 +235,6 @@ export default function NewListing() {
                     </CardContent>
                   </Card>
 
-                  {/* Vehicle Status Section */}
                   <Card className="border-none shadow-sm">
                     <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                       <AlertTriangle size={20} className="text-secondary" />
@@ -273,7 +276,6 @@ export default function NewListing() {
                     </CardContent>
                   </Card>
 
-                  {/* Available Parts Section */}
                   <Card className="border-none shadow-sm">
                     <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                       <Settings size={20} className="text-primary" />
@@ -293,7 +295,6 @@ export default function NewListing() {
                 </>
               )}
 
-              {/* Price and Commercial Info */}
               <Card className="border-none shadow-sm">
                 <CardHeader className="bg-destructive/5 border-b">
                   <CardTitle className="text-lg text-right">المعلومات التجارية والموقع</CardTitle>
@@ -332,7 +333,6 @@ export default function NewListing() {
                 </CardContent>
               </Card>
 
-              {/* Description & Images */}
               <Card className="border-none shadow-sm">
                 <CardHeader className="bg-destructive/5 border-b">
                   <CardTitle className="text-lg text-right">الوصف والصور</CardTitle>
@@ -368,7 +368,17 @@ export default function NewListing() {
                       <CheckCircle2 size={18} />
                     </div>
                   </div>
-                  <Button className="w-full h-14 text-lg font-black shadow-lg">نشر الإعلان الآن</Button>
+                  <Button 
+                    className="w-full h-14 text-lg font-black shadow-lg gap-2" 
+                    onClick={handlePostListing}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>جاري النشر...</>
+                    ) : (
+                      <>نشر الإعلان الآن <Send size={20} /></>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
 
