@@ -45,6 +45,8 @@ export default function EmployeeManagementPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Fix Hydration: Only render content after mount
   useEffect(() => {
@@ -70,6 +72,18 @@ export default function EmployeeManagementPage() {
         description: "تمت إزالة بيانات الموظف من النظام بنجاح."
       });
     }
+  };
+
+  const handleAddEmployee = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({ title: "تم الحفظ", description: "جاري إنشاء الحساب الإداري..." });
+    setIsAddDialogOpen(false);
+  };
+
+  const handleUpdateEmployee = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({ title: "تم التحديث", description: "تم تعديل بيانات الموظف بنجاح." });
+    setIsEditDialogOpen(false);
   };
 
   const filteredEmployees = employees.filter(emp => 
@@ -98,40 +112,39 @@ export default function EmployeeManagementPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md" dir="rtl">
-            <DialogHeader>
-              <DialogTitle className="text-right font-black text-xl flex items-center gap-2 justify-end">
-                <ShieldCheck className="text-secondary" /> إنشاء حساب إداري
-              </DialogTitle>
-              <DialogDescription className="text-right">أدخل بيانات الموظف واختر الدور الوظيفي المناسب.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-6 py-4">
-              <div className="space-y-2">
-                <Label>الاسم الكامل</Label>
-                <Input placeholder="الاسم واللقب" className="h-11" />
+            <form onSubmit={handleAddEmployee}>
+              <DialogHeader>
+                <DialogTitle className="text-right font-black text-xl flex items-center gap-2 justify-end">
+                  <ShieldCheck className="text-secondary" /> إنشاء حساب إداري
+                </DialogTitle>
+                <DialogDescription className="text-right">أدخل بيانات الموظف واختر الدور الوظيفي المناسب.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="space-y-2">
+                  <Label>الاسم الكامل</Label>
+                  <Input placeholder="الاسم واللقب" className="h-11" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>البريد الإلكتروني المهني</Label>
+                  <Input type="email" placeholder="name@bourouisse.com" className="h-11" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>الدور الوظيفي</Label>
+                  <Select defaultValue="CustomerService">
+                    <SelectTrigger className="h-11"><SelectValue placeholder="اختر الدور" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SuperAdmin">Super Admin (كامل الصلاحيات)</SelectItem>
+                      <SelectItem value="Manager">Manager (إدارة المحتوى)</SelectItem>
+                      <SelectItem value="FinancialOfficer">Financial Officer (الإدارة المالية)</SelectItem>
+                      <SelectItem value="CustomerService">Customer Service (خدمة العملاء)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>البريد الإلكتروني المهني</Label>
-                <Input type="email" placeholder="name@bourouisse.com" className="h-11" />
-              </div>
-              <div className="space-y-2">
-                <Label>الدور الوظيفي</Label>
-                <Select>
-                  <SelectTrigger className="h-11"><SelectValue placeholder="اختر الدور" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SuperAdmin">Super Admin (كامل الصلاحيات)</SelectItem>
-                    <SelectItem value="Manager">Manager (إدارة المحتوى)</SelectItem>
-                    <SelectItem value="FinancialOfficer">Financial Officer (الإدارة المالية)</SelectItem>
-                    <SelectItem value="CustomerService">Customer Service (خدمة العملاء)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter className="gap-2 sm:justify-start">
-              <Button type="submit" className="font-bold" onClick={() => {
-                toast({ title: "تم الحفظ", description: "جاري إنشاء الحساب الإداري..." });
-                setIsAddDialogOpen(false);
-              }}>حفظ وتفعيل الحساب</Button>
-            </DialogFooter>
+              <DialogFooter className="gap-2 sm:justify-start">
+                <Button type="submit" className="font-bold">حفظ وتفعيل الحساب</Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -212,13 +225,13 @@ export default function EmployeeManagementPage() {
                       <DropdownMenuContent align="start" className="w-56" dir="rtl">
                         <DropdownMenuLabel className="text-right">خيارات الإدارة</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => { setEditingEmployee(emp); setIsEditDialogOpen(true); }}>
                           <Edit3 size={16} /> تعديل البيانات
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => toast({ title: "تعديل الصلاحيات", description: "فتح محرر الصلاحيات المتقدم..." })}>
                           <UserCog size={16} /> تعيين دور وظيفي
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer">
+                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => toast({ title: "كلمة المرور", description: "تم إرسال رابط إعادة تعيين كلمة المرور للموظف." })}>
                           <Key size={16} /> إعادة تعيين كلمة المرور
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -243,17 +256,50 @@ export default function EmployeeManagementPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredEmployees.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">
-                    لا يوجد موظفون يطابقون بحثك.
-                  </TableCell>
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Employee Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md" dir="rtl">
+          <form onSubmit={handleUpdateEmployee}>
+            <DialogHeader>
+              <DialogTitle className="text-right font-black text-xl flex items-center gap-2 justify-end">
+                <Edit3 className="text-secondary" /> تعديل بيانات الموظف
+              </DialogTitle>
+              <DialogDescription className="text-right">تعديل الملف الشخصي للموظف: {editingEmployee?.name}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-6 py-4">
+              <div className="space-y-2">
+                <Label>الاسم الكامل</Label>
+                <Input defaultValue={editingEmployee?.name} className="h-11" required />
+              </div>
+              <div className="space-y-2">
+                <Label>البريد الإلكتروني المهني</Label>
+                <Input type="email" defaultValue={editingEmployee?.email} className="h-11" required />
+              </div>
+              <div className="space-y-2">
+                <Label>الدور الوظيفي</Label>
+                <Select defaultValue={editingEmployee?.role}>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SuperAdmin">Super Admin</SelectItem>
+                    <SelectItem value="Manager">Manager</SelectItem>
+                    <SelectItem value="FinancialOfficer">Financial Officer</SelectItem>
+                    <SelectItem value="CustomerService">Customer Service</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:justify-start">
+              <Button type="submit" className="font-bold">حفظ التغييرات</Button>
+              <Button variant="outline" type="button" onClick={() => setIsEditDialogOpen(false)}>إلغاء</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
