@@ -1,3 +1,4 @@
+
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -11,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, AlertCircle, Sparkles, CarFront, AlertTriangle, Settings, FileText, CheckCircle2, Send } from "lucide-react";
+import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -42,8 +43,8 @@ const CATEGORY_DATA = {
     "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveur", "Valve", "Capteur pression pneu", "Roue complète"
   ],
   "Carrosserie (الهيكل)": [
-    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
-    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-بريس", "Vitre latérale", "Feu stop"
+    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Portه avant", "Porte arrière", 
+    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
   ],
   "Accessoires (الأكسيسوارات)": [
     "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
@@ -51,27 +52,24 @@ const CATEGORY_DATA = {
   ]
 };
 
-const BRAND_MODELS = {
-  "Renault": ["Clio", "Symbol", "Megane", "Scenic", "Kangoo", "Express", "Laguna", "Fluence"],
-  "Peugeot": ["206", "207", "208", "301", "307", "308", "406", "407", "Partner"],
-  "Citroën": ["C3", "C4", "C5", "Berlingo", "Xsara"],
-  "Volkswagen": ["Golf 4", "Golf 5", "Golf 6", "Golf 7", "Polo", "Passat", "Tiguan", "Touran"],
-  "Seat": ["Ibiza", "Leon", "Cordoba", "Toledo"],
-  "Skoda": ["Fabia", "Octavia", "Superb", "Rapid"],
-  "Audi": ["A3", "A4", "A5", "A6", "Q3", "Q5"],
-  "BMW": ["Série 1", "Série 3", "Série 5", "X1", "X3", "X5"],
-  "Mercedes-Benz": ["Classe A", "Classe C", "Classe E", "Sprinter", "Vito"],
-  "Opel": ["Corsa", "Astra", "Vectra", "Zafira"],
-  "Fiat": ["Punto", "Doblo", "Panda", "Tipo"],
-  "Ford": ["Fiesta", "Focus", "Transit", "Mondeo"],
-  "Toyota": ["Yaris", "Corolla", "Hilux", "Rav4"],
-  "Nissan": ["Micra", "Sunny", "Qashqai", "Navara"],
-  "Hyundai": ["Accent", "i10", "i20", "Tucson", "Santa Fe"],
-  "Kia": ["Picanto", "Rio", "Cerato", "Sportage"],
-  "Dacia": ["Logan", "Sandero", "Duster", "Dokker"],
-  "Suzuki": ["Swift", "Alto", "Vitara"],
-  "Mitsubishi": ["L200", "Pajero", "Outlander"],
-  "Chevrolet": ["Aveo", "Spark", "Cruze", "Captiva"]
+const BRAND_MODELS: Record<string, string[]> = {
+  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter"],
+  "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X7"],
+  "Audi": ["A1", "A3", "A4", "A6", "A8", "Q3", "Q5", "Q7"],
+  "Volkswagen": ["Polo", "Golf", "Passat", "Jetta", "Tiguan", "Touareg", "Caddy", "Transporter"],
+  "Renault": ["Clio", "Megane", "Symbol", "Captur", "Kadjar", "Kangoo", "Trafic", "Master"],
+  "Peugeot": ["106", "206", "207", "208", "301", "308", "3008", "Partner"],
+  "Citroen": ["C1", "C3", "C4", "C5", "Berlingo", "Jumpy", "Jumper"],
+  "Toyota": ["Yaris", "Corolla", "Camry", "Prius", "RAV4", "Hilux", "Land Cruiser"],
+  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe"],
+  "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
+  "Ford": ["Fiesta", "Focus", "Mondeo", "Kuga", "Ranger", "Transit"],
+  "Nissan": ["Micra", "Sunny", "Sentra", "Qashqai", "X-Trail", "Patrol"],
+  "Honda": ["Jazz", "Civic", "Accord", "CR-V", "HR-V"],
+  "Chevrolet": ["Spark", "Aveo", "Cruze", "Malibu", "Tahoe"],
+  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
+  "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
+  "Haval": [], "JAC": [], "FAW": [], "Dongfeng": [], "BAIC": [], "Jetour": [], "Exeed": [], "Hongqi": [], "NIO": [], "XPeng": [], "Li Auto": [], "Tata": [], "Mahindra": [], "Maruti Suzuki": [], "Ashok Leyland": [], "Proton": [], "Perodua": [], "VinFast": [], "SsangYong": [], "Daewoo": [], "Roewe": [], "Wuling": [], "Zotye": [], "Lifan": [], "Foton": [], "Koenigsegg": [], "Bugatti": [], "Pagani": [], "Lotus": [], "Morgan": [], "TVR": [], "Caterham": [], "Polestar": [], "Smart": [], "Maybach": [], "Abarth": [], "Iveco": [], "MAN": [], "Scania": [], "DAF": [], "Peterbilt": [], "Kenworth": [], "Freightliner": [], "Hino": [], "UD Trucks": [], "Mack": [], "Western Star": [], "Tatra": [], "UAZ": [], "GAZ": [], "Lada": [], "Moskvitch": [], "ZAZ": [], "Yugo": [], "Skoda Truck": [], "Talbot": [], "Simca": [], "Rover": [], "Triumph": [], "Austin": [], "Morris": [], "Vauxhall": [], "Holden": [], "HSV": [], "Plymouth": [], "Mercury": [], "Saturn": [], "Geo": [], "Eagle": [], "AMC": [], "SEAT Classic": [], "Autobianchi": [], "De Tomaso": [], "Borgward": [], "Wartburg": [], "Trabant": [], "Zastava": [], "FSO": [], "Aixam": [], "Ligier": []
 };
 
 const WILAYAS = [
@@ -108,13 +106,11 @@ export default function NewListing() {
   }, [selectedCategory]);
 
   const modelsList = useMemo(() => {
-    return selectedBrand ? BRAND_MODELS[selectedBrand as keyof typeof BRAND_MODELS] : [];
+    return selectedBrand ? BRAND_MODELS[selectedBrand] : [];
   }, [selectedBrand]);
 
   const handlePostListing = () => {
     setLoading(true);
-    
-    // Simulate API delay
     setTimeout(() => {
       setLoading(false);
       toast({
@@ -149,7 +145,36 @@ export default function NewListing() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
-              {/* Conditional Form: Part vs Vehicle */}
+              {/* Common Section for Brand/Model for all types */}
+              <Card className="border-none shadow-sm">
+                <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
+                  <CarFront size={20} className="text-primary" />
+                  <CardTitle className="text-lg text-right">بيانات المركبة</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6 text-right" dir="rtl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="font-bold">الماركة</Label>
+                      <Select onValueChange={setSelectedBrand}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(BRAND_MODELS).sort().map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-bold">الموديل</Label>
+                      <Select disabled={!selectedBrand} onValueChange={setSelectedModel}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
+                        <SelectContent>
+                          {modelsList.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {listingType === "part" ? (
                 <Card className="border-none shadow-sm">
                   <CardHeader className="bg-primary text-white border-b rounded-t-lg">
@@ -188,53 +213,6 @@ export default function NewListing() {
                 </Card>
               ) : (
                 <>
-                  <Card className="border-none shadow-sm">
-                    <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
-                      <CarFront size={20} className="text-primary" />
-                      <CardTitle className="text-lg text-right">معلومات المركبة</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <Label className="font-bold">الماركة</Label>
-                          <Select onValueChange={setSelectedBrand}>
-                            <SelectTrigger className="h-12"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
-                            <SelectContent>
-                              {Object.keys(BRAND_MODELS).map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="font-bold">الموديل</Label>
-                          <Select disabled={!selectedBrand} onValueChange={setSelectedModel}>
-                            <SelectTrigger className="h-12"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
-                            <SelectContent>
-                              {modelsList.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="space-y-2">
-                          <Label className="font-bold">الوقود</Label>
-                          <Select><SelectTrigger className="h-12"><SelectValue placeholder="نوع الوقود" /></SelectTrigger>
-                          <SelectContent>{FUEL_TYPES.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="font-bold">علبة السرعة</Label>
-                          <Select><SelectTrigger className="h-12"><SelectValue placeholder="يدوي/آلي" /></SelectTrigger>
-                          <SelectContent>{GEARBOX_TYPES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="font-bold">الكيلومترات</Label>
-                          <Input type="number" placeholder="0" className="h-12" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
                   <Card className="border-none shadow-sm">
                     <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
                       <AlertTriangle size={20} className="text-secondary" />
@@ -317,17 +295,17 @@ export default function NewListing() {
                     <div className="space-y-2">
                       <Label className="font-bold">الولاية</Label>
                       <Select>
-                        <SelectTrigger className="h-12"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
                         <SelectContent>{WILAYAS.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">البلدية</Label>
-                      <Input placeholder="اسم البلدية" className="h-12" />
+                      <Input placeholder="اسم البلدية" className="h-12 border-2" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">رقم الهاتف للتواصل</Label>
-                      <Input placeholder="05/06/07..." className="h-12" />
+                      <Input placeholder="05/06/07..." className="h-12 border-2" />
                     </div>
                   </div>
                 </CardContent>
@@ -338,7 +316,7 @@ export default function NewListing() {
                   <CardTitle className="text-lg text-right">الوصف والصور</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                  <Textarea placeholder="أضف تفاصيل إضافية عن الحالة أو الملحقات..." className="min-h-[120px]" />
+                  <Textarea placeholder="أضف تفاصيل إضافية عن الحالة أو الملحقات..." className="min-h-[120px] border-2" />
                   <div className="space-y-4">
                     <Label className="font-bold">صور الإعلان (حتى 10 صور)</Label>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -373,24 +351,10 @@ export default function NewListing() {
                     onClick={handlePostListing}
                     disabled={loading}
                   >
-                    {loading ? (
-                      <>جاري النشر...</>
-                    ) : (
-                      <>نشر الإعلان الآن <Send size={20} /></>
-                    )}
+                    {loading ? "جاري النشر..." : <>نشر الإعلان الآن <Send size={20} /></>}
                   </Button>
                 </CardContent>
               </Card>
-
-              <div className="bg-secondary/10 p-6 rounded-3xl border border-secondary/20 flex flex-row-reverse gap-4">
-                <AlertCircle className="text-secondary shrink-0" size={24} />
-                <div className="text-right">
-                  <h4 className="font-black text-sm text-primary">لماذا "نوع الإعلان"؟</h4>
-                  <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-                    تحديد نوع الإعلان يساعد المشترين في العثور على ما يحتاجونه بدقة، سواء كانت قطعة غيار واحدة أو سيارة كاملة للتشليح.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

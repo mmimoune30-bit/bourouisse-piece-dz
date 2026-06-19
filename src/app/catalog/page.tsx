@@ -9,43 +9,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, Car, Settings, Fuel, AlertTriangle, Layers, ShieldCheck } from "lucide-react";
+import { Search, Filter, Car, Settings, Layers } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 
-// --- Data Constants ---
+// --- Updated Data Constants ---
 const BRAND_MODELS: Record<string, string[]> = {
-  "Renault": ["Clio 4", "Symbol", "Megane", "Scenic", "Kangoo", "Express", "Laguna", "Fluence"],
+  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter"],
+  "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X7"],
+  "Audi": ["A1", "A3", "A4", "A6", "A8", "Q3", "Q5", "Q7"],
+  "Volkswagen": ["Polo", "Golf", "Passat", "Jetta", "Tiguan", "Touareg", "Caddy", "Transporter"],
+  "Renault": ["Clio", "Megane", "Symbol", "Captur", "Kadjar", "Kangoo", "Trafic", "Master"],
+  "Peugeot": ["106", "206", "207", "208", "301", "308", "3008", "Partner"],
+  "Citroen": ["C1", "C3", "C4", "C5", "Berlingo", "Jumpy", "Jumper"],
+  "Toyota": ["Yaris", "Corolla", "Camry", "Prius", "RAV4", "Hilux", "Land Cruiser"],
+  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe"],
+  "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
+  "Ford": ["Fiesta", "Focus", "Mondeo", "Kuga", "Ranger", "Transit"],
+  "Nissan": ["Micra", "Sunny", "Sentra", "Qashqai", "X-Trail", "Patrol"],
+  "Honda": ["Jazz", "Civic", "Accord", "CR-V", "HR-V"],
+  "Chevrolet": ["Spark", "Aveo", "Cruze", "Malibu", "Tahoe"],
+  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-  "Peugeot": ["206", "207", "208", "301", "307", "308", "406", "407", "Partner"],
-  "Citroën": ["C3", "C4", "C5", "Berlingo", "Xsara"],
-  "Volkswagen": ["Golf 4", "Golf 5", "Golf 6", "Golf 7", "Polo", "Passat", "Tiguan"],
-  "Audi": ["A3", "A4", "A5", "A6", "Q3", "Q5"],
-  "BMW": ["Série 1", "Série 3", "Série 5", "X1", "X3", "X5"],
-  "Mercedes-Benz": ["Classe A", "Classe C", "Classe E", "Sprinter", "Vito"],
-  "Hyundai": ["Accent", "i10", "i20", "Tucson", "Santa Fe"],
-  "Kia": ["Picanto", "Rio", "Cerato", "Sportage"],
-  "Toyota": ["Yaris", "Corolla", "Hilux", "Rav4"],
+  "Haval": [], "JAC": [], "FAW": [], "Dongfeng": [], "BAIC": [], "Jetour": [], "Exeed": [], "Hongqi": [], "NIO": [], "XPeng": [], "Li Auto": [], "Tata": [], "Mahindra": [], "Maruti Suzuki": [], "Ashok Leyland": [], "Proton": [], "Perodua": [], "VinFast": [], "SsangYong": [], "Daewoo": [], "Roewe": [], "Wuling": [], "Zotye": [], "Lifan": [], "Foton": [], "Koenigsegg": [], "Bugatti": [], "Pagani": [], "Lotus": [], "Morgan": [], "TVR": [], "Caterham": [], "Polestar": [], "Smart": [], "Maybach": [], "Abarth": [], "Iveco": [], "MAN": [], "Scania": [], "DAF": [], "Peterbilt": [], "Kenworth": [], "Freightliner": [], "Hino": [], "UD Trucks": [], "Mack": [], "Western Star": [], "Tatra": [], "UAZ": [], "GAZ": [], "Lada": [], "Moskvitch": [], "ZAZ": [], "Yugo": [], "Skoda Truck": [], "Talbot": [], "Simca": [], "Rover": [], "Triumph": [], "Austin": [], "Morris": [], "Vauxhall": [], "Holden": [], "HSV": [], "Plymouth": [], "Mercury": [], "Saturn": [], "Geo": [], "Eagle": [], "AMC": [], "SEAT Classic": [], "Autobianchi": [], "De Tomaso": [], "Borgward": [], "Wartburg": [], "Trabant": [], "Zastava": [], "FSO": [], "Aixam": [], "Ligier": []
 };
 
 const CATEGORY_DATA: Record<string, string[]> = {
   "Moteur (المحرك)": ["Moteur complet", "Culasse", "Injecteurs", "Turbo", "Radiateur", "Filtre à huile"],
   "Carrosserie (الهيكل)": ["Capot", "Pare-chocs", "Ailes", "Phares", "Feux", "Portières", "Coffre"],
   "Suspension et Direction (التوازي و التوازن)": ["Amortisseurs", "Triangles", "Crémaillère", "Disques de frein"],
-  "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Alternateur", "Démarreur", "Phares", "Feux"],
+  "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Alternateur", "Déمارreur", "Phares", "Feux"],
   "Accessoires (الأكسيسوارات)": ["Autoradio", "Tapis", "Housses"]
 };
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "Électricité (الكهرباء)", partType: "Phares", brand: "Renault", model: "Clio 4", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
-  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "Carrosserie (الهيكل)", partType: "Portières", brand: "Renault", model: "Clio 4", condition: "Used" as const, listingType: "part", seller: "Auto Pièces Chlef" },
+  { id: "p1", name: "مصباح أمامي أيمن Clio", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "Électricité (الكهرباء)", partType: "Phares", brand: "Renault", model: "Clio", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
+  { id: "p2", name: "باب أمامي أيسر Clio", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "Carrosserie (الهيكل)", partType: "Portières", brand: "Renault", model: "Clio", condition: "Used" as const, listingType: "part", seller: "Auto Pièces Chlef" },
   { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Radiateur", brand: "Peugeot", model: "208", condition: "New" as const, listingType: "part", seller: "Pièces Renault DZ" },
   { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "Carrosserie (الهيكل)", partType: "Pare-chocs", brand: "Peugeot", model: "301", condition: "Used" as const, listingType: "part", seller: "Pièces Renault DZ" },
   { id: "p5", name: "فلتر زيت Hyundai Accent", price: 900, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Filtre à huile", brand: "Hyundai", model: "Accent", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
-  { id: "p6", name: "كتلة محرك V8 BMW", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", condition: "Used" as const, listingType: "part", seller: "EliteMotors DZ" },
+  { id: "p6", name: "كتلة محرك BMW X5", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", condition: "Used" as const, listingType: "part", seller: "EliteMotors DZ" },
 ];
 
 function CatalogContent() {
@@ -58,7 +63,6 @@ function CatalogContent() {
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   
   const [activeTab, setActiveTab] = useState<string>("all");
-  const [damageFilter, setDamageFilter] = useState<number>(100);
   const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
 
   useEffect(() => {
@@ -190,7 +194,7 @@ function CatalogContent() {
                        حالة القطعة
                     </Label>
                     <Select value={selectedCondition} onValueChange={setSelectedCondition}>
-                      <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الحالة (جديد/مستعمل)" /></SelectTrigger>
+                      <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الحالة" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">الكل</SelectItem>
                         <SelectItem value="New">جديد (New)</SelectItem>
