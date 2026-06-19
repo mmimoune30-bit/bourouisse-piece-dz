@@ -30,7 +30,9 @@ import {
   MessageSquare,
   BarChart3,
   Trash2,
-  Tag
+  Tag,
+  Download,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,7 @@ const INITIAL_LISTINGS = [
 export default function SellerDashboard() {
   const [listings, setListings] = useState(INITIAL_LISTINGS);
   const [search, setSearch] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDelete = (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) {
@@ -62,6 +65,23 @@ export default function SellerDashboard() {
   const handleMarkAsSold = (id: string) => {
     setListings(prev => prev.map(l => l.id === id ? { ...l, status: "Sold" } : l));
     toast({ title: "تم البيع!", description: "تم تحديث حالة الإعلان بنجاح." });
+  };
+
+  const handleDownloadReports = () => {
+    setIsDownloading(true);
+    toast({ 
+      title: "جاري المعالجة", 
+      description: "يتم الآن تجميع بيانات المبيعات والإحصائيات للشهر الحالي..." 
+    });
+
+    // Simulate API/Generation delay
+    setTimeout(() => {
+      setIsDownloading(false);
+      toast({ 
+        title: "اكتمل التنزيل", 
+        description: "تم تصدير تقرير المبيعات بنجاح بصيغة PDF. (تجريبي)" 
+      });
+    }, 2500);
   };
 
   const filteredListings = listings.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
@@ -82,8 +102,23 @@ export default function SellerDashboard() {
                 <Plus size={24} /> إضافة إعلان جديد
               </Button>
             </Link>
-            <Button variant="outline" className="h-14 px-6 font-bold rounded-2xl border-2" onClick={() => toast({ title: "التقارير", description: "جاري إنشاء ملف الإحصائيات..." })}>
-              تحميل تقارير المبيعات
+            <Button 
+              variant="outline" 
+              className="h-14 px-6 font-bold rounded-2xl border-2 flex gap-2 items-center" 
+              onClick={handleDownloadReports}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  جاري التحميل...
+                </>
+              ) : (
+                <>
+                  <Download size={20} />
+                  تحميل تقارير المبيعات
+                </>
+              )}
             </Button>
           </div>
         </header>
@@ -91,7 +126,7 @@ export default function SellerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
             { label: "إجمالي الإعلانات", value: listings.length, icon: <Package className="text-secondary" />, trend: "+4 هذا الأسبوع" },
-            { label: "الإعلانات النشطة", value: listings.filter(l => l.status === 'Active').length, icon: <CheckCircle className="text-green-500" />, trend: "90% من الإجمالي" },
+            { label: "إعلانات نشطة", value: listings.filter(l => l.status === 'Active').length, icon: <CheckCircle className="text-green-500" />, trend: "90% من الإجمالي" },
             { label: "قطع تم بيعها", value: listings.filter(l => l.status === 'Sold').length, icon: <TrendingUp className="text-blue-500" />, trend: "تحليل الأداء" },
             { label: "مشاهدات متجرك", value: "8.4K", icon: <Eye className="text-purple-500" />, trend: "+12% نمو" },
           ].map((stat, i) => (
