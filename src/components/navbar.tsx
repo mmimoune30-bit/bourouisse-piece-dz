@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { 
   User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, 
   Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, 
-  LogIn, UserPlus, Store, Languages, Globe
+  LogIn, UserPlus, Store, Languages, Globe, ShieldCheck, Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,7 @@ const translations = {
     stats: "لوحة التحكم", 
     new: "إعلان جديد", 
     store: "فتح متجر", 
-    admin: "لوحة المسؤول (Admin)",
+    admin: "إدارة المنصة",
     back: "رجوع", 
     contact: "للاستفسار:",
     all: "عرض الكل",
@@ -41,7 +41,7 @@ const translations = {
     stats: "Dashboard",
     new: "New Listing",
     store: "Open Store",
-    admin: "Admin Panel",
+    admin: "Platform Management",
     back: "Back",
     contact: "Inquiry:",
     all: "View All",
@@ -67,8 +67,10 @@ export default function Navbar() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
-    const adminCheck = localStorage.getItem("is_admin") === "true";
-    setIsAdmin(adminCheck);
+    // Simulate role check from local storage or context
+    const userRole = localStorage.getItem("user_role");
+    const allowedRoles = ["SuperAdmin", "Manager", "FinancialOfficer", "CustomerService"];
+    setIsAdmin(allowedRoles.includes(userRole || ""));
     
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
     if (savedLang) setLang(savedLang);
@@ -149,6 +151,15 @@ export default function Navbar() {
           "flex items-center gap-3",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
         )}>
+          {isAdmin && (
+            <Button variant="default" className="bg-destructive text-white hover:bg-red-700 font-black text-sm h-12 px-6 rounded-xl shadow-xl ring-2 ring-red-500/20" asChild>
+              <Link href="/admin/dashboard" className="flex gap-2 items-center">
+                <Lock size={20} />
+                <span className="hidden lg:inline">{t.admin}</span>
+              </Link>
+            </Button>
+          )}
+
           <Button variant="default" className="bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
             <Link href="/login" className="flex gap-2 items-center">
               <LogIn size={20} />
@@ -169,15 +180,6 @@ export default function Navbar() {
               <span className="hidden lg:inline">{t.seller}</span>
             </Link>
           </Button>
-
-          {isAdmin && (
-            <Button variant="default" className="bg-destructive text-white hover:bg-red-700 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
-              <Link href="/admin/dashboard" className="flex gap-2 items-center">
-                <ShieldAlert size={20} />
-                <span className="hidden lg:inline">Admin</span>
-              </Link>
-            </Button>
-          )}
 
           {pathname !== "/" && (
             <Button
