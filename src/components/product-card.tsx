@@ -30,13 +30,14 @@ export default function ProductCard({
   return (
     <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
       {/* Clickable Image Area */}
-      <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-muted">
+      <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-muted cursor-pointer">
         <Image
           src={image}
           alt={name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-bold shadow-lg">
             {condition}

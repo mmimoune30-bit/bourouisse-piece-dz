@@ -92,15 +92,19 @@ export default function CustomerDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {SAVED_ITEMS.map((item) => (
                       <div key={item.id} className="flex flex-row-reverse gap-4 p-4 border rounded-3xl hover:border-secondary transition-all bg-white group">
-                         <div className="w-24 h-24 rounded-2xl overflow-hidden relative shrink-0">
+                         <Link href={`/products/${item.id}`} className="w-24 h-24 rounded-2xl overflow-hidden relative shrink-0 cursor-pointer">
                             <Image src={item.image} alt={item.name} fill className="object-cover group-hover:scale-110 transition-transform" />
-                         </div>
+                         </Link>
                          <div className="flex-grow text-right" dir="rtl">
-                            <h4 className="font-black text-primary line-clamp-1">{item.name}</h4>
+                            <Link href={`/products/${item.id}`}>
+                               <h4 className="font-black text-primary line-clamp-1 hover:text-secondary transition-colors">{item.name}</h4>
+                            </Link>
                             <p className="text-secondary font-black text-lg">{item.price}</p>
                             <p className="text-[10px] text-muted-foreground font-bold mt-1">بواسطة: {item.store}</p>
                             <div className="mt-3 flex gap-2">
-                               <Button size="sm" className="font-bold h-8 px-4 rounded-lg">اتصل الآن</Button>
+                               <Button size="sm" className="font-bold h-8 px-4 rounded-lg" asChild>
+                                  <Link href={`/products/${item.id}`}>اتصل الآن</Link>
+                               </Button>
                                <Button size="sm" variant="outline" className="font-bold h-8 px-4 rounded-lg text-destructive border-destructive/20">حذف</Button>
                             </div>
                          </div>
