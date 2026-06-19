@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -26,21 +25,15 @@ const BRAND_MODELS: Record<string, string[]> = {
   "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
   "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-  "Haval": ["H6", "Jolion", "H9"],
-  "JAC": ["J7", "S3", "T8"],
-  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
-  "Chery": ["Tiggo 2", "Tiggo 4", "Tiggo 7", "Tiggo 8", "QQ"],
-  "Geely": ["Coolray", "Emgrand", "Azkarra"],
-  "MG": ["MG3", "MG5", "MG6", "ZS", "HS", "RX5"]
 };
 
 const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
 
 const CATEGORY_DATA: Record<string, string[]> = {
   "Moteur (المحرك)": ["Moteur complet", "Culasse", "Injecteurs", "Turbo", "Radiateur", "Filtre à huile"],
-  "Carrosserie (الهيكل)": ["Capot", "Pare-chocs", "Ailes", "Phares", "Feux", "Portières", "Coffre"],
+  "Carrosserie (الهيكل)": ["Capot", "Pare-chocs avant", "Pare-chocs arrière", "Ailes", "Phares", "Feux", "Portières", "Coffre"],
   "Suspension et Direction (التوازي و التوازن)": ["Amortisseurs", "Triangles", "Crémaillère", "Disques de frein"],
-  "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Alternateur", "Déمارreur", "Phares", "Feux"],
+  "Électricité (الكهرباء)": ["Batterie", "ECU (Cerveau)", "Alternateur", "Démarreur", "Phares", "Feux"],
   "Accessoires (الأكسيسوارات)": ["Autoradio", "Tapis", "Housses"]
 };
 
@@ -48,7 +41,7 @@ const ALL_PRODUCTS = [
   { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "Électricité (الكهرباء)", partType: "Phares", brand: "Renault", model: "Clio IV", year: "2015", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
   { id: "p2", name: "باب أمامي أيسر Clio 2", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "Carrosserie (الهيكل)", partType: "Portières", brand: "Renault", model: "Clio II", year: "2003", condition: "Used" as const, listingType: "part", seller: "Auto Pièces Chlef" },
   { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Radiateur", brand: "Peugeot", model: "208 I", year: "2014", condition: "New" as const, listingType: "part", seller: "Pièces Renault DZ" },
-  { id: "p4", name: "صدام أمامي Golf 7", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "Carrosserie (الهيكل)", partType: "Pare-chocs", brand: "Volkswagen", model: "Golf VII", year: "2016", condition: "Used" as const, listingType: "part", seller: "Pièces Renault DZ" },
+  { id: "p4", name: "صدام أمامي Golf 7", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "Carrosserie (الهيكل)", partType: "Pare-chocs avant", brand: "Volkswagen", model: "Golf VII", year: "2016", condition: "Used" as const, listingType: "part", seller: "Pièces Renault DZ" },
   { id: "p6", name: "كتلة محرك BMW X5", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", year: "2012", condition: "Used" as const, listingType: "part", seller: "EliteMotors DZ" },
 ];
 
@@ -56,7 +49,9 @@ function CatalogContent() {
   const searchParams = useSearchParams();
   
   const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get("brand") || "");
+  const [manualBrand, setManualBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [manualModel, setManualModel] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
   const [selectedPart, setSelectedPart] = useState<string>("");
@@ -72,15 +67,32 @@ function CatalogContent() {
     if (category) setSelectedCategory(category);
   }, [searchParams]);
 
-  const modelsList = useMemo(() => selectedBrand ? BRAND_MODELS[selectedBrand] || [] : [], [selectedBrand]);
+  const modelsList = useMemo(() => selectedBrand && selectedBrand !== "Other" ? BRAND_MODELS[selectedBrand] || [] : [], [selectedBrand]);
   const partsList = useMemo(() => selectedCategory ? CATEGORY_DATA[selectedCategory] || [] : [], [selectedCategory]);
 
   const filteredProducts = useMemo(() => {
     let result = ALL_PRODUCTS;
     
     if (activeTab !== "all") result = result.filter(p => p.listingType === activeTab);
-    if (selectedBrand) result = result.filter(p => p.brand === selectedBrand);
-    if (selectedModel && selectedModel !== "all") result = result.filter(p => p.model === selectedModel);
+    
+    // Brand filtering
+    if (selectedBrand) {
+      if (selectedBrand === "Other") {
+        if (manualBrand) result = result.filter(p => p.brand.toLowerCase().includes(manualBrand.toLowerCase()));
+      } else {
+        result = result.filter(p => p.brand === selectedBrand);
+      }
+    }
+
+    // Model filtering
+    if (selectedModel && selectedModel !== "all") {
+      if (selectedModel === "Other") {
+        if (manualModel) result = result.filter(p => p.model.toLowerCase().includes(manualModel.toLowerCase()));
+      } else {
+        result = result.filter(p => p.model === selectedModel);
+      }
+    }
+
     if (selectedYear && selectedYear !== "all") result = result.filter(p => p.year === selectedYear);
     if (selectedCategory) result = result.filter(p => p.category.includes(selectedCategory));
     if (selectedPart && selectedPart !== "all") result = result.filter(p => p.partType === selectedPart);
@@ -88,7 +100,7 @@ function CatalogContent() {
     if (searchQuery) result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return result;
-  }, [activeTab, selectedBrand, selectedModel, selectedYear, selectedCategory, selectedPart, selectedCondition, searchQuery]);
+  }, [activeTab, selectedBrand, manualBrand, selectedModel, manualModel, selectedYear, selectedCategory, selectedPart, selectedCondition, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -125,14 +137,23 @@ function CatalogContent() {
                       <Label className="text-sm font-black flex items-center justify-end gap-2">
                         <Car size={16} className="text-secondary" /> ماركة السيارة
                       </Label>
-                      <Select value={selectedBrand} onValueChange={(v) => { setSelectedBrand(v); setSelectedModel(""); }}>
+                      <Select value={selectedBrand} onValueChange={(v) => { setSelectedBrand(v); setSelectedModel(""); setManualBrand(""); }}>
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
                         <SelectContent>
                           {Object.keys(BRAND_MODELS).sort().map(b => (
                             <SelectItem key={b} value={b}>{b}</SelectItem>
                           ))}
+                          <SelectItem value="Other" className="font-black text-secondary italic">بحث عن ماركة أخرى...</SelectItem>
                         </SelectContent>
                       </Select>
+                      {selectedBrand === "Other" && (
+                        <Input 
+                          placeholder="اكتب اسم الماركة..." 
+                          className="mt-2 border-secondary h-11" 
+                          value={manualBrand}
+                          onChange={(e) => setManualBrand(e.target.value)}
+                        />
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -140,7 +161,7 @@ function CatalogContent() {
                       <Select 
                         disabled={!selectedBrand} 
                         value={selectedModel} 
-                        onValueChange={setSelectedModel}
+                        onValueChange={(v) => { setSelectedModel(v); setManualModel(""); }}
                       >
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
                         <SelectContent>
@@ -148,8 +169,17 @@ function CatalogContent() {
                           {modelsList.map(m => (
                             <SelectItem key={m} value={m}>{m}</SelectItem>
                           ))}
+                          <SelectItem value="Other" className="font-black text-secondary italic">بحث عن موديل آخر...</SelectItem>
                         </SelectContent>
                       </Select>
+                      {selectedModel === "Other" && (
+                        <Input 
+                          placeholder="اكتب اسم الموديل..." 
+                          className="mt-2 border-secondary h-11" 
+                          value={manualModel}
+                          onChange={(e) => setManualModel(e.target.value)}
+                        />
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -224,7 +254,9 @@ function CatalogContent() {
                     className="w-full font-black h-12 text-destructive border-destructive/20 hover:bg-destructive/5"
                     onClick={() => {
                       setSelectedBrand("");
+                      setManualBrand("");
                       setSelectedModel("");
+                      setManualModel("");
                       setSelectedYear("");
                       setSelectedCategory("");
                       setSelectedPart("");

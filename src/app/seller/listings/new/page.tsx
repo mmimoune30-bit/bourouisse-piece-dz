@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -12,10 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar } from "lucide-react";
+import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar, PlusCircle } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const LISTING_TYPES = [
   { id: "part", label: "Pièce détachée (قطعة غيار منفردة)" },
@@ -40,11 +41,11 @@ const CATEGORY_DATA = {
     "Crémaillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
   ],
   "Pneumatiques (الإطارات)": [
-    "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveur", "Valve", "Capteur pression pneu", "Roue complète"
+    "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveور", "Valve", "Capteur pression pneu", "Roue complète"
   ],
   "Carrosserie (الهيكل)": [
-    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Portه avant", "Porte arrière", 
-    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-بريز", "Vitre latérale", "Feu stop"
+    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
+    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
   ],
   "Accessoires (الأكسيسوارات)": [
     "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
@@ -63,12 +64,6 @@ const BRAND_MODELS: Record<string, string[]> = {
   "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
   "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-  "Haval": ["H6", "Jolion", "H9"],
-  "JAC": ["J7", "S3", "T8"],
-  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
-  "Chery": ["Tiggo 2", "Tiggo 4", "Tiggo 7", "Tiggo 8", "QQ"],
-  "Geely": ["Coolray", "Emgrand", "Azkarra"],
-  "MG": ["MG3", "MG5", "MG6", "ZS", "HS", "RX5"]
 };
 
 const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
@@ -93,12 +88,15 @@ const AVAILABLE_PARTS = [
 
 export default function NewListing() {
   const router = useRouter();
+  const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
   const [listingType, setListingType] = useState<string>("part");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedPart, setSelectedPart] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
+  const [manualBrand, setManualBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [manualModel, setManualModel] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [damagePercentage, setDamagePercentage] = useState<number>(0);
 
@@ -107,16 +105,32 @@ export default function NewListing() {
   }, [selectedCategory]);
 
   const modelsList = useMemo(() => {
-    return selectedBrand ? BRAND_MODELS[selectedBrand] : [];
+    return selectedBrand && selectedBrand !== "Other" ? BRAND_MODELS[selectedBrand] || [] : [];
   }, [selectedBrand]);
 
-  const handlePostListing = () => {
+  const handlePostListing = async () => {
     setLoading(true);
+    
+    // If "Other" brand or model is chosen, notify admin
+    if (selectedBrand === "Other" || selectedModel === "Other") {
+      if (firestore) {
+        await addDoc(collection(firestore, "complaints"), {
+          subject: "طلب إضافة ماركة أو موديل جديد",
+          details: `البائع طلب إضافة ماركة: ${manualBrand || selectedBrand}, موديل: ${manualModel || selectedModel}`,
+          userType: "seller",
+          category: "Technical Problem",
+          status: "New",
+          priority: "High",
+          createdAt: serverTimestamp()
+        });
+      }
+    }
+
     setTimeout(() => {
       setLoading(false);
       toast({
         title: "تم نشر الإعلان بنجاح!",
-        description: "إعلانك الآن متاح للمشترين في كافة ولايات الجزائر.",
+        description: "إعلانك الآن متاح للمشترين. تم إشعار الإدارة بالبيانات الجديدة إن وجدت.",
       });
       router.push("/seller/dashboard");
     }, 2000);
@@ -155,12 +169,21 @@ export default function NewListing() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">الماركة</Label>
-                      <Select onValueChange={setSelectedBrand}>
+                      <Select onValueChange={(v) => { setSelectedBrand(v); setSelectedModel(""); }}>
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
                         <SelectContent>
                           {Object.keys(BRAND_MODELS).sort().map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                          <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة ماركة جديدة) +</SelectItem>
                         </SelectContent>
                       </Select>
+                      {selectedBrand === "Other" && (
+                        <Input 
+                          placeholder="أدخل اسم الماركة يدوياً..." 
+                          className="mt-2 border-secondary animate-in slide-in-from-top-1" 
+                          value={manualBrand}
+                          onChange={(e) => setManualBrand(e.target.value)}
+                        />
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">الموديل</Label>
@@ -168,8 +191,17 @@ export default function NewListing() {
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
                         <SelectContent>
                           {modelsList.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                          <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة موديل جديد) +</SelectItem>
                         </SelectContent>
                       </Select>
+                      {selectedModel === "Other" && (
+                        <Input 
+                          placeholder="أدخل اسم الموديل يدوياً..." 
+                          className="mt-2 border-secondary animate-in slide-in-from-top-1" 
+                          value={manualModel}
+                          onChange={(e) => setManualModel(e.target.value)}
+                        />
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold flex items-center justify-end gap-1"><Calendar size={14} /> سنة الصنع</Label>

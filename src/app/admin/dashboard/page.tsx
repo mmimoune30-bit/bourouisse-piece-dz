@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,9 @@ import {
   CheckCircle2,
   AlertCircle,
   CreditCard,
-  FileText
+  FileText,
+  PlusSquare,
+  ShieldAlert
 } from "lucide-react";
 import {
   Table,
@@ -28,6 +29,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, query, where, orderBy, limit } from "firebase/firestore";
 
 const STATS = [
   { label: "إجمالي المستخدمين", value: "1,250", trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
@@ -36,14 +39,18 @@ const STATS = [
   { label: "المبيعات الإجمالية", value: "24.5M DZD", trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
 ];
 
-const RECENT_TRANSACTIONS = [
-  { id: "PAY001", store: "Auto Chlef", amount: "5,000 DZD", status: "Approved", method: "CCP" },
-  { id: "PAY002", store: "Renault DZ", amount: "12,000 DZD", status: "Pending", method: "Edahabia" },
-  { id: "PAY003", store: "Hyundai Parts", amount: "8,000 DZD", status: "Approved", method: "Bank" },
-  { id: "PAY004", store: "Peugeot Store", amount: "15,000 DZD", status: "Rejected", method: "CIB" },
-];
-
 export default function AdminDashboard() {
+  const { firestore } = useFirestore();
+
+  // Fetch New Brand/Model Requests (stored as complaints with a specific subject)
+  const requestsQuery = query(
+    collection(firestore!, "complaints"),
+    where("subject", "==", "طلب إضافة ماركة أو موديل جديد"),
+    orderBy("createdAt", "desc"),
+    limit(5)
+  );
+  const { data: brandRequests } = useCollection(requestsQuery);
+
   return (
     <div className="space-y-8 text-right" dir="rtl">
       <div className="flex justify-between items-center">
@@ -57,6 +64,29 @@ export default function AdminDashboard() {
           </Button>
         </Link>
       </div>
+
+      {/* Brand Requests Notification Bar */}
+      {brandRequests && brandRequests.length > 0 && (
+        <Card className="border-2 border-secondary bg-secondary/5 overflow-hidden">
+          <CardHeader className="py-3 bg-secondary text-primary">
+            <CardTitle className="text-sm font-black flex items-center justify-end gap-2">
+               طلبات إضافة ماركات/موديلات جديدة بانتظار المراجعة <PlusSquare size={16} />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-2">
+            {brandRequests.map((req) => (
+              <div key={req.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-secondary/20">
+                <Badge variant="outline" className="border-secondary text-secondary">{req.status}</Badge>
+                <p className="text-xs font-bold text-primary">{req.details}</p>
+                <span className="text-[10px] text-muted-foreground">{req.createdAt?.toDate().toLocaleDateString('ar-DZ')}</span>
+              </div>
+            ))}
+            <Link href="/admin/complaints" className="block text-center pt-2">
+              <Button variant="link" className="text-xs font-black text-secondary">عرض كافة الطلبات والشكاوى</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -106,7 +136,12 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {RECENT_TRANSACTIONS.map((tx, i) => (
+                {[
+                  { id: "PAY001", store: "Auto Chlef", amount: "5,000 DZD", status: "Approved", method: "CCP" },
+                  { id: "PAY002", store: "Renault DZ", amount: "12,000 DZD", status: "Pending", method: "Edahabia" },
+                  { id: "PAY003", store: "Hyundai Parts", amount: "8,000 DZD", status: "Approved", method: "Bank" },
+                  { id: "PAY004", store: "Peugeot Store", amount: "15,000 DZD", status: "Rejected", method: "CIB" },
+                ].map((tx, i) => (
                   <TableRow key={i}>
                     <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
                     <TableCell className="font-bold">{tx.store}</TableCell>
