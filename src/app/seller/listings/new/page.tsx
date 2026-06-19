@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar, PlusCircle } from "lucide-react";
+import { ImagePlus, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,7 @@ const CATEGORY_DATA = {
     "Turbo", "Injecteurs", "Bougies", "Filtre à huile", "Filtre à air", "Filtre à carburant", "Courroie de distribution"
   ],
   "Électricité (الكهرباء)": [
-    "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
+    "Alternateur", "Déمارreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
     "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
     "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
   ],
@@ -68,9 +68,66 @@ const BRAND_MODELS: Record<string, string[]> = {
 
 const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
 
-const WILAYAS = [
-  "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", "16 - Alger", "31 - Oran"
-];
+const WILAYAS_DATA: Record<string, string[]> = {
+  "01 - Adrar": ["Adrar", "Tamest", "Akabli", "Aoulef", "Reggane"],
+  "02 - Chlef": ["Chlef", "Ténès", "Boukadir", "Oued Fodda", "Ouled Fares"],
+  "03 - Laghouat": ["Laghouat", "Aflou", "Aïn Madhi", "Hassi R'Mel"],
+  "04 - Oum El Bouaghi": ["Oum El Bouaghi", "Aïn Beïda", "Aïn M'lila"],
+  "05 - Batna": ["Batna", "Arris", "Barika", "Merouana", "Timgad"],
+  "06 - Béjaïa": ["Béjaïa", "Amizour", "Akbou", "El Kseur", "Sidi Aïch"],
+  "07 - Biskra": ["Biskra", "Tolga", "Sidi Okba", "Ouled Djellal"],
+  "08 - Béchar": ["Béchar", "Kenadsa", "Abadla", "Taghit"],
+  "09 - Blida": ["Blida", "Boufarik", "Bougara", "Beni Mered", "Ouled Yaïch"],
+  "10 - Bouira": ["Bouira", "Lakhdaria", "Sour El Ghozlane", "Aïn Bessem"],
+  "11 - Tamanrasset": ["Tamanrasset", "In Salah", "In Ghar"],
+  "12 - Tébessa": ["Tébessa", "Bir el-Ater", "Morsott", "Ouenza"],
+  "13 - Tlemcen": ["Tlemcen", "Maghnia", "Ghazaouet", "Remchi", "Mansourah"],
+  "14 - Tiaret": ["Tiaret", "Frenda", "Sougueur", "Mahdia"],
+  "15 - Tizi Ouzou": ["Tizi Ouzou", "Azazga", "Draâ Ben Khedda", "Larbaâ Nath Irathen"],
+  "16 - Alger": ["Alger Centre", "Bab El Oued", "Bordj El Kiffan", "Cheraga", "Dely Ibrahim", "Hydra", "Kouba", "Sidi M'Hamed"],
+  "17 - Djelfa": ["Djelfa", "Hassi Bahbah", "Messaad", "Aïn Oussera"],
+  "18 - Jijel": ["Jijel", "Taher", "El Milia", "El Aouana"],
+  "19 - Sétif": ["Sétif", "El Eulma", "Aïn Arnat", "Aïn Azel"],
+  "20 - Saïda": ["Saïda", "Aïn El Hadjar", "Youb"],
+  "21 - Skikda": ["Skikda", "Azzaba", "El Harrouch", "Collo"],
+  "22 - Sidi Bel Abbès": ["Sidi Bel Abbès", "Tessala", "Sfisef"],
+  "23 - Annaba": ["Annaba", "El Bouni", "El Hadjar", "Berrahal"],
+  "24 - Guelma": ["Guelma", "Héliopolis", "Oued Zenati"],
+  "25 - Constantine": ["Constantine", "El Khroub", "Hamma Bouziane", "Zighoud Youcef"],
+  "26 - Médéa": ["Médéa", "Berrouaghia", "Ksar El Boukhari"],
+  "27 - Mostaganem": ["Mostaganem", "Aïn Nouïssy", "Bouguirat"],
+  "28 - M'Sila": ["M'Sila", "Bou Saâda", "Sidi Aïssa"],
+  "29 - Mascara": ["Mascara", "Sig", "Mohammadia", "Ghriss"],
+  "30 - Ouargla": ["Ouargla", "Hassi Messaoud", "Touggourt"],
+  "31 - Oran": ["Oran", "Es Sénia", "Bir El Djir", "Arzew", "Aïn El Turk"],
+  "32 - El Bayadh": ["El Bayadh", "Bougtob", "Rogassa"],
+  "33 - Illizi": ["Illizi", "Djanet", "In Amenas"],
+  "34 - Bordj Bou Arréridj": ["Bordj Bou Arréridj", "Mansoura", "Ras El Oued"],
+  "35 - Boumerdès": ["Boumerdès", "Boudouaou", "Dellys", "Khemis El Khechna"],
+  "36 - El Tarf": ["El Tarf", "El Kala", "Dréan"],
+  "37 - Tindouf": ["Tindouf"],
+  "38 - Tissemsilt": ["Tissemsilt", "Lardjem", "Theniet El Had"],
+  "39 - El Oued": ["El Oued", "Guémar", "Robbah"],
+  "40 - Khenchela": ["Khenchela", "Kaïs", "Chechar"],
+  "41 - Souk Ahras": ["Souk Ahras", "M'daourouch", "Sedrata"],
+  "42 - Tipaza": ["Tipaza", "Cherchell", "Koléa", "Bou Ismaïl"],
+  "43 - Mila": ["Mila", "Chelghoum Laïd", "Ferdjioua"],
+  "44 - Aïn Defla": ["Aïn Defla", "Khemis Miliana", "Miliana"],
+  "45 - Naâma": ["Naâma", "Mecheria", "Aïn Séfra"],
+  "46 - Aïn Témouchent": ["Aïn Témouchent", "Béni Saf", "Hammam Bou Hadjar"],
+  "47 - Ghardaïa": ["Ghardaïa", "Metlili", "El Guerrara"],
+  "48 - Relizane": ["Relizane", "Oued Rhiou", "Mazouna"],
+  "49 - El M'Ghair": ["El M'Ghair", "Djamaa"],
+  "50 - El Meniaa": ["El Meniaa", "Hassi Gara"],
+  "51 - Ouled Djellal": ["Ouled Djellal", "Sidi Khaled"],
+  "52 - Bordj Badji Mokhtar": ["Bordj Badji Mokhtar"],
+  "53 - Béni Abbès": ["Béni Abbès", "Igli", "Tabelbala"],
+  "54 - Timimoun": ["Timimoun", "Aougrout"],
+  "55 - Touggourt": ["Touggourt", "Temacine"],
+  "56 - Djanet": ["Djanet"],
+  "57 - In Salah": ["In Salah"],
+  "58 - In Guezzam": ["In Guezzam", "Tin Zaouatine"]
+};
 
 const VEHICLE_STATUSES = [
   "Accidenté (مصدومة)", 
@@ -98,6 +155,7 @@ export default function NewListing() {
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [manualModel, setManualModel] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedWilaya, setSelectedWilaya] = useState<string>("");
   const [damagePercentage, setDamagePercentage] = useState<number>(0);
 
   const partsList = useMemo(() => {
@@ -108,10 +166,13 @@ export default function NewListing() {
     return selectedBrand && selectedBrand !== "Other" ? BRAND_MODELS[selectedBrand] || [] : [];
   }, [selectedBrand]);
 
+  const communesList = useMemo(() => {
+    return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
+  }, [selectedWilaya]);
+
   const handlePostListing = async () => {
     setLoading(true);
     
-    // If "Other" brand or model is chosen, notify admin
     if (selectedBrand === "Other" || selectedModel === "Other") {
       if (firestore) {
         await addDoc(collection(firestore, "complaints"), {
@@ -335,14 +396,19 @@ export default function NewListing() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">الولاية</Label>
-                      <Select>
+                      <Select onValueChange={setSelectedWilaya}>
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
-                        <SelectContent>{WILAYAS.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
+                        <SelectContent>{Object.keys(WILAYAS_DATA).sort().map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">البلدية</Label>
-                      <Input placeholder="اسم البلدية" className="h-12 border-2" />
+                      <Select disabled={!selectedWilaya}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر البلدية" /></SelectTrigger>
+                        <SelectContent>
+                          {communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">رقم الهاتف للتواصل</Label>
