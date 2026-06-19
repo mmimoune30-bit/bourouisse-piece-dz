@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -85,15 +84,15 @@ export default function Navbar() {
   const t = translations[lang];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl h-[235px]">
-      {/* Top Bar: White background with Red (destructive) text */}
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl h-[235px] border-b">
+      {/* Top Bar: White background with Black text */}
       <div className="bg-white border-b border-zinc-100 py-2">
         <div className={cn(
           "container mx-auto px-4 flex items-center justify-between gap-4",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
         )}>
           <div className={cn(
-            "flex items-center gap-6 text-destructive",
+            "flex items-center gap-6 text-black",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
             <span className="text-[11px] font-black uppercase tracking-widest">{t.contact}</span>
@@ -101,15 +100,15 @@ export default function Navbar() {
               "flex items-center gap-2 text-[12px] font-bold",
               lang === 'AR' ? "flex-row-reverse" : "flex-row"
             )}>
-              <Phone size={16} className="text-destructive" />
+              <Phone size={16} className="text-primary" />
               <span dir="ltr">+213 778 42 89 77</span>
             </div>
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-destructive hover:bg-zinc-100 gap-2 font-bold">
-                <Globe size={16} className="text-destructive" />
+              <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
+                <Globe size={16} className="text-primary" />
                 {lang === 'AR' ? 'العربية' : 'English'}
                 <ChevronDown size={14} />
               </Button>
@@ -136,10 +135,10 @@ export default function Navbar() {
               <Settings size={28} className="animate-spin-slow" />
             </div>
             <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")}>
-              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-secondary uppercase italic leading-none">
-                Bourouisse <span className="text-white">Piece-Dz</span>
+              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none">
+                Bourouisse <span className="text-black">Piece-Dz</span>
               </span>
-              <span className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase mt-1">
+              <span className="text-[10px] font-bold text-black/50 tracking-[0.2em] uppercase mt-1">
                 {lang === 'AR' ? 'قطع غيار وسيارات' : 'Spare Parts & Automobiles'}
               </span>
             </div>
@@ -151,14 +150,14 @@ export default function Navbar() {
           "flex items-center gap-3",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
         )}>
-          <Button variant="default" className="bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
+          <Button variant="outline" className="bg-white text-primary border-2 border-primary/20 hover:bg-zinc-50 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
             <Link href="/login" className="flex gap-2 items-center">
               <LogIn size={20} />
               <span className="hidden lg:inline">{t.login}</span>
             </Link>
           </Button>
 
-          <Button variant="default" className="bg-white text-primary hover:bg-zinc-100 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
+          <Button variant="outline" className="bg-white text-primary border-2 border-primary/20 hover:bg-zinc-50 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
             <Link href="/join" className="flex gap-2 items-center">
               <UserPlus size={20} />
               <span className="hidden lg:inline">{t.buyer}</span>
@@ -174,9 +173,9 @@ export default function Navbar() {
 
           {pathname !== "/" && (
             <Button
-              variant="default"
+              variant="outline"
               size="icon"
-              className="h-12 w-12 bg-zinc-800 border-2 border-zinc-700 text-white hover:bg-zinc-700 transition-all shadow-xl rounded-xl"
+              className="h-12 w-12 bg-white border-2 border-zinc-200 text-black hover:bg-zinc-50 transition-all shadow-xl rounded-xl"
               onClick={() => router.back()}
               title={t.back}
             >
