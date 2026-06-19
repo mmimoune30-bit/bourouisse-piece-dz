@@ -167,7 +167,8 @@ export default function Home() {
                 return (
                   <CarouselItem key={banner.id}>
                     <div className="relative min-h-[600px] lg:min-h-[700px] flex items-center justify-center py-20 overflow-hidden">
-                      <div className="absolute inset-0 z-0">
+                      {/* Clickable Background Image */}
+                      <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
                         <Image
                           src={banner.image}
                           alt={content.title}
@@ -175,12 +176,12 @@ export default function Home() {
                           className="object-cover animate-ken-burns"
                           priority
                         />
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
-                      </div>
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] group-hover:bg-black/50 transition-colors" />
+                      </Link>
 
-                      <div className="container mx-auto px-4 z-10">
+                      <div className="container mx-auto px-4 z-10 pointer-events-none">
                         <div className={cn(
-                          "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100",
+                          "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
                           lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
                           <h1 className="text-4xl md:text-7xl font-black text-white tracking-tighter mb-6 uppercase drop-shadow-2xl leading-tight">
@@ -247,15 +248,19 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {FEATURED_STORES.map((store, i) => (
-              <div key={i} className={cn(
-                "bg-white p-6 rounded-3xl shadow-sm border hover:shadow-xl transition-all flex items-center gap-4 group",
-                lang === 'AR' ? "flex-row-reverse text-right" : "flex-row text-left"
-              )}>
+              <Link 
+                key={i} 
+                href={`/catalog?query=${encodeURIComponent(store.name)}`}
+                className={cn(
+                  "bg-white p-6 rounded-3xl shadow-sm border hover:shadow-xl transition-all flex items-center gap-4 group",
+                  lang === 'AR' ? "flex-row-reverse text-right" : "flex-row text-left"
+                )}
+              >
                  <div className="w-20 h-20 rounded-2xl overflow-hidden relative border-2 border-secondary/20 shrink-0">
                     <Image src={store.logo} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" />
                  </div>
                  <div className="flex-grow" dir={lang === 'AR' ? "rtl" : "ltr"}>
-                    <h3 className="font-black text-lg text-primary">{store.name}</h3>
+                    <h3 className="font-black text-lg text-primary group-hover:text-secondary transition-colors">{store.name}</h3>
                     <p className={cn(
                       "text-sm text-muted-foreground flex items-center gap-1",
                       lang === 'AR' ? "justify-end" : "justify-start"
@@ -272,7 +277,7 @@ export default function Home() {
                        </span>
                     </div>
                  </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

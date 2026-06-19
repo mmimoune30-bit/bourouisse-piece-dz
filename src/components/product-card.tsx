@@ -28,59 +28,64 @@ export default function ProductCard({
   condition = "New"
 }: ProductCardProps) {
   return (
-    <Card className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 bg-white">
+    <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
+      {/* Clickable Image Area */}
       <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-muted">
         <Image
           src={image}
           alt={name}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-bold">
+          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-bold shadow-lg">
             {condition}
           </Badge>
           {condition === 'New' && (
-            <Badge variant="outline" className="bg-white/80 backdrop-blur-sm border-none shadow-sm text-primary flex items-center gap-1">
+            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-none shadow-sm text-primary flex items-center gap-1 font-bold">
               <ShieldCheck size={12} className="text-secondary" />
-              Warranty
+              أصلية
             </Badge>
           )}
         </div>
       </Link>
-      <CardContent className="p-4">
-        <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1 tracking-wider">
+      
+      <CardContent className="p-4 text-right" dir="rtl">
+        <div className="text-[10px] uppercase font-black text-secondary mb-1 tracking-widest">
           {category}
         </div>
         <Link href={`/products/${id}`} className="block mb-2">
-          <h3 className="font-headline font-bold text-lg text-primary line-clamp-1 group-hover:text-secondary transition-colors">
+          <h3 className="font-headline font-black text-lg text-primary line-clamp-1 group-hover:text-secondary transition-colors">
             {name}
           </h3>
         </Link>
-        <div className="flex items-center gap-1 mb-3">
+        <div className="flex items-center justify-end gap-1 mb-3">
+          <span className="text-xs text-muted-foreground font-bold">({rating})</span>
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                size={14}
+                size={12}
                 fill={i < Math.floor(rating) ? "currentColor" : "none"}
-                className={i < Math.floor(rating) ? "" : "text-muted-foreground"}
+                className={i < Math.floor(rating) ? "" : "text-zinc-200"}
               />
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">({rating})</span>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-primary">
-            {price.toLocaleString()} <span className="text-sm font-normal">DZD</span>
+        <div className="flex items-center justify-between flex-row-reverse">
+          <span className="text-2xl font-black text-primary">
+            {price.toLocaleString()} <span className="text-sm font-bold text-muted-foreground">دج</span>
           </span>
-          <span className="text-xs text-muted-foreground">by {seller}</span>
+          <span className="text-[10px] text-muted-foreground font-bold">بواسطة: {seller}</span>
         </div>
       </CardContent>
+      
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full gap-2 group/btn" variant="outline">
-          <ShoppingCart size={18} className="group-hover/btn:scale-110 transition-transform" />
-          Add to Cart
+        <Button className="w-full gap-2 group/btn font-black bg-zinc-50 border-2 hover:bg-primary hover:text-white transition-all rounded-xl" variant="outline" asChild>
+          <Link href={`/products/${id}`}>
+            <ShoppingCart size={18} className="group-hover/btn:scale-110 transition-transform" />
+            التفاصيل والطلب
+          </Link>
         </Button>
       </CardFooter>
     </Card>
