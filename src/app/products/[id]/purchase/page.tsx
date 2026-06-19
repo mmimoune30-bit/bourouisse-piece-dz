@@ -17,6 +17,8 @@ import { useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import Image from "next/image";
 
 const WILAYAS = [
   "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", "09 - Blida", "16 - Alger", "31 - Oran"
@@ -127,7 +129,7 @@ export default function PurchasePage({ params }: { params: Promise<{ id: string 
                 <p className="text-muted-foreground mt-1">أدخل بياناتك ليتمكن البائع من شحن القطعة إليك.</p>
              </div>
              <Button variant="ghost" onClick={() => router.back()} className="gap-2 font-bold">
-                <ChevronRight className={router.back ? "" : "rotate-180"} size={20} /> رجوع
+                <ChevronRight size={20} /> رجوع
              </Button>
           </div>
 
