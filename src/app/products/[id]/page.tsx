@@ -1,19 +1,22 @@
+
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Phone, Mail, MapPin, ShieldCheck, Truck, Clock, MessageSquare, Share2, Heart, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, Truck, Clock, MessageSquare, Share2, Heart, ChevronLeft, ChevronRight, AlertCircle, Star, ImagePlus } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { toast } from "@/hooks/use-toast";
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  // Mock product data for now
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Mock product data
   const product = {
     id: resolvedParams.id,
     name: "كتلة محرك V8 دقيقة أصلية لسيارة BMW",
@@ -31,15 +34,35 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     description: "محرك V8 كامل بحالة ممتازة، مستورد مباشرة من ألمانيا. متوافق مع موديلات BMW الفئة الخامسة والسابعة (2018-2022). ضمان لمدة 6 أشهر على كافة الأجزاء الميكانيكية. السعر قابل للتفاوض في حدود المعقول."
   };
 
+  const handleAction = (type: string) => {
+    switch(type) {
+      case 'share':
+        navigator.clipboard.writeText(window.location.href);
+        toast({ title: "تم نسخ الرابط", description: "يمكنك الآن مشاركته مع أصدقائك." });
+        break;
+      case 'favorite':
+        setIsFavorite(!isFavorite);
+        toast({ title: isFavorite ? "تمت الإزالة" : "تمت الإضافة للمفضلة", description: "تجد محفوظاتك في لوحة التحكم." });
+        break;
+      case 'report':
+        toast({ variant: "destructive", title: "تبليغ", description: "تم إرسال بلاغك للإدارة لمراجعة هذا الإعلان." });
+        break;
+      case 'call':
+        window.open(`tel:${product.seller.phone}`);
+        break;
+      case 'message':
+        toast({ title: "رسالة", description: "جاري فتح نظام المحادثة مع البائع..." });
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-grow pt-[235px] pb-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left/Main Content: Images and Description */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Image Gallery */}
               <div className="relative aspect-video md:aspect-[16/9] rounded-3xl overflow-hidden border-2 border-white shadow-xl bg-muted">
                 <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
                 <div className="absolute top-4 right-4 flex gap-2">
@@ -61,7 +84,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 ))}
               </div>
 
-              {/* Description */}
               <div className="bg-white p-8 rounded-3xl shadow-sm space-y-6 text-right" dir="rtl">
                 <div className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-4 border-b pb-6">
                   <div>
@@ -98,7 +120,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </div>
             </div>
 
-            {/* Right Side: Seller and Actions */}
             <div className="space-y-6">
               <Card className="border-none shadow-xl overflow-hidden">
                 <div className="bg-destructive p-6 text-white text-right">
@@ -123,10 +144,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   </div>
 
                   <div className="space-y-3">
-                    <Button className="w-full h-14 text-lg font-black gap-3 bg-green-600 hover:bg-green-700 shadow-lg shadow-green-100">
+                    <Button className="w-full h-14 text-lg font-black gap-3 bg-green-600 hover:bg-green-700 shadow-lg shadow-green-100" onClick={() => handleAction('call')}>
                       <Phone size={24} /> اتصل بالبائع
                     </Button>
-                    <Button variant="outline" className="w-full h-12 font-bold gap-3 border-secondary text-secondary">
+                    <Button variant="outline" className="w-full h-12 font-bold gap-3 border-secondary text-secondary" onClick={() => handleAction('message')}>
                       <MessageSquare size={20} /> مراسلة في التطبيق
                     </Button>
                   </div>
@@ -139,21 +160,20 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </Card>
 
               <div className="grid grid-cols-3 gap-3">
-                <Button variant="outline" className="flex flex-col h-16 rounded-2xl gap-1">
+                <Button variant="outline" className="flex flex-col h-16 rounded-2xl gap-1" onClick={() => handleAction('share')}>
                   <Share2 size={18} />
                   <span className="text-[10px] font-bold">مشاركة</span>
                 </Button>
-                <Button variant="outline" className="flex flex-col h-16 rounded-2xl gap-1">
-                  <Heart size={18} />
+                <Button variant={isFavorite ? "default" : "outline"} className={cn("flex flex-col h-16 rounded-2xl gap-1", isFavorite && "bg-red-500 text-white")} onClick={() => handleAction('favorite')}>
+                  <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
                   <span className="text-[10px] font-bold">تفضيل</span>
                 </Button>
-                <Button variant="outline" className="flex flex-col h-16 rounded-2xl gap-1">
+                <Button variant="outline" className="flex flex-col h-16 rounded-2xl gap-1 text-destructive" onClick={() => handleAction('report')}>
                   <AlertCircle size={18} />
                   <span className="text-[10px] font-bold">تبليغ</span>
                 </Button>
               </div>
 
-              {/* Related/Sidebar Ad */}
               <div className="bg-zinc-900 p-6 rounded-3xl text-white text-right relative overflow-hidden group">
                  <div className="relative z-10">
                    <h3 className="font-black text-xl mb-2 text-secondary">إعلان ممول</h3>
@@ -170,45 +190,5 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       </main>
       <Footer />
     </div>
-  );
-}
-
-function Star({ size, fill, className }: { size?: number, fill?: string, className?: string }) {
-  return (
-    <svg 
-      width={size || 24} 
-      height={size || 24} 
-      viewBox="0 0 24 24" 
-      fill={fill || "none"} 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
-
-function ImagePlus({ size, className }: { size?: number, className?: string }) {
-  return (
-    <svg 
-      width={size || 24} 
-      height={size || 24} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
-      <line x1="16" y1="5" x2="22" y2="5" />
-      <line x1="19" y1="2" x2="19" y2="8" />
-      <circle cx="9" cy="9" r="2" />
-      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-    </svg>
   );
 }
