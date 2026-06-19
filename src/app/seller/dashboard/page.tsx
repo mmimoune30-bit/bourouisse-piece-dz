@@ -32,7 +32,8 @@ import {
   Trash2,
   Tag,
   Download,
-  Loader2
+  Loader2,
+  ShoppingBag
 } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -102,36 +103,23 @@ export default function SellerDashboard() {
             <p className="text-muted-foreground font-bold">مرحباً بك، <span className="text-secondary">EliteMotors DZ</span> (المعرف: BR-S-9918)</p>
           </div>
           <div className="flex gap-3">
+            <Link href="/seller/purchase-requests">
+              <Button className="h-14 px-8 text-lg font-black gap-2 shadow-xl bg-secondary text-primary hover:bg-white transition-all rounded-2xl">
+                <ShoppingBag size={24} /> طلبات الشراء الواردة
+              </Button>
+            </Link>
             <Link href="/seller/listings/new">
               <Button className="h-14 px-8 text-lg font-black gap-2 shadow-xl bg-primary hover:bg-secondary hover:text-primary transition-all rounded-2xl">
                 <Plus size={24} /> إضافة إعلان جديد
               </Button>
             </Link>
-            <Button 
-              variant="outline" 
-              className="h-14 px-6 font-bold rounded-2xl border-2 flex gap-2 items-center" 
-              onClick={handleDownloadReports}
-              disabled={isDownloading}
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  جاري التحميل...
-                </>
-              ) : (
-                <>
-                  <Download size={20} />
-                  تحميل تقارير المبيعات
-                </>
-              )}
-            </Button>
           </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
             { label: "إجمالي الإعلانات", value: listings.length, icon: <Package className="text-secondary" />, trend: "+4 هذا الأسبوع" },
-            { label: "إعلانات نشطة", value: listings.filter(l => l.status === 'Active').length, icon: <CheckCircle className="text-green-500" />, trend: "90% من الإجمالي" },
+            { label: "إعلانات نشطة", value: listings.filter(l => l.status === 'Active').length, icon: <CheckCircle className="text-green-50" />, trend: "90% من الإجمالي" },
             { label: "قطع تم بيعها", value: listings.filter(l => l.status === 'Sold').length, icon: <TrendingUp className="text-blue-500" />, trend: "تحليل الأداء" },
             { label: "مشاهدات متجرك", value: "8.4K", icon: <Eye className="text-purple-500" />, trend: "+12% نمو" },
           ].map((stat, i) => (

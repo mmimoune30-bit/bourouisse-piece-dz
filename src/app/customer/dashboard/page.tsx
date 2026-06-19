@@ -16,7 +16,8 @@ import {
   Package,
   Bell,
   MapPin,
-  Settings
+  Settings,
+  ShoppingBag
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,6 +51,16 @@ export default function CustomerDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Menu Sidebar */}
           <div className="space-y-4 text-right order-2 lg:order-1" dir="rtl">
+             <Link href="/customer/purchase-requests" className="block">
+               <Button variant="ghost" className="w-full h-16 justify-between px-6 bg-white shadow-sm border rounded-2xl hover:bg-zinc-50 hover:border-secondary transition-all font-black text-lg">
+                 <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 bg-zinc-50 rounded-xl flex items-center justify-center"><ShoppingBag className="text-primary" /></div>
+                   طلبات الشراء الخاصة بي
+                 </div>
+                 <Badge className="bg-secondary text-primary">نشط</Badge>
+               </Button>
+             </Link>
+
              {[
                { label: "الإعلانات المحفوظة", icon: <Heart className="text-red-500" />, count: "8" },
                { label: "المراسلات", icon: <MessageSquare className="text-blue-500" />, count: "3" },
@@ -123,7 +134,9 @@ export default function CustomerDashboard() {
                   <div className="relative z-10 text-right">
                      <h3 className="text-2xl font-black mb-2 flex items-center justify-end gap-2 text-secondary">طلباتي النشطة <Package /></h3>
                      <p className="text-blue-100/70 font-medium mb-6">لديك 3 استفسارات بانتظار رد البائعين.</p>
-                     <Button variant="secondary" className="font-black rounded-xl px-8">متابعة الاستفسارات</Button>
+                     <Link href="/customer/purchase-requests">
+                        <Button variant="secondary" className="font-black rounded-xl px-8">متابعة الاستفسارات</Button>
+                     </Link>
                   </div>
                   <Package size={120} className="absolute -bottom-10 -left-10 opacity-10 group-hover:scale-110 transition-transform" />
                </div>

@@ -82,6 +82,29 @@
         "attachments": { "type": "array", "items": { "type": "string" } }
       }
     },
+    "PurchaseRequest": {
+      "title": "طلب شراء",
+      "description": "بيانات طلب شراء قطعة غيار",
+      "type": "object",
+      "properties": {
+        "requestNumber": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "storeName": { "type": "string" },
+        "buyerId": { "type": "string" },
+        "buyerName": { "type": "string" },
+        "buyerPhone": { "type": "string" },
+        "buyerEmail": { "type": "string" },
+        "wilaya": { "type": "string" },
+        "quantity": { "type": "number" },
+        "deliveryAddress": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string", "enum": ["New", "Under Review", "Accepted", "Rejected", "Completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productId", "productName", "sellerId", "buyerName", "buyerPhone", "quantity", "wilaya", "status"]
+    },
     "Payment": {
       "title": "عملية دفع",
       "description": "بيانات عملية الدفع مقابل اشتراك أو خدمة",
@@ -117,6 +140,10 @@
     "/complaints/{complaintId}": {
       "schema": "Complaint",
       "description": "سجل الشكاوى والدعم الفني"
+    },
+    "/purchase_requests/{requestId}": {
+      "schema": "PurchaseRequest",
+      "description": "طلبات الشراء والتعاملات التجارية"
     },
     "/payments/{paymentId}": {
       "schema": "Payment",

@@ -23,7 +23,8 @@ import {
   History,
   UserPlus,
   Lock,
-  UserCircle
+  UserCircle,
+  ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ const ADMIN_MENU = [
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Stores", href: "/admin/stores", icon: Store },
   { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Purchase Requests", href: "/admin/purchase-requests", icon: ShoppingBag },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
   { name: "Subscriptions", href: "/admin/subscriptions", icon: Ticket },
   { name: "Pricing Plans", href: "/admin/plans", icon: ShieldCheck },

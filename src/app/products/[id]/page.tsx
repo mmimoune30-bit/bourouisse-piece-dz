@@ -16,10 +16,13 @@ import {
   Heart, 
   AlertCircle, 
   MessageCircle,
-  Settings
+  Settings,
+  ShoppingCart,
+  Zap
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 // Custom Social Icons
 const ViberIcon = () => (
@@ -109,16 +112,17 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                    <div className="flex gap-2 w-full mt-2">
                      <Button 
                       className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full gap-2 text-sm shadow-lg"
-                      onClick={() => toast({ title: "تمت الإضافة", description: "تم إضافة القطعة إلى سلة المشتريات." })}
+                      onClick={() => toast({ title: "سلة المشتريات", description: "تم إضافة القطعة إلى سلتك بنجاح." })}
                      >
-                        سلة المشتريات
+                        <ShoppingCart size={18} /> سلة المشتريات
                      </Button>
-                     <Button 
-                      className="bg-zinc-900 hover:bg-black text-white font-black h-14 px-8 rounded-full text-sm shadow-lg"
-                      onClick={() => toast({ title: "طلب شراء", description: "جاري تحويلك لبوابة الدفع..." })}
-                     >
-                        شراء
-                     </Button>
+                     <Link href={`/products/${product.id}/purchase`} className="flex-1">
+                        <Button 
+                          className="w-full bg-zinc-900 hover:bg-black text-white font-black h-14 px-8 rounded-full text-sm shadow-lg gap-2"
+                        >
+                          <Zap size={18} className="text-secondary" /> شراء
+                        </Button>
+                     </Link>
                    </div>
                 </CardContent>
               </Card>
