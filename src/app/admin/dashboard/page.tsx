@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const STATS = [
   { label: "إجمالي المستخدمين", value: "1,250", trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
@@ -50,9 +51,11 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-black text-primary">نظرة عامة على النظام</h1>
           <p className="text-muted-foreground">متابعة الأداء الحي للمنصة والبيانات المالية.</p>
         </div>
-        <Button className="font-bold gap-2 bg-primary">
-          <FileText size={18} /> تصدير تقرير شامل
-        </Button>
+        <Link href="/admin/reports">
+          <Button className="font-bold gap-2 bg-primary">
+            <FileText size={18} /> تصدير تقرير شامل
+          </Button>
+        </Link>
       </div>
 
       {/* Stats Grid */}
@@ -87,7 +90,9 @@ export default function AdminDashboard() {
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between border-b">
             <CardTitle className="text-xl font-black">آخر عمليات الدفع</CardTitle>
-            <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
+            <Link href="/admin/payments">
+              <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
+            </Link>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -149,7 +154,9 @@ export default function AdminDashboard() {
             <CardContent className="p-6 relative z-10">
               <h3 className="font-black text-xl mb-2 text-secondary">عمولات المنصة</h3>
               <p className="text-blue-100/70 text-sm mb-4">تم تحصيل <span className="text-white font-black">1,229,000 دج</span> كعمولات خلال الشهر الحالي.</p>
-              <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">مراجعة التقارير المالية</Button>
+              <Link href="/admin/reports">
+                <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">مراجعة التقارير المالية</Button>
+              </Link>
             </CardContent>
             <TrendingUp className="absolute -bottom-4 -right-4 w-32 h-32 text-white/5" />
           </Card>
