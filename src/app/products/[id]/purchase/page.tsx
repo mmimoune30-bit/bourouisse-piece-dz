@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useEffect } from "react";
@@ -10,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingBag, Send, MapPin, Phone, User, Mail, CreditCard, ChevronRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ShoppingBag, Send, MapPin, Phone, User, Mail, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";

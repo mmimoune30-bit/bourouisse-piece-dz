@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -6,7 +5,8 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, Clock, CheckCircle2, XCircle, Package, ArrowRight, Store, MapPin, Truck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, Clock, CheckCircle2, XCircle, Package, ArrowRight, Store, MapPin, Truck, MessageCircle } from "lucide-react";
 import { useFirestore, useCollection, useUser } from "@/firebase";
 import { collection, query, where, orderBy } from "firebase/firestore";
 import { cn } from "@/lib/utils";
@@ -137,5 +137,3 @@ export default function MyPurchaseRequests() {
     </div>
   );
 }
-
-import { Button } from "@/components/ui/button";
