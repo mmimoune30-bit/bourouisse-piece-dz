@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -45,15 +45,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const INITIAL_LISTINGS = [
-  { id: "L001", name: "محرك كامل Clio 4", price: "450,000 دج", status: "Active", views: 420, date: "2024-05-15" },
-  { id: "L002", name: "مصباح أمامي LED", price: "12,000 دج", status: "Active", views: 185, date: "2024-05-14" },
-  { id: "L003", name: "رادياتور تبريد", price: "8,500 دج", status: "Sold", views: 98, date: "2024-05-12" },
+  { id: "L001", name: "محرك كامل Clio 4", price: 450000, status: "Active", views: 420, date: "2024-05-15" },
+  { id: "L002", name: "مصباح أمامي LED", price: 12000, status: "Active", views: 185, date: "2024-05-14" },
+  { id: "L003", name: "رادياتور تبريد", price: 8500, status: "Sold", views: 98, date: "2024-05-12" },
 ];
 
 export default function SellerDashboard() {
+  const [mounted, setMounted] = useState(false);
   const [listings, setListings] = useState(INITIAL_LISTINGS);
   const [search, setSearch] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleDelete = (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) {
@@ -183,7 +188,9 @@ export default function SellerDashboard() {
                           <span className="text-[10px] text-muted-foreground font-mono">{item.id}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right font-black text-secondary">{item.price}</TableCell>
+                      <TableCell className="text-right font-black text-secondary">
+                        {mounted ? item.price.toLocaleString() : item.price} دج
+                      </TableCell>
                       <TableCell className="text-right">
                         <Badge className={cn("font-black", item.status === 'Active' ? "bg-green-600" : "bg-zinc-400")}>
                           {item.status === 'Active' ? 'نشط' : 'تم البيع'}

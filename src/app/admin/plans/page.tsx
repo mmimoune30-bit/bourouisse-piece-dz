@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -41,9 +41,14 @@ const INITIAL_PLANS = [
 ];
 
 export default function PlansManagement() {
+  const [mounted, setMounted] = useState(false);
   const [plans, setPlans] = useState(INITIAL_PLANS);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<any>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // --- Handlers ---
   const toggleStatus = (id: string) => {
@@ -168,7 +173,7 @@ export default function PlansManagement() {
               <Layers size={20} />
             </div>
             <h4 className="font-black text-primary">{p.name}</h4>
-            <p className="text-2xl font-black text-secondary">{p.price.toLocaleString()} دج</p>
+            <p className="text-2xl font-black text-secondary">{mounted ? p.price.toLocaleString() : p.price} دج</p>
             <Badge variant={p.active ? "default" : "secondary"}>{p.active ? "نشطة" : "معطلة"}</Badge>
           </Card>
         ))}
@@ -197,7 +202,7 @@ export default function PlansManagement() {
                 plans.map((p) => (
                   <TableRow key={p.id} className="group">
                     <TableCell className="pr-6 font-black text-primary">{p.name}</TableCell>
-                    <TableCell className="font-bold text-green-600">{p.price.toLocaleString()} دج</TableCell>
+                    <TableCell className="font-bold text-green-600">{mounted ? p.price.toLocaleString() : p.price} دج</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 justify-end text-xs font-bold text-muted-foreground">
                         <Clock size={12} /> {p.duration}

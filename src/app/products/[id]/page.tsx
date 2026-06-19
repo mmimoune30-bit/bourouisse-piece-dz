@@ -1,7 +1,7 @@
 
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,16 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Phone, Mail, MapPin, ShieldCheck, Truck, Clock, MessageSquare, Share2, Heart, ChevronLeft, ChevronRight, AlertCircle, Star, ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Mock product data
   const product = {
@@ -94,7 +100,9 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-4xl font-black text-secondary">{product.price.toLocaleString()} <span className="text-lg">دج</span></div>
+                    <div className="text-4xl font-black text-secondary">
+                      {mounted ? product.price.toLocaleString() : product.price} <span className="text-lg">دج</span>
+                    </div>
                   </div>
                 </div>
 

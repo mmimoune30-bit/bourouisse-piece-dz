@@ -1,10 +1,13 @@
 
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Star, ShoppingCart, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 
 interface ProductCardProps {
   id: string;
@@ -27,6 +30,12 @@ export default function ProductCard({
   rating = 4.5,
   condition = "New"
 }: ProductCardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
       {/* Clickable Image Area */}
@@ -75,7 +84,7 @@ export default function ProductCard({
         </div>
         <div className="flex items-center justify-between flex-row-reverse">
           <span className="text-2xl font-black text-primary">
-            {price.toLocaleString()} <span className="text-sm font-bold text-muted-foreground">دج</span>
+            {mounted ? price.toLocaleString() : price} <span className="text-sm font-bold text-muted-foreground">دج</span>
           </span>
           <span className="text-[10px] text-muted-foreground font-bold">بواسطة: {seller}</span>
         </div>

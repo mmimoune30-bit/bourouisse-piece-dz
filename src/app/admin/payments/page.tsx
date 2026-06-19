@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -102,12 +102,17 @@ const INITIAL_PAYMENTS = [
 ];
 
 export default function PaymentManagement() {
+  const [mounted, setMounted] = useState(false);
   const [payments, setPayments] = useState(INITIAL_PAYMENTS);
   const [search, setSearch] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Simulated Role Check
   const currentUser = { name: "ميمون محمد", role: "Financial Officer" };
@@ -178,7 +183,7 @@ export default function PaymentManagement() {
         <Card className="p-6 border-none shadow-sm bg-white overflow-hidden relative">
           <div className="relative z-10">
             <p className="text-xs font-black text-muted-foreground uppercase mb-1">إجمالي الإيرادات</p>
-            <h3 className="text-3xl font-black text-green-600">{stats.total.toLocaleString()} دج</h3>
+            <h3 className="text-3xl font-black text-green-600">{mounted ? stats.total.toLocaleString() : stats.total} دج</h3>
             <div className="flex items-center gap-1 text-green-600 text-[10px] font-bold mt-2">
               <TrendingUp size={12} /> +15% هذا الشهر
             </div>
@@ -194,7 +199,7 @@ export default function PaymentManagement() {
         </Card>
         <Card className="p-6 border-none shadow-sm bg-white">
           <p className="text-xs font-black text-muted-foreground uppercase mb-1">العمولات المحصلة</p>
-          <h3 className="text-3xl font-black text-primary">{(stats.total * 0.05).toLocaleString()} دج</h3>
+          <h3 className="text-3xl font-black text-primary">{mounted ? (stats.total * 0.05).toLocaleString() : (stats.total * 0.05)} دج</h3>
           <div className="flex items-center gap-1 text-primary text-[10px] font-bold mt-2">
             <CheckCircle2 size={12} /> صافي ربح المنصة (5%)
           </div>
@@ -240,7 +245,7 @@ export default function PaymentManagement() {
                       <span className="text-[10px] text-muted-foreground">{p.storeName}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-black text-green-600">{p.amount.toLocaleString()} دج</TableCell>
+                  <TableCell className="font-black text-green-600">{mounted ? p.amount.toLocaleString() : p.amount} دج</TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="font-bold">{p.type}</Badge>
                   </TableCell>
@@ -334,7 +339,7 @@ export default function PaymentManagement() {
                                   <span className="font-bold text-left">{selectedPayment?.planDates?.end}</span>
                                   <div className="col-span-2 border-t mt-2 pt-2 flex justify-between items-center">
                                     <span className="font-black text-lg">المبلغ المدفوع:</span>
-                                    <span className="font-black text-2xl text-green-600">{selectedPayment?.amount.toLocaleString()} دج</span>
+                                    <span className="font-black text-2xl text-green-600">{mounted ? selectedPayment?.amount.toLocaleString() : selectedPayment?.amount} دج</span>
                                   </div>
                                 </div>
                               </section>
@@ -452,3 +457,15 @@ function DialogClose({ children, asChild }: { children: React.ReactNode, asChild
     </DialogTrigger>
   );
 }
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
