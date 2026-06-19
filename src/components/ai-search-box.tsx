@@ -1,27 +1,33 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Sparkles, Car, Settings, Layers } from "lucide-react";
+import { Search, Sparkles, Car, Settings, Layers, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AISearchBox() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (query.length > 2) {
+        setIsLoading(true);
         try {
           const res = await generateSearchSuggestions({ query });
           setSuggestions(res.suggestions);
           setShowSuggestions(true);
         } catch (error) {
           console.error("Failed to fetch AI suggestions", error);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         setSuggestions([]);
@@ -29,7 +35,7 @@ export default function AISearchBox() {
       }
     };
 
-    const timer = setTimeout(fetchSuggestions, 300);
+    const timer = setTimeout(fetchSuggestions, 400);
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -42,6 +48,13 @@ export default function AISearchBox() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && query.trim()) {
+      setShowSuggestions(false);
+      router.push(`/catalog?query=${encodeURIComponent(query)}`);
+    }
+  };
 
   const SPECIAL_CATEGORIES = [
     { name: "مركبات خارج الخدمة", icon: <Car size={32} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
@@ -72,10 +85,14 @@ export default function AISearchBox() {
         </div>
 
         {/* Left Side: AI Search Box */}
-        <div className="w-full max-w-sm relative">
+        <div className="w-full max-w-sm relative z-50">
           <div className="absolute -top-4 left-0 flex items-center gap-2">
             <span className="text-[8px] font-black text-secondary uppercase tracking-widest bg-black px-2 py-0.5 rounded border border-secondary/20 flex items-center gap-1.5">
-              <Sparkles size={8} className="animate-pulse" />
+              {isLoading ? (
+                <Loader2 size={8} className="animate-spin" />
+              ) : (
+                <Sparkles size={8} className="animate-pulse" />
+              )}
               AI Search
             </span>
           </div>
@@ -89,27 +106,35 @@ export default function AISearchBox() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => query.length > 2 && setShowSuggestions(true)}
+              onKeyDown={handleKeyDown}
             />
           </div>
 
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-secondary/30 p-2 animate-in fade-in slide-in-from-top-2 z-50 text-white text-right">
+          {showSuggestions && (suggestions.length > 0 || isLoading) && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] border border-secondary/30 p-2 animate-in fade-in slide-in-from-top-2 z-[60] text-white text-right">
               <div className="text-[9px] uppercase font-black text-secondary px-3 mb-2 flex items-center justify-end gap-2 border-b border-white/10 pb-1">
                 اقتراحات البحث الذكي
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
               </div>
               <div className="grid grid-cols-1 gap-1">
-                {suggestions.map((s, i) => (
-                  <Link
-                    key={i}
-                    href={`/catalog?query=${encodeURIComponent(s)}`}
-                    className="w-full text-right px-3 py-2 hover:bg-secondary hover:text-black rounded-lg text-sm font-bold transition-all flex items-center justify-end gap-2 group/item block"
-                    onClick={() => setShowSuggestions(false)}
-                  >
-                    {s}
-                    <Search size={14} className="text-secondary group-hover/item:text-black" />
-                  </Link>
-                ))}
+                {isLoading ? (
+                  <div className="p-4 flex items-center justify-center gap-2 text-zinc-500 text-xs">
+                    <Loader2 size={16} className="animate-spin" />
+                    جاري التفكير...
+                  </div>
+                ) : (
+                  suggestions.map((s, i) => (
+                    <Link
+                      key={i}
+                      href={`/catalog?query=${encodeURIComponent(s)}`}
+                      className="w-full text-right px-3 py-2 hover:bg-secondary hover:text-black rounded-lg text-sm font-bold transition-all flex items-center justify-end gap-2 group/item block"
+                      onClick={() => setShowSuggestions(false)}
+                    >
+                      {s}
+                      <Search size={14} className="text-secondary group-hover/item:text-black" />
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           )}
