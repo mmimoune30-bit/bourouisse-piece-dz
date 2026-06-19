@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2 } from "lucide-react";
+import { ImagePlus, AlertCircle, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ const CATEGORY_DATA = {
   ],
   "Carrosserie (الهيكل)": [
     "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Portه avant", "Porte arrière", 
-    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-brise", "Vitre latérale", "Feu stop"
+    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-بريز", "Vitre latérale", "Feu stop"
   ],
   "Accessoires (الأكسيسوارات)": [
     "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
@@ -53,31 +53,30 @@ const CATEGORY_DATA = {
 };
 
 const BRAND_MODELS: Record<string, string[]> = {
-  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter"],
+  "Renault": ["Clio I", "Clio II", "Clio III", "Clio IV", "Clio V", "Megane I", "Megane II", "Megane III", "Megane IV", "Megane E-Tech", "Symbol", "Kangoo", "Scenic", "Laguna", "Fluence", "Captur", "Kadjar", "Koleos"],
+  "Peugeot": ["205", "206", "206+", "207", "208 I", "208 II", "306", "307", "308 I", "308 II", "308 III", "406", "407", "508 I", "508 II", "Partner", "Expert", "Boxer", "2008", "3008", "5008"],
+  "Volkswagen": ["Golf I", "Golf II", "Golf III", "Golf IV", "Golf V", "Golf VI", "Golf VII", "Golf VIII", "Polo", "Passat", "Bora", "Jetta", "Tiguan", "Touareg", "T-Roc", "Caddy", "Transporter"],
+  "Toyota": ["Corolla", "Yaris", "Camry", "Avensis", "Prius", "RAV4", "C-HR", "Hilux", "Prado", "Land Cruiser"],
+  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter", "Vito"],
   "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X7"],
   "Audi": ["A1", "A3", "A4", "A6", "A8", "Q3", "Q5", "Q7"],
-  "Volkswagen": ["Polo", "Golf", "Passat", "Jetta", "Tiguan", "Touareg", "Caddy", "Transporter"],
-  "Renault": ["Clio", "Megane", "Symbol", "Captur", "Kadjar", "Kangoo", "Trafic", "Master"],
-  "Peugeot": ["106", "206", "207", "208", "301", "308", "3008", "Partner"],
-  "Citroen": ["C1", "C3", "C4", "C5", "Berlingo", "Jumpy", "Jumper"],
-  "Toyota": ["Yaris", "Corolla", "Camry", "Prius", "RAV4", "Hilux", "Land Cruiser"],
-  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe"],
+  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
   "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
-  "Ford": ["Fiesta", "Focus", "Mondeo", "Kuga", "Ranger", "Transit"],
-  "Nissan": ["Micra", "Sunny", "Sentra", "Qashqai", "X-Trail", "Patrol"],
-  "Honda": ["Jazz", "Civic", "Accord", "CR-V", "HR-V"],
-  "Chevrolet": ["Spark", "Aveo", "Cruze", "Malibu", "Tahoe"],
-  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-  "Haval": [], "JAC": [], "FAW": [], "Dongfeng": [], "BAIC": [], "Jetour": [], "Exeed": [], "Hongqi": [], "NIO": [], "XPeng": [], "Li Auto": [], "Tata": [], "Mahindra": [], "Maruti Suzuki": [], "Ashok Leyland": [], "Proton": [], "Perodua": [], "VinFast": [], "SsangYong": [], "Daewoo": [], "Roewe": [], "Wuling": [], "Zotye": [], "Lifan": [], "Foton": [], "Koenigsegg": [], "Bugatti": [], "Pagani": [], "Lotus": [], "Morgan": [], "TVR": [], "Caterham": [], "Polestar": [], "Smart": [], "Maybach": [], "Abarth": [], "Iveco": [], "MAN": [], "Scania": [], "DAF": [], "Peterbilt": [], "Kenworth": [], "Freightliner": [], "Hino": [], "UD Trucks": [], "Mack": [], "Western Star": [], "Tatra": [], "UAZ": [], "GAZ": [], "Lada": [], "Moskvitch": [], "ZAZ": [], "Yugo": [], "Skoda Truck": [], "Talbot": [], "Simca": [], "Rover": [], "Triumph": [], "Austin": [], "Morris": [], "Vauxhall": [], "Holden": [], "HSV": [], "Plymouth": [], "Mercury": [], "Saturn": [], "Geo": [], "Eagle": [], "AMC": [], "SEAT Classic": [], "Autobianchi": [], "De Tomaso": [], "Borgward": [], "Wartburg": [], "Trabant": [], "Zastava": [], "FSO": [], "Aixam": [], "Ligier": []
+  "Haval": ["H6", "Jolion", "H9"],
+  "JAC": ["J7", "S3", "T8"],
+  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
+  "Chery": ["Tiggo 2", "Tiggo 4", "Tiggo 7", "Tiggo 8", "QQ"],
+  "Geely": ["Coolray", "Emgrand", "Azkarra"],
+  "MG": ["MG3", "MG5", "MG6", "ZS", "HS", "RX5"]
 };
+
+const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
 
 const WILAYAS = [
   "01 - Adrar", "02 - Chlef", "03 - Laghouat", "04 - Oum El Bouaghi", "05 - Batna", "16 - Alger", "31 - Oran"
 ];
 
-const FUEL_TYPES = ["Essence", "Diesel", "GPL", "Hybride", "Électrique"];
-const GEARBOX_TYPES = ["Manuelle", "Automatique"];
 const VEHICLE_STATUSES = [
   "Accidenté (مصدومة)", 
   "En panne moteur (عطل محرك)", 
@@ -86,6 +85,7 @@ const VEHICLE_STATUSES = [
   "Véhicule immergé (غارقة)", 
   "Pour pièces uniquement (للقطع فقط)"
 ];
+
 const AVAILABLE_PARTS = [
   "Moteur", "Boîte de vitesse", "Train avant", "Train arrière", "Suspension", 
   "Direction", "Électricité", "Carrosserie", "Intérieur", "Climatisation", "Pneumatiques", "Accessoires"
@@ -99,6 +99,7 @@ export default function NewListing() {
   const [selectedPart, setSelectedPart] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
   const [damagePercentage, setDamagePercentage] = useState<number>(0);
 
   const partsList = useMemo(() => {
@@ -152,7 +153,7 @@ export default function NewListing() {
                   <CardTitle className="text-lg text-right">بيانات المركبة</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">الماركة</Label>
                       <Select onValueChange={setSelectedBrand}>
@@ -168,6 +169,15 @@ export default function NewListing() {
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
                         <SelectContent>
                           {modelsList.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-bold flex items-center justify-end gap-1"><Calendar size={14} /> سنة الصنع</Label>
+                      <Select onValueChange={setSelectedYear}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر السنة" /></SelectTrigger>
+                        <SelectContent>
+                          {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
@@ -269,8 +279,7 @@ export default function NewListing() {
                         ))}
                       </div>
                     </CardContent>
-                  </Card>
-                </>
+                  </>
               )}
 
               <Card className="border-none shadow-sm">

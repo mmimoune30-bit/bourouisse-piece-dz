@@ -12,29 +12,29 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Search, Filter, Car, Settings, Layers } from "lucide-react";
+import { Search, Filter, Car, Settings, Layers, Calendar } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 
-// --- Updated Data Constants ---
 const BRAND_MODELS: Record<string, string[]> = {
-  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter"],
+  "Renault": ["Clio I", "Clio II", "Clio III", "Clio IV", "Clio V", "Megane I", "Megane II", "Megane III", "Megane IV", "Megane E-Tech", "Symbol", "Kangoo", "Scenic", "Laguna", "Fluence", "Captur", "Kadjar", "Koleos"],
+  "Peugeot": ["205", "206", "206+", "207", "208 I", "208 II", "306", "307", "308 I", "308 II", "308 III", "406", "407", "508 I", "508 II", "Partner", "Expert", "Boxer", "2008", "3008", "5008"],
+  "Volkswagen": ["Golf I", "Golf II", "Golf III", "Golf IV", "Golf V", "Golf VI", "Golf VII", "Golf VIII", "Polo", "Passat", "Bora", "Jetta", "Tiguan", "Touareg", "T-Roc", "Caddy", "Transporter"],
+  "Toyota": ["Corolla", "Yaris", "Camry", "Avensis", "Prius", "RAV4", "C-HR", "Hilux", "Prado", "Land Cruiser"],
+  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter", "Vito"],
   "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X7"],
   "Audi": ["A1", "A3", "A4", "A6", "A8", "Q3", "Q5", "Q7"],
-  "Volkswagen": ["Polo", "Golf", "Passat", "Jetta", "Tiguan", "Touareg", "Caddy", "Transporter"],
-  "Renault": ["Clio", "Megane", "Symbol", "Captur", "Kadjar", "Kangoo", "Trafic", "Master"],
-  "Peugeot": ["106", "206", "207", "208", "301", "308", "3008", "Partner"],
-  "Citroen": ["C1", "C3", "C4", "C5", "Berlingo", "Jumpy", "Jumper"],
-  "Toyota": ["Yaris", "Corolla", "Camry", "Prius", "RAV4", "Hilux", "Land Cruiser"],
-  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe"],
+  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
   "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
-  "Ford": ["Fiesta", "Focus", "Mondeo", "Kuga", "Ranger", "Transit"],
-  "Nissan": ["Micra", "Sunny", "Sentra", "Qashqai", "X-Trail", "Patrol"],
-  "Honda": ["Jazz", "Civic", "Accord", "CR-V", "HR-V"],
-  "Chevrolet": ["Spark", "Aveo", "Cruze", "Malibu", "Tahoe"],
-  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-  "Haval": [], "JAC": [], "FAW": [], "Dongfeng": [], "BAIC": [], "Jetour": [], "Exeed": [], "Hongqi": [], "NIO": [], "XPeng": [], "Li Auto": [], "Tata": [], "Mahindra": [], "Maruti Suzuki": [], "Ashok Leyland": [], "Proton": [], "Perodua": [], "VinFast": [], "SsangYong": [], "Daewoo": [], "Roewe": [], "Wuling": [], "Zotye": [], "Lifan": [], "Foton": [], "Koenigsegg": [], "Bugatti": [], "Pagani": [], "Lotus": [], "Morgan": [], "TVR": [], "Caterham": [], "Polestar": [], "Smart": [], "Maybach": [], "Abarth": [], "Iveco": [], "MAN": [], "Scania": [], "DAF": [], "Peterbilt": [], "Kenworth": [], "Freightliner": [], "Hino": [], "UD Trucks": [], "Mack": [], "Western Star": [], "Tatra": [], "UAZ": [], "GAZ": [], "Lada": [], "Moskvitch": [], "ZAZ": [], "Yugo": [], "Skoda Truck": [], "Talbot": [], "Simca": [], "Rover": [], "Triumph": [], "Austin": [], "Morris": [], "Vauxhall": [], "Holden": [], "HSV": [], "Plymouth": [], "Mercury": [], "Saturn": [], "Geo": [], "Eagle": [], "AMC": [], "SEAT Classic": [], "Autobianchi": [], "De Tomaso": [], "Borgward": [], "Wartburg": [], "Trabant": [], "Zastava": [], "FSO": [], "Aixam": [], "Ligier": []
+  "Haval": ["H6", "Jolion", "H9"],
+  "JAC": ["J7", "S3", "T8"],
+  "Tesla": ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck"],
+  "Chery": ["Tiggo 2", "Tiggo 4", "Tiggo 7", "Tiggo 8", "QQ"],
+  "Geely": ["Coolray", "Emgrand", "Azkarra"],
+  "MG": ["MG3", "MG5", "MG6", "ZS", "HS", "RX5"]
 };
+
+const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
 
 const CATEGORY_DATA: Record<string, string[]> = {
   "Moteur (المحرك)": ["Moteur complet", "Culasse", "Injecteurs", "Turbo", "Radiateur", "Filtre à huile"],
@@ -45,12 +45,11 @@ const CATEGORY_DATA: Record<string, string[]> = {
 };
 
 const ALL_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "Électricité (الكهرباء)", partType: "Phares", brand: "Renault", model: "Clio", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
-  { id: "p2", name: "باب أمامي أيسر Clio", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "Carrosserie (الهيكل)", partType: "Portières", brand: "Renault", model: "Clio", condition: "Used" as const, listingType: "part", seller: "Auto Pièces Chlef" },
-  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Radiateur", brand: "Peugeot", model: "208", condition: "New" as const, listingType: "part", seller: "Pièces Renault DZ" },
-  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "Carrosserie (الهيكل)", partType: "Pare-chocs", brand: "Peugeot", model: "301", condition: "Used" as const, listingType: "part", seller: "Pièces Renault DZ" },
-  { id: "p5", name: "فلتر زيت Hyundai Accent", price: 900, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Filtre à huile", brand: "Hyundai", model: "Accent", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
-  { id: "p6", name: "كتلة محرك BMW X5", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", condition: "Used" as const, listingType: "part", seller: "EliteMotors DZ" },
+  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "Électricité (الكهرباء)", partType: "Phares", brand: "Renault", model: "Clio IV", year: "2015", condition: "New" as const, listingType: "part", seller: "Auto Pièces Chlef" },
+  { id: "p2", name: "باب أمامي أيسر Clio 2", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "Carrosserie (الهيكل)", partType: "Portières", brand: "Renault", model: "Clio II", year: "2003", condition: "Used" as const, listingType: "part", seller: "Auto Pièces Chlef" },
+  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "Moteur (المحرك)", partType: "Radiateur", brand: "Peugeot", model: "208 I", year: "2014", condition: "New" as const, listingType: "part", seller: "Pièces Renault DZ" },
+  { id: "p4", name: "صدام أمامي Golf 7", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "Carrosserie (الهيكل)", partType: "Pare-chocs", brand: "Volkswagen", model: "Golf VII", year: "2016", condition: "Used" as const, listingType: "part", seller: "Pièces Renault DZ" },
+  { id: "p6", name: "كتلة محرك BMW X5", price: 450000, image: PlaceHolderImages[0].imageUrl, category: "Moteur (المحرك)", partType: "Moteur complet", brand: "BMW", model: "X5", year: "2012", condition: "Used" as const, listingType: "part", seller: "EliteMotors DZ" },
 ];
 
 function CatalogContent() {
@@ -58,6 +57,7 @@ function CatalogContent() {
   
   const [selectedBrand, setSelectedBrand] = useState<string>(searchParams.get("brand") || "");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
   const [selectedPart, setSelectedPart] = useState<string>("");
   const [selectedCondition, setSelectedCondition] = useState<string>("");
@@ -81,13 +81,14 @@ function CatalogContent() {
     if (activeTab !== "all") result = result.filter(p => p.listingType === activeTab);
     if (selectedBrand) result = result.filter(p => p.brand === selectedBrand);
     if (selectedModel && selectedModel !== "all") result = result.filter(p => p.model === selectedModel);
+    if (selectedYear && selectedYear !== "all") result = result.filter(p => p.year === selectedYear);
     if (selectedCategory) result = result.filter(p => p.category.includes(selectedCategory));
     if (selectedPart && selectedPart !== "all") result = result.filter(p => p.partType === selectedPart);
     if (selectedCondition && selectedCondition !== "all") result = result.filter(p => p.condition === selectedCondition);
     if (searchQuery) result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return result;
-  }, [activeTab, selectedBrand, selectedModel, selectedCategory, selectedPart, selectedCondition, searchQuery]);
+  }, [activeTab, selectedBrand, selectedModel, selectedYear, selectedCategory, selectedPart, selectedCondition, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -146,6 +147,21 @@ function CatalogContent() {
                           <SelectItem value="all">كل الموديلات</SelectItem>
                           {modelsList.map(m => (
                             <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-black flex items-center justify-end gap-2">
+                        <Calendar size={16} className="text-secondary" /> سنة الصنع
+                      </Label>
+                      <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر السنة" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">كل السنوات</SelectItem>
+                          {YEARS.map(y => (
+                            <SelectItem key={y} value={y}>{y}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -209,6 +225,7 @@ function CatalogContent() {
                     onClick={() => {
                       setSelectedBrand("");
                       setSelectedModel("");
+                      setSelectedYear("");
                       setSelectedCategory("");
                       setSelectedPart("");
                       setSelectedCondition("");
@@ -253,7 +270,7 @@ function CatalogContent() {
                     <Search size={48} className="text-muted-foreground opacity-20" />
                   </div>
                   <h3 className="text-2xl font-black text-primary mb-2">عذراً، لم نجد نتائج تطابق بحثك</h3>
-                  <p className="text-muted-foreground font-bold">حاول تغيير ماركة السيارة أو حالة القطعة.</p>
+                  <p className="text-muted-foreground font-bold">حاول تغيير ماركة السيارة أو سنة الصنع.</p>
                 </div>
               )}
             </div>
