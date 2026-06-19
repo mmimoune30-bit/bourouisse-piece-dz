@@ -147,7 +147,7 @@ export default function Home() {
         {/* AI SEARCH BOX */}
         <AISearchBox />
 
-        {/* Dynamic Multi-language Hero Section - Resized to fit better */}
+        {/* Dynamic Multi-language Hero Section - Resized to 280px */}
         <section className="relative w-full">
           <Carousel 
             setApi={setApi}
@@ -166,7 +166,7 @@ export default function Home() {
                 const content = lang === "AR" ? banner.ar : banner.en;
                 return (
                   <CarouselItem key={banner.id}>
-                    <div className="relative min-h-[350px] lg:min-h-[400px] flex items-center justify-center py-8 overflow-hidden">
+                    <div className="relative h-[280px] flex items-center justify-center py-4 overflow-hidden">
                       {/* Clickable Background Image */}
                       <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
                         <Image
@@ -184,23 +184,23 @@ export default function Home() {
                           "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
                           lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
-                          <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-3 uppercase drop-shadow-2xl leading-tight">
+                          <h1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-2 uppercase drop-shadow-2xl leading-tight">
                             {content.title}
                           </h1>
-                          <p className="text-base md:text-lg text-secondary font-bold italic mb-6 leading-relaxed max-w-2xl opacity-90">
+                          <p className="text-sm md:text-base text-secondary font-bold italic mb-4 leading-relaxed max-w-2xl opacity-90">
                             {content.description}
                           </p>
                           <div className={cn(
-                            "flex flex-col sm:flex-row gap-4",
+                            "flex flex-col sm:flex-row gap-3",
                             lang === "AR" ? "sm:justify-start" : "sm:justify-start"
                           )}>
                             <Link href={banner.link}>
-                              <Button size="lg" className="h-12 px-8 text-base font-black gap-3 bg-secondary text-primary hover:bg-white transition-all rounded-xl shadow-2xl">
-                                {content.button} {lang === 'AR' ? <ArrowLeft size={18} /> : <ChevronRight size={18} />}
+                              <Button size="sm" className="h-10 px-6 text-xs font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-xl shadow-2xl">
+                                {content.button} {lang === 'AR' ? <ArrowLeft size={16} /> : <ChevronRight size={16} />}
                               </Button>
                             </Link>
                             <Link href="/catalog">
-                              <Button size="lg" variant="outline" className="h-12 px-8 text-base font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-xl shadow-2xl">
+                              <Button size="sm" variant="outline" className="h-10 px-6 text-xs font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-xl shadow-2xl">
                                 {lang === 'AR' ? 'تصفح كافة القطع' : 'Browse All Parts'}
                               </Button>
                             </Link>
@@ -314,3 +314,4 @@ export default function Home() {
     </div>
   );
 }
+
