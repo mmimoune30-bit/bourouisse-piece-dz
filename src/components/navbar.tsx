@@ -52,12 +52,12 @@ const translations = {
 };
 
 const CATEGORY_ICONS = [
-  <Car size={24} className="text-secondary" />,
-  <Zap size={24} className="text-secondary" />,
-  <Scale size={24} className="text-secondary" />,
-  <Plug size={24} className="text-secondary" />,
-  <Disc size={24} className="text-secondary" />,
-  <Sparkles size={24} className="text-secondary" />,
+  <Car size={24} className="text-black" />,
+  <Zap size={24} className="text-black" />,
+  <Scale size={24} className="text-black" />,
+  <Plug size={24} className="text-black" />,
+  <Disc size={24} className="text-black" />,
+  <Sparkles size={24} className="text-black" />,
 ];
 
 export default function Navbar() {
@@ -66,8 +66,14 @@ export default function Navbar() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
-    if (savedLang) setLang(savedLang);
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+      if (savedLang) setLang(savedLang);
+    };
+
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
+    return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
   const toggleLang = (newLang: "AR" | "EN") => {
@@ -80,30 +86,30 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black shadow-2xl h-[235px]">
-      {/* Top Bar: Contact Info & Language */}
-      <div className="bg-zinc-900/80 border-b border-white/5 py-2">
+      {/* Top Bar: White background with Red (destructive) text */}
+      <div className="bg-white border-b border-zinc-100 py-2">
         <div className={cn(
           "container mx-auto px-4 flex items-center justify-between gap-4",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
         )}>
           <div className={cn(
-            "flex items-center gap-6 text-white/80",
+            "flex items-center gap-6 text-destructive",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
-            <span className="text-[11px] font-black text-secondary uppercase tracking-widest">{t.contact}</span>
+            <span className="text-[11px] font-black uppercase tracking-widest">{t.contact}</span>
             <div className={cn(
               "flex items-center gap-2 text-[12px] font-bold",
               lang === 'AR' ? "flex-row-reverse" : "flex-row"
             )}>
-              <Phone size={16} className="text-secondary" />
+              <Phone size={16} className="text-destructive" />
               <span dir="ltr">+213 778 42 89 77</span>
             </div>
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 gap-2 font-bold">
-                <Globe size={16} className="text-secondary" />
+              <Button variant="ghost" size="sm" className="text-destructive hover:bg-zinc-100 gap-2 font-bold">
+                <Globe size={16} className="text-destructive" />
                 {lang === 'AR' ? 'العربية' : 'English'}
                 <ChevronDown size={14} />
               </Button>
@@ -180,8 +186,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* FIXED RED BAR - Categories Only */}
-      <section className="bg-destructive border-b-2 border-secondary h-[75px] w-full flex items-center overflow-hidden shadow-lg">
+      {/* Categories Bar: Light Sky Blue background with Black text */}
+      <section className="bg-sky-200 border-b-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg">
         <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
           <div className={cn(
             "flex items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar justify-center",
@@ -196,10 +202,10 @@ export default function Navbar() {
                   lang === 'AR' ? "flex-row-reverse" : "flex-row"
                 )}
               >
-                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-secondary group-hover:text-primary transition-all group-hover:scale-110 shadow-sm">
+                <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black group-hover:text-sky-200 transition-all group-hover:scale-110 shadow-sm">
                   {CATEGORY_ICONS[i]}
                 </div>
-                <span className="text-sm md:text-base font-extrabold text-white group-hover:text-secondary transition-colors whitespace-nowrap">
+                <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">
                   {catName}
                 </span>
               </Link>
