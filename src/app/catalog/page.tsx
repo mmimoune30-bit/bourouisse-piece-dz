@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -55,6 +56,7 @@ function CatalogContent() {
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
   const [selectedPart, setSelectedPart] = useState<string>("");
+  const [manualPart, setManualPart] = useState<string>("");
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -95,12 +97,21 @@ function CatalogContent() {
 
     if (selectedYear && selectedYear !== "all") result = result.filter(p => p.year === selectedYear);
     if (selectedCategory) result = result.filter(p => p.category.includes(selectedCategory));
-    if (selectedPart && selectedPart !== "all") result = result.filter(p => p.partType === selectedPart);
+    
+    // Part filtering
+    if (selectedPart && selectedPart !== "all") {
+      if (selectedPart === "Other") {
+        if (manualPart) result = result.filter(p => p.partType.toLowerCase().includes(manualPart.toLowerCase()));
+      } else {
+        result = result.filter(p => p.partType === selectedPart);
+      }
+    }
+
     if (selectedCondition && selectedCondition !== "all") result = result.filter(p => p.condition === selectedCondition);
     if (searchQuery) result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return result;
-  }, [activeTab, selectedBrand, manualBrand, selectedModel, manualModel, selectedYear, selectedCategory, selectedPart, selectedCondition, searchQuery]);
+  }, [activeTab, selectedBrand, manualBrand, selectedModel, manualModel, selectedYear, selectedCategory, selectedPart, manualPart, selectedCondition, searchQuery]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -143,7 +154,7 @@ function CatalogContent() {
                           {Object.keys(BRAND_MODELS).sort().map(b => (
                             <SelectItem key={b} value={b}>{b}</SelectItem>
                           ))}
-                          <SelectItem value="Other" className="font-black text-secondary italic">بحث عن ماركة أخرى...</SelectItem>
+                          <SelectItem value="Other" className="font-black text-secondary italic">آخر (إضافة ماركة جديدة) +</SelectItem>
                         </SelectContent>
                       </Select>
                       {selectedBrand === "Other" && (
@@ -169,7 +180,7 @@ function CatalogContent() {
                           {modelsList.map(m => (
                             <SelectItem key={m} value={m}>{m}</SelectItem>
                           ))}
-                          <SelectItem value="Other" className="font-black text-secondary italic">بحث عن موديل آخر...</SelectItem>
+                          <SelectItem value="Other" className="font-black text-secondary italic">آخر (إضافة موديل جديد) +</SelectItem>
                         </SelectContent>
                       </Select>
                       {selectedModel === "Other" && (
@@ -220,7 +231,7 @@ function CatalogContent() {
                       <Select 
                         disabled={!selectedCategory} 
                         value={selectedPart} 
-                        onValueChange={setSelectedPart}
+                        onValueChange={(v) => { setSelectedPart(v); setManualPart(""); }}
                       >
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر نوع القطعة" /></SelectTrigger>
                         <SelectContent>
@@ -228,8 +239,17 @@ function CatalogContent() {
                           {partsList.map(p => (
                             <SelectItem key={p} value={p}>{p}</SelectItem>
                           ))}
+                          <SelectItem value="Other" className="font-black text-secondary italic">آخر (إضافة نوع جديد) +</SelectItem>
                         </SelectContent>
                       </Select>
+                      {selectedPart === "Other" && (
+                        <Input 
+                          placeholder="اكتب اسم القطعة..." 
+                          className="mt-2 border-secondary h-11" 
+                          value={manualPart}
+                          onChange={(e) => setManualPart(e.target.value)}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -260,6 +280,7 @@ function CatalogContent() {
                       setSelectedYear("");
                       setSelectedCategory("");
                       setSelectedPart("");
+                      setManualPart("");
                       setSelectedCondition("");
                       setSearchQuery("");
                     }}

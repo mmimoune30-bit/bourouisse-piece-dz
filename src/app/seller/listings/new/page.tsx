@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { ImagePlus, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar } from "lucide-react";
+import { ImagePlus, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar, Layers } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -34,13 +34,13 @@ const CATEGORY_DATA = {
     "Turbo", "Injecteurs", "Bougies", "Filtre à huile", "Filtre à air", "Filtre à carburant", "Courroie de distribution"
   ],
   "Électricité (الكهرباء)": [
-    "Alternateur", "Déمارreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
+    "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
     "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
     "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
   ],
   "Suspension et Direction (التوازي والتوازن)": [
     "Amortisseur", "Ressort", "Triangle de suspension", "Rotule", "Biellette de direction", 
-    "Crémaillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
+    "Créماillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
   ],
   "Pneumatiques (الإطارات)": [
     "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveور", "Valve", "Capteur pression pneu", "Roue complète"
@@ -60,9 +60,6 @@ const BRAND_MODELS: Record<string, string[]> = {
   "Peugeot": ["205", "206", "206+", "207", "208 I", "208 II", "306", "307", "308 I", "308 II", "308 III", "406", "407", "508 I", "508 II", "Partner", "Expert", "Boxer", "2008", "3008", "5008"],
   "Volkswagen": ["Golf I", "Golf II", "Golf III", "Golf IV", "Golf V", "Golf VI", "Golf VII", "Golf VIII", "Polo", "Passat", "Bora", "Jetta", "Tiguan", "Touareg", "T-Roc", "Caddy", "Transporter"],
   "Toyota": ["Corolla", "Yaris", "Camry", "Avensis", "Prius", "RAV4", "C-HR", "Hilux", "Prado", "Land Cruiser"],
-  "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter", "Vito"],
-  "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X7"],
-  "Audi": ["A1", "A3", "A4", "A6", "A8", "Q3", "Q5", "Q7"],
   "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
   "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
   "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
@@ -91,6 +88,7 @@ export default function NewListing() {
   const [listingType, setListingType] = useState<string>("part");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedPart, setSelectedPart] = useState<string>("");
+  const [manualPartName, setManualPartName] = useState<string>("");
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [manualBrand, setManualBrand] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -114,11 +112,15 @@ export default function NewListing() {
   const handlePostListing = async () => {
     setLoading(true);
     
-    if (selectedBrand === "Other" || selectedModel === "Other") {
+    // Notify admin if "Other" is used for Brand, Model, or Part Type
+    if (selectedBrand === "Other" || selectedModel === "Other" || selectedPart === "Other") {
       if (firestore) {
         await addDoc(collection(firestore, "complaints"), {
-          subject: "طلب إضافة ماركة أو موديل جديد",
-          details: `البائع طلب إضافة ماركة: ${manualBrand || selectedBrand}, موديل: ${manualModel || selectedModel}`,
+          subject: "طلب إضافة بيانات جديدة للقوائم",
+          details: `البائع طلب إضافة: 
+            الماركة: ${manualBrand || selectedBrand}, 
+            الموديل: ${manualModel || selectedModel}, 
+            نوع القطعة: ${manualPartName || selectedPart}`,
           userType: "seller",
           category: "Technical Problem",
           status: "New",
@@ -248,8 +250,17 @@ export default function NewListing() {
                             {partsList.map((part) => (
                               <SelectItem key={part} value={part}>{part}</SelectItem>
                             ))}
+                            <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة نوع جديد) +</SelectItem>
                           </SelectContent>
                         </Select>
+                        {selectedPart === "Other" && (
+                          <Input 
+                            placeholder="أدخل اسم القطعة يدوياً..." 
+                            className="mt-2 border-secondary animate-in slide-in-from-top-1" 
+                            value={manualPartName}
+                            onChange={(e) => setManualPartName(e.target.value)}
+                          />
+                        )}
                       </div>
                     </div>
                   </CardContent>
