@@ -32,6 +32,24 @@
       "imageHint": "car wheels"
     },
     {
+      "id": "electrical-category",
+      "description": "Car electrical components and wiring",
+      "imageUrl": "https://picsum.photos/seed/car-electric/800/600",
+      "imageHint": "car alternator"
+    },
+    {
+      "id": "suspension-category",
+      "description": "Car shock absorbers and suspension",
+      "imageUrl": "https://picsum.photos/seed/suspension/800/600",
+      "imageHint": "car suspension"
+    },
+    {
+      "id": "accessories-category",
+      "description": "Car interior and exterior accessories",
+      "imageUrl": "https://picsum.photos/seed/accessories/800/600",
+      "imageHint": "car accessories"
+    },
+    {
       "id": "hero-banner-1",
       "description": "Modern auto parts warehouse in Algeria",
       "imageUrl": "https://picsum.photos/seed/auto-warehouse/1200/800",

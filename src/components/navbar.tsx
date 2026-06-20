@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { 
   User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, 
   Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, 
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const translations = {
   AR: { 
@@ -51,22 +53,13 @@ const translations = {
   }
 };
 
-const CATEGORY_ICONS = [
-  <Car size={24} className="text-black" />,
-  <Zap size={24} className="text-black" />,
-  <Scale size={24} className="text-black" />,
-  <Plug size={24} className="text-black" />,
-  <Disc size={24} className="text-black" />,
-  <Sparkles size={24} className="text-black" />,
-];
-
-const CATEGORY_HINTS = [
-  "car body",
-  "car engine",
-  "car suspension",
-  "car electrical",
-  "car tires",
-  "car accessories"
+const CATEGORY_IMAGE_IDS = [
+  "body-category",
+  "engine-category",
+  "suspension-category",
+  "electrical-category",
+  "wheels-category",
+  "accessories-category"
 ];
 
 // WhatsApp SVG Icon
@@ -226,24 +219,34 @@ export default function Navbar() {
             "flex items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar justify-center",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
-            {t.categories.map((catName, i) => (
-              <Link
-                key={i}
-                href={`/catalog?category=${encodeURIComponent(catName)}`}
-                className={cn(
-                  "flex items-center gap-3 group transition-all shrink-0",
-                  lang === 'AR' ? "flex-row-reverse" : "flex-row"
-                )}
-                data-ai-hint={CATEGORY_HINTS[i]}
-              >
-                <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black group-hover:text-sky-200 transition-all group-hover:scale-110 shadow-sm">
-                  {CATEGORY_ICONS[i]}
-                </div>
-                <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">
-                  {catName}
-                </span>
-              </Link>
-            ))}
+            {t.categories.map((catName, i) => {
+              const imgData = PlaceHolderImages.find(img => img.id === CATEGORY_IMAGE_IDS[i]);
+              return (
+                <Link
+                  key={i}
+                  href={`/catalog?category=${encodeURIComponent(catName)}`}
+                  className={cn(
+                    "flex items-center gap-3 group transition-all shrink-0",
+                    lang === 'AR' ? "flex-row-reverse" : "flex-row"
+                  )}
+                >
+                  <div className="w-12 h-12 rounded-lg bg-white overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
+                    {imgData && (
+                      <Image 
+                        src={imgData.imageUrl} 
+                        alt={catName} 
+                        fill 
+                        className="object-cover" 
+                        data-ai-hint={imgData.imageHint} 
+                      />
+                    )}
+                  </div>
+                  <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">
+                    {catName}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
