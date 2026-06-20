@@ -97,6 +97,13 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes logo-ripple {
+  0% { transform: translateY(0); }
+  5% { transform: translateY(-8px); }
+  10% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
 .animate-ken-burns {
   animation: ken-burns 20s ease-in-out infinite;
 }
@@ -125,6 +132,11 @@
 .animate-gradient-dynamic {
   background-size: 200% 200%;
   animation: gradient-move 8s ease infinite;
+}
+
+.animate-logo-ripple {
+  display: inline-block;
+  animation: logo-ripple 8s ease-in-out infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar {

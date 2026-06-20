@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -60,7 +59,7 @@ export default function Footer() {
           lang === 'AR' ? "text-right" : "text-left"
         )} dir={lang === 'AR' ? "rtl" : "ltr"}>
           
-          {/* Admin Section - Only for Admin Staff - Placed on the visual left (end of grid in RTL) */}
+          {/* Admin Section */}
           <div className="lg:order-last">
             {isAdmin && (
               <div className="space-y-6">
@@ -100,8 +99,19 @@ export default function Footer() {
                 <div className="bg-secondary p-2 rounded-2xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
-                <span className="font-headline font-black text-2xl tracking-tighter uppercase italic">
-                  Bourouisse <span className="text-secondary">Piece-Dz</span>
+                <span className="font-headline font-black text-2xl tracking-tighter uppercase italic whitespace-nowrap">
+                  {"Bourouisse ".split("").map((char, i) => (
+                    <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
+                      {char === " " ? "\u00A0" : char}
+                    </span>
+                  ))}
+                  <span className="text-secondary">
+                    {"Piece-Dz".split("").map((char, i) => (
+                      <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${(i + 11) * 0.1}s` }}>
+                        {char === " " ? "\u00A0" : char}
+                      </span>
+                    ))}
+                  </span>
                 </span>
               </div>
               <div className="w-full">

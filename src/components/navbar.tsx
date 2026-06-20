@@ -135,8 +135,19 @@ export default function Navbar() {
               <Settings size={28} className="animate-spin-slow" />
             </div>
             <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")}>
-              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none">
-                Bourouisse <span className="text-black">Piece-Dz</span>
+              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap">
+                {"Bourouisse ".split("").map((char, i) => (
+                  <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
+                <span className="text-black">
+                  {"Piece-Dz".split("").map((char, i) => (
+                    <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${(i + 11) * 0.1}s` }}>
+                      {char === " " ? "\u00A0" : char}
+                    </span>
+                  ))}
+                </span>
               </span>
               <span className="text-[10px] font-bold text-black/50 tracking-[0.2em] uppercase mt-1">
                 {lang === 'AR' ? 'قطع غيار وسيارات' : 'Spare Parts & Automobiles'}
