@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { 
   Facebook, 
   Twitter, 
@@ -17,10 +16,10 @@ import {
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export default function Footer() {
   const qrCode = PlaceHolderImages.find(img => img.id === "site-qr-code")?.imageUrl;
-  const siteLogo = PlaceHolderImages.find(img => img.id === "site-logo")?.imageUrl || "";
   const [isAdmin, setIsAdmin] = useState(false);
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
@@ -81,14 +80,26 @@ export default function Footer() {
           </div>
 
           <div className="space-y-6 lg:col-span-1">
-            <Link href="/" className="block relative h-16 w-full max-w-[200px]">
-              <Image 
-                src={siteLogo} 
-                alt="Bourouisse Piece-Dz" 
-                fill 
-                className="object-contain filter brightness-0 invert" 
-                data-ai-hint="automotive logo"
-              />
+            <Link href="/" className="flex items-center gap-1 mb-6" dir="ltr">
+              {"BOUROUISSE".split("").map((letter, i) => (
+                <span 
+                  key={i} 
+                  className="text-xl font-black text-white inline-block animate-logo-ripple"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {letter}
+                </span>
+              ))}
+              <span className="text-xl font-black text-secondary mx-1">-</span>
+              {"PIECEDZ".split("").map((letter, i) => (
+                <span 
+                  key={i} 
+                  className="text-xl font-black text-secondary inline-block animate-logo-ripple"
+                  style={{ animationDelay: `${(i + 10) * 0.1}s` }}
+                >
+                  {letter}
+                </span>
+              ))}
             </Link>
             
             <div className={cn(
