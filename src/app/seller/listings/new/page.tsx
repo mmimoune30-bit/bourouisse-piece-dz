@@ -9,413 +9,230 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { ImagePlus, CarFront, AlertTriangle, Settings, Send, CheckCircle2, Calendar, Layers } from "lucide-react";
-import { useState, useMemo } from "react";
+import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES } from "@/lib/vehicle-data";
+import { WILAYAS_DATA } from "@/lib/algeria-locations";
+import { Send, CheckCircle2, ImagePlus, Car, Settings, Tags, MapPin, AlertCircle } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { WILAYAS_DATA } from "@/lib/algeria-locations";
-
-const LISTING_TYPES = [
-  { id: "part", label: "Pièce détachée (قطعة غيار منفردة)" },
-  { id: "vhs", label: "Véhicule hors service (مركبة خارج الخدمة)" },
-  { id: "accidented", label: "Véhicule accidenté (مركبة مصدومة)" },
-  { id: "for_parts", label: "Véhicule pour pièces (مركبة للقطع)" },
-];
-
-const CATEGORY_DATA = {
-  "Moteur (المحرك)": [
-    "Moteur complet", "Culasse", "Bloc moteur", "Piston", "Segments", "Bielles", "Vilebrequin", 
-    "Arbre à cames", "Soupapes", "Joint de culasse", "Pompe à huile", "Pompe à eau", "Radiateur", 
-    "Turbo", "Injecteurs", "Bougies", "Filtre à huile", "Filtre à air", "Filtre à carburant", "Courroie de distribution"
-  ],
-  "Électricité (الكهرباء)": [
-    "Alternateur", "Démarreur", "Batterie", "Faisceau électrique", "Boîte à fusibles", "Relais", 
-    "Capteur ABS", "Capteur PMH", "Calculateur moteur ECU", "Bobine d'allumage", "Commodo", 
-    "Moteur essuie-glace", "Phare avant", "Feu arrière", "Clignotant", "Klaxon"
-  ],
-  "Suspension et Direction (التوازي والتوازن)": [
-    "Amortisseur", "Ressort", "Triangle de suspension", "Rotule", "Biellette de direction", 
-    "Créماillère", "Barre stabilisatrice", "Silentbloc", "Moyeu", "Roulement de roue"
-  ],
-  "Pneumatiques (الإطارات)": [
-    "Pneu", "Jante aluminium", "Jante tôle", "Enjoliveور", "Valve", "Capteur pression pneu", "Roue complète"
-  ],
-  "Carrosserie (الهيكل)": [
-    "Capot", "Pare-chocs avant", "Pare-chocs arrière", "Aile avant", "Porte avant", "Porte arrière", 
-    "Coffre", "Toit", "Rétroviseur", "Calandre", "Pare-بريس", "Vitre latérale", "Feu stop"
-  ],
-  "Accessoires (الأكسيسوارات)": [
-    "Autoradio", "Écran multimédia", "Caméra de recul", "Tapis de sol", "Housse siège", 
-    "Chargeur USB", "Support téléphone", "Alarme", "GPS", "Barre de toit", "Attelage", "Climatisation"
-  ]
-};
-
-const BRAND_MODELS: Record<string, string[]> = {
-  "Renault": ["Clio I", "Clio II", "Clio III", "Clio IV", "Clio V", "Megane I", "Megane II", "Megane III", "Megane IV", "Megane E-Tech", "Symbol", "Kangoo", "Scenic", "Laguna", "Fluence", "Captur", "Kadjar", "Koleos"],
-  "Peugeot": ["205", "206", "206+", "207", "208 I", "208 II", "306", "307", "308 I", "308 II", "308 III", "406", "407", "508 I", "508 II", "Partner", "Expert", "Boxer", "2008", "3008", "5008"],
-  "Volkswagen": ["Golf I", "Golf II", "Golf III", "Golf IV", "Golf V", "Golf VI", "Golf VII", "Golf VIII", "Polo", "Passat", "Bora", "Jetta", "Tiguan", "Touareg", "T-Roc", "Caddy", "Transporter"],
-  "Toyota": ["Corolla", "Yaris", "Camry", "Avensis", "Prius", "RAV4", "C-HR", "Hilux", "Prado", "Land Cruiser"],
-  "Hyundai": ["i10", "i20", "i30", "Accent", "Elantra", "Tucson", "Santa Fe", "Sonata"],
-  "Kia": ["Picanto", "Rio", "Cerato", "Optima", "Sportage", "Sorento"],
-  "Dacia": ["Logan", "Sandero", "Duster", "Dokker", "Lodgy"],
-};
-
-const YEARS = Array.from({ length: 2026 - 1980 }, (_, i) => (2025 - i).toString());
-
-const VEHICLE_STATUSES = [
-  "Accidenté (مصدومة)", 
-  "En panne moteur (عطل محرك)", 
-  "En panne boîte de vitesse (عطل علبة سرعة)", 
-  "Véhicule incendié (محروقة)", 
-  "Véhicule immergé (غارقة)", 
-  "Pour pièces uniquement (للقطع فقط)"
-];
-
-const AVAILABLE_PARTS = [
-  "Moteur", "Boîte de vitesse", "Train avant", "Train arrière", "Suspension", 
-  "Direction", "Électricité", "Carrosserie", "Intérieur", "Climatisation", "Pneumatiques", "Accessoires"
-];
+import { cn } from "@/lib/utils";
 
 export default function NewListing() {
   const router = useRouter();
-  const { firestore } = useFirestore();
+  const [lang, setLang] = useState<"ar" | "en">("ar");
   const [loading, setLoading] = useState(false);
-  const [listingType, setListingType] = useState<string>("part");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedPart, setSelectedPart] = useState<string>("");
-  const [manualPartName, setManualPartName] = useState<string>("");
-  const [selectedBrand, setSelectedBrand] = useState<string>("");
-  const [manualBrand, setManualBrand] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("");
-  const [manualModel, setManualModel] = useState<string>("");
-  const [selectedYear, setSelectedYear] = useState<string>("");
-  const [selectedWilaya, setSelectedWilaya] = useState<string>("");
-  const [damagePercentage, setDamagePercentage] = useState<number>(0);
 
-  const partsList = useMemo(() => {
-    return selectedCategory ? CATEGORY_DATA[selectedCategory as keyof typeof CATEGORY_DATA] : [];
-  }, [selectedCategory]);
+  // Cascading Selection State
+  const [vehicleType, setVehicleType] = useState<string>("");
+  const [brand, setBrand] = useState<string>("");
+  const [model, setModel] = useState<string>("");
+  const [year, setYear] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
 
-  const modelsList = useMemo(() => {
-    return selectedBrand && selectedBrand !== "Other" ? BRAND_MODELS[selectedBrand] || [] : [];
-  }, [selectedBrand]);
+  useEffect(() => {
+    const savedLang = localStorage.getItem("app_lang")?.toLowerCase() as "ar" | "en";
+    if (savedLang) setLang(savedLang);
+  }, []);
 
-  const communesList = useMemo(() => {
-    return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
-  }, [selectedWilaya]);
+  const availableBrands = useMemo(() => {
+    const typeObj = VEHICLE_TYPES.find(t => t.id === vehicleType);
+    return typeObj ? typeObj.brands : [];
+  }, [vehicleType]);
 
-  const handlePostListing = async () => {
+  const availableModels = useMemo(() => {
+    return brand ? BRAND_MODELS[brand] || [] : [];
+  }, [brand]);
+
+  const handlePostListing = () => {
     setLoading(true);
-    
-    // Notify admin if "Other" is used for Brand, Model, or Part Type
-    if (selectedBrand === "Other" || selectedModel === "Other" || selectedPart === "Other") {
-      if (firestore) {
-        await addDoc(collection(firestore, "complaints"), {
-          subject: "طلب إضافة بيانات جديدة للقوائم",
-          details: `البائع طلب إضافة: 
-            الماركة: ${manualBrand || selectedBrand}, 
-            الموديل: ${manualModel || selectedModel}, 
-            نوع القطعة: ${manualPartName || selectedPart}`,
-          userType: "seller",
-          category: "Technical Problem",
-          status: "New",
-          priority: "High",
-          createdAt: serverTimestamp()
-        });
-      }
-    }
-
     setTimeout(() => {
       setLoading(false);
-      toast({
-        title: "تم نشر الإعلان بنجاح!",
-        description: "إعلانك الآن متاح للمشترين. تم إشعار الإدارة بالبيانات الجديدة إن وجدت.",
-      });
+      toast({ title: "تم النشر بنجاح!", description: "إعلانك الآن متاح للمراجعة والظهور للمشترين." });
       router.push("/seller/dashboard");
     }, 2000);
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 pt-[235px] pb-12">
-        <div className="max-w-5xl mx-auto space-y-8">
-          <div className="flex flex-col md:flex-row-reverse items-center justify-between bg-white p-6 rounded-3xl shadow-sm border border-border gap-4">
-            <h1 className="text-3xl font-black text-primary">إضافة إعلان جديد</h1>
-            <div className="w-full md:w-64" dir="rtl">
-              <Label className="mb-2 block font-bold text-xs">اختر نوع الإعلان</Label>
-              <Select value={listingType} onValueChange={setListingType}>
-                <SelectTrigger className="border-2 border-primary/20 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {LISTING_TYPES.map(t => (
-                    <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <div className="max-w-4xl mx-auto space-y-8">
+          
+          <div className="text-right" dir="rtl">
+            <h1 className="text-4xl font-black text-primary mb-2">إضافة قطعة غيار جديدة</h1>
+            <p className="text-muted-foreground font-bold">اتبع الخطوات المتسلسلة لضمان دقة معلومات الإعلان.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <Card className="border-none shadow-sm">
-                <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
-                  <CarFront size={20} className="text-primary" />
-                  <CardTitle className="text-lg text-right">بيانات المركبة</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">الماركة</Label>
-                      <Select onValueChange={(v) => { setSelectedBrand(v); setSelectedModel(""); }}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الماركة" /></SelectTrigger>
-                        <SelectContent>
-                          {Object.keys(BRAND_MODELS).sort().map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                          <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة ماركة جديدة) +</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {selectedBrand === "Other" && (
-                        <Input 
-                          placeholder="أدخل اسم الماركة يدوياً..." 
-                          className="mt-2 border-secondary animate-in slide-in-from-top-1" 
-                          value={manualBrand}
-                          onChange={(e) => setManualBrand(e.target.value)}
-                        />
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">الموديل</Label>
-                      <Select disabled={!selectedBrand} onValueChange={setSelectedModel}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الموديل" /></SelectTrigger>
-                        <SelectContent>
-                          {modelsList.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                          <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة موديل جديد) +</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {selectedModel === "Other" && (
-                        <Input 
-                          placeholder="أدخل اسم الموديل يدوياً..." 
-                          className="mt-2 border-secondary animate-in slide-in-from-top-1" 
-                          value={manualModel}
-                          onChange={(e) => setManualModel(e.target.value)}
-                        />
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold flex items-center justify-end gap-1"><Calendar size={14} /> سنة الصنع</Label>
-                      <Select onValueChange={setSelectedYear}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر السنة" /></SelectTrigger>
-                        <SelectContent>
-                          {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* STEPPER / SELECTION CARD */}
+          <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
+            <CardHeader className="bg-primary text-white p-6">
+              <CardTitle className="text-xl flex items-center justify-end gap-3">
+                1. مواصفات المركبة المتوافقة <Car className="text-secondary" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 space-y-8 text-right" dir="rtl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* 1. Vehicle Type */}
+                <div className="space-y-2">
+                  <Label className="font-black text-sm">نوع المركبة (إلزامي أولاً)</Label>
+                  <Select value={vehicleType} onValueChange={(v) => { setVehicleType(v); setBrand(""); setModel(""); setYear(""); setCategory(""); }}>
+                    <SelectTrigger className="h-14 border-2 focus:border-secondary">
+                      <SelectValue placeholder="اختر نوع المركبة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_TYPES.map(t => <SelectItem key={t.id} value={t.id}>{t.label[lang]}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {listingType === "part" ? (
-                <Card className="border-none shadow-sm">
-                  <CardHeader className="bg-primary text-white border-b rounded-t-lg">
-                    <CardTitle className="text-lg text-right">تصنيف القطعة</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label className="font-bold">الفئة الرئيسية</Label>
-                        <Select onValueChange={setSelectedCategory}>
-                          <SelectTrigger className="h-12 border-2">
-                            <SelectValue placeholder="اختر الفئة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.keys(CATEGORY_DATA).map((cat) => (
-                              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="font-bold">نوع القطعة</Label>
-                        <Select disabled={!selectedCategory} value={selectedPart} onValueChange={setSelectedPart}>
-                          <SelectTrigger className="h-12 border-2">
-                            <SelectValue placeholder="اختر النوع" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {partsList.map((part) => (
-                              <SelectItem key={part} value={part}>{part}</SelectItem>
-                            ))}
-                            <SelectItem value="Other" className="font-black text-secondary">آخر (إضافة نوع جديد) +</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {selectedPart === "Other" && (
-                          <Input 
-                            placeholder="أدخل اسم القطعة يدوياً..." 
-                            className="mt-2 border-secondary animate-in slide-in-from-top-1" 
-                            value={manualPartName}
-                            onChange={(e) => setManualPartName(e.target.value)}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <>
-                  <Card className="border-none shadow-sm">
-                    <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
-                      <AlertTriangle size={20} className="text-secondary" />
-                      <CardTitle className="text-lg text-right">حالة المركبة والأوراق</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <Label className="font-bold">حالة المركبة</Label>
-                          <div className="grid grid-cols-1 gap-2">
-                            {VEHICLE_STATUSES.map(status => (
-                              <div key={status} className="flex items-center justify-end gap-3 p-3 bg-muted/50 rounded-lg">
-                                <Label htmlFor={status} className="text-sm cursor-pointer">{status}</Label>
-                                <Checkbox id={status} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label className="font-bold">حالة الأوراق</Label>
-                            <Select>
-                              <SelectTrigger className="h-12"><SelectValue placeholder="اختر الحالة" /></SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="avec">Avec papiers (بالأوراق)</SelectItem>
-                                <SelectItem value="sans">Sans papiers (بدون أوراق)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-4 p-4 border-2 border-dashed rounded-2xl">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-black text-primary bg-secondary/20 px-3 py-1 rounded-full">{damagePercentage}%</span>
-                              <Label className="font-bold">نسبة التحطم</Label>
-                            </div>
-                            <Slider value={[damagePercentage]} max={100} onValueChange={(v) => setDamagePercentage(v[0])} />
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                {/* 2. Brand */}
+                <div className="space-y-2">
+                  <Label className={cn("font-black text-sm", !vehicleType && "opacity-30")}>ماركة المركبة</Label>
+                  <Select disabled={!vehicleType} value={brand} onValueChange={(v) => { setBrand(v); setModel(""); setYear(""); setCategory(""); }}>
+                    <SelectTrigger className="h-14 border-2 focus:border-secondary">
+                      <SelectValue placeholder="اختر الماركة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableBrands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <Card className="border-none shadow-sm">
-                    <CardHeader className="bg-destructive/5 border-b flex flex-row-reverse items-center gap-2">
-                      <Settings size={20} className="text-primary" />
-                      <CardTitle className="text-lg text-right">القطع المتوفرة في المركبة</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 text-right" dir="rtl">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {AVAILABLE_PARTS.map(part => (
-                          <div key={part} className="flex items-center justify-end gap-2 p-2 border rounded-xl hover:bg-muted/50 transition-colors">
-                            <Label htmlFor={`part-${part}`} className="text-xs cursor-pointer">{part}</Label>
-                            <Checkbox id={`part-${part}`} />
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </>
+                {/* 3. Model */}
+                <div className="space-y-2">
+                  <Label className={cn("font-black text-sm", !brand && "opacity-30")}>الموديل</Label>
+                  <Select disabled={!brand} value={model} onValueChange={(v) => { setModel(v); setYear(""); setCategory(""); }}>
+                    <SelectTrigger className="h-14 border-2 focus:border-secondary">
+                      <SelectValue placeholder="اختر الموديل" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableModels.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 4. Year */}
+                <div className="space-y-2">
+                  <Label className={cn("font-black text-sm", !model && "opacity-30")}>سنة الصنع</Label>
+                  <Select disabled={!model} value={year} onValueChange={(v) => { setYear(v); setCategory(""); }}>
+                    <SelectTrigger className="h-14 border-2 focus:border-secondary">
+                      <SelectValue placeholder="اختر السنة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Selection Summary Breadcrumb */}
+              {vehicleType && (
+                <div className="bg-secondary/10 p-4 rounded-2xl border-2 border-dashed border-secondary/30 flex items-center justify-between">
+                   <div className="flex items-center gap-2 font-black text-primary">
+                     <CheckCircle2 className="text-green-600" size={20} />
+                     <span>{lang === 'ar' ? 'المواصفات المختارة:' : 'Selected Specs:'}</span>
+                   </div>
+                   <div className="text-sm font-bold text-primary/70">
+                     {[VEHICLE_TYPES.find(t=>t.id===vehicleType)?.label[lang], brand, model, year].filter(Boolean).join(" > ")}
+                   </div>
+                </div>
               )}
+            </CardContent>
+          </Card>
 
-              <Card className="border-none shadow-sm">
-                <CardHeader className="bg-destructive/5 border-b">
-                  <CardTitle className="text-lg text-right">المعلومات التجارية والموقع</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">السعر (دج)</Label>
-                      <div className="relative">
-                        <Input type="number" placeholder="0.00" className="h-12 pl-12" />
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">DZD</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-end gap-4 p-4 bg-muted/30 rounded-2xl">
-                      <Label className="font-bold">السعر قابل للتفاوض</Label>
-                      <Switch />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">الولاية</Label>
-                      <Select onValueChange={setSelectedWilaya}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
-                        <SelectContent>{Object.keys(WILAYAS_DATA).sort().map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">البلدية</Label>
-                      <Select disabled={!selectedWilaya}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر البلدية" /></SelectTrigger>
-                        <SelectContent>
-                          {communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">رقم الهاتف للتواصل</Label>
-                      <Input placeholder="05/06/07..." className="h-12 border-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* PART DETAILS CARD */}
+          <Card className={cn("border-none shadow-xl rounded-[32px] overflow-hidden transition-all", !year && "opacity-30 pointer-events-none")}>
+            <CardHeader className="bg-secondary text-primary p-6">
+              <CardTitle className="text-xl flex items-center justify-end gap-3">
+                2. معلومات القطعة <Settings />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 space-y-8 text-right" dir="rtl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <Label className="font-black">تصنيف القطعة</Label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="h-14 border-2"><SelectValue placeholder="اختر الفئة" /></SelectTrigger>
+                    <SelectContent>
+                      {PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en}>{c[lang]}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black">اسم القطعة</Label>
+                  <Input placeholder="مثلاً: محرك كامل، مصباح خلفي..." className="h-14 border-2" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black">رقم القطعة (Part Number) - اختياري</Label>
+                  <Input placeholder="مثلاً: 03L130277J" className="h-14 border-2 font-mono" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black">الحالة</Label>
+                  <Select defaultValue="used">
+                    <SelectTrigger className="h-14 border-2"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">جديد (New)</SelectItem>
+                      <SelectItem value="used">مستعمل (Used)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black">السعر (دج)</Label>
+                  <Input type="number" placeholder="0.00" className="h-14 border-2" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black">الكمية المتاحة</Label>
+                  <Input type="number" defaultValue="1" className="h-14 border-2" />
+                </div>
+              </div>
 
-              <Card className="border-none shadow-sm">
-                <CardHeader className="bg-destructive/5 border-b">
-                  <CardTitle className="text-lg text-right">الوصف والصور</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6 text-right" dir="rtl">
-                  <Textarea placeholder="أضف تفاصيل إضافية عن الحالة أو الملحقات..." className="min-h-[120px] border-2" />
-                  <div className="space-y-4">
-                    <Label className="font-bold">صور الإعلان (حتى 10 صور)</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      <div className="aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-all text-muted-foreground hover:text-secondary group">
-                        <ImagePlus size={32} className="mb-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-black uppercase">إضافة صور</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+              <div className="space-y-2">
+                <Label className="font-black">وصف إضافي</Label>
+                <Textarea placeholder="أضف أي تفاصيل أخرى عن حالة القطعة أو الضمان..." className="min-h-[120px] border-2" />
+              </div>
 
-            <div className="space-y-8">
-              <Card className="border-none shadow-xl sticky top-[250px] overflow-hidden">
-                <CardHeader className="bg-primary text-white text-right p-6">
-                  <CardTitle className="text-xl font-black">نشر الإعلان</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-end gap-2 text-green-600">
-                      <span className="text-sm font-black">نشر مجاني</span>
-                      <CheckCircle2 size={18} />
-                    </div>
-                    <div className="flex items-center justify-end gap-2 text-primary/70">
-                      <span className="text-sm font-bold">وصول لـ 58 ولاية</span>
-                      <CheckCircle2 size={18} />
-                    </div>
+              <div className="space-y-4">
+                <Label className="font-black">الصور (حتى 10 صور)</Label>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="aspect-square rounded-3xl border-4 border-dashed border-zinc-100 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-50 transition-all group">
+                     <ImagePlus size={32} className="text-zinc-300 group-hover:text-primary transition-colors" />
+                     <span className="text-[10px] font-black text-zinc-400 mt-2">إضافة صور</span>
                   </div>
-                  <Button 
-                    className="w-full h-14 text-lg font-black shadow-lg gap-2" 
-                    onClick={handlePostListing}
-                    disabled={loading}
-                  >
-                    {loading ? "جاري النشر..." : <>نشر الإعلان الآن <Send size={20} /></>}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* FINAL SUBMIT */}
+          <div className="flex flex-col md:flex-row gap-4">
+             <Button 
+              className="flex-1 h-20 text-2xl font-black rounded-[24px] shadow-2xl gap-3"
+              disabled={loading || !category}
+              onClick={handlePostListing}
+             >
+               {loading ? "جاري المعالجة..." : <>نشر الإعلان الآن <Send size={24} /></>}
+             </Button>
+             <Button 
+              variant="outline" 
+              className="h-20 px-10 text-lg font-black rounded-[24px] border-2 border-zinc-200"
+              onClick={() => router.back()}
+             >
+               إلغاء
+             </Button>
           </div>
+
+          {!year && (
+            <div className="bg-amber-50 p-6 rounded-3xl border-2 border-amber-100 flex items-start gap-4" dir="rtl">
+               <AlertCircle className="text-amber-600 shrink-0 mt-1" />
+               <div className="text-right">
+                  <h4 className="font-black text-amber-900">تنبيه النظام</h4>
+                  <p className="text-sm text-amber-800 font-bold leading-relaxed">
+                    يجب عليك إكمال مواصفات المركبة (النوع > الماركة > الموديل > السنة) أولاً لتتمكن من إدخال بيانات القطعة ونشر الإعلان. هذا يضمن وصول إعلانك للأشخاص المناسبين.
+                  </p>
+               </div>
+            </div>
+          )}
+
         </div>
       </main>
       <Footer />

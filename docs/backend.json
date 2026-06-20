@@ -6,123 +6,24 @@
       "description": "بيانات تفصيلية لقطعة غيار أو مركبة معروضة للبيع",
       "type": "object",
       "properties": {
-        "listingType": { 
-          "type": "string", 
-          "enum": ["part", "vhs", "accidented", "for_parts"],
-          "description": "نوع الإعلان: قطعة منفردة، مركبة خارج الخدمة، مركبة مصدومة، مركبة للقطع"
-        },
-        "category": { "type": "string", "description": "الفئة الرئيسية (مثال: محرك، مركبات خارج الخدمة)" },
-        "partType": { "type": "string", "description": "نوع القطعة أو نوع المركبة" },
-        "manualPartName": { "type": "string", "description": "اسم القطعة المدخل يدوياً" },
+        "vehicleType": { "type": "string", "description": "نوع المركبة: سياحية، نفعية، شاحنة..." },
         "brand": { "type": "string", "description": "العلامة التجارية للمركبة" },
         "model": { "type": "string", "description": "موديل المركبة" },
         "year": { "type": "string", "description": "سنة الصنع" },
-        "motorisation": { "type": "string", "description": "نوع المحرك" },
-        "fuelType": { "type": "string", "enum": ["Essence", "Diesel", "GPL", "Hybride", "Électrique"] },
-        "gearbox": { "type": "string", "enum": ["Manuelle", "Automatique"] },
-        "mileage": { "type": "number", "description": "المسافة المقطوعة بالكيلومتر" },
-        "vehicleStatus": { 
-          "type": "array", 
-          "items": { "type": "string" },
-          "description": "حالة المركبة (مصدومة، عطل محرك، إلخ)" 
-        },
-        "paperStatus": { "type": "string", "enum": ["Sans papiers", "Avec papiers"] },
-        "availableParts": { 
-          "type": "array", 
-          "items": { "type": "string" },
-          "description": "القطع المتاحة في المركبة" 
-        },
-        "condition": { "type": "string", "enum": ["new", "used", "damaged"], "description": "حالة القطعة أو المركبة" },
-        "damagePercentage": { "type": "number", "description": "نسبة التحطم (0-100)" },
+        "category": { "type": "string", "description": "فئة القطعة: محرك، هيكل، إضاءة..." },
+        "partName": { "type": "string", "description": "اسم القطعة" },
+        "partNumber": { "type": "string", "description": "رقم القطعة الأصلي" },
+        "condition": { "type": "string", "enum": ["new", "used"], "description": "حالة القطعة" },
         "price": { "type": "number", "description": "السعر بالدينار الجزائري" },
-        "priceNegotiable": { "type": "boolean", "description": "السعر قابل للتفاوض" },
-        "wilaya": { "type": "string", "description": "ولاية البائع" },
-        "commune": { "type": "string", "description": "بلدية البائع" },
+        "quantity": { "type": "number", "description": "الكمية المتوفرة" },
         "description": { "type": "string", "description": "وصف إضافي" },
         "images": { "type": "array", "items": { "type": "string" }, "description": "روابط صور القطعة" },
-        "phone": { "type": "string", "description": "رقم الهاتف للتواصل" },
+        "wilaya": { "type": "string", "description": "ولاية البائع" },
+        "commune": { "type": "string", "description": "بلدية البائع" },
         "sellerId": { "type": "string", "description": "معرف البائع صاحب الإعلان" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["listingType", "brand", "model", "price", "wilaya"]
-    },
-    "Seller": {
-      "title": "بائع",
-      "description": "بيانات حساب التاجر أو البائع",
-      "type": "object",
-      "properties": {
-        "shopName": { "type": "string", "description": "اسم المتجر" },
-        "phone": { "type": "string", "description": "رقم الهاتف" },
-        "wilaya": { "type": "string", "description": "مقر النشاط" },
-        "email": { "type": "string", "format": "email" },
-        "userId": { "type": "string", "description": "معرف المستخدم المرتبط" },
-        "subscriptionActive": { "type": "boolean", "description": "حالة الاشتراك" }
-      }
-    },
-    "Complaint": {
-      "title": "شكوى",
-      "description": "بيانات شكوى مقدمة من مشتري أو بائع",
-      "type": "object",
-      "properties": {
-        "complaintNumber": { "type": "string" },
-        "userId": { "type": "string" },
-        "userName": { "type": "string" },
-        "userType": { "type": "string", "enum": ["customer", "seller"] },
-        "phone": { "type": "string" },
-        "email": { "type": "string" },
-        "orderNumber": { "type": "string" },
-        "storeName": { "type": "string" },
-        "category": { "type": "string" },
-        "subject": { "type": "string" },
-        "details": { "type": "string" },
-        "status": { "type": "string", "enum": ["New", "Under Review", "Waiting Customer", "Waiting Seller", "Resolved", "Closed"] },
-        "priority": { "type": "string", "enum": ["Low", "Medium", "High", "Urgent"] },
-        "assignedTo": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "attachments": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "PurchaseRequest": {
-      "title": "طلب شراء",
-      "description": "بيانات طلب شراء قطعة غيار",
-      "type": "object",
-      "properties": {
-        "requestNumber": { "type": "string" },
-        "productId": { "type": "string" },
-        "productName": { "type": "string" },
-        "sellerId": { "type": "string" },
-        "storeName": { "type": "string" },
-        "buyerId": { "type": "string" },
-        "buyerName": { "type": "string" },
-        "buyerPhone": { "type": "string" },
-        "buyerEmail": { "type": "string" },
-        "wilaya": { "type": "string" },
-        "quantity": { "type": "number" },
-        "deliveryAddress": { "type": "string" },
-        "notes": { "type": "string" },
-        "status": { "type": "string", "enum": ["New", "Under Review", "Accepted", "Rejected", "Completed"] },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["productId", "productName", "sellerId", "buyerName", "buyerPhone", "quantity", "wilaya", "status"]
-    },
-    "Payment": {
-      "title": "عملية دفع",
-      "description": "بيانات عملية الدفع مقابل اشتراك أو خدمة",
-      "type": "object",
-      "properties": {
-        "paymentId": { "type": "string" },
-        "userId": { "type": "string" },
-        "storeId": { "type": "string" },
-        "amount": { "type": "number" },
-        "paymentMethod": { "type": "string" },
-        "paymentDate": { "type": "string", "format": "date-time" },
-        "receiptImage": { "type": "string" },
-        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected", "Refunded"] },
-        "approvedBy": { "type": "string" },
-        "approvalDate": { "type": "string", "format": "date-time" },
-        "notes": { "type": "string" }
-      },
-      "required": ["userId", "amount", "paymentMethod", "status"]
+      "required": ["vehicleType", "brand", "model", "year", "category", "partName", "price"]
     }
   },
   "auth": {
@@ -131,23 +32,7 @@
   "firestore": {
     "/listings/{listingId}": {
       "schema": "Listing",
-      "description": "مجموعة الإعلانات العامة"
-    },
-    "/sellers/{sellerId}": {
-      "schema": "Seller",
-      "description": "بيانات البائعين"
-    },
-    "/complaints/{complaintId}": {
-      "schema": "Complaint",
-      "description": "سجل الشكاوى والدعم الفني"
-    },
-    "/purchase_requests/{requestId}": {
-      "schema": "PurchaseRequest",
-      "description": "طلبات الشراء والتعاملات التجارية"
-    },
-    "/payments/{paymentId}": {
-      "schema": "Payment",
-      "description": "سجل عمليات الدفع والتحويلات المالية"
+      "description": "مجموعة الإعلانات وقطع الغيار"
     }
   }
 }
