@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -48,6 +47,9 @@ export default function Footer() {
     };
   }, []);
 
+  const siteName = "bourouisse -piece dt-dz";
+  const tagline = "بورويس لقطع الغيار-M-M CHLEF";
+
   return (
     <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-secondary/30">
       <div className="container mx-auto px-4">
@@ -80,26 +82,24 @@ export default function Footer() {
           </div>
 
           <div className="space-y-6 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-1 mb-6" dir="ltr">
-              {"BOUROUISSE".split("").map((letter, i) => (
-                <span 
-                  key={i} 
-                  className="text-xl font-black text-white inline-block animate-logo-ripple"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {letter}
-                </span>
-              ))}
-              <span className="text-xl font-black text-secondary mx-1">-</span>
-              {"PIECEDZ".split("").map((letter, i) => (
-                <span 
-                  key={i} 
-                  className="text-xl font-black text-secondary inline-block animate-logo-ripple"
-                  style={{ animationDelay: `${(i + 10) * 0.1}s` }}
-                >
-                  {letter}
-                </span>
-              ))}
+            <Link href="/" className="flex flex-col items-center gap-1 mb-6" dir="ltr">
+              <div className="flex gap-[1px]">
+                {siteName.split("").map((letter, i) => (
+                  <span 
+                    key={i} 
+                    className={cn(
+                      "text-xl font-black inline-block animate-logo-ripple",
+                      letter === "-" || i > 12 ? "text-secondary" : "text-white"
+                    )}
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[10px] font-bold text-secondary tracking-tighter" dir="rtl">
+                {tagline}
+              </p>
             </Link>
             
             <div className={cn(

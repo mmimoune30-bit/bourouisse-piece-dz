@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -65,6 +64,9 @@ export default function Navbar() {
 
   const t = translations[lang];
 
+  const siteName = "bourouisse -piece dt-dz";
+  const tagline = "بورويس لقطع الغيار-M-M CHLEF";
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl border-b">
       {/* Top Bar: White Ticker with contacting info */}
@@ -110,28 +112,24 @@ export default function Navbar() {
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
         <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-1 group overflow-hidden px-4 py-2 bg-white rounded-2xl shadow-inner border border-zinc-100">
+          <Link href="/" className="flex flex-col items-center group overflow-hidden px-4 py-2 bg-white rounded-2xl shadow-inner border border-zinc-100">
             <div className="flex gap-[1px]" dir="ltr">
-              {"BOUROUISSE".split("").map((letter, i) => (
+              {siteName.split("").map((letter, i) => (
                 <span 
                   key={i} 
-                  className="text-xl md:text-2xl font-black text-black inline-block animate-logo-ripple"
+                  className={cn(
+                    "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
+                    letter === "-" || i > 12 ? "text-secondary" : "text-black"
+                  )}
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  {letter}
-                </span>
-              ))}
-              <span className="text-xl md:text-2xl font-black text-secondary mx-1">-</span>
-              {"PIECEDZ".split("").map((letter, i) => (
-                <span 
-                  key={i} 
-                  className="text-xl md:text-2xl font-black text-secondary inline-block animate-logo-ripple"
-                  style={{ animationDelay: `${(i + 10) * 0.1}s` }}
-                >
-                  {letter}
+                  {letter === " " ? "\u00A0" : letter}
                 </span>
               ))}
             </div>
+            <p className="text-[9px] md:text-[10px] font-bold text-primary mt-1 tracking-tighter" dir="rtl">
+              {tagline}
+            </p>
           </Link>
         </div>
 
