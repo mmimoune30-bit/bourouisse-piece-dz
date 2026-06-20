@@ -1,10 +1,10 @@
+
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { 
-  User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, 
-  Mail, LogIn, UserPlus, Store, Globe, ShieldCheck, Lock, Search, Sparkles
+  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,29 +23,17 @@ const translations = {
   AR: { 
     buyer: "حساب جديد", 
     seller: "كن بائعاً معنا", 
-    stats: "لوحة التحكم", 
-    new: "إعلان جديد", 
-    store: "فتح متجر", 
-    admin: "إدارة المنصة",
-    back: "رجوع", 
     contact: "للاستفسار:",
-    all: "عرض الكل",
     login: "الدخول إلى حسابي",
-    join: "انضم إلينا",
+    back: "رجوع",
     categories: ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"]
   },
   EN: {
     buyer: "New Account",
     seller: "Become a Seller",
-    stats: "Dashboard",
-    new: "New Listing",
-    store: "Open Store",
-    admin: "Platform Management",
-    back: "Back",
     contact: "Inquiry:",
-    all: "View All",
     login: "Login to My Account",
-    join: "Join Us",
+    back: "Back",
     categories: ["Body", "Engine", "Suspension", "Electric", "Tires", "Accessories"]
   }
 };
@@ -69,13 +57,13 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN">("AR");
+  const siteLogo = PlaceHolderImages.find(img => img.id === "site-logo")?.imageUrl || "";
 
   useEffect(() => {
     const checkLang = () => {
       const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
       if (savedLang) setLang(savedLang);
     };
-
     checkLang();
     window.addEventListener("languageChange", checkLang);
     return () => window.removeEventListener("languageChange", checkLang);
@@ -91,7 +79,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl border-b">
-      {/* Top Bar: News Ticker Style */}
+      {/* Top Bar: White Ticker */}
       <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -110,7 +98,6 @@ export default function Navbar() {
                </div>
             </div>
           </div>
-
           <div className="shrink-0 bg-white/90 backdrop-blur-sm z-10 pl-4 border-l">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -129,40 +116,21 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Brand Bar */}
+      {/* Main Navbar: White Background */}
       <div className={cn(
-        "container mx-auto px-4 py-4 flex items-center justify-between gap-4",
+        "container mx-auto px-4 py-3 flex items-center justify-between gap-4",
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
-        <div className="flex items-center gap-4">
-          <Link href="/" className={cn(
-            "flex items-center gap-3 group",
-            lang === 'AR' ? "flex-row-reverse" : "flex-row"
-          )}>
-            <div className="bg-secondary p-2 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-              <Settings size={28} className="animate-spin-slow" />
-            </div>
-            <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")} dir="ltr">
-              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap">
-                {"Bourouisse ".split("").map((char, i) => (
-                  <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
-                    {char === " " ? "\u00A0" : char}
-                  </span>
-                ))}
-                <span className="text-black">
-                  {"Piece-Dz".split("").map((char, i) => (
-                    <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${(i + 11) * 0.1}s` }}>
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </span>
-              </span>
-              <div className={cn("w-full flex mt-1", lang === 'AR' ? "justify-end" : "justify-start")}>
-                <span className="text-[10px] font-bold text-black/50 tracking-[0.2em] uppercase">
-                  {lang === 'AR' ? 'قطع غيار وسيارات' : 'Spare Parts & Automobiles'}
-                </span>
-              </div>
-            </div>
+        <div className="flex items-center">
+          <Link href="/" className="block relative h-12 w-48 md:h-16 md:w-64">
+            <Image 
+              src={siteLogo} 
+              alt="Bourouisse Piece-Dz" 
+              fill 
+              className="object-contain" 
+              priority
+              data-ai-hint="automotive logo"
+            />
           </Link>
         </div>
 
@@ -176,21 +144,18 @@ export default function Navbar() {
               <span className="hidden lg:inline">{t.login}</span>
             </Link>
           </Button>
-
           <Button variant="outline" className="bg-white text-primary border-2 border-primary/20 hover:bg-zinc-50 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
             <Link href="/join" className="flex gap-2 items-center">
               <UserPlus size={20} />
               <span className="hidden lg:inline">{t.buyer}</span>
             </Link>
           </Button>
-          
           <Button variant="default" className="bg-secondary text-primary hover:bg-white font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
             <Link href="/seller/register" className="flex gap-2 items-center">
               <Store size={20} />
               <span className="hidden lg:inline">{t.seller}</span>
             </Link>
           </Button>
-
           {pathname !== "/" && (
             <Button
               variant="outline"
@@ -205,9 +170,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* CATEGORIES BAR (BLUE) */}
+      {/* Categories Bar: Sky Blue */}
       <section className="bg-sky-200 border-t-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg relative z-0">
-        <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
+        <div className="container mx-auto px-4 flex items-center justify-center h-full">
           <div className={cn(
             "flex items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar justify-center",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
@@ -215,7 +180,6 @@ export default function Navbar() {
             {t.categories.map((catName, i) => {
               const imageId = CATEGORY_IMAGE_IDS[i];
               const imgData = PlaceHolderImages.find(img => img.id === imageId);
-              
               return (
                 <Link
                   key={i}
@@ -225,7 +189,7 @@ export default function Navbar() {
                     lang === 'AR' ? "flex-row-reverse" : "flex-row"
                   )}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-zinc-100 overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
+                  <div className="w-12 h-12 rounded-lg bg-white overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
                     {imgData ? (
                       <Image 
                         src={imgData.imageUrl} 
@@ -235,9 +199,7 @@ export default function Navbar() {
                         data-ai-hint={imgData.imageHint} 
                       />
                     ) : (
-                      <div className="w-full h-full bg-white flex items-center justify-center">
-                         <Settings size={20} className="text-sky-300" />
-                      </div>
+                      <div className="w-full h-full bg-white" />
                     )}
                   </div>
                   <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">
@@ -250,7 +212,7 @@ export default function Navbar() {
         </div>
       </section>
 
-      {/* AI SEARCH BOX BAR (GRAY) - NOW BELOW BLUE BAR */}
+      {/* AI Search Box: Light Gray */}
       <div className="bg-zinc-100 py-3 border-t border-zinc-200">
          <AISearchBox />
       </div>

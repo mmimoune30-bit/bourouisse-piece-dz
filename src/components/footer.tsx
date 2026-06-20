@@ -10,7 +10,6 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Settings, 
   ShieldAlert, 
   QrCode,
   Lock
@@ -21,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function Footer() {
   const qrCode = PlaceHolderImages.find(img => img.id === "site-qr-code")?.imageUrl;
+  const siteLogo = PlaceHolderImages.find(img => img.id === "site-logo")?.imageUrl || "";
   const [isAdmin, setIsAdmin] = useState(false);
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
@@ -68,10 +68,7 @@ export default function Footer() {
                 </h4>
                 <ul className="space-y-4 text-sm text-blue-100/70">
                   <li>
-                    <Link href="/admin/dashboard" className={cn(
-                      "flex items-center gap-2 hover:text-secondary transition-colors group",
-                      lang === 'AR' ? "justify-start" : "justify-start"
-                    )}>
+                    <Link href="/admin/dashboard" className="flex items-center gap-2 hover:text-secondary transition-colors group">
                       <Lock size={14} className="text-secondary" />
                       <span className="font-black underline decoration-secondary/30 decoration-2 underline-offset-4">
                         {lang === 'AR' ? 'إدارة المنصة' : 'Platform Management'}
@@ -84,40 +81,14 @@ export default function Footer() {
           </div>
 
           <div className="space-y-6 lg:col-span-1">
-            <Link href="/" className={cn(
-              "flex flex-col gap-1 group",
-              lang === 'AR' ? "items-end" : "items-start"
-            )}>
-              <div className={cn(
-                "flex items-center gap-3",
-                lang === 'AR' ? "flex-row-reverse" : "flex-row"
-              )}>
-                <div className="bg-secondary p-2 rounded-2xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
-                  <Settings size={28} className="animate-spin-slow" />
-                </div>
-                <span className="font-headline font-black text-2xl tracking-tighter uppercase italic whitespace-nowrap" dir="ltr">
-                  {"Bourouisse ".split("").map((char, i) => (
-                    <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                  <span className="text-secondary">
-                    {"Piece-Dz".split("").map((char, i) => (
-                      <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${(i + 11) * 0.1}s` }}>
-                        {char === " " ? "\u00A0" : char}
-                      </span>
-                    ))}
-                  </span>
-                </span>
-              </div>
-              <div className="w-full">
-                <span className={cn(
-                  "text-sm font-bold text-secondary/80 tracking-widest block",
-                  lang === 'AR' ? "text-right" : "text-left"
-                )}>
-                  {lang === 'AR' ? 'لقطع الغيار والسيارات' : 'Auto Parts & Vehicles'}
-                </span>
-              </div>
+            <Link href="/" className="block relative h-16 w-full max-w-[200px]">
+              <Image 
+                src={siteLogo} 
+                alt="Bourouisse Piece-Dz" 
+                fill 
+                className="object-contain filter brightness-0 invert" 
+                data-ai-hint="automotive logo"
+              />
             </Link>
             
             <div className={cn(
@@ -194,23 +165,20 @@ export default function Footer() {
               {lang === 'AR' ? 'اتصل بنا' : 'Contact Us'}
             </h4>
             <ul className="space-y-4 text-sm text-blue-100/70">
-              <li className={cn("flex items-center gap-3", lang === 'AR' ? "justify-start" : "justify-start")}>
+              <li className="flex items-center gap-3">
                 <span>support@bourouisse-piecedz.com</span>
                 <Mail size={16} className="text-secondary" />
               </li>
-              <li className={cn("flex items-center gap-3", lang === 'AR' ? "justify-start" : "justify-start")}>
+              <li className="flex items-center gap-3">
                 <span dir="ltr">+213 778 42 89 77</span>
                 <Phone size={16} className="text-secondary" />
               </li>
-              <li className={cn("flex items-center gap-3", lang === 'AR' ? "justify-start" : "justify-start")}>
+              <li className="flex items-center gap-3">
                 <span>{lang === 'AR' ? 'الجزائر العاصمة، الجزائر' : 'Algiers, Algeria'}</span>
                 <MapPin size={16} className="text-secondary" />
               </li>
               <li className={cn("pt-4 border-t border-white/5", lang === 'AR' ? "text-right" : "text-left")}>
-                <Link href="/customer/complaints/new" className={cn(
-                  "flex items-center gap-3 group/link",
-                  lang === 'AR' ? "justify-start" : "justify-start"
-                )}>
+                <Link href="/customer/complaints/new" className="flex items-center gap-3 group/link">
                   <span className="font-black text-secondary group-hover:text-white transition-colors">
                     {lang === 'AR' ? 'تقديم الشكاوى و الملاحظات' : 'Submit Complaints & Feedback'}
                   </span>
