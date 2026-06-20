@@ -19,9 +19,9 @@ import { cn } from "@/lib/utils";
 const BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/dz-auto-1/1200/800",
+    image: PlaceHolderImages.find(img => img.id === "hero-banner-1")?.imageUrl || "",
     link: "/seller/register",
-    hint: "auto parts",
+    hint: "parts warehouse",
     ar: {
       title: "اشترك معنا واعرض منتجاتك",
       description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين في كافة الولايات.",
@@ -35,7 +35,7 @@ const BANNERS = [
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/dz-auto-2/1200/800",
+    image: PlaceHolderImages.find(img => img.id === "hero-banner-2")?.imageUrl || "",
     link: "/catalog",
     hint: "car engine",
     ar: {
@@ -51,7 +51,7 @@ const BANNERS = [
   },
   {
     id: 3,
-    image: "https://picsum.photos/seed/dz-auto-3/1200/800",
+    image: PlaceHolderImages.find(img => img.id === "hero-banner-3")?.imageUrl || "",
     link: "/catalog",
     hint: "car scrapyard",
     ar: {
@@ -68,16 +68,16 @@ const BANNERS = [
 ];
 
 const FEATURED_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: "https://picsum.photos/seed/headlight-1/600/400", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, hint: "car headlight" },
-  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: "https://picsum.photos/seed/radiator-1/600/400", category: "المحرك", seller: "Pièces Renault DZ", condition: "New" as const, hint: "car radiator" },
-  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: "https://picsum.photos/seed/door-1/600/400", category: "هيكل", seller: "Auto Pièces Chlef", condition: "Used" as const, hint: "car door" },
-  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: "https://picsum.photos/seed/bumper-1/600/400", category: "هيكل", seller: "Pièces Renault DZ", condition: "Used" as const, hint: "car bumper" }
+  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages.find(img => img.id === "product-headlight")?.imageUrl || "", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, hint: "car headlight" },
+  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages.find(img => img.id === "product-radiator")?.imageUrl || "", category: "المحرك", seller: "Pièces Renault DZ", condition: "New" as const, hint: "car radiator" },
+  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: PlaceHolderImages.find(img => img.id === "product-door")?.imageUrl || "", category: "هيكل", seller: "Auto Pièces Chlef", condition: "Used" as const, hint: "car door" },
+  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: PlaceHolderImages.find(img => img.id === "product-bumper")?.imageUrl || "", category: "هيكل", seller: "Pièces Renault DZ", condition: "Used" as const, hint: "car bumper" }
 ];
 
 const FEATURED_STORES = [
-  { name: "Auto Pièces Chlef", location: "الشلف", logo: "https://picsum.photos/seed/store-1/200/200", hint: "auto shop" },
-  { name: "Pièces Renault DZ", location: "الجزائر", logo: "https://picsum.photos/seed/store-2/200/200", hint: "renault parts" },
-  { name: "EliteMotors DZ", location: "وهران", logo: "https://picsum.photos/seed/store-3/200/200", hint: "engine shop" },
+  { name: "Auto Pièces Chlef", location: "الشلف", logo: PlaceHolderImages.find(img => img.id === "store-logo-1")?.imageUrl || "", hint: "automotive shop" },
+  { name: "Pièces Renault DZ", location: "الجزائر", logo: PlaceHolderImages.find(img => img.id === "store-logo-2")?.imageUrl || "", hint: "renault parts" },
+  { name: "EliteMotors DZ", location: "وهران", logo: PlaceHolderImages.find(img => img.id === "store-logo-3")?.imageUrl || "", hint: "engine mechanic" },
 ];
 
 export default function Home() {

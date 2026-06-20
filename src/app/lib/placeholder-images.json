@@ -4,56 +4,98 @@
     {
       "id": "engine-category",
       "description": "Real car engine block",
-      "imageUrl": "https://picsum.photos/seed/engine-real/200/200",
+      "imageUrl": "https://picsum.photos/seed/engine-123/200/200",
       "imageHint": "car engine"
     },
     {
       "id": "body-category",
       "description": "Car body parts and doors",
-      "imageUrl": "https://picsum.photos/seed/car-body/200/200",
+      "imageUrl": "https://picsum.photos/seed/body-123/200/200",
       "imageHint": "car bodywork"
     },
     {
       "id": "suspension-category",
       "description": "Car shock absorbers and suspension",
-      "imageUrl": "https://picsum.photos/seed/suspension/200/200",
+      "imageUrl": "https://picsum.photos/seed/susp-123/200/200",
       "imageHint": "car suspension"
     },
     {
       "id": "electrical-category",
       "description": "Car electrical components",
-      "imageUrl": "https://picsum.photos/seed/car-electric/200/200",
+      "imageUrl": "https://picsum.photos/seed/elec-123/200/200",
       "imageHint": "car alternator"
     },
     {
       "id": "wheels-category",
       "description": "Alloy rims and tires",
-      "imageUrl": "https://picsum.photos/seed/wheels/200/200",
+      "imageUrl": "https://picsum.photos/seed/wheels-123/200/200",
       "imageHint": "car wheels"
     },
     {
       "id": "accessories-category",
       "description": "Car interior accessories",
-      "imageUrl": "https://picsum.photos/seed/accessories/200/200",
+      "imageUrl": "https://picsum.photos/seed/acc-123/200/200",
       "imageHint": "car accessories"
     },
     {
       "id": "hero-banner-1",
       "description": "Auto parts warehouse",
-      "imageUrl": "https://picsum.photos/seed/warehouse/1200/400",
+      "imageUrl": "https://picsum.photos/seed/warehouse-99/1200/400",
       "imageHint": "parts warehouse"
     },
     {
       "id": "hero-banner-2",
       "description": "Car engine detail",
-      "imageUrl": "https://picsum.photos/seed/engine-hd/1200/400",
+      "imageUrl": "https://picsum.photos/seed/engine-hd-99/1200/400",
       "imageHint": "car engine"
     },
     {
       "id": "hero-banner-3",
       "description": "Auto scrapyard",
-      "imageUrl": "https://picsum.photos/seed/scrap/1200/400",
+      "imageUrl": "https://picsum.photos/seed/scrap-99/1200/400",
       "imageHint": "car scrapyard"
+    },
+    {
+      "id": "product-headlight",
+      "description": "Car headlight",
+      "imageUrl": "https://picsum.photos/seed/headlight-99/600/400",
+      "imageHint": "car headlight"
+    },
+    {
+      "id": "product-radiator",
+      "description": "Car radiator",
+      "imageUrl": "https://picsum.photos/seed/radiator-99/600/400",
+      "imageHint": "car radiator"
+    },
+    {
+      "id": "product-door",
+      "description": "Car door",
+      "imageUrl": "https://picsum.photos/seed/door-99/600/400",
+      "imageHint": "car door"
+    },
+    {
+      "id": "product-bumper",
+      "description": "Car bumper",
+      "imageUrl": "https://picsum.photos/seed/bumper-99/600/400",
+      "imageHint": "car bumper"
+    },
+    {
+      "id": "store-logo-1",
+      "description": "Auto shop logo",
+      "imageUrl": "https://picsum.photos/seed/shop-1/200/200",
+      "imageHint": "automotive shop"
+    },
+    {
+      "id": "store-logo-2",
+      "description": "Renault parts shop",
+      "imageUrl": "https://picsum.photos/seed/shop-2/200/200",
+      "imageHint": "renault parts"
+    },
+    {
+      "id": "store-logo-3",
+      "description": "Engine specialist logo",
+      "imageUrl": "https://picsum.photos/seed/shop-3/200/200",
+      "imageHint": "engine mechanic"
     },
     {
       "id": "site-qr-code",
