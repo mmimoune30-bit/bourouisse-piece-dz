@@ -2,52 +2,52 @@
 {
   "placeholderImages": [
     {
-      "id": "engine-part",
-      "description": "Powerful V8 car engine component",
+      "id": "engine-category",
+      "description": "Real car engine block",
       "imageUrl": "https://picsum.photos/seed/engine-real/800/600",
       "imageHint": "car engine"
     },
     {
-      "id": "brake-pads",
-      "description": "High-performance ceramic brake set",
-      "imageUrl": "https://picsum.photos/seed/brakes-real/800/600",
-      "imageHint": "brake pads"
+      "id": "gearbox-category",
+      "description": "Automatic and manual transmission gearbox",
+      "imageUrl": "https://picsum.photos/seed/gearbox-real/800/600",
+      "imageHint": "transmission gearbox"
     },
     {
-      "id": "tires-set",
-      "description": "Brand new all-terrain car tires",
-      "imageUrl": "https://picsum.photos/seed/tires-real/800/600",
-      "imageHint": "car tires"
+      "id": "body-category",
+      "description": "Car body parts and doors",
+      "imageUrl": "https://picsum.photos/seed/car-body/800/600",
+      "imageHint": "car bodywork"
     },
     {
-      "id": "battery-car",
-      "description": "Heavy duty 12V car battery",
-      "imageUrl": "https://picsum.photos/seed/battery-real/800/600",
-      "imageHint": "car battery"
+      "id": "lighting-category",
+      "description": "Car headlights and taillights",
+      "imageUrl": "https://picsum.photos/seed/headlight/800/600",
+      "imageHint": "car headlight"
     },
     {
-      "id": "oil-filter",
-      "description": "Premium quality oil filter",
-      "imageUrl": "https://picsum.photos/seed/oil-real/800/600",
-      "imageHint": "oil filter"
+      "id": "wheels-category",
+      "description": "Alloy rims and tires",
+      "imageUrl": "https://picsum.photos/seed/wheels/800/600",
+      "imageHint": "car wheels"
     },
     {
-      "id": "hero-parts",
-      "description": "Modern auto parts warehouse and yard",
-      "imageUrl": "https://picsum.photos/seed/auto-hero-real/1200/800",
-      "imageHint": "auto parts"
+      "id": "hero-banner-1",
+      "description": "Modern auto parts warehouse in Algeria",
+      "imageUrl": "https://picsum.photos/seed/auto-warehouse/1200/800",
+      "imageHint": "parts warehouse"
     },
     {
-      "id": "steering-wheel",
-      "description": "Leather sports steering wheel accessory",
-      "imageUrl": "https://picsum.photos/seed/steering-real/800/600",
-      "imageHint": "steering wheel"
+      "id": "hero-banner-2",
+      "description": "Aerial view of a car scrapyard",
+      "imageUrl": "https://picsum.photos/seed/scrapyard/1200/800",
+      "imageHint": "car scrapyard"
     },
     {
-      "id": "brand-banner-bourouisse",
-      "description": "Aerial view of Bourouisse scrapyard and road",
-      "imageUrl": "https://picsum.photos/seed/bourouisse-scrapyard/1200/800",
-      "imageHint": "aerial scrapyard"
+      "id": "hero-banner-3",
+      "description": "Professional mechanic shop environment",
+      "imageUrl": "https://picsum.photos/seed/auto-shop/1200/800",
+      "imageHint": "mechanic shop"
     },
     {
       "id": "site-qr-code",

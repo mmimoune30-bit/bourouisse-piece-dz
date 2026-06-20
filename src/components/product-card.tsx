@@ -18,6 +18,7 @@ interface ProductCardProps {
   seller: string;
   rating?: number;
   condition?: "New" | "Used" | "Refurbished";
+  hint?: string;
 }
 
 export default function ProductCard({
@@ -28,7 +29,8 @@ export default function ProductCard({
   category,
   seller,
   rating = 4.5,
-  condition = "New"
+  condition = "New",
+  hint = "car parts"
 }: ProductCardProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -45,6 +47,7 @@ export default function ProductCard({
           alt={name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"
+          data-ai-hint={hint}
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         <div className="absolute top-3 left-3 flex flex-col gap-2">

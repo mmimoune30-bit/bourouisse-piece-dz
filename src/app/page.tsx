@@ -19,92 +19,65 @@ import { cn } from "@/lib/utils";
 const BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/auto-hero-1/1200/800",
+    image: "https://picsum.photos/seed/dz-auto-1/1200/800",
     link: "/seller/register",
+    hint: "auto parts",
     ar: {
       title: "اشترك معنا واعرض منتجاتك",
-      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين.",
+      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين في كافة الولايات.",
       button: "سجل كبائع"
     },
     en: {
       title: "Join Us & List Your Products",
-      description: "List new and used spare parts and reach thousands of buyers.",
+      description: "List new and used spare parts and reach thousands of buyers across all wilayas.",
       button: "Register as Seller"
     }
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/auto-hero-2/1200/800",
+    image: "https://picsum.photos/seed/dz-auto-2/1200/800",
     link: "/catalog",
+    hint: "car engine",
     ar: {
       title: "ابحث عن قطع الغيار بسهولة",
-      description: "ابحث حسب الماركة والموديل وسنة الصنع.",
+      description: "محرك بحث متطور حسب الماركة والموديل وسنة الصنع بدقة متناهية.",
       button: "ابدأ البحث"
     },
     en: {
       title: "Find Auto Parts Easily",
-      description: "Search by brand, model and manufacturing year.",
+      description: "Advanced search by brand, model and manufacturing year with extreme precision.",
       button: "Start Searching"
     }
   },
   {
     id: 3,
-    image: "https://picsum.photos/seed/auto-hero-3/1200/800",
+    image: "https://picsum.photos/seed/dz-auto-3/1200/800",
     link: "/catalog",
+    hint: "car scrapyard",
     ar: {
-      title: "آلاف قطع الغيار في مكان واحد",
-      description: "منتجات جديدة ومستعملة من مختلف ولايات الجزائر.",
+      title: "أكبر تجمع لقطع الغيار في الجزائر",
+      description: "منتجات حقيقية من ساحات الخردة والمتاجر المعتمدة في منصة واحدة.",
       button: "تصفح الإعلانات"
     },
     en: {
-      title: "Thousands of Parts in One Place",
-      description: "New and used products from various Algerian wilayas.",
+      title: "Largest Parts Hub in Algeria",
+      description: "Real products from scrapyards and certified stores in one platform.",
       button: "Browse Listings"
-    }
-  },
-  {
-    id: 4,
-    image: "https://picsum.photos/seed/auto-hero-4/1200/800",
-    link: "/catalog",
-    ar: {
-      title: "متاجر موثوقة ومعتمدة",
-      description: "اكتشف المتاجر الموثقة وتواصل مباشرة مع البائعين.",
-      button: "استكشف المتاجر"
-    },
-    en: {
-      title: "Trusted & Certified Stores",
-      description: "Discover verified stores and connect directly with sellers.",
-      button: "Explore Stores"
-    }
-  },
-  {
-    id: 5,
-    image: "https://picsum.photos/seed/auto-hero-5/1200/800",
-    link: "/join",
-    ar: {
-      title: "أنشئ حسابك مجاناً",
-      description: "سجل الآن كبائع أو مشتري واستفد من جميع خدمات المنصة.",
-      button: "اشترك معنا"
-    },
-    en: {
-      title: "Create Your Free Account",
-      description: "Register now as a seller or buyer and benefit from all platform services.",
-      button: "Join Us"
     }
   }
 ];
 
 const FEATURED_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages[5].imageUrl, category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const },
-  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages[4].imageUrl, category: "المحرك", seller: "Pièces Renault DZ", condition: "New" as const },
-  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: PlaceHolderImages[6].imageUrl, category: "هيكل", seller: "Auto Pièces Chlef", condition: "Used" as const },
-  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: PlaceHolderImages[5].imageUrl, category: "هيكل", seller: "Pièces Renault DZ", condition: "Used" as const }
+  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: "https://picsum.photos/seed/headlight-1/600/400", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, hint: "car headlight" },
+  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: "https://picsum.photos/seed/radiator-1/600/400", category: "المحرك", seller: "Pièces Renault DZ", condition: "New" as const, hint: "car radiator" },
+  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: "https://picsum.photos/seed/door-1/600/400", category: "هيكل", seller: "Auto Pièces Chlef", condition: "Used" as const, hint: "car door" },
+  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: "https://picsum.photos/seed/bumper-1/600/400", category: "هيكل", seller: "Pièces Renault DZ", condition: "Used" as const, hint: "car bumper" }
 ];
 
 const FEATURED_STORES = [
-  { name: "Auto Pièces Chlef", location: "الشلف", logo: PlaceHolderImages[4].imageUrl },
-  { name: "Pièces Renault DZ", location: "الجزائر", logo: PlaceHolderImages[5].imageUrl },
-  { name: "EliteMotors DZ", location: "وهران", logo: PlaceHolderImages[6].imageUrl },
+  { name: "Auto Pièces Chlef", location: "الشلف", logo: "https://picsum.photos/seed/store-1/200/200", hint: "auto shop" },
+  { name: "Pièces Renault DZ", location: "الجزائر", logo: "https://picsum.photos/seed/store-2/200/200", hint: "renault parts" },
+  { name: "EliteMotors DZ", location: "وهران", logo: "https://picsum.photos/seed/store-3/200/200", hint: "engine shop" },
 ];
 
 export default function Home() {
@@ -125,7 +98,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!api) return;
-    
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap());
     });
@@ -147,36 +119,30 @@ export default function Home() {
         {/* AI SEARCH BOX */}
         <AISearchBox />
 
-        {/* Dynamic Multi-language Hero Section - Resized to 280px */}
+        {/* Dynamic Multi-language Hero Section */}
         <section className="relative w-full">
           <Carousel 
             setApi={setApi}
             className="w-full" 
-            opts={{ 
-              loop: true,
-              duration: 50
-            }}
-            plugins={[
-              Autoplay({ delay: 5000, stopOnInteraction: true }),
-              Fade()
-            ]}
+            opts={{ loop: true, duration: 50 }}
+            plugins={[Autoplay({ delay: 5000, stopOnInteraction: true }), Fade()]}
           >
             <CarouselContent>
               {BANNERS.map((banner) => {
                 const content = lang === "AR" ? banner.ar : banner.en;
                 return (
                   <CarouselItem key={banner.id}>
-                    <div className="relative h-[280px] flex items-center justify-center py-4 overflow-hidden">
-                      {/* Clickable Background Image */}
+                    <div className="relative h-[280px] flex items-center justify-center overflow-hidden">
                       <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
                         <Image
                           src={banner.image}
                           alt={content.title}
                           fill
                           className="object-cover animate-ken-burns"
+                          data-ai-hint={banner.hint}
                           priority
                         />
-                        <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] group-hover:bg-black/40 transition-colors" />
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] group-hover:bg-black/50 transition-colors" />
                       </Link>
 
                       <div className="container mx-auto px-4 z-10 pointer-events-none">
@@ -184,10 +150,10 @@ export default function Home() {
                           "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
                           lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
-                          <h1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-2 uppercase drop-shadow-2xl leading-tight">
+                          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2 uppercase drop-shadow-2xl leading-tight">
                             {content.title}
                           </h1>
-                          <p className="text-sm md:text-base text-secondary font-bold italic mb-4 leading-relaxed max-w-2xl opacity-90">
+                          <p className="text-xs md:text-sm text-secondary font-bold italic mb-4 leading-relaxed max-w-2xl opacity-90">
                             {content.description}
                           </p>
                           <div className={cn(
@@ -215,7 +181,6 @@ export default function Home() {
             
             {/* Controls */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
-               <CarouselPrevious className="static translate-y-0 h-8 w-8 bg-white/20 border-white/20 text-white hover:bg-white hover:text-primary" />
                <div className="flex gap-2">
                  {BANNERS.map((_, index) => (
                    <button
@@ -228,7 +193,6 @@ export default function Home() {
                    />
                  ))}
                </div>
-               <CarouselNext className="static translate-y-0 h-8 w-8 bg-white/20 border-white/20 text-white hover:bg-white hover:text-primary" />
             </div>
           </Carousel>
         </section>
@@ -257,7 +221,7 @@ export default function Home() {
                 )}
               >
                  <div className="w-16 h-16 rounded-xl overflow-hidden relative border-2 border-secondary/20 shrink-0">
-                    <Image src={store.logo} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" />
+                    <Image src={store.logo} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" data-ai-hint={store.hint} />
                  </div>
                  <div className="flex-grow" dir={lang === 'AR' ? "rtl" : "ltr"}>
                     <h3 className="font-black text-base text-primary group-hover:text-secondary transition-colors">{store.name}</h3>
@@ -293,7 +257,7 @@ export default function Home() {
                 {lang === 'AR' ? 'أحدث العروض' : 'Latest Offers'}
               </h2>
               <p className="text-sm text-muted-foreground font-bold">
-                {lang === 'AR' ? 'قطع غيار أصلية بأسعار تنافسية' : 'Genuine parts at competitive prices'}
+                {lang === 'AR' ? 'قطع غيار حقيقية تم التحقق منها' : 'Verified genuine spare parts'}
               </p>
             </div>
             <Link href="/catalog">
@@ -314,4 +278,3 @@ export default function Home() {
     </div>
   );
 }
-

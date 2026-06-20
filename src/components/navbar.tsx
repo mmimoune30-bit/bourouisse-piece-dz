@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -57,6 +58,15 @@ const CATEGORY_ICONS = [
   <Plug size={24} className="text-black" />,
   <Disc size={24} className="text-black" />,
   <Sparkles size={24} className="text-black" />,
+];
+
+const CATEGORY_HINTS = [
+  "car body",
+  "car engine",
+  "car suspension",
+  "car electrical",
+  "car tires",
+  "car accessories"
 ];
 
 // WhatsApp SVG Icon
@@ -209,7 +219,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Categories Bar: Light Sky Blue background with Black text */}
+      {/* Categories Bar */}
       <section className="bg-sky-200 border-b-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg">
         <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
           <div className={cn(
@@ -224,6 +234,7 @@ export default function Navbar() {
                   "flex items-center gap-3 group transition-all shrink-0",
                   lang === 'AR' ? "flex-row-reverse" : "flex-row"
                 )}
+                data-ai-hint={CATEGORY_HINTS[i]}
               >
                 <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black group-hover:text-sky-200 transition-all group-hover:scale-110 shadow-sm">
                   {CATEGORY_ICONS[i]}
