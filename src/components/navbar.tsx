@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { 
   User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, 
   Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, 
-  LogIn, UserPlus, Store, Languages, Globe, ShieldCheck, Lock
+  LogIn, UserPlus, Store, Languages, Globe, ShieldCheck, Lock, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +59,13 @@ const CATEGORY_ICONS = [
   <Sparkles size={24} className="text-black" />,
 ];
 
+// WhatsApp SVG Icon
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.05-.148-.471-1.138-.646-1.557-.171-.406-.347-.35-.471-.357-.121-.006-.26-.007-.4 architecture-008-.135 0-.354.05-.539.247-.185.198-.708.691-.708 1.684 0 .993.722 1.952.821 2.085.1.133 1.422 2.172 3.444 3.046.482.208.858.332 1.151.426.484.154.925.132 1.272.067.387-.072 1.138-.465 1.298-.914.161-.448.161-.832.113-.914-.047-.082-.172-.132-.469-.281zM12.004 0C5.374 0 0 5.373 0 12c0 2.123.55 4.12 1.519 5.861L.061 24l6.294-1.651A11.947 11.947 0 0 0 12.004 24c6.628 0 12.003-5.373 12.003-12s-5.375-12-12.003-12zm0 21.928c-1.895 0-4.18-.485-5.836-1.391l-.419-.232-3.738.981 1.002-3.642-.256-.407A9.923 9.923 0 0 1 2.006 12C2.006 6.486 6.488 2.004 12.004 2.004c5.514 0 9.996 4.482 9.996 9.996 0 5.516-4.482 9.928-9.996 9.928z"/>
+  </svg>
+);
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -85,39 +92,45 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl h-[235px] border-b">
-      {/* Top Bar: White background with Black text */}
-      <div className="bg-white border-b border-zinc-100 py-2">
-        <div className={cn(
-          "container mx-auto px-4 flex items-center justify-between gap-4",
-          lang === 'AR' ? "flex-row-reverse" : "flex-row"
-        )}>
-          <div className={cn(
-            "flex items-center gap-6 text-black",
-            lang === 'AR' ? "flex-row-reverse" : "flex-row"
-          )}>
-            <span className="text-[11px] font-black uppercase tracking-widest">{t.contact}</span>
-            <div className={cn(
-              "flex items-center gap-2 text-[12px] font-bold",
-              lang === 'AR' ? "flex-row-reverse" : "flex-row"
-            )}>
-              <Phone size={16} className="text-primary" />
-              <span dir="ltr">+213 778 42 89 77</span>
+      {/* Top Bar: News Ticker Style */}
+      <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
+        <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+          
+          {/* Moving Ticker Wrapper */}
+          <div className="flex-1 overflow-hidden relative h-6">
+            <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
+               {/* Content Block 1 */}
+               <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
+                  <span className="text-primary tracking-widest">{t.contact}</span>
+                  <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
+               </div>
+               {/* Content Block 2 (Duplicate for continuous loop) */}
+               <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
+                  <span className="text-primary tracking-widest">{t.contact}</span>
+                  <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
+               </div>
             </div>
           </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
-                <Globe size={16} className="text-primary" />
-                {lang === 'AR' ? 'العربية' : 'English'}
-                <ChevronDown size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align={lang === 'AR' ? "end" : "start"} className="w-32">
-              <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-bold cursor-pointer">العربية</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold cursor-pointer">English</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          <div className="shrink-0 bg-white/90 backdrop-blur-sm z-10 pl-4 border-l">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
+                  <Globe size={16} className="text-primary" />
+                  {lang === 'AR' ? 'العربية' : 'English'}
+                  <ChevronDown size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={lang === 'AR' ? "end" : "start"} className="w-32">
+                <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-bold cursor-pointer">العربية</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold cursor-pointer">English</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
