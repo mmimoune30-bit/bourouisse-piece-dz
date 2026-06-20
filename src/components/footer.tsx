@@ -17,6 +17,19 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+const WheelIcon = () => (
+  <div className="relative w-10 h-10 animate-spin-slow text-secondary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="2" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+      <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+    </svg>
+  </div>
+);
+
 export default function Footer() {
   const qrCode = PlaceHolderImages.find(img => img.id === "site-qr-code")?.imageUrl;
   const [isAdmin, setIsAdmin] = useState(false);
@@ -47,8 +60,8 @@ export default function Footer() {
     };
   }, []);
 
-  const siteName = "bourouisse -piece dt-dz";
-  const tagline = "بورويس لقطع الغيار-M-M CHLEF";
+  const siteName = "Bourouisse -Piece DT-dz";
+  const tagline = "بورويس لقطع الغيار   -   M-M CHLEF";
 
   return (
     <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-secondary/30">
@@ -82,24 +95,27 @@ export default function Footer() {
           </div>
 
           <div className="space-y-6 lg:col-span-1">
-            <Link href="/" className="flex flex-col items-center gap-1 mb-6" dir="ltr">
-              <div className="flex gap-[1px]">
-                {siteName.split("").map((letter, i) => (
-                  <span 
-                    key={i} 
-                    className={cn(
-                      "text-xl font-black inline-block animate-logo-ripple",
-                      letter === "-" || i > 12 ? "text-secondary" : "text-white"
-                    )}
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >
-                    {letter === " " ? "\u00A0" : letter}
-                  </span>
-                ))}
+            <Link href="/" className="flex items-center gap-3 mb-6" dir="ltr">
+              <WheelIcon />
+              <div className="flex flex-col items-center">
+                <div className="flex gap-[1px]">
+                  {siteName.split("").map((letter, i) => (
+                    <span 
+                      key={i} 
+                      className={cn(
+                        "text-xl font-black inline-block animate-logo-ripple",
+                        letter === "-" || i > 12 ? "text-secondary" : "text-white"
+                      )}
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    >
+                      {letter === " " ? "\u00A0" : letter}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[9px] font-bold text-secondary tracking-tighter" dir="rtl">
+                  {tagline}
+                </p>
               </div>
-              <p className="text-[10px] font-bold text-secondary tracking-tighter" dir="rtl">
-                {tagline}
-              </p>
             </Link>
             
             <div className={cn(

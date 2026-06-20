@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { 
-  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight
+  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight, Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,19 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
+const WheelIcon = () => (
+  <div className="relative w-8 h-8 md:w-10 md:h-10 animate-spin-slow text-secondary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="2" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+      <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+    </svg>
+  </div>
+);
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -64,8 +77,8 @@ export default function Navbar() {
 
   const t = translations[lang];
 
-  const siteName = "bourouisse -piece dt-dz";
-  const tagline = "بورويس لقطع الغيار-M-M CHLEF";
+  const siteName = "Bourouisse -Piece DT-dz";
+  const tagline = "بورويس لقطع الغيار   -   M-M CHLEF";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl border-b">
@@ -112,24 +125,27 @@ export default function Navbar() {
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
         <div className="flex items-center">
-          <Link href="/" className="flex flex-col items-center group overflow-hidden px-4 py-2 bg-white rounded-2xl shadow-inner border border-zinc-100">
-            <div className="flex gap-[1px]" dir="ltr">
-              {siteName.split("").map((letter, i) => (
-                <span 
-                  key={i} 
-                  className={cn(
-                    "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
-                    letter === "-" || i > 12 ? "text-secondary" : "text-black"
-                  )}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))}
+          <Link href="/" className="flex items-center gap-3 group px-4 py-2 bg-white rounded-2xl shadow-inner border border-zinc-100">
+            <WheelIcon />
+            <div className="flex flex-col items-center">
+              <div className="flex gap-[1px]" dir="ltr">
+                {siteName.split("").map((letter, i) => (
+                  <span 
+                    key={i} 
+                    className={cn(
+                      "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
+                      letter === "-" || i > 12 ? "text-secondary" : "text-black"
+                    )}
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    {letter === " " ? "\u00A0" : letter}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[8px] md:text-[10px] font-bold text-primary tracking-tighter" dir="rtl">
+                {tagline}
+              </p>
             </div>
-            <p className="text-[9px] md:text-[10px] font-bold text-primary mt-1 tracking-tighter" dir="rtl">
-              {tagline}
-            </p>
           </Link>
         </div>
 
