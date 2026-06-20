@@ -102,14 +102,12 @@ export default function Navbar() {
           {/* Moving Ticker Wrapper */}
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               {/* Content Block 1 */}
                <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
                   <span className="text-primary tracking-widest">{t.contact}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
                </div>
-               {/* Content Block 2 (Duplicate for continuous loop) */}
                <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
                   <span className="text-primary tracking-widest">{t.contact}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
@@ -141,7 +139,6 @@ export default function Navbar() {
         "container mx-auto px-4 py-4 flex items-center justify-between gap-4 h-[100px]",
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
-        {/* Logo */}
         <div className="flex items-center gap-4">
           <Link href="/" className={cn(
             "flex items-center gap-3 group",
@@ -172,7 +169,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Action Buttons */}
         <div className={cn(
           "flex items-center gap-3",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
@@ -212,7 +208,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Categories Bar */}
       <section className="bg-sky-200 border-b-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg">
         <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
           <div className={cn(
@@ -220,7 +215,9 @@ export default function Navbar() {
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
             {t.categories.map((catName, i) => {
-              const imgData = PlaceHolderImages.find(img => img.id === CATEGORY_IMAGE_IDS[i]);
+              const imageId = CATEGORY_IMAGE_IDS[i];
+              const imgData = PlaceHolderImages.find(img => img.id === imageId);
+              
               return (
                 <Link
                   key={i}
@@ -230,8 +227,8 @@ export default function Navbar() {
                     lang === 'AR' ? "flex-row-reverse" : "flex-row"
                   )}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-white overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
-                    {imgData && (
+                  <div className="w-12 h-12 rounded-lg bg-zinc-100 overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
+                    {imgData ? (
                       <Image 
                         src={imgData.imageUrl} 
                         alt={catName} 
@@ -239,6 +236,10 @@ export default function Navbar() {
                         className="object-cover" 
                         data-ai-hint={imgData.imageHint} 
                       />
+                    ) : (
+                      <div className="w-full h-full bg-white flex items-center justify-center">
+                         <Settings size={20} className="text-sky-300" />
+                      </div>
                     )}
                   </div>
                   <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">

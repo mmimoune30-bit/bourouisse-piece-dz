@@ -4,72 +4,60 @@
     {
       "id": "engine-category",
       "description": "Real car engine block",
-      "imageUrl": "https://picsum.photos/seed/engine-real/800/600",
+      "imageUrl": "https://picsum.photos/seed/engine-real/200/200",
       "imageHint": "car engine"
-    },
-    {
-      "id": "gearbox-category",
-      "description": "Automatic and manual transmission gearbox",
-      "imageUrl": "https://picsum.photos/seed/gearbox-real/800/600",
-      "imageHint": "transmission gearbox"
     },
     {
       "id": "body-category",
       "description": "Car body parts and doors",
-      "imageUrl": "https://picsum.photos/seed/car-body/800/600",
+      "imageUrl": "https://picsum.photos/seed/car-body/200/200",
       "imageHint": "car bodywork"
-    },
-    {
-      "id": "lighting-category",
-      "description": "Car headlights and taillights",
-      "imageUrl": "https://picsum.photos/seed/headlight/800/600",
-      "imageHint": "car headlight"
-    },
-    {
-      "id": "wheels-category",
-      "description": "Alloy rims and tires",
-      "imageUrl": "https://picsum.photos/seed/wheels/800/600",
-      "imageHint": "car wheels"
-    },
-    {
-      "id": "electrical-category",
-      "description": "Car electrical components and wiring",
-      "imageUrl": "https://picsum.photos/seed/car-electric/800/600",
-      "imageHint": "car alternator"
     },
     {
       "id": "suspension-category",
       "description": "Car shock absorbers and suspension",
-      "imageUrl": "https://picsum.photos/seed/suspension/800/600",
+      "imageUrl": "https://picsum.photos/seed/suspension/200/200",
       "imageHint": "car suspension"
     },
     {
+      "id": "electrical-category",
+      "description": "Car electrical components",
+      "imageUrl": "https://picsum.photos/seed/car-electric/200/200",
+      "imageHint": "car alternator"
+    },
+    {
+      "id": "wheels-category",
+      "description": "Alloy rims and tires",
+      "imageUrl": "https://picsum.photos/seed/wheels/200/200",
+      "imageHint": "car wheels"
+    },
+    {
       "id": "accessories-category",
-      "description": "Car interior and exterior accessories",
-      "imageUrl": "https://picsum.photos/seed/accessories/800/600",
+      "description": "Car interior accessories",
+      "imageUrl": "https://picsum.photos/seed/accessories/200/200",
       "imageHint": "car accessories"
     },
     {
       "id": "hero-banner-1",
-      "description": "Modern auto parts warehouse in Algeria",
-      "imageUrl": "https://picsum.photos/seed/auto-warehouse/1200/800",
+      "description": "Auto parts warehouse",
+      "imageUrl": "https://picsum.photos/seed/warehouse/1200/400",
       "imageHint": "parts warehouse"
     },
     {
       "id": "hero-banner-2",
-      "description": "Aerial view of a car scrapyard",
-      "imageUrl": "https://picsum.photos/seed/scrapyard/1200/800",
-      "imageHint": "car scrapyard"
+      "description": "Car engine detail",
+      "imageUrl": "https://picsum.photos/seed/engine-hd/1200/400",
+      "imageHint": "car engine"
     },
     {
       "id": "hero-banner-3",
-      "description": "Professional mechanic shop environment",
-      "imageUrl": "https://picsum.photos/seed/auto-shop/1200/800",
-      "imageHint": "mechanic shop"
+      "description": "Auto scrapyard",
+      "imageUrl": "https://picsum.photos/seed/scrap/1200/400",
+      "imageHint": "car scrapyard"
     },
     {
       "id": "site-qr-code",
-      "description": "QR Code for Bourouisse Piece-Dz site",
+      "description": "QR Code for the site",
       "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://bourouisse-piecedz.com",
       "imageHint": "qr code"
     }
