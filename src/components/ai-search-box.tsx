@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -57,27 +58,27 @@ export default function AISearchBox() {
   };
 
   const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={32} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
-    { name: "محركات كاملة", icon: <Settings size={32} />, href: "/catalog?category=Moteur (المحرك)" },
-    { name: "نصف محرك", icon: <Layers size={32} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "مركبات خارج الخدمة", icon: <Car size={24} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
+    { name: "محركات كاملة", icon: <Settings size={24} />, href: "/catalog?category=Moteur (المحرك)" },
+    { name: "نصف محرك", icon: <Layers size={24} />, href: "/catalog?category=Moteur (المحرك)" },
   ];
 
   return (
-    <div className="w-full bg-white border-b border-zinc-100 py-4 shadow-sm" ref={searchRef}>
-      <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
+    <div className="w-full bg-white py-2 relative z-10" ref={searchRef}>
+      <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-4">
         
         {/* Right Side: Special Categories */}
-        <div className="flex flex-row-reverse items-center gap-6 w-full md:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex flex-row-reverse items-center gap-4 w-full md:w-auto overflow-x-auto no-scrollbar">
           {SPECIAL_CATEGORIES.map((cat, i) => (
             <Link
               key={i}
               href={cat.href}
-              className="flex flex-col items-center gap-1 group shrink-0"
+              className="flex items-center gap-2 group shrink-0 bg-zinc-50 hover:bg-secondary px-3 py-2 rounded-xl transition-all border border-zinc-100 hover:border-secondary"
             >
-              <div className="w-14 h-14 rounded-2xl bg-zinc-50 border-2 border-zinc-100 flex items-center justify-center text-primary group-hover:bg-secondary group-hover:text-black group-hover:border-secondary transition-all shadow-sm">
+              <div className="text-primary group-hover:text-black">
                 {cat.icon}
               </div>
-              <span className="text-[12px] font-black text-black group-hover:text-primary transition-colors text-center whitespace-nowrap uppercase tracking-tighter">
+              <span className="text-[11px] font-black text-black group-hover:text-primary transition-colors whitespace-nowrap uppercase tracking-tighter">
                 {cat.name}
               </span>
             </Link>
@@ -85,23 +86,23 @@ export default function AISearchBox() {
         </div>
 
         {/* Left Side: AI Search Box */}
-        <div className="w-full max-w-lg relative z-50">
-          <div className="absolute -top-4 left-0 flex items-center gap-2">
-            <span className="text-[8px] font-black text-white uppercase tracking-widest bg-primary px-2 py-0.5 rounded flex items-center gap-1.5 shadow-lg">
+        <div className="w-full max-w-lg relative">
+          <div className="absolute -top-3 left-2 flex items-center gap-2 z-10">
+            <span className="text-[7px] font-black text-white uppercase tracking-widest bg-primary px-2 py-0.5 rounded flex items-center gap-1.5 shadow-lg">
               {isLoading ? (
-                <Loader2 size={8} className="animate-spin" />
+                <Loader2 size={6} className="animate-spin" />
               ) : (
-                <Sparkles size={8} className="animate-pulse" />
+                <Sparkles size={6} className="animate-pulse" />
               )}
               AI Search
             </span>
           </div>
           
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary w-5 h-5 group-focus-within:scale-110 transition-transform z-10" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary w-4 h-4 group-focus-within:scale-110 transition-transform z-10" />
             <Input
               placeholder="ابحث بذكاء..."
-              className="pl-12 h-14 bg-zinc-50 border-2 border-zinc-100 text-black text-xl font-black placeholder:text-zinc-400 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-inner"
+              className="pl-10 h-11 bg-zinc-50 border-2 border-zinc-100 text-black text-base font-black placeholder:text-zinc-400 focus:ring-secondary focus:border-secondary transition-all text-right rounded-xl shadow-inner"
               dir="rtl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -111,7 +112,7 @@ export default function AISearchBox() {
           </div>
 
           {showSuggestions && (suggestions.length > 0 || isLoading) && (
-            <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-100 p-2 animate-in fade-in slide-in-from-top-2 z-[60] text-black text-right">
+            <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-100 p-2 animate-in fade-in slide-in-from-top-2 z-[100] text-black text-right">
               <div className="text-[9px] uppercase font-black text-primary px-3 mb-2 flex items-center justify-end gap-2 border-b border-zinc-50 pb-1">
                 اقتراحات البحث الذكي
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />

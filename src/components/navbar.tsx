@@ -3,24 +3,22 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { 
   User, Settings, LayoutDashboard, ChevronDown, ArrowRight, Phone, 
-  Mail, Facebook, Car, Zap, Disc, Sparkles, Scale, Plug, ShieldAlert, 
-  LogIn, UserPlus, Store, Languages, Globe, ShieldCheck, Lock, MessageCircle
+  Mail, LogIn, UserPlus, Store, Globe, ShieldCheck, Lock, Search, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import AISearchBox from "./ai-search-box";
+import Image from "next/image";
 
 const translations = {
   AR: { 
@@ -94,12 +92,11 @@ export default function Navbar() {
   const t = translations[lang];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl h-[235px] border-b">
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl border-b">
       {/* Top Bar: News Ticker Style */}
       <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           
-          {/* Moving Ticker Wrapper */}
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
@@ -136,7 +133,7 @@ export default function Navbar() {
       </div>
 
       <div className={cn(
-        "container mx-auto px-4 py-4 flex items-center justify-between gap-4 h-[100px]",
+        "container mx-auto px-4 py-4 flex items-center justify-between gap-4",
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
         <div className="flex items-center gap-4">
@@ -148,7 +145,7 @@ export default function Navbar() {
               <Settings size={28} className="animate-spin-slow" />
             </div>
             <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")}>
-              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap">
+              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap" dir="ltr">
                 {"Bourouisse ".split("").map((char, i) => (
                   <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
                     {char === " " ? "\u00A0" : char}
@@ -208,7 +205,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      <section className="bg-sky-200 border-b-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg">
+      {/* SEARCH INTEGRATION */}
+      <AISearchBox />
+
+      <section className="bg-sky-200 border-b-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg relative z-0">
         <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
           <div className={cn(
             "flex items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar justify-center",

@@ -6,12 +6,11 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
-import AISearchBox from "@/components/ai-search-box";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, UserPlus, Store, Search, ShieldCheck, MapPin, ChevronRight, ChevronLeft, LayoutGrid } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronRight, ShieldCheck } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
@@ -115,10 +114,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[235px]">
-        {/* AI SEARCH BOX */}
-        <AISearchBox />
-
+      <main className="flex-grow pt-[290px]">
         {/* Dynamic Multi-language Hero Section */}
         <section className="relative w-full">
           <Carousel 
@@ -179,7 +175,6 @@ export default function Home() {
               })}
             </CarouselContent>
             
-            {/* Controls */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
                <div className="flex gap-2">
                  {BANNERS.map((_, index) => (

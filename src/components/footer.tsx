@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -30,10 +31,7 @@ export default function Footer() {
   };
 
   useEffect(() => {
-    // Initial checks
     checkAdminStatus();
-
-    // Language check
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
     if (savedLang) setLang(savedLang);
 
@@ -43,7 +41,7 @@ export default function Footer() {
     };
 
     window.addEventListener("languageChange", handleLangChange);
-    window.addEventListener("authChange", checkAdminStatus); // Listen for auth changes
+    window.addEventListener("authChange", checkAdminStatus);
     
     return () => {
       window.removeEventListener("languageChange", handleLangChange);
@@ -59,7 +57,6 @@ export default function Footer() {
           lang === 'AR' ? "text-right" : "text-left"
         )} dir={lang === 'AR' ? "rtl" : "ltr"}>
           
-          {/* Admin Section */}
           <div className="lg:order-last">
             {isAdmin && (
               <div className="space-y-6">
@@ -86,10 +83,9 @@ export default function Footer() {
             )}
           </div>
 
-          {/* Brand Info & QR Code */}
           <div className="space-y-6 lg:col-span-1">
             <Link href="/" className={cn(
-              "flex flex-col items-start gap-1 group",
+              "flex flex-col gap-1 group",
               lang === 'AR' ? "items-end" : "items-start"
             )}>
               <div className={cn(
@@ -99,7 +95,7 @@ export default function Footer() {
                 <div className="bg-secondary p-2 rounded-2xl text-primary shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
-                <span className="font-headline font-black text-2xl tracking-tighter uppercase italic whitespace-nowrap">
+                <span className="font-headline font-black text-2xl tracking-tighter uppercase italic whitespace-nowrap" dir="ltr">
                   {"Bourouisse ".split("").map((char, i) => (
                     <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
                       {char === " " ? "\u00A0" : char}
