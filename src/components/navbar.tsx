@@ -129,6 +129,7 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Brand Bar */}
       <div className={cn(
         "container mx-auto px-4 py-4 flex items-center justify-between gap-4",
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
@@ -141,8 +142,8 @@ export default function Navbar() {
             <div className="bg-secondary p-2 rounded-2xl text-black shadow-lg shadow-secondary/20 group-hover:rotate-12 transition-transform">
               <Settings size={28} className="animate-spin-slow" />
             </div>
-            <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")}>
-              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap" dir="ltr">
+            <div className={cn("flex flex-col", lang === 'AR' ? "text-right" : "text-left")} dir="ltr">
+              <span className="font-headline font-black text-lg md:text-2xl tracking-tighter text-primary uppercase italic leading-none whitespace-nowrap">
                 {"Bourouisse ".split("").map((char, i) => (
                   <span key={i} className="animate-logo-ripple" style={{ animationDelay: `${i * 0.1}s` }}>
                     {char === " " ? "\u00A0" : char}
@@ -156,9 +157,11 @@ export default function Navbar() {
                   ))}
                 </span>
               </span>
-              <span className="text-[10px] font-bold text-black/50 tracking-[0.2em] uppercase mt-1">
-                {lang === 'AR' ? 'قطع غيار وسيارات' : 'Spare Parts & Automobiles'}
-              </span>
+              <div className={cn("w-full flex mt-1", lang === 'AR' ? "justify-end" : "justify-start")}>
+                <span className="text-[10px] font-bold text-black/50 tracking-[0.2em] uppercase">
+                  {lang === 'AR' ? 'قطع غيار وسيارات' : 'Spare Parts & Automobiles'}
+                </span>
+              </div>
             </div>
           </Link>
         </div>
@@ -202,12 +205,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* AI SEARCH BOX BAR - BACK TO DISTINCT SEPARATE BAR */}
-      <div className="border-t bg-zinc-50/50 py-2">
-         <AISearchBox />
-      </div>
-
-      {/* CATEGORIES BAR */}
+      {/* CATEGORIES BAR (BLUE) */}
       <section className="bg-sky-200 border-t-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg relative z-0">
         <div className="container mx-auto px-4 flex items-center justify-center h-full gap-8">
           <div className={cn(
@@ -251,6 +249,11 @@ export default function Navbar() {
           </div>
         </div>
       </section>
+
+      {/* AI SEARCH BOX BAR (GRAY) - NOW BELOW BLUE BAR */}
+      <div className="bg-zinc-100 py-3 border-t border-zinc-200">
+         <AISearchBox />
+      </div>
     </nav>
   );
 }
