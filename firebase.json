@@ -1,0 +1,18 @@
+
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworkConfig": {
+      "appId": "bourouisse-piecedz",
+      "region": "us-central1"
+    }
+  }
+}
