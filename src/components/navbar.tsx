@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { 
-  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight, Settings
+  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,13 +76,12 @@ export default function Navbar() {
   };
 
   const t = translations[lang];
-
   const siteName = "Bourouisse -Piece DT-dz";
-  const tagline = "بورويس لقطع الغيار   -   M-M CHLEF";
+  const subtext = lang === 'AR' ? "بورويس لقطع الغيار - M-M CHLEF" : "Bourouisse Parts - M-M CHLEF";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-2xl border-b">
-      {/* Top Bar: White Ticker with contacting info */}
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-xl">
+      {/* 1. Top Contact Bar (White) */}
       <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -101,7 +100,7 @@ export default function Navbar() {
                </div>
             </div>
           </div>
-          <div className="shrink-0 bg-white/90 backdrop-blur-sm z-10 pl-4 border-l">
+          <div className="shrink-0 pl-4 border-l">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
@@ -119,103 +118,90 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navbar: White Background with Logo */}
+      {/* 2. Logo & Main Actions Bar (White) */}
       <div className={cn(
         "container mx-auto px-4 py-3 flex items-center justify-between gap-4",
         lang === 'AR' ? "flex-row-reverse" : "flex-row"
       )}>
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-3 group px-4 py-2 bg-white rounded-2xl shadow-inner border border-zinc-100">
-            <WheelIcon />
-            <div className="flex flex-col items-center">
-              <div className="flex gap-[1px]" dir="ltr">
-                {siteName.split("").map((letter, i) => (
-                  <span 
-                    key={i} 
-                    className={cn(
-                      "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
-                      letter === "-" || i > 12 ? "text-secondary" : "text-black"
-                    )}
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >
-                    {letter === " " ? "\u00A0" : letter}
-                  </span>
-                ))}
-              </div>
-              <p className="text-[8px] md:text-[10px] font-bold text-primary tracking-tighter" dir="rtl">
-                {tagline}
-              </p>
+        <Link href="/" className="flex items-center gap-3 group px-4 py-2 hover:bg-zinc-50 rounded-2xl transition-colors">
+          <WheelIcon />
+          <div className="flex flex-col items-center">
+            <div className="flex gap-[1px]" dir="ltr">
+              {siteName.split("").map((letter, i) => (
+                <span 
+                  key={i} 
+                  className={cn(
+                    "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
+                    letter === "-" || i > 12 ? "text-secondary" : "text-black"
+                  )}
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
             </div>
-          </Link>
-        </div>
+            <p className="text-[8px] md:text-[10px] font-bold text-primary tracking-tighter" dir={lang === 'AR' ? "rtl" : "ltr"}>
+              {subtext}
+            </p>
+          </div>
+        </Link>
 
         <div className={cn(
           "flex items-center gap-3",
           lang === 'AR' ? "flex-row-reverse" : "flex-row"
         )}>
-          <Button variant="outline" className="bg-white text-primary border-2 border-primary/20 hover:bg-zinc-50 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
+          <Button variant="outline" className="font-black text-sm h-11 px-6 rounded-xl border-2" asChild>
             <Link href="/login" className="flex gap-2 items-center">
-              <LogIn size={20} />
+              <LogIn size={18} />
               <span className="hidden lg:inline">{t.login}</span>
             </Link>
           </Button>
-          <Button variant="outline" className="bg-white text-primary border-2 border-primary/20 hover:bg-zinc-50 font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
+          <Button variant="outline" className="font-black text-sm h-11 px-6 rounded-xl border-2" asChild>
             <Link href="/join" className="flex gap-2 items-center">
-              <UserPlus size={20} />
+              <UserPlus size={18} />
               <span className="hidden lg:inline">{t.buyer}</span>
             </Link>
           </Button>
-          <Button variant="default" className="bg-secondary text-primary hover:bg-white font-black text-sm h-12 px-6 rounded-xl shadow-xl" asChild>
+          <Button variant="default" className="bg-secondary text-primary hover:bg-white font-black text-sm h-11 px-6 rounded-xl shadow-lg transition-all" asChild>
             <Link href="/seller/register" className="flex gap-2 items-center">
-              <Store size={20} />
+              <Store size={18} />
               <span className="hidden lg:inline">{t.seller}</span>
             </Link>
           </Button>
           {pathname !== "/" && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-12 w-12 bg-white border-2 border-zinc-200 text-black hover:bg-zinc-50 transition-all shadow-xl rounded-xl"
+              className="h-11 w-11 rounded-xl border-2"
               onClick={() => router.back()}
-              title={t.back}
             >
-              <ArrowRight size={24} className={cn("w-8 h-8", lang === 'EN' && "rotate-180")} />
+              <ArrowRight size={24} className={cn(lang === 'EN' && "rotate-180")} />
             </Button>
           )}
         </div>
       </div>
 
-      {/* Categories Bar: Sky Blue */}
-      <section className="bg-sky-200 border-t-2 border-sky-300 h-[75px] w-full flex items-center overflow-hidden shadow-lg relative z-0">
-        <div className="container mx-auto px-4 flex items-center justify-center h-full">
+      {/* 3. Blue Categories Bar */}
+      <section className="bg-primary text-white h-[65px] flex items-center shadow-inner">
+        <div className="container mx-auto px-4 flex items-center justify-center overflow-x-auto no-scrollbar">
           <div className={cn(
-            "flex items-center gap-6 md:gap-12 overflow-x-auto no-scrollbar justify-center",
+            "flex items-center gap-6 md:gap-10",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
-            {t.categories.map((catName, i) => (
+            {t.categories.map((cat, i) => (
               <Link
                 key={i}
-                href={`/catalog?category=${encodeURIComponent(catName)}`}
-                className={cn(
-                  "flex items-center gap-3 group transition-all shrink-0",
-                  lang === 'AR' ? "flex-row-reverse" : "flex-row"
-                )}
+                href={`/catalog?category=${encodeURIComponent(cat)}`}
+                className="text-sm font-black whitespace-nowrap hover:text-secondary transition-colors"
               >
-                <div className="w-12 h-12 rounded-lg bg-white overflow-hidden border-2 border-sky-300 group-hover:border-primary transition-all group-hover:scale-110 shadow-sm relative">
-                  <div className="w-full h-full bg-zinc-50 flex items-center justify-center text-primary/20">
-                     <Store size={20} />
-                  </div>
-                </div>
-                <span className="text-sm md:text-base font-extrabold text-black group-hover:text-primary transition-colors whitespace-nowrap">
-                  {catName}
-                </span>
+                {cat}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* AI Search Box Bar */}
+      {/* 4. Gray AI Search Bar (Unified & Filter-focused) */}
       <div className="bg-zinc-100 py-3 border-t border-zinc-200">
          <AISearchBox />
       </div>

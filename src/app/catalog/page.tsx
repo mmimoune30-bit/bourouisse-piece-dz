@@ -11,13 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES } from "@/lib/vehicle-data";
 import { Filter, Search, RotateCcw } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 
 // Mock Data for live filtering demonstration
 const MOCK_CATALOG_PRODUCTS = [
   { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: "https://picsum.photos/seed/p1/400/400", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, brand: "Renault", model: "Clio IV", year: "2018" },
   { id: "p2", name: "محرك كامل 1.5 dCi", price: 450000, image: "https://picsum.photos/seed/p2/400/400", category: "المحرك", seller: "Bourouisse Parts", condition: "Used" as const, brand: "Renault", model: "Megane", year: "2015" },
   { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: "https://picsum.photos/seed/p3/400/400", category: "التبريد", seller: "Pièces Renault DZ", condition: "New" as const, brand: "Peugeot", model: "208", year: "2019" },
+  { id: "p4", name: "علبة سرعة VW Golf 7", price: 65000, image: "https://picsum.photos/seed/p4/400/400", category: "علبة السرعة", seller: "EliteMotors DZ", condition: "Used" as const, brand: "Volkswagen", model: "Golf", year: "2017" },
 ];
 
 function CatalogContent() {
@@ -25,32 +25,35 @@ function CatalogContent() {
   const [lang, setLang] = useState<"ar" | "en">("ar");
 
   // Selection States
-  const [vehicleType, setVehicleType] = useState<string>("");
-  const [brand, setBrand] = useState<string>("");
-  const [model, setModel] = useState<string>("");
-  const [year, setYear] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
+  const [brand, setBrand] = useState<string>(searchParams.get("brand") || "");
+  const [model, setModel] = useState<string>(searchParams.get("model") || "");
+  const [year, setYear] = useState<string>(searchParams.get("year") || "");
+  const [category, setCategory] = useState<string>(searchParams.get("category") || "");
   const [textSearch, setTextSearch] = useState<string>(searchParams.get("query") || "");
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang")?.toLowerCase() as "ar" | "en";
     if (savedLang) setLang(savedLang);
-    
-    const qCat = searchParams.get("category");
-    if (qCat) setCategory(qCat);
-    
-    const qQuery = searchParams.get("query");
-    if (qQuery) setTextSearch(qQuery);
+  }, []);
+
+  // Sync local textSearch state with searchParams (for Navbar AI Search Box)
+  useEffect(() => {
+    setTextSearch(searchParams.get("query") || "");
+    setCategory(searchParams.get("category") || "");
   }, [searchParams]);
 
   // Real-time Filtering Logic
   const filteredProducts = useMemo(() => {
     return MOCK_CATALOG_PRODUCTS.filter(p => {
-      const matchesText = !textSearch || p.name.toLowerCase().includes(textSearch.toLowerCase()) || p.brand.toLowerCase().includes(textSearch.toLowerCase());
+      const q = textSearch.toLowerCase();
+      const matchesText = !textSearch || 
+                          p.name.toLowerCase().includes(q) || 
+                          p.brand.toLowerCase().includes(q) ||
+                          p.model.toLowerCase().includes(q);
       const matchesBrand = !brand || brand === "Any" || p.brand === brand;
       const matchesModel = !model || model === "Any" || p.model === model;
       const matchesYear = !year || year === "Any" || p.year === year;
-      const matchesCategory = !category || category === "Any" || p.category === category || category.includes(p.category);
+      const matchesCategory = !category || category === "Any" || p.category.includes(category) || category.includes(p.category);
       return matchesText && matchesBrand && matchesModel && matchesYear && matchesCategory;
     });
   }, [textSearch, brand, model, year, category]);
@@ -66,112 +69,95 @@ function CatalogContent() {
   }, [brand]);
 
   const handleReset = () => {
-    setVehicleType("");
     setBrand("");
     setModel("");
     setYear("");
     setCategory("");
     setTextSearch("");
-  };
-
-  const getSelectionPath = () => {
-    const parts = [brand, model, year, category, textSearch].filter(Boolean);
-    return parts.length > 0 ? parts.join(" > ") : (lang === 'ar' ? "عرض الكل" : "Showing All");
+    window.history.pushState({}, "", "/catalog");
   };
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[275px] pb-12">
+      <main className="flex-grow pt-[295px] pb-12">
         <div className="container mx-auto px-4">
           
           <div className="mb-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4">
             <div className="text-right">
-              <h1 className="text-3xl font-black text-primary">
-                {lang === 'ar' ? 'البحث الذكي في الكتالوج' : 'Smart Catalog Search'}
-              </h1>
-              <p className="text-muted-foreground font-bold">
-                {lang === 'ar' ? 'النتائج تظهر فوراً بمجرد الكتابة أو الاختيار' : 'Results update instantly as you type or select'}
-              </p>
+              <h1 className="text-3xl font-black text-primary">الكتالوج الشامل</h1>
+              <p className="text-muted-foreground font-bold">تصفح وفلتر آلاف القطع المتوفرة حالياً.</p>
             </div>
-            <div className="bg-white px-6 py-3 rounded-2xl border-2 border-primary/10 shadow-sm flex items-center gap-3 text-sm font-black text-primary" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <span className="text-secondary">{lang === 'ar' ? 'الفلتر الحالي:' : 'Current Filter:'}</span>
-              <span className="opacity-70">{getSelectionPath()}</span>
+            <div className="bg-white px-6 py-3 rounded-2xl border shadow-sm flex items-center gap-3 text-sm font-bold text-primary" dir="rtl">
+              <span className="text-secondary">نتائج الفلترة:</span>
+              <span className="opacity-70">{filteredProducts.length} قطعة مطابقة</span>
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row-reverse gap-8">
-            <aside className="w-full lg:w-80 space-y-6">
-              <Card className="border-none shadow-xl sticky top-[280px]">
-                <CardContent className="p-6 space-y-6 text-right" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Advanced Filters Sidebar */}
+            <aside className="lg:col-span-1 space-y-6">
+              <Card className="border-none shadow-xl sticky top-[300px]">
+                <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
-                    <h3 className="font-black text-xl text-primary">{lang === 'ar' ? 'تصفية سريعة' : 'Quick Filters'}</h3>
+                    <h3 className="font-black text-xl text-primary">فلاتر متقدمة</h3>
                     <Filter size={20} className="text-secondary" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-black text-xs text-muted-foreground">بحث نصي حر</Label>
-                    <Input 
-                      placeholder={lang === 'ar' ? "اكتب اسم القطعة..." : "Type part name..."}
-                      value={textSearch}
-                      onChange={(e) => setTextSearch(e.target.value)}
-                      className="border-2 focus:border-secondary text-right"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="font-black text-xs text-muted-foreground">{lang === 'ar' ? 'الماركة' : 'Brand'}</Label>
+                    <Label className="font-black text-xs text-muted-foreground">الماركة</Label>
                     <Select value={brand} onValueChange={setBrand}>
                       <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Any">الكل</SelectItem>
+                        <SelectItem value="Any">كل الماركات</SelectItem>
                         {availableBrands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-black text-xs text-muted-foreground">{lang === 'ar' ? 'الموديل' : 'Model'}</Label>
+                    <Label className="font-black text-xs text-muted-foreground">الموديل</Label>
                     <Select value={model} onValueChange={setModel} disabled={!brand || brand === "Any"}>
                       <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Any">الكل</SelectItem>
+                        <SelectItem value="Any">كل الموديلات</SelectItem>
                         {availableModels.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-black text-xs text-muted-foreground">{lang === 'ar' ? 'السنة' : 'Year'}</Label>
+                    <Label className="font-black text-xs text-muted-foreground">سنة الصنع</Label>
                     <Select value={year} onValueChange={setYear}>
                       <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Any">الكل</SelectItem>
+                        <SelectItem value="Any">كل السنوات</SelectItem>
                         {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-black text-xs text-muted-foreground">{lang === 'ar' ? 'الفئة' : 'Category'}</Label>
+                    <Label className="font-black text-xs text-muted-foreground">تصنيف القطعة</Label>
                     <Select value={category} onValueChange={setCategory}>
                       <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Any">الكل</SelectItem>
+                        <SelectItem value="Any">كل الفئات</SelectItem>
                         {PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en}>{c[lang]}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <Button variant="outline" className="w-full h-11 font-black gap-2 mt-4" onClick={handleReset}>
-                    <RotateCcw size={16} /> إعادة ضبط
+                    <RotateCcw size={16} /> إعادة ضبط الفلاتر
                   </Button>
                 </CardContent>
               </Card>
             </aside>
 
-            <div className="flex-1 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Results Grid */}
+            <div className="lg:col-span-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                  {filteredProducts.length > 0 ? (
                    filteredProducts.map((product) => (
                      <ProductCard key={product.id} {...product} />
@@ -179,8 +165,8 @@ function CatalogContent() {
                  ) : (
                    <div className="col-span-full py-32 bg-white rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
                       <Search size={64} className="opacity-10 mb-4" />
-                      <p className="font-black text-lg">لا توجد قطع مطابقة حالياً</p>
-                      <Button variant="link" onClick={handleReset} className="mt-2 font-bold text-secondary">مسح الفلاتر</Button>
+                      <p className="font-black text-lg text-primary/40">لا توجد نتائج مطابقة لبحثك حالياً</p>
+                      <Button variant="link" onClick={handleReset} className="mt-2 font-bold text-secondary">إظهار كافة القطع</Button>
                    </div>
                  )}
               </div>

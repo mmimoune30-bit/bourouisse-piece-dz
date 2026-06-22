@@ -1,20 +1,27 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Sparkles, Car, Settings, Layers, Loader2 } from "lucide-react";
+import { Search, Sparkles, Loader2, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggestions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AISearchBox() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("query") || "");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Sync with URL query
+  useEffect(() => {
+    const q = searchParams.get("query");
+    if (q !== null) setQuery(q);
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -25,7 +32,7 @@ export default function AISearchBox() {
           setSuggestions(res.suggestions);
           setShowSuggestions(true);
         } catch (error) {
-          console.error("Failed to fetch AI suggestions", error);
+          console.error("AI Suggestions Error", error);
         } finally {
           setIsLoading(false);
         }
@@ -39,6 +46,17 @@ export default function AISearchBox() {
     return () => clearTimeout(timer);
   }, [query]);
 
+  // Unified Filtering: Instant navigation/update
+  const handleInputChange = (val: string) => {
+    setQuery(val);
+    const params = new URLSearchParams(searchParams.toString());
+    if (val) params.set("query", val);
+    else params.delete("query");
+    
+    // Smoothly push to catalog if not there, or just update params
+    router.push(`/catalog?${params.toString()}`, { scroll: false });
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -49,92 +67,53 @@ export default function AISearchBox() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && query.trim()) {
-      setShowSuggestions(false);
-      router.push(`/catalog?query=${encodeURIComponent(query)}`);
-    }
-  };
-
-  const SPECIAL_CATEGORIES = [
-    { name: "مركبات خارج الخدمة", icon: <Car size={20} />, href: "/catalog?category=Véhicules hors service (مركبات خارج الخدمة)" },
-    { name: "محركات كاملة", icon: <Settings size={20} />, href: "/catalog?category=Moteur (المحرك)" },
-    { name: "نصف محرك", icon: <Layers size={20} />, href: "/catalog?category=Moteur (المحرك)" },
-  ];
-
   return (
-    <div className="w-full relative z-10" ref={searchRef}>
-      <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-4">
-        
-        {/* Special Categories Quick Access */}
-        <div className="flex flex-row-reverse items-center gap-3 w-full md:w-auto overflow-x-auto no-scrollbar py-1">
-          {SPECIAL_CATEGORIES.map((cat, i) => (
-            <Link
-              key={i}
-              href={cat.href}
-              className="flex items-center gap-2 group shrink-0 bg-white hover:bg-secondary px-3 py-1.5 rounded-xl transition-all border border-zinc-200 hover:border-secondary shadow-sm"
-            >
-              <div className="text-primary group-hover:text-black">
-                {cat.icon}
-              </div>
-              <span className="text-[10px] font-black text-black group-hover:text-primary transition-colors whitespace-nowrap uppercase">
-                {cat.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        {/* AI Search Input */}
-        <div className="w-full max-w-xl relative">
-          <div className="absolute -top-3 left-2 flex items-center gap-2 z-10">
-            <span className="text-[7px] font-black text-white uppercase tracking-widest bg-primary px-2 py-0.5 rounded flex items-center gap-1.5 shadow-lg border border-primary/20">
-              {isLoading ? (
-                <Loader2 size={6} className="animate-spin" />
-              ) : (
-                <Sparkles size={6} className="animate-pulse" />
-              )}
-              AI Search
+    <div className="w-full relative" ref={searchRef}>
+      <div className="container mx-auto px-4 flex justify-center">
+        <div className="w-full max-w-2xl relative">
+          
+          <div className="absolute -top-3 left-4 flex items-center gap-2 z-10">
+            <span className="text-[7px] font-black text-white uppercase tracking-widest bg-zinc-800 px-2 py-0.5 rounded flex items-center gap-1.5 shadow-md">
+              {isLoading ? <Loader2 size={6} className="animate-spin" /> : <Sparkles size={6} className="animate-pulse" />}
+              AI Smart Filter
             </span>
           </div>
           
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary w-4 h-4 group-focus-within:scale-110 transition-transform z-10" />
             <Input
-              placeholder="ابحث بذكاء عن ماركة، موديل أو قطعة..."
-              className="pl-10 h-11 bg-white border-2 border-zinc-200 text-black text-sm font-bold placeholder:text-zinc-400 focus:ring-secondary focus:border-secondary transition-all text-right rounded-xl shadow-sm"
+              placeholder="ابحث بذكاء (ماركة، موديل، رقم قطعة)... الفلترة فورية"
+              className="pl-10 pr-12 h-12 bg-white border-2 border-zinc-200 text-black text-sm font-bold placeholder:text-zinc-400 focus:ring-secondary focus:border-secondary transition-all text-right rounded-2xl shadow-sm"
               dir="rtl"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => handleInputChange(e.target.value)}
               onFocus={() => query.length > 2 && setShowSuggestions(true)}
-              onKeyDown={handleKeyDown}
             />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+               <Filter size={18} className="text-zinc-300" />
+            </div>
           </div>
 
-          {showSuggestions && (suggestions.length > 0 || isLoading) && (
-            <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-zinc-100 p-2 animate-in fade-in slide-in-from-top-2 z-[100] text-black text-right">
-              <div className="text-[9px] uppercase font-black text-primary px-3 mb-2 flex items-center justify-end gap-2 border-b border-zinc-50 pb-1">
-                اقتراحات البحث الذكي
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-2xl border border-zinc-100 p-2 z-[100] text-right">
+              <div className="text-[9px] uppercase font-black text-primary px-3 mb-2 flex items-center justify-end gap-2 border-b pb-1">
+                مقترحات ذكية
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
               </div>
               <div className="grid grid-cols-1 gap-1">
-                {isLoading ? (
-                  <div className="p-4 flex items-center justify-center gap-2 text-zinc-400 text-xs">
-                    <Loader2 size={16} className="animate-spin text-primary" />
-                    جاري التفكير...
-                  </div>
-                ) : (
-                  suggestions.map((s, i) => (
-                    <Link
-                      key={i}
-                      href={`/catalog?query=${encodeURIComponent(s)}`}
-                      className="w-full text-right px-4 py-3 hover:bg-zinc-50 rounded-xl text-sm font-bold transition-all flex items-center justify-end gap-2 group/item block"
-                      onClick={() => setShowSuggestions(false)}
-                    >
-                      {s}
-                      <Search size={14} className="text-primary group-hover/item:scale-110 transition-transform" />
-                    </Link>
-                  ))
-                )}
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      handleInputChange(s);
+                      setShowSuggestions(false);
+                    }}
+                    className="w-full text-right px-4 py-3 hover:bg-zinc-50 rounded-xl text-sm font-bold transition-all flex items-center justify-end gap-2 group/item"
+                  >
+                    {s}
+                    <Search size={14} className="text-zinc-300 group-hover/item:text-primary transition-colors" />
+                  </button>
+                ))}
               </div>
             </div>
           )}
