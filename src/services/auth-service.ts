@@ -7,7 +7,7 @@ import {
   User as FirebaseUser
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/firebase/config";
+import { auth, firestore } from "@/firebase/config";
 
 /**
  * @fileOverview خدمة إدارة هوية المستخدمين والأدوار في المنصة.
@@ -28,8 +28,9 @@ export interface UserProfile {
  * جلب بيانات دور المستخدم من Firestore
  */
 export async function getUserRole(uid: string): Promise<Role | null> {
+  if (!firestore) return null;
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(firestore, "users", uid));
     if (userDoc.exists()) {
       return userDoc.data().role as Role;
     }
