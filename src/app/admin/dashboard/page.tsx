@@ -38,7 +38,6 @@ import { collection, query, where, orderBy, limit, getCountFromServer } from "fi
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
   
-  // العدادات المطلوبة
   const [usersCount, setUsersCount] = useState(0);
   const [productsCount, setProductsCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
@@ -57,39 +56,32 @@ export default function AdminDashboard() {
   const { data: brandRequests } = useCollection(requestsQuery);
 
   useEffect(() => {
-    async function fetchLiveCounts() {
+    const fetchStats = async () => {
       if (!firestore) return;
       try {
-        const usersColl = collection(firestore, "users");
-        const storesColl = collection(firestore, "sellers");
-        const listingsColl = collection(firestore, "listings");
-        const ordersColl = collection(firestore, "purchase_requests");
-
-        const [usersSnap, storesSnap, listingsSnap, ordersSnap] = await Promise.all([
-          getCountFromServer(usersColl),
-          getCountFromServer(storesColl),
-          getCountFromServer(listingsColl),
-          getCountFromServer(ordersColl)
-        ]);
+        // نستخدم أسماء المجموعات المعرفة في النظام: users, listings, purchase_requests
+        const usersSnap = await getCountFromServer(collection(firestore!, "users"));
+        const productsSnap = await getCountFromServer(collection(firestore!, "listings"));
+        const ordersSnap = await getCountFromServer(collection(firestore!, "purchase_requests"));
+        const storesSnap = await getCountFromServer(collection(firestore!, "sellers"));
 
         setUsersCount(usersSnap.data().count);
-        setStoresCount(storesSnap.data().count);
-        setProductsCount(listingsSnap.data().count);
+        setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
-        
+        setStoresCount(storesSnap.data().count);
       } catch (error) {
-        console.error("Error fetching live counts:", error);
+        console.error("Error fetching stats:", error);
       } finally {
         setLoadingStats(false);
       }
-    }
+    };
 
-    fetchLiveCounts();
+    if (firestore) fetchStats();
   }, [firestore]);
 
   const STATS_CARDS = [
     { label: "إجمالي المستخدمين", value: usersCount, trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
-    { label: "المتاجر النشطة", value: storesCount, trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
+    { label: "المتاجر النشطة", value: storesCount, trend: "+5%", up: true, icon: Store, color: "bg-amber-50" },
     { label: "قطع الغيار (المنتجات)", value: productsCount, trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
     { label: "طلبات الشراء (الأوامر)", value: ordersCount, trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
   ];
@@ -152,9 +144,9 @@ export default function AdminDashboard() {
                     {stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                   </div>
                 </div>
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                <h3 className="text-3xl font-black text-primary mt-1">
-                  {loadingStats ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8" /> : stat.value}
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest text-right">{stat.label}</p>
+                <h3 className="text-3xl font-black text-primary mt-1 text-right">
+                  {loadingStats ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8 mr-auto" /> : stat.value}
                 </h3>
               </CardContent>
             </Card>
@@ -165,7 +157,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between border-b">
+          <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
             <CardTitle className="text-xl font-black">آخر عمليات الدفع</CardTitle>
             <Link href="/admin/payments">
               <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
@@ -213,7 +205,7 @@ export default function AdminDashboard() {
         <div className="space-y-6">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-black">نشاط الطاقم الإداري</CardTitle>
+              <CardTitle className="text-lg font-black text-right">نشاط الطاقم الإداري</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {[
@@ -221,8 +213,8 @@ export default function AdminDashboard() {
                 { name: "سميرة بوحفص", action: "قبول عملية دفع", time: "منذ 25 دقيقة" },
                 { name: "يوسف حمدي", action: "حظر منتج مخالف", time: "منذ ساعة" },
               ].map((log, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border">
-                  <div>
+                <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border flex-row-reverse">
+                  <div className="text-right">
                     <p className="text-sm font-bold text-primary">{log.name}</p>
                     <p className="text-[10px] text-muted-foreground">{log.action}</p>
                   </div>
@@ -233,7 +225,7 @@ export default function AdminDashboard() {
           </Card>
 
           <Card className="border-none shadow-sm bg-primary text-white overflow-hidden relative">
-            <CardContent className="p-6 relative z-10">
+            <CardContent className="p-6 relative z-10 text-right">
               <h3 className="font-black text-xl mb-2 text-secondary">عمولات المنصة</h3>
               <p className="text-blue-100/70 text-sm mb-4">تم تحصيل <span className="text-white font-black">1,229,000 دج</span> كعمولات خلال الشهر الحالي.</p>
               <Link href="/admin/reports">
