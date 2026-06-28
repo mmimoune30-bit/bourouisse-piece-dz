@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -45,12 +44,12 @@ export default function AdminDashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchAllData = async () => {
       if (!firestore) return;
       try {
         setLoadingStats(true);
         
-        // جلب الإحصائيات (Counts)
+        // 1. جلب الإحصائيات (Counts)
         const [usersSnap, productsSnap, ordersSnap, storesSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
           getCountFromServer(collection(firestore, "products")),
@@ -63,7 +62,7 @@ export default function AdminDashboard() {
         setOrdersCount(ordersSnap.data().count);
         setStoresCount(storesSnap.data().count);
 
-        // جلب آخر 10 عمليات دفع (بناءً على طلب المستخدم)
+        // 2. جلب آخر 10 عمليات دفع
         const q = query(
           collection(firestore, "payments"),
           orderBy("createdAt", "desc"),
@@ -85,7 +84,7 @@ export default function AdminDashboard() {
       }
     };
 
-    if (firestore) fetchStats();
+    fetchAllData();
   }, [firestore]);
 
   const STATS = [
