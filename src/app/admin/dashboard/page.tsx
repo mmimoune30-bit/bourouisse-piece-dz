@@ -18,9 +18,7 @@ import {
   ArrowUpRight, 
   ArrowDownRight,
   FileText,
-  PlusSquare,
-  Loader2,
-  CreditCard
+  Loader2
 } from "lucide-react";
 import {
   Table,
@@ -33,8 +31,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, limit, getCountFromServer, getDocs } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
+import { collection, query, orderBy, limit, getCountFromServer, getDocs } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
@@ -46,52 +44,42 @@ export default function AdminDashboard() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  // جلب طلبات الماركات الجديدة (شكاوى بموضوع محدد)
-  const requestsQuery = firestore ? query(
-    collection(firestore, "complaints"),
-    where("subject", "==", "طلب إضافة ماركة أو موديل جديد"),
-    orderBy("createdAt", "desc"),
-    limit(5)
-  ) : null;
-  
-  const { data: brandRequests } = useCollection(requestsQuery);
-
   useEffect(() => {
     const fetchStats = async () => {
       if (!firestore) return;
       try {
         setLoadingStats(true);
         
-        // جلب الإحصائيات (Counts) حسب المجموعات المطلوبة
-        const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
+        // جلب الإحصائيات (Counts)
+        const [usersSnap, productsSnap, ordersSnap, storesSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
           getCountFromServer(collection(firestore, "products")),
-          getCountFromServer(collection(firestore, "orders"))
+          getCountFromServer(collection(firestore, "orders")),
+          getCountFromServer(collection(firestore, "sellers"))
         ]);
 
         setUsersCount(usersSnap.data().count);
         setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
-
-        // جلب عدد المتاجر بشكل منفصل
-        const storesSnap = await getCountFromServer(collection(firestore, "sellers"));
         setStoresCount(storesSnap.data().count);
 
-        // جلب آخر 5 عمليات دفع
-        const paymentsQuery = query(
+        // جلب آخر 10 عمليات دفع (بناءً على طلب المستخدم)
+        const q = query(
           collection(firestore, "payments"),
-          orderBy("date", "desc"),
-          limit(5)
+          orderBy("createdAt", "desc"),
+          limit(10)
         );
-        const paymentsSnap = await getDocs(paymentsQuery);
-        const fetchedPayments = paymentsSnap.docs.map(doc => ({
+
+        const snap = await getDocs(q);
+        const data = snap.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        setTransactions(fetchedPayments);
+
+        setTransactions(data);
 
       } catch (error) {
-        console.error("Error fetching admin data:", error);
+        console.error("Error fetching admin dashboard data:", error);
       } finally {
         setLoadingStats(false);
       }
@@ -182,7 +170,7 @@ export default function AdminDashboard() {
         {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
-            <CardTitle className="text-xl font-black">آخر عمليات الدفع</CardTitle>
+            <CardTitle className="text-xl font-black">آخر عمليات الدفع (أحدث 10)</CardTitle>
             <Link href="/admin/payments">
               <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
             </Link>
@@ -230,38 +218,29 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* System & Staff Activity */}
+        {/* System Activity */}
         <div className="space-y-6">
-          <Card className="border-none shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-black text-right">نشاط الطاقم الإداري</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { name: "ميمون محمد", action: "قبول متجر جديد", time: "منذ 10 دقائق" },
-                { name: "سميرة بوحفص", action: "قبول عملية دفع", time: "منذ 25 دقيقة" },
-                { name: "يوسف حمدي", action: "حظر منتج مخالف", time: "منذ ساعة" },
-              ].map((log, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border flex-row-reverse">
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-primary">{log.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{log.action}</p>
-                  </div>
-                  <span className="text-[10px] text-zinc-400">{log.time}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
           <Card className="border-none shadow-sm bg-primary text-white overflow-hidden relative">
             <CardContent className="p-6 relative z-10 text-right">
               <h3 className="font-black text-xl mb-2 text-secondary">عمولات المنصة</h3>
-              <p className="text-blue-100/70 text-sm mb-4">يتم احتساب العمولات بناءً على الاشتراكات المفعلة.</p>
+              <p className="text-blue-100/70 text-sm mb-4">يتم احتساب الأرباح بناءً على نسب المبيعات والاشتراكات.</p>
               <Link href="/admin/reports">
                 <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">مراجعة التقارير المالية</Button>
               </Link>
             </CardContent>
             <TrendingUp className="absolute -bottom-4 -right-4 w-32 h-32 text-white/5" />
+          </Card>
+
+          <Card className="border-none shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-black text-right">أحدث الطلبات</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-center text-muted-foreground py-4">راجع صفحة "Purchase Requests" لمتابعة تفاصيل الطلبات.</p>
+              <Link href="/admin/purchase-requests">
+                <Button variant="outline" className="w-full font-bold">عرض كافة الطلبات</Button>
+              </Link>
+            </CardContent>
           </Card>
         </div>
       </div>
