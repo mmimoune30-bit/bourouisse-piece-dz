@@ -1,7 +1,9 @@
-
 {
   "firestore": {
-    "rules": "firestore.rules"
+    "database": "(default)",
+    "location": "us-central1",
+    "rules": "firestore.rules",
+    "indexes": "studio-6660467819-36b41"
   },
   "hosting": {
     "source": ".",
