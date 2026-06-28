@@ -44,7 +44,6 @@ export default function AdminDashboard() {
   const [ordersCount, setOrdersCount] = useState(0);
   const [storesCount, setStoresCount] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
-  
   const [loadingStats, setLoadingStats] = useState(true);
 
   // جلب طلبات الماركات الجديدة (شكاوى بموضوع محدد)
@@ -58,22 +57,24 @@ export default function AdminDashboard() {
   const { data: brandRequests } = useCollection(requestsQuery);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       if (!firestore) return;
       try {
         setLoadingStats(true);
         
-        // جلب الإحصائيات (Counts)
-        const [usersSnap, productsSnap, ordersSnap, storesSnap] = await Promise.all([
+        // جلب الإحصائيات (Counts) حسب المجموعات المطلوبة
+        const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
-          getCountFromServer(collection(firestore, "listings")),
-          getCountFromServer(collection(firestore, "purchase_requests")),
-          getCountFromServer(collection(firestore, "sellers"))
+          getCountFromServer(collection(firestore, "products")),
+          getCountFromServer(collection(firestore, "orders"))
         ]);
 
         setUsersCount(usersSnap.data().count);
         setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
+
+        // جلب عدد المتاجر بشكل منفصل
+        const storesSnap = await getCountFromServer(collection(firestore, "sellers"));
         setStoresCount(storesSnap.data().count);
 
         // جلب آخر 5 عمليات دفع
@@ -96,7 +97,7 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchData();
+    if (firestore) fetchStats();
   }, [firestore]);
 
   const STATS = [
@@ -139,7 +140,7 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-black text-primary">نظرة عامة على النظام</h1>
-          <p className="text-muted-foreground">متابعة الأداء الحي للمنصة والبيانات المالية.</p>
+          <p className="text-muted-foreground">متابعة الأداء الحي للمنصة والبيانات المالية من Firestore.</p>
         </div>
         <Link href="/admin/reports">
           <Button className="font-bold gap-2 bg-primary">
@@ -147,31 +148,6 @@ export default function AdminDashboard() {
           </Button>
         </Link>
       </div>
-
-      {/* Brand Requests Notification Bar */}
-      {brandRequests && brandRequests.length > 0 && (
-        <Card className="border-2 border-secondary bg-secondary/5 overflow-hidden">
-          <CardHeader className="py-3 bg-secondary text-primary">
-            <CardTitle className="text-sm font-black flex items-center justify-end gap-2">
-               طلبات إضافة ماركات/موديلات جديدة بانتظار المراجعة <PlusSquare size={16} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 space-y-2">
-            {brandRequests.map((req) => (
-              <div key={req.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-secondary/20">
-                <Badge variant="outline" className="border-secondary text-secondary">{req.status}</Badge>
-                <p className="text-xs font-bold text-primary">{req.details}</p>
-                <span className="text-[10px] text-muted-foreground">
-                  {req.createdAt?.toDate ? req.createdAt.toDate().toLocaleDateString('ar-DZ') : "قيد المراجعة"}
-                </span>
-              </div>
-            ))}
-            <Link href="/admin/complaints" className="block text-center pt-2">
-              <Button variant="link" className="text-xs font-black text-secondary">عرض كافة الطلبات والشكاوى</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
