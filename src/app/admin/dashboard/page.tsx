@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFirestore } from "@/firebase";
-import { collection, query, orderBy, limit, getCountFromServer, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getCountFromServer, onSnapshot } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
@@ -41,15 +41,16 @@ export default function AdminDashboard() {
   const [productsCount, setProductsCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   useEffect(() => {
-    const fetchAllData = async () => {
-      if (!firestore) return;
+    if (!firestore) return;
+
+    // 1. جلب الإحصائيات الأساسية (One-shot fetch)
+    const fetchStats = async () => {
       try {
-        setLoading(true);
-        
-        // 1. جلب الإحصائيات (Counts)
+        setLoadingStats(true);
         const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
           getCountFromServer(collection(firestore, "products")),
@@ -59,37 +60,42 @@ export default function AdminDashboard() {
         setUsersCount(usersSnap.data().count);
         setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
-
-        // 2. جلب آخر 10 عمليات دفع
-        const q = query(
-          collection(firestore, "payments"),
-          orderBy("createdAt", "desc"),
-          limit(10)
-        );
-
-        const snap = await getDocs(q);
-        const data = snap.docs.map(doc => {
-          const d = doc.data();
-          return {
-            id: doc.id,
-            store: d.store || d.storeName || "N/A",
-            amount: typeof d.amount === 'number' ? `${d.amount.toLocaleString()} DZD` : d.amount || "0 DZD",
-            status: d.status || "Pending",
-            method: d.method || "N/A",
-            createdAt: d.createdAt
-          };
-        });
-
-        setTransactions(data);
-
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        console.error("Error fetching dashboard stats:", error);
       } finally {
-        setLoading(false);
+        setLoadingStats(false);
       }
     };
 
-    fetchAllData();
+    fetchStats();
+
+    // 2. مراقبة العمليات المالية بشكل لحظي (Real-time Listener)
+    const q = query(
+      collection(firestore, "payments"),
+      orderBy("createdAt", "desc"),
+      limit(10)
+    );
+
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const data = snap.docs.map(doc => {
+        const d = doc.data();
+        return {
+          id: doc.id,
+          store: d.store || d.storeName || "N/A",
+          amount: d.amount || "0 DZD",
+          status: d.status || "Pending",
+          method: d.method || "N/A",
+          createdAt: d.createdAt
+        };
+      });
+      setTransactions(data);
+      setLoadingTransactions(false);
+    }, (error) => {
+      console.error("Error listening to payments:", error);
+      setLoadingTransactions(false);
+    });
+
+    return () => unsubscribe();
   }, [firestore]);
 
   const STATS = [
@@ -162,7 +168,7 @@ export default function AdminDashboard() {
                 </div>
                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest text-right">{stat.label}</p>
                 <h3 className="text-3xl font-black text-primary mt-1 text-right">
-                  {loading ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8 mr-auto" /> : stat.value}
+                  {loadingStats ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8 mr-auto" /> : stat.value}
                 </h3>
               </CardContent>
             </Card>
@@ -174,7 +180,7 @@ export default function AdminDashboard() {
         {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
-            <CardTitle className="text-xl font-black">آخر عمليات الدفع (أحدث 10)</CardTitle>
+            <CardTitle className="text-xl font-black">آخر عمليات الدفع (تحديث لحظي)</CardTitle>
             <Link href="/admin/payments">
               <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
             </Link>
@@ -191,7 +197,7 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {loadingTransactions ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10">
                       <Loader2 className="animate-spin mx-auto text-primary" />
@@ -226,7 +232,7 @@ export default function AdminDashboard() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground font-bold">
+                    <TableCell colSpan={5} className="text-center py-20 text-muted-foreground font-bold">
                       لا توجد عمليات دفع مسجلة حالياً.
                     </TableCell>
                   </TableRow>
