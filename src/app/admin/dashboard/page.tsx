@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -67,12 +68,17 @@ export default function AdminDashboard() {
         );
 
         const snap = await getDocs(q);
-        const data = snap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          // تأمين توافق البيانات مع الجدول (Mapping)
-          store: doc.data().storeName || "متجر غير معروف",
-        }));
+        const data = snap.docs.map(doc => {
+          const d = doc.data();
+          return {
+            id: doc.id,
+            store: d.store || d.storeName || "N/A",
+            amount: typeof d.amount === 'number' ? `${d.amount.toLocaleString()} DZD` : d.amount || "0 DZD",
+            status: d.status || "Pending",
+            method: d.method || "N/A",
+            createdAt: d.createdAt
+          };
+        });
 
         setTransactions(data);
 
@@ -97,7 +103,7 @@ export default function AdminDashboard() {
     },
     {
       label: "المتاجر النشطة",
-      value: "72", // قيمة ثابتة للعرض حالياً أو يمكن جلبها أيضاً
+      value: "72", 
       trend: "+5%",
       up: true,
       icon: Store,
@@ -196,7 +202,7 @@ export default function AdminDashboard() {
                     <TableRow key={i}>
                       <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
                       <TableCell className="font-bold">{tx.store}</TableCell>
-                      <TableCell className="font-black text-green-600">{tx.amount?.toLocaleString()} دج</TableCell>
+                      <TableCell className="font-black text-green-600">{tx.amount}</TableCell>
 
                       <TableCell>
                         <Badge
@@ -253,7 +259,7 @@ export default function AdminDashboard() {
                 <Button variant="outline" className="w-full font-bold">عرض كافة الطلبات</Button>
               </Link>
             </CardContent>
-          </div>
+          </Card>
         </div>
       </div>
     </div>
