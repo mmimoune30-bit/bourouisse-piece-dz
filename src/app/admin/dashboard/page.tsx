@@ -44,11 +44,10 @@ export default function AdminDashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
 
+  // 1. جلب الإحصائيات (عدادات المجموعات)
   useEffect(() => {
-    if (!firestore) return;
-
-    // 1. جلب الإحصائيات الأساسية (One-shot fetch)
     const fetchStats = async () => {
+      if (!firestore) return;
       try {
         setLoadingStats(true);
         const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
@@ -68,30 +67,25 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
+  }, [firestore]);
 
-    // 2. مراقبة العمليات المالية بشكل لحظي (Real-time Listener)
+  // 2. مراقبة العمليات المالية بشكل لحظي (onSnapshot)
+  useEffect(() => {
+    if (!firestore) return;
+
     const q = query(
       collection(firestore, "payments"),
       orderBy("createdAt", "desc"),
       limit(10)
     );
 
-    const unsubscribe = onSnapshot(q, (snap) => {
-      const data = snap.docs.map(doc => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          store: d.store || d.storeName || "N/A",
-          amount: d.amount || "0 DZD",
-          status: d.status || "Pending",
-          method: d.method || "N/A",
-          createdAt: d.createdAt
-        };
-      });
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
       setTransactions(data);
-      setLoadingTransactions(false);
-    }, (error) => {
-      console.error("Error listening to payments:", error);
       setLoadingTransactions(false);
     });
 
@@ -207,7 +201,7 @@ export default function AdminDashboard() {
                   transactions.map((tx, i) => (
                     <TableRow key={i}>
                       <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
-                      <TableCell className="font-bold">{tx.store}</TableCell>
+                      <TableCell className="font-bold">{tx.store || tx.storeName || "N/A"}</TableCell>
                       <TableCell className="font-black text-green-600">{tx.amount}</TableCell>
 
                       <TableCell>
