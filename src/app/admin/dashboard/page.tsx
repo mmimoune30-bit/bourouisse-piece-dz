@@ -37,12 +37,13 @@ import { collection, query, where, orderBy, limit, getCountFromServer } from "fi
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
-  const [stats, setStats] = useState({
-    users: 0,
-    stores: 0,
-    listings: 0,
-    sales: "24.5M DZD" // تجريبي
-  });
+  
+  // العدادات المطلوبة
+  const [usersCount, setUsersCount] = useState(0);
+  const [productsCount, setProductsCount] = useState(0);
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [storesCount, setStoresCount] = useState(0);
+  
   const [loadingStats, setLoadingStats] = useState(true);
 
   // جلب طلبات الماركات الجديدة (شكاوى بموضوع محدد)
@@ -62,19 +63,20 @@ export default function AdminDashboard() {
         const usersColl = collection(firestore, "users");
         const storesColl = collection(firestore, "sellers");
         const listingsColl = collection(firestore, "listings");
+        const ordersColl = collection(firestore, "purchase_requests");
 
-        const [usersSnap, storesSnap, listingsSnap] = await Promise.all([
+        const [usersSnap, storesSnap, listingsSnap, ordersSnap] = await Promise.all([
           getCountFromServer(usersColl),
           getCountFromServer(storesColl),
-          getCountFromServer(listingsColl)
+          getCountFromServer(listingsColl),
+          getCountFromServer(ordersColl)
         ]);
 
-        setStats(prev => ({
-          ...prev,
-          users: usersSnap.data().count,
-          stores: storesSnap.data().count,
-          listings: listingsSnap.data().count
-        }));
+        setUsersCount(usersSnap.data().count);
+        setStoresCount(storesSnap.data().count);
+        setProductsCount(listingsSnap.data().count);
+        setOrdersCount(ordersSnap.data().count);
+        
       } catch (error) {
         console.error("Error fetching live counts:", error);
       } finally {
@@ -86,10 +88,10 @@ export default function AdminDashboard() {
   }, [firestore]);
 
   const STATS_CARDS = [
-    { label: "إجمالي المستخدمين", value: stats.users, trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
-    { label: "المتاجر النشطة", value: stats.stores, trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
-    { label: "قطع الغيار", value: stats.listings, trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
-    { label: "المبيعات الإجمالية", value: stats.sales, trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
+    { label: "إجمالي المستخدمين", value: usersCount, trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
+    { label: "المتاجر النشطة", value: storesCount, trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
+    { label: "قطع الغيار (المنتجات)", value: productsCount, trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
+    { label: "طلبات الشراء (الأوامر)", value: ordersCount, trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
   ];
 
   return (
@@ -120,7 +122,7 @@ export default function AdminDashboard() {
                 <Badge variant="outline" className="border-secondary text-secondary">{req.status}</Badge>
                 <p className="text-xs font-bold text-primary">{req.details}</p>
                 <span className="text-[10px] text-muted-foreground">
-                  {req.createdAt?.toDate ? req.createdAt.toDate().toLocaleDateString('ar-DZ') : "قيد المعالجة"}
+                  {req.createdAt?.toDate ? req.createdAt.toDate().toLocaleDateString('ar-DZ') : "قيد المراجعة"}
                 </span>
               </div>
             ))}
