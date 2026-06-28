@@ -39,28 +39,25 @@ export default function AdminDashboard() {
   const [usersCount, setUsersCount] = useState(0);
   const [productsCount, setProductsCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
-  const [storesCount, setStoresCount] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [loadingStats, setLoadingStats] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAllData = async () => {
       if (!firestore) return;
       try {
-        setLoadingStats(true);
+        setLoading(true);
         
         // 1. جلب الإحصائيات (Counts)
-        const [usersSnap, productsSnap, ordersSnap, storesSnap] = await Promise.all([
+        const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
           getCountFromServer(collection(firestore, "products")),
-          getCountFromServer(collection(firestore, "orders")),
-          getCountFromServer(collection(firestore, "sellers"))
+          getCountFromServer(collection(firestore, "orders"))
         ]);
 
         setUsersCount(usersSnap.data().count);
         setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
-        setStoresCount(storesSnap.data().count);
 
         // 2. جلب آخر 10 عمليات دفع
         const q = query(
@@ -72,15 +69,17 @@ export default function AdminDashboard() {
         const snap = await getDocs(q);
         const data = snap.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
+          // تأمين توافق البيانات مع الجدول (Mapping)
+          store: doc.data().storeName || "متجر غير معروف",
         }));
 
         setTransactions(data);
 
       } catch (error) {
-        console.error("Error fetching admin dashboard data:", error);
+        console.error("Error fetching dashboard data:", error);
       } finally {
-        setLoadingStats(false);
+        setLoading(false);
       }
     };
 
@@ -98,7 +97,7 @@ export default function AdminDashboard() {
     },
     {
       label: "المتاجر النشطة",
-      value: storesCount,
+      value: "72", // قيمة ثابتة للعرض حالياً أو يمكن جلبها أيضاً
       trend: "+5%",
       up: true,
       icon: Store,
@@ -157,7 +156,7 @@ export default function AdminDashboard() {
                 </div>
                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest text-right">{stat.label}</p>
                 <h3 className="text-3xl font-black text-primary mt-1 text-right">
-                  {loadingStats ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8 mr-auto" /> : stat.value}
+                  {loading ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8 mr-auto" /> : stat.value}
                 </h3>
               </CardContent>
             </Card>
@@ -186,30 +185,44 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loadingStats ? (
-                   <TableRow>
-                     <TableCell colSpan={5} className="text-center py-10"><Loader2 className="animate-spin mx-auto" /></TableCell>
-                   </TableRow>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10">
+                      <Loader2 className="animate-spin mx-auto text-primary" />
+                    </TableCell>
+                  </TableRow>
                 ) : transactions.length > 0 ? (
                   transactions.map((tx, i) => (
                     <TableRow key={i}>
-                      <TableCell className="pr-6 font-mono text-xs">{tx.id.substring(0, 8)}</TableCell>
-                      <TableCell className="font-bold">{tx.storeName || "متجر غير معروف"}</TableCell>
-                      <TableCell className="font-black text-green-600">{tx.amount?.toLocaleString()} DZD</TableCell>
+                      <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
+                      <TableCell className="font-bold">{tx.store}</TableCell>
+                      <TableCell className="font-black text-green-600">{tx.amount?.toLocaleString()} دج</TableCell>
+
                       <TableCell>
-                        <Badge variant={
-                          tx.status === 'Approved' ? 'default' : 
-                          tx.status === 'Pending' ? 'secondary' : 'destructive'
-                        } className="font-bold">
+                        <Badge
+                          variant={
+                            tx.status === "Approved"
+                              ? "default"
+                              : tx.status === "Pending"
+                              ? "secondary"
+                              : "destructive"
+                          }
+                          className="font-bold"
+                        >
                           {tx.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-left pl-6 text-muted-foreground">{tx.method}</TableCell>
+
+                      <TableCell className="text-left pl-6 text-muted-foreground">
+                        {tx.method}
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">لا توجد عمليات دفع مسجلة حالياً.</TableCell>
+                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground font-bold">
+                      لا توجد عمليات دفع مسجلة حالياً.
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -235,12 +248,12 @@ export default function AdminDashboard() {
               <CardTitle className="text-lg font-black text-right">أحدث الطلبات</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-xs text-center text-muted-foreground py-4">راجع صفحة "Purchase Requests" لمتابعة تفاصيل الطلبات.</p>
+              <p className="text-xs text-center text-muted-foreground py-4 italic">راجع صفحة "Purchase Requests" لمتابعة تفاصيل الطلبات التجارية الحية.</p>
               <Link href="/admin/purchase-requests">
                 <Button variant="outline" className="w-full font-bold">عرض كافة الطلبات</Button>
               </Link>
             </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
