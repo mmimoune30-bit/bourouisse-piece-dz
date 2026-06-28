@@ -1,9 +1,10 @@
+
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -16,13 +17,9 @@ import {
   TrendingUp, 
   ArrowUpRight, 
   ArrowDownRight,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  CreditCard,
   FileText,
   PlusSquare,
-  ShieldAlert
+  Loader2
 } from "lucide-react";
 import {
   Table,
@@ -36,26 +33,64 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, limit } from "firebase/firestore";
-
-const STATS = [
-  { label: "إجمالي المستخدمين", value: "1,250", trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
-  { label: "المتاجر النشطة", value: "72", trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
-  { label: "قطع الغيار", value: "8,450", trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
-  { label: "المبيعات الإجمالية", value: "24.5M DZD", trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
-];
+import { collection, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
+  const [stats, setStats] = useState({
+    users: 0,
+    stores: 0,
+    listings: 0,
+    sales: "24.5M DZD" // تجريبي
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  // Fetch New Brand/Model Requests (stored as complaints with a specific subject)
-  const requestsQuery = query(
-    collection(firestore!, "complaints"),
+  // جلب طلبات الماركات الجديدة (شكاوى بموضوع محدد)
+  const requestsQuery = firestore ? query(
+    collection(firestore, "complaints"),
     where("subject", "==", "طلب إضافة ماركة أو موديل جديد"),
     orderBy("createdAt", "desc"),
     limit(5)
-  );
+  ) : null;
+  
   const { data: brandRequests } = useCollection(requestsQuery);
+
+  useEffect(() => {
+    async function fetchLiveCounts() {
+      if (!firestore) return;
+      try {
+        const usersColl = collection(firestore, "users");
+        const storesColl = collection(firestore, "sellers");
+        const listingsColl = collection(firestore, "listings");
+
+        const [usersSnap, storesSnap, listingsSnap] = await Promise.all([
+          getCountFromServer(usersColl),
+          getCountFromServer(storesColl),
+          getCountFromServer(listingsColl)
+        ]);
+
+        setStats(prev => ({
+          ...prev,
+          users: usersSnap.data().count,
+          stores: storesSnap.data().count,
+          listings: listingsSnap.data().count
+        }));
+      } catch (error) {
+        console.error("Error fetching live counts:", error);
+      } finally {
+        setLoadingStats(false);
+      }
+    }
+
+    fetchLiveCounts();
+  }, [firestore]);
+
+  const STATS_CARDS = [
+    { label: "إجمالي المستخدمين", value: stats.users, trend: "+12%", up: true, icon: Users, color: "bg-blue-600" },
+    { label: "المتاجر النشطة", value: stats.stores, trend: "+5%", up: true, icon: Store, color: "bg-amber-500" },
+    { label: "قطع الغيار", value: stats.listings, trend: "+18%", up: true, icon: Package, color: "bg-purple-600" },
+    { label: "المبيعات الإجمالية", value: stats.sales, trend: "+25%", up: true, icon: ShoppingBag, color: "bg-green-600" },
+  ];
 
   return (
     <div className="space-y-8 text-right" dir="rtl">
@@ -84,7 +119,9 @@ export default function AdminDashboard() {
               <div key={req.id} className="flex items-center justify-between bg-white p-3 rounded-xl border border-secondary/20">
                 <Badge variant="outline" className="border-secondary text-secondary">{req.status}</Badge>
                 <p className="text-xs font-bold text-primary">{req.details}</p>
-                <span className="text-[10px] text-muted-foreground">{req.createdAt?.toDate().toLocaleDateString('ar-DZ')}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {req.createdAt?.toDate ? req.createdAt.toDate().toLocaleDateString('ar-DZ') : "قيد المعالجة"}
+                </span>
               </div>
             ))}
             <Link href="/admin/complaints" className="block text-center pt-2">
@@ -96,7 +133,7 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {STATS.map((stat, i) => {
+        {STATS_CARDS.map((stat, i) => {
           const Icon = stat.icon;
           return (
             <Card key={i} className="border-none shadow-sm overflow-hidden group">
@@ -114,7 +151,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                <h3 className="text-3xl font-black text-primary mt-1">{stat.value}</h3>
+                <h3 className="text-3xl font-black text-primary mt-1">
+                  {loadingStats ? <Loader2 className="animate-spin text-muted-foreground h-8 w-8" /> : stat.value}
+                </h3>
               </CardContent>
             </Card>
           );
