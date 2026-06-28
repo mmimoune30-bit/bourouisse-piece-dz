@@ -19,7 +19,8 @@ import {
   ArrowDownRight,
   FileText,
   PlusSquare,
-  Loader2
+  Loader2,
+  CreditCard
 } from "lucide-react";
 import {
   Table,
@@ -33,7 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
+import { collection, query, where, orderBy, limit, getCountFromServer, getDocs } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
@@ -42,6 +43,7 @@ export default function AdminDashboard() {
   const [productsCount, setProductsCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
   const [storesCount, setStoresCount] = useState(0);
+  const [transactions, setTransactions] = useState<any[]>([]);
   
   const [loadingStats, setLoadingStats] = useState(true);
 
@@ -56,27 +58,45 @@ export default function AdminDashboard() {
   const { data: brandRequests } = useCollection(requestsQuery);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       if (!firestore) return;
       try {
-        // نستخدم أسماء المجموعات المعرفة في النظام: users, listings, purchase_requests
-        const usersSnap = await getCountFromServer(collection(firestore!, "users"));
-        const productsSnap = await getCountFromServer(collection(firestore!, "listings"));
-        const ordersSnap = await getCountFromServer(collection(firestore!, "purchase_requests"));
-        const storesSnap = await getCountFromServer(collection(firestore!, "sellers"));
+        setLoadingStats(true);
+        
+        // جلب الإحصائيات (Counts)
+        const [usersSnap, productsSnap, ordersSnap, storesSnap] = await Promise.all([
+          getCountFromServer(collection(firestore, "users")),
+          getCountFromServer(collection(firestore, "listings")),
+          getCountFromServer(collection(firestore, "purchase_requests")),
+          getCountFromServer(collection(firestore, "sellers"))
+        ]);
 
         setUsersCount(usersSnap.data().count);
         setProductsCount(productsSnap.data().count);
         setOrdersCount(ordersSnap.data().count);
         setStoresCount(storesSnap.data().count);
+
+        // جلب آخر 5 عمليات دفع
+        const paymentsQuery = query(
+          collection(firestore, "payments"),
+          orderBy("date", "desc"),
+          limit(5)
+        );
+        const paymentsSnap = await getDocs(paymentsQuery);
+        const fetchedPayments = paymentsSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setTransactions(fetchedPayments);
+
       } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.error("Error fetching admin data:", error);
       } finally {
         setLoadingStats(false);
       }
     };
 
-    if (firestore) fetchStats();
+    fetchData();
   }, [firestore]);
 
   const STATS = [
@@ -90,7 +110,7 @@ export default function AdminDashboard() {
     },
     {
       label: "المتاجر النشطة",
-      value: storesCount || "72",
+      value: storesCount,
       trend: "+5%",
       up: true,
       icon: Store,
@@ -203,27 +223,32 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: "PAY001", store: "Auto Chlef", amount: "5,000 DZD", status: "Approved", method: "CCP" },
-                  { id: "PAY002", store: "Renault DZ", amount: "12,000 DZD", status: "Pending", method: "Edahabia" },
-                  { id: "PAY003", store: "Hyundai Parts", amount: "8,000 DZD", status: "Approved", method: "Bank" },
-                  { id: "PAY004", store: "Peugeot Store", amount: "15,000 DZD", status: "Rejected", method: "CIB" },
-                ].map((tx, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
-                    <TableCell className="font-bold">{tx.store}</TableCell>
-                    <TableCell className="font-black text-green-600">{tx.amount}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        tx.status === 'Approved' ? 'default' : 
-                        tx.status === 'Pending' ? 'secondary' : 'destructive'
-                      } className="font-bold">
-                        {tx.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-left pl-6 text-muted-foreground">{tx.method}</TableCell>
+                {loadingStats ? (
+                   <TableRow>
+                     <TableCell colSpan={5} className="text-center py-10"><Loader2 className="animate-spin mx-auto" /></TableCell>
+                   </TableRow>
+                ) : transactions.length > 0 ? (
+                  transactions.map((tx, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="pr-6 font-mono text-xs">{tx.id.substring(0, 8)}</TableCell>
+                      <TableCell className="font-bold">{tx.storeName || "متجر غير معروف"}</TableCell>
+                      <TableCell className="font-black text-green-600">{tx.amount?.toLocaleString()} DZD</TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          tx.status === 'Approved' ? 'default' : 
+                          tx.status === 'Pending' ? 'secondary' : 'destructive'
+                        } className="font-bold">
+                          {tx.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-left pl-6 text-muted-foreground">{tx.method}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">لا توجد عمليات دفع مسجلة حالياً.</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -255,7 +280,7 @@ export default function AdminDashboard() {
           <Card className="border-none shadow-sm bg-primary text-white overflow-hidden relative">
             <CardContent className="p-6 relative z-10 text-right">
               <h3 className="font-black text-xl mb-2 text-secondary">عمولات المنصة</h3>
-              <p className="text-blue-100/70 text-sm mb-4">تم تحصيل <span className="text-white font-black">1,229,000 دج</span> كعمولات خلال الشهر الحالي.</p>
+              <p className="text-blue-100/70 text-sm mb-4">يتم احتساب العمولات بناءً على الاشتراكات المفعلة.</p>
               <Link href="/admin/reports">
                 <Button className="w-full bg-secondary text-primary font-black hover:bg-white transition-all">مراجعة التقارير المالية</Button>
               </Link>
