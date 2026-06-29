@@ -1,65 +1,56 @@
+
 'use client';
 
 import { 
   createUserWithEmailAndPassword,
-n  await setDoc(doc(firestore, "users", user.uid), {
-    uid: user.uid,
-    name: user.displayName || "",
-    email: user.email,
-    role: "customer",
-    status: "active",
-    createdAt: serverTimestamp()
-  });
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { firestore } from "@/firebase";
   signInWithEmailAndPassword,
   signOut,
   User as FirebaseUser
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { auth, firestore } from "@/firebase/config";
+import { doc, setDoc, getDoc, serverTimestamp, Firestore } from "firebase/firestore";
+import { Auth } from "firebase/auth";
 
 /**
- * @fileOverview خدمة إدارة هوية المستخدمين والأدوار في المنصة.
- * تشمل: تسجيل الدخول، إنشاء الحساب، وتعيين الأدوار (Admin, Seller, Customer).
+ * @fileOverview خدمة إدارة هوية المستخدمين والأدوار.
+ * تضمن هذه الخدمة مزامنة بيانات Firebase Auth مع Firestore.
  */
 
-export type Role = "admin" | "seller" | "customer";
+export type UserRole = "Super Admin" | "Manager" | "Financial Officer" | "Customer Service" | "Seller" | "Customer";
 
-export interface UserProfile {
-  uid: string;
-  email: string;
+export interface CreateUserOptions {
   name: string;
-  role: Role;
-  createdAt: any;
+  email: string;
+  role: UserRole;
+  storeId?: string;
 }
 
 /**
- * جلب بيانات دور المستخدم من Firestore
+ * إنشاء حساب مستخدم جديد مع وثيقة Firestore مقابلة له
  */
-export async function getUserRole(uid: string): Promise<Role | null> {
-  if (!firestore) return null;
-  try {
-    const userDoc = await getDoc(doc(firestore, "users", uid));
-    if (userDoc.exists()) {
-      return userDoc.data().role as Role;
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching user role:", error);
-    return null;
-  }
+export async function registerUser(auth: Auth, db: Firestore, options: CreateUserOptions, password: string) {
+  const { user } = await createUserWithEmailAndPassword(auth, options.email, password);
+  
+  const profile = {
+    uid: user.uid,
+    name: options.name,
+    email: options.email,
+    role: options.role,
+    status: "Active",
+    storeId: options.storeId || null,
+    createdAt: serverTimestamp()
+  };
+
+  await setDoc(doc(db, "users", user.uid), profile);
+  return user;
 }
 
 /**
- * تسجيل الخروج من المنصة
+ * تسجيل الخروج
  */
-export async function logoutUser() {
-  try {
-    await signOut(auth);
+export async function logoutUser(auth: Auth) {
+  await signOut(auth);
+  // تنظيف أي بيانات محلية متبقية
+  if (typeof window !== 'undefined') {
     localStorage.removeItem("user_role");
-  } catch (error) {
-    console.error("Logout error:", error);
-    throw error;
   }
 }

@@ -1,35 +1,50 @@
 
 {
   "entities": {
-    "Listing": {
-      "title": "إعلان قطعة غيار أو مركبة",
-      "description": "بيانات تفصيلية لقطعة غيار أو مركبة معروضة للبيع",
+    "User": {
+      "title": "ملف المستخدم",
+      "description": "بيانات حساب المستخدم وصلاحياته في النظام",
       "type": "object",
       "properties": {
-        "vehicleType": { "type": "string", "description": "نوع المركبة: سياحية، نفعية، شاحنة..." },
-        "brand": { "type": "string", "description": "العلامة التجارية للمركبة" },
-        "model": { "type": "string", "description": "موديل المركبة" },
-        "year": { "type": "string", "description": "سنة الصنع" },
-        "category": { "type": "string", "description": "فئة القطعة: محرك، هيكل، إضاءة..." },
-        "partName": { "type": "string", "description": "اسم القطعة" },
-        "partNumber": { "type": "string", "description": "رقم القطعة الأصلي" },
-        "condition": { "type": "string", "enum": ["new", "used"], "description": "حالة القطعة" },
-        "price": { "type": "number", "description": "السعر بالدينار الجزائري" },
-        "quantity": { "type": "number", "description": "الكمية المتوفرة" },
-        "description": { "type": "string", "description": "وصف إضافي" },
-        "images": { "type": "array", "items": { "type": "string" }, "description": "روابط صور القطعة" },
-        "wilaya": { "type": "string", "description": "ولاية البائع" },
-        "commune": { "type": "string", "description": "بلدية البائع" },
-        "sellerId": { "type": "string", "description": "معرف البائع صاحب الإعلان" },
+        "uid": { "type": "string", "description": "معرف المستخدم الفريد من Firebase Auth" },
+        "name": { "type": "string", "description": "الاسم الكامل" },
+        "email": { "type": "string", "format": "email", "description": "البريد الإلكتروني" },
+        "role": { 
+          "type": "string", 
+          "enum": ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Seller", "Customer"],
+          "description": "الدور الوظيفي للمستخدم" 
+        },
+        "status": { "type": "string", "enum": ["Active", "Blocked"], "description": "حالة الحساب" },
+        "storeId": { "type": "string", "description": "معرف المتجر (خاص بالبائعين فقط)" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["vehicleType", "brand", "model", "year", "category", "partName", "price"]
+      "required": ["uid", "name", "email", "role", "status"]
+    },
+    "Listing": {
+      "title": "إعلان قطعة غيار",
+      "description": "بيانات تفصيلية لقطعة غيار معروضة للبيع",
+      "type": "object",
+      "properties": {
+        "vehicleType": { "type": "string" },
+        "brand": { "type": "string" },
+        "model": { "type": "string" },
+        "year": { "type": "string" },
+        "category": { "type": "string" },
+        "partName": { "type": "string" },
+        "price": { "type": "number" },
+        "sellerId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "Sold"] }
+      }
     }
   },
   "auth": {
     "providers": ["password", "google.com"]
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "سجلات المستخدمين والصلاحيات"
+    },
     "/listings/{listingId}": {
       "schema": "Listing",
       "description": "مجموعة الإعلانات وقطع الغيار"

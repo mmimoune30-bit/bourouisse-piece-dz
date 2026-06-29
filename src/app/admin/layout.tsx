@@ -4,33 +4,19 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { 
-  LayoutDashboard, 
-  Users, 
-  Store, 
-  Package, 
-  CreditCard, 
-  Settings, 
-  ShieldAlert, 
-  FileText, 
-  LogOut,
-  Menu,
-  X,
-  Bell,
-  Search,
-  Ticket,
-  Layout as LayoutIcon,
-  ShieldCheck,
-  History,
-  UserPlus,
-  Lock,
-  UserCircle,
-  ShoppingBag
+  LayoutDashboard, Users, Store, Package, CreditCard, 
+  Settings, ShieldAlert, FileText, LogOut, Menu, X, 
+  Bell, Search, Ticket, Layout as LayoutIcon, ShieldCheck, 
+  History, UserPlus, ShoppingBag, UserCircle, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { useUser } from "@/firebase";
+import { logoutUser } from "@/services/auth-service";
+import { useAuth } from "@/firebase";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +28,6 @@ import {
 
 const ADMIN_MENU = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { name: "Employees", href: "/admin/employees", icon: UserPlus },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Stores", href: "/admin/stores", icon: Store },
   { name: "Products", href: "/admin/products", icon: Package },
@@ -52,55 +37,60 @@ const ADMIN_MENU = [
   { name: "Pricing Plans", href: "/admin/plans", icon: ShieldCheck },
   { name: "Banners", href: "/admin/banners", icon: LayoutIcon },
   { name: "Complaints", href: "/admin/complaints", icon: ShieldAlert },
-  { name: "Reports", href: "/admin/reports", icon: FileText },
   { name: "Audit Logs", href: "/admin/audit-logs", icon: History },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
+const ALLOWED_ADMIN_ROLES = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, profile, loading } = useUser();
+  const { auth } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [adminUser, setAdminUser] = useState<any>(null);
 
   useEffect(() => {
-    // Role & Auth Protection
-    const userRole = localStorage.getItem("user_role");
-    const allowedRoles = ["SuperAdmin", "Manager", "FinancialOfficer", "CustomerService"];
-    
-    if (!userRole) {
+    if (loading) return;
+
+    if (!user) {
       router.push("/login");
       return;
     }
 
-    if (!allowedRoles.includes(userRole)) {
+    if (!profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
       toast({
         variant: "destructive",
-        title: "Access Denied / منع الوصول",
-        description: "You do not have permission to access the administration panel. / ليس لديك صلاحية للوصول.",
+        title: "منع الوصول",
+        description: "ليس لديك صلاحية للدخول إلى لوحة التحكم الإدارية.",
       });
       router.push("/");
-      return;
     }
+  }, [user, profile, loading, router]);
 
-    // Mock Admin User
-    setAdminUser({
-      name: "Admin Principal",
-      role: userRole,
-      avatar: "https://picsum.photos/seed/admin/100/100"
-    });
-    
-    setIsLoading(false);
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user_role");
-    router.push("/login");
-    toast({ title: "Logged Out", description: "You have been logged out of the admin panel." });
+  const handleLogout = async () => {
+    if (!auth) return;
+    try {
+      await logoutUser(auth);
+      router.push("/login");
+      toast({ title: "تم تسجيل الخروج", description: "تم الخروج من لوحة الإدارة بأمان." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "خطأ", description: "فشل تسجيل الخروج." });
+    }
   };
 
-  if (isLoading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-white font-black text-2xl animate-pulse">VERIFYING ACCESS...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white font-black text-2xl animate-pulse">
+        <Loader2 className="animate-spin mb-4" size={48} />
+        VERIFYING ACCESS...
+      </div>
+    );
+  }
+
+  if (!user || !profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 flex">
@@ -156,60 +146,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="rounded-xl">
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
-            <div className="relative w-96 hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-              <Input placeholder="Search system records..." className="pl-10 h-11 bg-zinc-50 border-none rounded-xl focus-visible:ring-secondary" />
-            </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-xl relative">
-                  <Bell size={20} />
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <div className="max-h-[300px] overflow-y-auto">
-                  <div className="p-4 text-xs hover:bg-zinc-50 cursor-pointer border-b">
-                    <p className="font-bold text-primary">New Store Request</p>
-                    <p className="text-muted-foreground mt-1">"Auto DZ" submitted a store registration.</p>
-                    <span className="text-[10px] text-secondary mt-2 block">2 mins ago</span>
-                  </div>
-                  <div className="p-4 text-xs hover:bg-zinc-50 cursor-pointer border-b">
-                    <p className="font-bold text-primary">High Priority Complaint</p>
-                    <p className="text-muted-foreground mt-1">CMP-1029 requires immediate attention.</p>
-                    <span className="text-[10px] text-secondary mt-2 block">1 hour ago</span>
-                  </div>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-3 pl-4 border-l cursor-pointer group">
-                  <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold text-primary leading-none group-hover:text-secondary transition-colors">{adminUser?.name}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">{adminUser?.role}</p>
-                  </div>
-                  <Avatar className="w-10 h-10 border-2 border-secondary/20 rounded-xl group-hover:border-secondary transition-all">
-                    <AvatarImage src={adminUser?.avatar} />
-                    <AvatarFallback>AD</AvatarFallback>
-                  </Avatar>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56" dir="rtl">
-                <DropdownMenuLabel className="text-right">حسابي</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="justify-end gap-2 cursor-pointer"><UserCircle size={18} /> ملفي الشخصي</DropdownMenuItem>
-                <DropdownMenuItem className="justify-end gap-2 cursor-pointer"><Settings size={18} /> إعدادات الإدارة</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="justify-end gap-2 cursor-pointer text-destructive font-bold"><LogOut size={18} /> تسجيل الخروج</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-3 pl-4 border-l cursor-pointer group">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-primary leading-none group-hover:text-secondary transition-colors">{profile.name}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">{profile.role}</p>
+              </div>
+              <Avatar className="w-10 h-10 border-2 border-secondary/20 rounded-xl">
+                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`} />
+                <AvatarFallback>AD</AvatarFallback>
+              </Avatar>
+            </div>
           </div>
         </header>
 
