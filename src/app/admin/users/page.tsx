@@ -65,7 +65,7 @@ export default function UserManagement() {
   useEffect(() => {
     if (!firestore) return;
 
-    const q = query(collection(firestore, "users"), orderBy("createdAt", "desc"));
+    const q = collection(firestore, "users");
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
