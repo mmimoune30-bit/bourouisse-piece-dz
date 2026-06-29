@@ -19,7 +19,6 @@ import {
   MoreVertical, 
   ShieldCheck, 
   Ban, 
-  Mail,
   UserPlus,
   Edit3,
   History,
@@ -49,7 +48,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore } from "@/firebase";
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const ROLES = ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Moderator", "Seller", "Customer"];
 
@@ -61,24 +62,37 @@ export default function UserManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  
+  // Controlled Select values for Shadcn Select within standard forms
+  const [newUserRole, setNewUserRole] = useState("Customer");
+  const [editUserRole, setEditUserRole] = useState("");
 
   useEffect(() => {
     if (!firestore) return;
 
     const q = collection(firestore, "users");
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setUsers(data);
-    });
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setUsers(data);
+        setMounted(true);
+      },
+      async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: "users",
+          operation: "list",
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
+    );
 
-    setMounted(true);
     return () => unsubscribe();
   }, [firestore]);
 
-  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!firestore) return;
 
@@ -86,21 +100,29 @@ export default function UserManagement() {
     const data = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
-      role: formData.get("role") as string,
+      role: newUserRole,
       status: "Active",
       createdAt: serverTimestamp()
     };
 
-    try {
-      await addDoc(collection(firestore, "users"), data);
-      setIsAddDialogOpen(false);
-      toast({ title: "تم الإضافة", description: "تم إنشاء حساب المستخدم الجديد بنجاح." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر إضافة المستخدم." });
-    }
+    // Firebase Write Pattern 1: No await, use .catch with errorEmitter
+    addDoc(collection(firestore, "users"), data)
+      .then(() => {
+        setIsAddDialogOpen(false);
+        setNewUserRole("Customer"); // Reset role
+        toast({ title: "تم الإضافة", description: "تم إنشاء حساب المستخدم الجديد بنجاح." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: "users",
+          operation: "create",
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
-  const handleUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedUser || !firestore) return;
 
@@ -108,43 +130,60 @@ export default function UserManagement() {
     const updatedData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
-      role: formData.get("role") as string,
+      role: editUserRole,
     };
 
-    try {
-      await updateDoc(doc(firestore, "users", selectedUser.id), updatedData);
-      setIsEditDialogOpen(false);
-      toast({ title: "تم التحديث", description: "تم تعديل بيانات المستخدم بنجاح." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر تحديث البيانات." });
-    }
+    updateDoc(doc(firestore, "users", selectedUser.id), updatedData)
+      .then(() => {
+        setIsEditDialogOpen(false);
+        toast({ title: "تم التحديث", description: "تم تعديل بيانات المستخدم بنجاح." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${selectedUser.id}`,
+          operation: "update",
+          requestResourceData: updatedData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
+  const handleToggleStatus = (id: string, currentStatus: string) => {
     if (!firestore) return;
     const newStatus = currentStatus === "Active" ? "Blocked" : "Active";
 
-    try {
-      await updateDoc(doc(firestore, "users", id), { status: newStatus });
-      toast({
-        title: newStatus === 'Blocked' ? "تم حظر الحساب" : "تم إلغاء الحظر",
-        description: `تغيرت حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}`,
-        variant: newStatus === 'Blocked' ? 'destructive' : 'default'
+    updateDoc(doc(firestore, "users", id), { status: newStatus })
+      .then(() => {
+        toast({
+          title: newStatus === 'Blocked' ? "تم حظر الحساب" : "تم إلغاء الحظر",
+          description: `تغيرت حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}`,
+          variant: newStatus === 'Blocked' ? 'destructive' : 'default'
+        });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${id}`,
+          operation: "update",
+          requestResourceData: { status: newStatus },
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-    } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "فشلت عملية تحديث الحالة." });
-    }
   };
 
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteUser = (id: string) => {
     if (!firestore || !confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) return;
 
-    try {
-      await deleteDoc(doc(firestore, "users", id));
-      toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر حذف السجل." });
-    }
+    deleteDoc(doc(firestore, "users", id))
+      .then(() => {
+        toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${id}`,
+          operation: "delete",
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
   const filteredUsers = users.filter(u => 
@@ -152,7 +191,7 @@ export default function UserManagement() {
     u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (!mounted) return null;
+  if (!mounted) return <div className="min-h-screen flex items-center justify-center font-black text-primary animate-pulse">جاري تحميل البيانات...</div>;
 
   return (
     <div className="space-y-8 text-right" dir="rtl">
@@ -189,7 +228,7 @@ export default function UserManagement() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="role">الدور الوظيفي</Label>
-                  <Select name="role" defaultValue="Customer">
+                  <Select name="role" value={newUserRole} onValueChange={setNewUserRole}>
                     <SelectTrigger><SelectValue placeholder="اختر الدور" /></SelectTrigger>
                     <SelectContent>
                       {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
@@ -282,7 +321,11 @@ export default function UserManagement() {
                         <DropdownMenuContent align="start" className="w-56" dir="rtl">
                           <DropdownMenuLabel className="text-right">خيارات الإدارة</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => { setSelectedUser(user); setIsEditDialogOpen(true); }}>
+                          <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => { 
+                            setSelectedUser(user); 
+                            setEditUserRole(user.role || "Customer");
+                            setIsEditDialogOpen(true); 
+                          }}>
                             <Edit3 size={16} /> تعديل البيانات
                           </DropdownMenuItem>
                           <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => toast({ title: "سجل النشاط", description: "جاري تحميل سجل نشاط المستخدم..." })}>
@@ -340,7 +383,7 @@ export default function UserManagement() {
               </div>
               <div className="grid gap-2">
                 <Label>الدور الوظيفي (الصلاحيات)</Label>
-                <Select name="role" defaultValue={selectedUser?.role}>
+                <Select name="role" value={editUserRole} onValueChange={setEditUserRole}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
