@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,11 +19,8 @@ import {
   MoreVertical, 
   ShieldCheck, 
   Ban, 
-  Key, 
   Mail,
-  Filter,
   UserPlus,
-  ShieldAlert,
   Edit3,
   History,
   CheckCircle2,
@@ -52,18 +48,20 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
-
-const INITIAL_USERS = [
-  { id: "U001", name: "ميمون محمد", email: "maymoun@autopartsdz.com", role: "Super Admin", status: "Active" },
-  { id: "U002", name: "أحمد بن علي", email: "ahmed@autopartsdz.com", role: "Manager", status: "Active" },
-  { id: "U003", name: "سميرة بوحفص", email: "samira@autopartsdz.com", role: "Financial Officer", status: "Active" },
-  { id: "U004", name: "كريم قادري", email: "karim@autopartsdz.com", role: "Customer Service", status: "Active" },
-  { id: "U005", name: "يوسف حمدي", email: "youssef@autopartsdz.com", role: "Moderator", status: "Blocked" },
-];
+import { useFirestore } from "@/firebase";
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const ROLES = ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Moderator", "Seller", "Customer"];
 
+const INITIAL_USERS = [
+  { id: "U1", name: "كريم بوعلام", email: "karim@example.com", role: "Customer", status: "Active" },
+  { id: "U2", name: "ميمون محمد", email: "admin@bourouisse.com", role: "Super Admin", status: "Active" },
+];
+
 export default function UserManagement() {
+  const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -71,43 +69,97 @@ export default function UserManagement() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
-  // Fix Hydration
   useEffect(() => {
-    setUsers(INITIAL_USERS);
+    if (!firestore) {
+      setUsers(INITIAL_USERS);
+      setMounted(true);
+      return;
+    }
+
+    const unsubscribe = onSnapshot(collection(firestore, "users"), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setUsers(data.length > 0 ? data : INITIAL_USERS);
+    }, async (error) => {
+      const permissionError = new FirestorePermissionError({
+        path: "users",
+        operation: "list"
+      });
+      errorEmitter.emit('permission-error', permissionError);
+    });
+
     setMounted(true);
-  }, []);
+    return () => unsubscribe();
+  }, [firestore]);
 
   const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const newUser = {
-      id: `U${Math.floor(Math.random() * 1000)}`,
+    const data = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       role: formData.get("role") as string,
-      status: "Active"
+      status: "Active",
+      createdAt: serverTimestamp()
     };
-    setUsers([newUser, ...users]);
+
+    if (firestore) {
+      addDoc(collection(firestore, "users"), data)
+        .catch(async (err) => {
+          const permissionError = new FirestorePermissionError({
+            path: "users",
+            operation: "create",
+            requestResourceData: data
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        });
+    }
+
     setIsAddDialogOpen(false);
     toast({ title: "تم الإضافة", description: "تم إنشاء حساب المستخدم الجديد بنجاح." });
   };
 
   const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!selectedUser || !firestore) return;
+
     const formData = new FormData(e.currentTarget);
     const updatedData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       role: formData.get("role") as string,
     };
-    setUsers(prev => prev.map(u => u.id === selectedUser.id ? { ...u, ...updatedData } : u));
+
+    updateDoc(doc(firestore, "users", selectedUser.id), updatedData)
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${selectedUser.id}`,
+          operation: "update",
+          requestResourceData: updatedData
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+
     setIsEditDialogOpen(false);
     toast({ title: "تم التحديث", description: "تم تعديل بيانات المستخدم بنجاح." });
   };
 
   const handleToggleStatus = (id: string, currentStatus: string) => {
+    if (!firestore) return;
     const newStatus = currentStatus === "Active" ? "Blocked" : "Active";
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus } : u));
+
+    updateDoc(doc(firestore, "users", id), { status: newStatus })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${id}`,
+          operation: "update",
+          requestResourceData: { status: newStatus }
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+
     toast({
       title: newStatus === 'Blocked' ? "تم حظر الحساب" : "تم إلغاء الحظر",
       description: `تغيرت حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}`,
@@ -116,10 +168,18 @@ export default function UserManagement() {
   };
 
   const handleDeleteUser = (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) {
-      setUsers(prev => prev.filter(u => u.id !== id));
-      toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
-    }
+    if (!firestore || !confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) return;
+
+    deleteDoc(doc(firestore, "users", id))
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${id}`,
+          operation: "delete"
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+
+    toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
   };
 
   const filteredUsers = users.filter(u => 
@@ -215,7 +275,7 @@ export default function UserManagement() {
                   <TableCell className="pr-6">
                     <div className="flex items-center gap-3 justify-start flex-row-reverse">
                       <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center font-black text-primary border border-secondary/20">
-                        {user.name.charAt(0)}
+                        {user.name?.charAt(0) || "U"}
                       </div>
                       <div className="flex flex-col text-right">
                         <span className="font-black text-primary">{user.name}</span>
@@ -285,7 +345,6 @@ export default function UserManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]" dir="rtl">
           <form onSubmit={handleUpdateUser}>

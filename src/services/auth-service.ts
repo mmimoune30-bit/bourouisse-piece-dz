@@ -2,6 +2,16 @@
 
 import { 
   createUserWithEmailAndPassword,
+n  await setDoc(doc(firestore, "users", user.uid), {
+    uid: user.uid,
+    name: user.displayName || "",
+    email: user.email,
+    role: "customer",
+    status: "active",
+    createdAt: serverTimestamp()
+  });
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { firestore } from "@/firebase";
   signInWithEmailAndPassword,
   signOut,
   User as FirebaseUser
