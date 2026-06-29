@@ -49,16 +49,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore } from "@/firebase";
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
 
 const ROLES = ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Moderator", "Seller", "Customer"];
-
-const INITIAL_USERS = [
-  { id: "U1", name: "كريم بوعلام", email: "karim@example.com", role: "Customer", status: "Active" },
-  { id: "U2", name: "ميمون محمد", email: "admin@bourouisse.com", role: "Super Admin", status: "Active" },
-];
 
 export default function UserManagement() {
   const { firestore } = useFirestore();
@@ -70,32 +63,25 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   useEffect(() => {
-    if (!firestore) {
-      setUsers(INITIAL_USERS);
-      setMounted(true);
-      return;
-    }
+    if (!firestore) return;
 
-    const unsubscribe = onSnapshot(collection(firestore, "users"), (snapshot) => {
+    const q = query(collection(firestore, "users"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setUsers(data.length > 0 ? data : INITIAL_USERS);
-    }, async (error) => {
-      const permissionError = new FirestorePermissionError({
-        path: "users",
-        operation: "list"
-      });
-      errorEmitter.emit('permission-error', permissionError);
+      setUsers(data);
     });
 
     setMounted(true);
     return () => unsubscribe();
   }, [firestore]);
 
-  const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!firestore) return;
+
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name") as string,
@@ -105,23 +91,16 @@ export default function UserManagement() {
       createdAt: serverTimestamp()
     };
 
-    if (firestore) {
-      addDoc(collection(firestore, "users"), data)
-        .catch(async (err) => {
-          const permissionError = new FirestorePermissionError({
-            path: "users",
-            operation: "create",
-            requestResourceData: data
-          });
-          errorEmitter.emit('permission-error', permissionError);
-        });
+    try {
+      await addDoc(collection(firestore, "users"), data);
+      setIsAddDialogOpen(false);
+      toast({ title: "تم الإضافة", description: "تم إنشاء حساب المستخدم الجديد بنجاح." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر إضافة المستخدم." });
     }
-
-    setIsAddDialogOpen(false);
-    toast({ title: "تم الإضافة", description: "تم إنشاء حساب المستخدم الجديد بنجاح." });
   };
 
-  const handleUpdateUser = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedUser || !firestore) return;
 
@@ -132,59 +111,45 @@ export default function UserManagement() {
       role: formData.get("role") as string,
     };
 
-    updateDoc(doc(firestore, "users", selectedUser.id), updatedData)
-      .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: `users/${selectedUser.id}`,
-          operation: "update",
-          requestResourceData: updatedData
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-
-    setIsEditDialogOpen(false);
-    toast({ title: "تم التحديث", description: "تم تعديل بيانات المستخدم بنجاح." });
+    try {
+      await updateDoc(doc(firestore, "users", selectedUser.id), updatedData);
+      setIsEditDialogOpen(false);
+      toast({ title: "تم التحديث", description: "تم تعديل بيانات المستخدم بنجاح." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر تحديث البيانات." });
+    }
   };
 
-  const handleToggleStatus = (id: string, currentStatus: string) => {
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
     if (!firestore) return;
     const newStatus = currentStatus === "Active" ? "Blocked" : "Active";
 
-    updateDoc(doc(firestore, "users", id), { status: newStatus })
-      .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: `users/${id}`,
-          operation: "update",
-          requestResourceData: { status: newStatus }
-        });
-        errorEmitter.emit('permission-error', permissionError);
+    try {
+      await updateDoc(doc(firestore, "users", id), { status: newStatus });
+      toast({
+        title: newStatus === 'Blocked' ? "تم حظر الحساب" : "تم إلغاء الحظر",
+        description: `تغيرت حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}`,
+        variant: newStatus === 'Blocked' ? 'destructive' : 'default'
       });
-
-    toast({
-      title: newStatus === 'Blocked' ? "تم حظر الحساب" : "تم إلغاء الحظر",
-      description: `تغيرت حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}`,
-      variant: newStatus === 'Blocked' ? 'destructive' : 'default'
-    });
+    } catch (err) {
+      toast({ variant: "destructive", title: "خطأ", description: "فشلت عملية تحديث الحالة." });
+    }
   };
 
-  const handleDeleteUser = (id: string) => {
+  const handleDeleteUser = async (id: string) => {
     if (!firestore || !confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) return;
 
-    deleteDoc(doc(firestore, "users", id))
-      .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: `users/${id}`,
-          operation: "delete"
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-
-    toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
+    try {
+      await deleteDoc(doc(firestore, "users", id));
+      toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة المستخدم من النظام." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر حذف السجل." });
+    }
   };
 
   const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(search.toLowerCase()) || 
-    u.email.toLowerCase().includes(search.toLowerCase())
+    u.name?.toLowerCase().includes(search.toLowerCase()) || 
+    u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (!mounted) return null;
@@ -216,11 +181,11 @@ export default function UserManagement() {
               <div className="grid gap-4 py-4 text-right">
                 <div className="grid gap-2">
                   <Label htmlFor="name">الاسم الكامل</Label>
-                  <Input id="name" name="name" placeholder="الاسم هنا" required />
+                  <Input id="name" name="name" placeholder="الاسم هنا" required className="text-right" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">البريد الإلكتروني</Label>
-                  <Input id="email" name="email" type="email" placeholder="email@example.com" required />
+                  <Input id="email" name="email" type="email" placeholder="email@example.com" required className="text-right" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="role">الدور الوظيفي</Label>
@@ -270,73 +235,82 @@ export default function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id} className="group">
-                  <TableCell className="pr-6">
-                    <div className="flex items-center gap-3 justify-start flex-row-reverse">
-                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center font-black text-primary border border-secondary/20">
-                        {user.name?.charAt(0) || "U"}
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="group">
+                    <TableCell className="pr-6">
+                      <div className="flex items-center gap-3 justify-start flex-row-reverse">
+                        <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center font-black text-primary border border-secondary/20">
+                          {user.name?.charAt(0) || "U"}
+                        </div>
+                        <div className="flex flex-col text-right">
+                          <span className="font-black text-primary">{user.name}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {user.email}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col text-right">
-                        <span className="font-black text-primary">{user.name}</span>
-                        <span className="text-[10px] text-muted-foreground font-mono">{user.email}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={cn(
-                      "font-black text-[10px] uppercase",
-                      user.role === 'Super Admin' ? "text-red-600 border-red-200 bg-red-50" : 
-                      user.role === 'Financial Officer' ? "text-blue-600 border-blue-200 bg-blue-50" : ""
-                    )}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn(
-                      "font-bold",
-                      user.status === "Active" ? "bg-green-600" : "bg-destructive"
-                    )}>
-                      {user.status === 'Active' ? 'نشط' : 'محظور'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-left pl-6">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-lg"><MoreVertical size={18} /></Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-56" dir="rtl">
-                        <DropdownMenuLabel className="text-right">خيارات الإدارة</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => { setSelectedUser(user); setIsEditDialogOpen(true); }}>
-                          <Edit3 size={16} /> تعديل البيانات
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => toast({ title: "سجل النشاط", description: "جاري تحميل سجل نشاط المستخدم..." })}>
-                          <History size={16} /> سجل العمليات
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className={cn("justify-end gap-2 cursor-pointer font-bold", user.status === 'Active' ? "text-destructive" : "text-green-600")}
-                          onClick={() => handleToggleStatus(user.id, user.status)}
-                        >
-                          {user.status === 'Active' ? (
-                            <><Ban size={16} /> حظر الحساب</>
-                          ) : (
-                            <><CheckCircle2 size={16} /> إلغاء الحظر</>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="justify-end gap-2 cursor-pointer text-destructive/50 hover:text-destructive" onClick={() => handleDeleteUser(user.id)}>
-                          <Trash2 size={16} /> حذف نهائي
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredUsers.length === 0 && (
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge variant="outline" className={cn(
+                        "font-black text-[10px] uppercase",
+                        user.role === 'Super Admin'
+                          ? "text-red-600 border-red-200 bg-red-50"
+                          : user.role === 'Financial Officer'
+                          ? "text-blue-600 border-blue-200 bg-blue-50"
+                          : ""
+                      )}>
+                        {user.role}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge className={cn(
+                        "font-bold",
+                        user.status === "Active" ? "bg-green-600" : "bg-destructive"
+                      )}>
+                        {user.status === 'Active' ? 'نشط' : 'محظور'}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-left pl-6">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="rounded-lg"><MoreVertical size={18} /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-56" dir="rtl">
+                          <DropdownMenuLabel className="text-right">خيارات الإدارة</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => { setSelectedUser(user); setIsEditDialogOpen(true); }}>
+                            <Edit3 size={16} /> تعديل البيانات
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="justify-end gap-2 cursor-pointer" onClick={() => toast({ title: "سجل النشاط", description: "جاري تحميل سجل نشاط المستخدم..." })}>
+                            <History size={16} /> سجل العمليات
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className={cn("justify-end gap-2 cursor-pointer font-bold", user.status === 'Active' ? "text-destructive" : "text-green-600")}
+                            onClick={() => handleToggleStatus(user.id, user.status)}
+                          >
+                            {user.status === 'Active' ? (
+                              <><Ban size={16} /> حظر الحساب</>
+                            ) : (
+                              <><CheckCircle2 size={16} /> إلغاء الحظر</>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="justify-end gap-2 cursor-pointer text-destructive/50 hover:text-destructive" onClick={() => handleDeleteUser(user.id)}>
+                            <Trash2 size={16} /> حذف نهائي
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-20 text-muted-foreground font-bold">
-                    لا يوجد مستخدمون يطابقون بحثك.
+                    لا يوجد مستخدمون مسجلون حالياً
                   </TableCell>
                 </TableRow>
               )}
@@ -345,6 +319,7 @@ export default function UserManagement() {
         </CardContent>
       </Card>
 
+      {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]" dir="rtl">
           <form onSubmit={handleUpdateUser}>
@@ -357,11 +332,11 @@ export default function UserManagement() {
             <div className="grid gap-4 py-4 text-right">
               <div className="grid gap-2">
                 <Label>الاسم الكامل</Label>
-                <Input name="name" defaultValue={selectedUser?.name} required />
+                <Input name="name" defaultValue={selectedUser?.name} required className="text-right" />
               </div>
               <div className="grid gap-2">
                 <Label>البريد الإلكتروني</Label>
-                <Input name="email" type="email" defaultValue={selectedUser?.email} required />
+                <Input name="email" type="email" defaultValue={selectedUser?.email} required className="text-right" />
               </div>
               <div className="grid gap-2">
                 <Label>الدور الوظيفي (الصلاحيات)</Label>
