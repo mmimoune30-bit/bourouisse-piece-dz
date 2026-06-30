@@ -53,11 +53,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (loading) return;
 
+    // إذا لم يكن هناك مستخدم مسجل
     if (!user) {
       router.push("/login");
       return;
     }
 
+    // إذا اكتمل التحميل ولم يتم العثور على ملف شخصي أو الدور غير مسموح به
     if (!profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
       toast({
         variant: "destructive",
@@ -82,12 +84,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white font-black text-2xl animate-pulse">
-        <Loader2 className="animate-spin mb-4" size={48} />
-        VERIFYING ACCESS...
+        <Loader2 className="animate-spin mb-4 text-secondary" size={48} />
+        <span className="tracking-widest">تحقق من الصلاحيات...</span>
       </div>
     );
   }
 
+  // منع وميض المحتوى قبل إعادة التوجيه
   if (!user || !profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
     return null;
   }
@@ -138,8 +141,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <main className={cn(
         "flex-grow transition-all duration-300 min-h-screen flex flex-col",
-        isSidebarOpen ? "ml-64" : "ml-20"
-      )}>
+        isSidebarOpen ? "mr-64" : "mr-20"
+      )} dir="rtl">
         {/* Top Header */}
         <header className="h-20 bg-white border-b flex items-center justify-between px-8 sticky top-0 z-40">
           <div className="flex items-center gap-6">
@@ -149,8 +152,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 pl-4 border-l cursor-pointer group">
-              <div className="text-right hidden sm:block">
+            <div className="flex items-center gap-3 pr-4 border-r cursor-pointer group">
+              <div className="text-right">
                 <p className="text-sm font-bold text-primary leading-none group-hover:text-secondary transition-colors">{profile.name}</p>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">{profile.role}</p>
               </div>
