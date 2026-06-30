@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,35 +37,52 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. جلب ملف المستخدم من Firestore للتحقق من الدور
-      const userDoc = await getDoc(doc(firestore, "users", user.uid));
+      // 2. جلب ملف المستخدم من Firestore باستخدام الـ UID كمعرف
+      const userDocRef = doc(firestore, "users", user.uid);
+      let userDoc = await getDoc(userDocRef);
       
-      if (userDoc.exists()) {
-        const profile = userDoc.data();
-        const role = profile.role;
+      let profile;
 
-        // تخزين الدور محلياً للسرعة في المكونات البسيطة
-        localStorage.setItem("user_role", role);
-        window.dispatchEvent(new Event("authChange"));
+      // 3. ميزة الإصلاح الذاتي: إذا كان المستخدم موجوداً في Auth ولكن ليس له ملف في Firestore
+      if (!userDoc.exists()) {
+        console.log("Profile missing, creating default profile for UID:", user.uid);
+        // نحدد الدور بناءً على الإيميل لضمان دخول المسؤول الأول
+        const isAdmin = email === "mmimoune30@gmail.com"; 
+        
+        profile = {
+          uid: user.uid,
+          name: user.displayName || email.split('@')[0],
+          email: email,
+          role: isAdmin ? "Super Admin" : "Customer",
+          status: "Active",
+          createdAt: serverTimestamp()
+        };
 
-        toast({ 
-          title: "تم تسجيل الدخول", 
-          description: `مرحباً بك مجدداً ${profile.name}. جاري توجيهك...` 
-        });
-
-        // 3. التوجيه الذكي حسب الدور
-        const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
-        if (adminRoles.includes(role)) {
-          router.push("/admin/dashboard");
-        } else if (role === "Seller") {
-          router.push("/seller/dashboard");
-        } else {
-          router.push("/customer/dashboard");
-        }
+        // استخدام setDoc مع الـ UID لضمان الربط الصحيح
+        await setDoc(userDocRef, profile);
+        toast({ title: "تم إنشاء ملفك الشخصي", description: "جاري توجيهك للوحة التحكم..." });
       } else {
-        // حالة نادرة: المستخدم موجود في Auth ولكن ليس له ملف في Firestore
-        router.push("/");
+        profile = userDoc.data();
       }
+
+      const role = profile.role;
+      localStorage.setItem("user_role", role);
+
+      toast({ 
+        title: "تم تسجيل الدخول", 
+        description: `مرحباً بك مجدداً ${profile.name}.` 
+      });
+
+      // 4. التوجيه الذكي حسب الدور
+      const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
+      if (adminRoles.includes(role)) {
+        router.push("/admin/dashboard");
+      } else if (role === "Seller") {
+        router.push("/seller/dashboard");
+      } else {
+        router.push("/customer/dashboard");
+      }
+
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "فشل تسجيل الدخول. يرجى التأكد من البيانات.";

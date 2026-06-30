@@ -12,7 +12,7 @@ import { Auth } from "firebase/auth";
 
 /**
  * @fileOverview خدمة إدارة هوية المستخدمين والأدوار.
- * تضمن هذه الخدمة مزامنة بيانات Firebase Auth مع Firestore.
+ * تضمن هذه الخدمة مزامنة بيانات Firebase Auth مع Firestore باستخدام الـ UID كمعرف ثابت.
  */
 
 export type UserRole = "Super Admin" | "Manager" | "Financial Officer" | "Customer Service" | "Seller" | "Customer";
@@ -25,7 +25,7 @@ export interface CreateUserOptions {
 }
 
 /**
- * إنشاء حساب مستخدم جديد مع وثيقة Firestore مقابلة له
+ * إنشاء حساب مستخدم جديد مع وثيقة Firestore مقابلة له (UID Mapping)
  */
 export async function registerUser(auth: Auth, db: Firestore, options: CreateUserOptions, password: string) {
   const { user } = await createUserWithEmailAndPassword(auth, options.email, password);
@@ -40,6 +40,7 @@ export async function registerUser(auth: Auth, db: Firestore, options: CreateUse
     createdAt: serverTimestamp()
   };
 
+  // القاعدة الذهبية: استخدام الـ UID كاسم للمستند
   await setDoc(doc(db, "users", user.uid), profile);
   return user;
 }

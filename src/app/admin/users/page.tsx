@@ -52,11 +52,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  
-  const [newUserRole, setNewUserRole] = useState("Customer");
-  const [editUserRole, setEditUserRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("Customer");
 
   useEffect(() => {
     if (!firestore) return;
@@ -75,6 +71,38 @@ export default function UserManagement() {
 
     return () => unsubscribe();
   }, [firestore]);
+
+  const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!firestore) return;
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const name = formData.get("name") as string;
+    
+    // ملاحظة تقنية: في البيئة الحقيقية، نحتاج UID من Firebase Auth. 
+    // هنا نقوم بإنشاء سجل تمهيدي في Firestore بانتظار تسجيل دخول المستخدم الحقيقي.
+    // المعرف هنا سيكون الإيميل مؤقتاً أو UID يدوياً إذا توفر.
+    const tempUid = `temp_${Date.now()}`; 
+
+    const newUser = {
+      uid: tempUid,
+      name,
+      email,
+      role: selectedRole,
+      status: "Active",
+      createdAt: serverTimestamp()
+    };
+
+    try {
+      // استخدام setDoc مع المعرف المحدد لضمان النظام
+      await setDoc(doc(firestore, "users", tempUid), newUser);
+      toast({ title: "تمت الإضافة", description: "تم إنشاء سجل المستخدم بنجاح." });
+      setIsAddDialogOpen(false);
+    } catch (err) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "write", requestResourceData: newUser }));
+    }
+  };
 
   const handleUpdateStatus = (id: string, currentStatus: string) => {
     if (!firestore) return;
@@ -111,6 +139,44 @@ export default function UserManagement() {
           </h1>
           <p className="text-muted-foreground mt-1">إدارة الصلاحيات، الأدوار، والرقابة على الحسابات.</p>
         </div>
+        
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="font-bold gap-2 h-12 px-8 bg-primary">
+              <UserPlus size={18} /> إضافة مستخدم يدوي
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md" dir="rtl">
+            <form onSubmit={handleAddUser}>
+              <DialogHeader>
+                <DialogTitle className="text-right font-black">إضافة مستخدم جديد</DialogTitle>
+                <DialogDescription className="text-right">سيتم إنشاء سجل بيانات للمستخدم في Firestore.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label className="text-right block">الاسم الكامل</Label>
+                  <Input name="name" placeholder="الاسم واللقب" required />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-right block">البريد الإلكتروني</Label>
+                  <Input name="email" type="email" placeholder="example@mail.com" required />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-right block">الدور الوظيفي</Label>
+                  <Select value={selectedRole} onValueChange={setSelectedRole}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STANDARDIZED_ROLES.map(role => <SelectItem key={role} value={role}>{role}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:justify-start">
+                <Button type="submit" className="font-bold">حفظ البيانات</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border shadow-sm">
