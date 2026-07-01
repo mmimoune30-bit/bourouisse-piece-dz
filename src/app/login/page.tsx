@@ -37,16 +37,14 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. جلب ملف المستخدم من Firestore باستخدام الـ UID كمعرف
+      // 2. جلب ملف المستخدم من Firestore باستخدام الـ UID كمعرف حصري
       const userDocRef = doc(firestore, "users", user.uid);
-      let userDoc = await getDoc(userDocRef);
+      const userDoc = await getDoc(userDocRef);
       
       let profile;
 
-      // 3. ميزة الإصلاح الذاتي: إذا كان المستخدم موجوداً في Auth ولكن ليس له ملف في Firestore
       if (!userDoc.exists()) {
-        console.log("Profile missing, creating default profile for UID:", user.uid);
-        // نحدد الدور بناءً على الإيميل لضمان دخول المسؤول الأول
+        // ميزة الإصلاح الذاتي: إنشاء بروفايل للمسؤول إذا كان غير موجود
         const isAdmin = email === "mmimoune30@gmail.com"; 
         
         profile = {
@@ -58,9 +56,8 @@ export default function LoginPage() {
           createdAt: serverTimestamp()
         };
 
-        // استخدام setDoc مع الـ UID لضمان الربط الصحيح
         await setDoc(userDocRef, profile);
-        toast({ title: "تم إنشاء ملفك الشخصي", description: "جاري توجيهك للوحة التحكم..." });
+        toast({ title: "مرحباً بك", description: "تم ربط حسابك بلوحة التحكم بنجاح." });
       } else {
         profile = userDoc.data();
       }
@@ -68,14 +65,11 @@ export default function LoginPage() {
       const role = profile.role;
       localStorage.setItem("user_role", role);
 
-      toast({ 
-        title: "تم تسجيل الدخول", 
-        description: `مرحباً بك مجدداً ${profile.name}.` 
-      });
-
-      // 4. التوجيه الذكي حسب الدور
+      // 3. التوجيه الذكي حسب الدور (Admin Roles)
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
+      
       if (adminRoles.includes(role)) {
+        toast({ title: "تم الدخول كمسؤول", description: `مرحباً بك في لوحة الإدارة، ${profile.name}.` });
         router.push("/admin/dashboard");
       } else if (role === "Seller") {
         router.push("/seller/dashboard");
@@ -86,7 +80,7 @@ export default function LoginPage() {
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+      if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
       toast({ 
@@ -105,7 +99,7 @@ export default function LoginPage() {
       <main className="flex-grow pt-[235px] pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px]">
-            <CardHeader className="bg-primary text-white p-8 text-center relative">
+            <CardHeader className="bg-primary text-white p-8 text-center">
                <div className="mx-auto w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4">
                   <ShieldCheck size={32} />
                </div>

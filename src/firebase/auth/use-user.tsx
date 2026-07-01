@@ -18,20 +18,23 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth || !firestore) return;
+    if (!auth || !firestore) {
+      setLoading(false);
+      return;
+    }
 
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
       
       if (u) {
-        // الاستماع لتغييرات الملف الشخصي في Firestore
+        // الاستماع لتغييرات الملف الشخصي في Firestore باستخدام الـ UID
         const unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
           if (snap.exists()) {
             setProfile(snap.data());
           } else {
             setProfile(null);
           }
-          setLoading(false);
+          setLoading(false); // يتم إنهاء حالة التحميل فقط بعد الرد من Firestore
         }, (error) => {
           console.error("Error fetching user profile:", error);
           setLoading(false);
