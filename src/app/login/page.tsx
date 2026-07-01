@@ -101,7 +101,12 @@ export default function LoginPage() {
       }
 
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("FULL LOGIN ERROR", error);
+      alert(JSON.stringify({
+        code: error.code,
+        message: error.message
+      }, null, 2));
+
       let errorMessage = "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
       
       if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
