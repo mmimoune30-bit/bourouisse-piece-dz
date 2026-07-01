@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState("email");
-  const [email, setEmail] = useState("");
+  const [emailOrId, setEmailOrId] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,43 +33,64 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      // 1. تسجيل الدخول عبر Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      let finalEmail = emailOrId;
+
+      // إذا كان تسجيل الدخول بالمعرف الرقمي، نبحث عن الإيميل المرتبط به أولاً
+      if (loginMethod === "id") {
+        const usersRef = collection(firestore, "users");
+        
+        // البحث في معرفات المتاجر (Sellers) أو العملاء (Customers)
+        // ملاحظة: نفترض أن المعرف مخزن في حقل storeId أو customerId أو accountId
+        const qStore = query(usersRef, where("storeId", "==", emailOrId));
+        const qCustomer = query(usersRef, where("customerId", "==", emailOrId));
+        
+        const [storeSnap, customerSnap] = await Promise.all([
+          getDocs(qStore),
+          getDocs(qCustomer)
+        ]);
+
+        let foundUserDoc = null;
+        if (!storeSnap.empty) foundUserDoc = storeSnap.docs[0];
+        else if (!customerSnap.empty) foundUserDoc = customerSnap.docs[0];
+
+        if (!foundUserDoc) {
+          throw new Error("المعرف الرقمي غير صحيح أو غير مسجل.");
+        }
+
+        finalEmail = foundUserDoc.data().email;
+      }
+
+      // تسجيل الدخول عبر Firebase Auth باستخدام الإيميل (الحقيقي أو المستخرج)
+      const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 2. جلب ملف المستخدم من Firestore باستخدام الـ UID كمعرف حصري
+      // جلب ملف المستخدم للتوجيه الصحيح
       const userDocRef = doc(firestore, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       
       let profile;
 
       if (!userDoc.exists()) {
-        // ميزة الإصلاح الذاتي: إنشاء بروفايل للمسؤول إذا كان غير موجود
-        const isAdmin = email === "mmimoune30@gmail.com"; 
-        
+        // حالة استثنائية: الحساب موجود في Auth ولكن غير موجود في Firestore (مثل تسجيلات قديمة)
+        const isAdmin = finalEmail === "mmimoune30@gmail.com"; 
         profile = {
           uid: user.uid,
-          name: user.displayName || email.split('@')[0],
-          email: email,
+          name: user.displayName || finalEmail.split('@')[0],
+          email: finalEmail,
           role: isAdmin ? "Super Admin" : "Customer",
           status: "Active",
           createdAt: serverTimestamp()
         };
-
         await setDoc(userDocRef, profile);
-        toast({ title: "مرحباً بك", description: "تم ربط حسابك بلوحة التحكم بنجاح." });
       } else {
         profile = userDoc.data();
       }
 
       const role = profile.role;
-      localStorage.setItem("user_role", role);
-
-      // 3. التوجيه الذكي حسب الدور (Admin Roles)
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       
       if (adminRoles.includes(role)) {
-        toast({ title: "تم الدخول كمسؤول", description: `مرحباً بك في لوحة الإدارة، ${profile.name}.` });
+        toast({ title: "تم الدخول كمسؤول", description: `مرحباً بك، ${profile.name}.` });
         router.push("/admin/dashboard");
       } else if (role === "Seller") {
         router.push("/seller/dashboard");
@@ -82,6 +103,8 @@ export default function LoginPage() {
       let errorMessage = "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
       if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      } else if (error.message) {
+        errorMessage = error.message;
       }
       toast({ 
         variant: "destructive", 
@@ -118,9 +141,9 @@ export default function LoginPage() {
                       <Label className="font-bold">{loginMethod === 'email' ? 'البريد الإلكتروني' : 'معرف الحساب (Account ID)'}</Label>
                       <div className="relative">
                         <Input 
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          type={loginMethod === 'email' ? "email" : "text"}
+                          value={emailOrId}
+                          onChange={(e) => setEmailOrId(e.target.value)}
                           placeholder={loginMethod === 'email' ? 'email@example.com' : 'BR-S-XXXX'} 
                           className="h-14 pr-12 text-lg border-2 focus:border-secondary rounded-xl" 
                           required

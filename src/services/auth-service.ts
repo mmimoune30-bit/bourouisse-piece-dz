@@ -22,6 +22,7 @@ export interface CreateUserOptions {
   email: string;
   role: UserRole;
   storeId?: string;
+  customerId?: string;
 }
 
 /**
@@ -37,6 +38,7 @@ export async function registerUser(auth: Auth, db: Firestore, options: CreateUse
     role: options.role,
     status: "Active",
     storeId: options.storeId || null,
+    customerId: options.customerId || null,
     createdAt: serverTimestamp()
   };
 

@@ -9,20 +9,28 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, Lock, X } from "lucide-react";
+import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, Lock, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { WILAYAS_DATA } from "@/lib/algeria-locations";
+import { useAuth, useFirestore } from "@/firebase";
+import { registerUser } from "@/services/auth-service";
+import { useRouter } from "next/navigation";
 
 export default function SellerRegister() {
+  const router = useRouter();
+  const { auth } = useAuth();
+  const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const storeId = `BR-S-${Math.floor(1000 + Math.random() * 9000)}`;
+  
+  // توليد المعرف الرقمي للمتجر
+  const storeId = useMemo(() => `BR-S-${Math.floor(1000 + Math.random() * 9000)}`, []);
 
   const communesList = useMemo(() => {
     return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
@@ -36,17 +44,11 @@ export default function SellerRegister() {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "خطأ في الحجم",
-          description: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت.",
-        });
+        toast({ variant: "destructive", title: "خطأ في الحجم", description: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت." });
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
+      reader.onloadend = () => setLogoPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -57,17 +59,40 @@ export default function SellerRegister() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!agreed) {
       toast({ variant: "destructive", title: "تنبيه", description: "يجب الموافقة على الشروط والأحكام أولاً." });
       return;
     }
+
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
+      return;
+    }
+
+    if (!auth || !firestore) return;
+
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await registerUser(auth, firestore, {
+        name: formData.get("storeName") as string,
+        email: formData.get("email") as string,
+        role: "Seller",
+        storeId: storeId
+      }, password);
+
+      toast({ title: "تم إنشاء المتجر", description: `معرف متجرك هو ${storeId}. يمكنك استخدامه للدخول.` });
+      router.push("/seller/dashboard");
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "فشل التسجيل", description: err.message });
+    } finally {
       setLoading(false);
-      toast({ title: "تم إنشاء الحساب", description: `معرف متجرك هو ${storeId}. يرجى تذكر هذا المعرف.` });
-    }, 1500);
+    }
   };
 
   return (
@@ -96,7 +121,7 @@ export default function SellerRegister() {
               </div>
 
               <div className="p-6 border-2 border-dashed border-primary/20 rounded-3xl text-center">
-                 <p className="text-xs font-black text-muted-foreground uppercase mb-2">سيتم توليد المعرف تلقائياً</p>
+                 <p className="text-xs font-black text-muted-foreground uppercase mb-2">معرفك الرقمي الجديد</p>
                  <div className="text-3xl font-black text-primary tracking-widest bg-zinc-100 p-4 rounded-xl border-2 border-white shadow-inner">
                     {storeId}
                  </div>
@@ -115,40 +140,40 @@ export default function SellerRegister() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">اسم المتجر</Label>
-                      <Input placeholder="مثلاً: بوزيد لقطع الغيار" className="h-12 border-2" required />
+                      <Input name="storeName" placeholder="مثلاً: بوزيد لقطع الغيار" className="h-12 border-2" required />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">اسم صاحب المتجر</Label>
-                      <Input placeholder="الاسم واللقب" className="h-12 border-2" required />
+                      <Input name="ownerName" placeholder="الاسم واللقب" className="h-12 border-2" required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">رقم الهاتف</Label>
-                      <Input placeholder="05/06/07..." className="h-12 border-2" required />
+                      <Input name="phone" placeholder="05/06/07..." className="h-12 border-2" required />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">رقم الواتساب</Label>
-                      <Input placeholder="05/06/07..." className="h-12 border-2 border-green-100" />
+                      <Input name="whatsapp" placeholder="05/06/07..." className="h-12 border-2 border-green-100" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">البريد الإلكتروني</Label>
-                      <Input type="email" placeholder="email@example.com" className="h-12 border-2" required />
+                      <Input name="email" type="email" placeholder="email@example.com" className="h-12 border-2" required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">الولاية</Label>
-                      <Select required onValueChange={setSelectedWilaya}>
+                      <Select name="wilaya" required onValueChange={setSelectedWilaya}>
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
                         <SelectContent>{Object.keys(WILAYAS_DATA).sort().map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">البلدية</Label>
-                      <Select required disabled={!selectedWilaya}>
+                      <Select name="commune" required disabled={!selectedWilaya}>
                         <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر البلدية" /></SelectTrigger>
                         <SelectContent>{communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                       </Select>
@@ -158,44 +183,22 @@ export default function SellerRegister() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="font-bold">كلمة المرور</Label>
-                      <Input type="password" placeholder="••••••••" className="h-12 border-2" required />
+                      <Input name="password" type="password" placeholder="••••••••" className="h-12 border-2" required />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">تأكيد كلمة المرور</Label>
-                      <Input type="password" placeholder="••••••••" className="h-12 border-2" required />
+                      <Input name="confirmPassword" type="password" placeholder="••••••••" className="h-12 border-2" required />
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <Label className="font-bold">شعار المتجر (Logo)</Label>
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      className="hidden" 
-                      accept="image/*" 
-                      onChange={handleLogoChange}
-                    />
-                    <div 
-                      onClick={handleLogoClick}
-                      className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]"
-                    >
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoChange} />
+                    <div onClick={handleLogoClick} className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]">
                        {logoPreview ? (
                          <div className="relative w-full h-full flex items-center justify-center">
-                           <Image 
-                            src={logoPreview} 
-                            alt="Store Logo Preview" 
-                            width={150} 
-                            height={150} 
-                            className="object-contain max-h-[180px] rounded-xl"
-                           />
-                           <Button 
-                            variant="destructive" 
-                            size="icon" 
-                            className="absolute -top-2 -right-2 rounded-full h-8 w-8 shadow-lg"
-                            onClick={removeLogo}
-                           >
-                            <X size={16} />
-                           </Button>
+                           <Image src={logoPreview} alt="Store Logo Preview" width={150} height={150} className="object-contain max-h-[180px] rounded-xl" />
+                           <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 rounded-full h-8 w-8 shadow-lg" onClick={removeLogo}><X size={16} /></Button>
                          </div>
                        ) : (
                          <>
@@ -208,22 +211,12 @@ export default function SellerRegister() {
                   </div>
 
                   <div className="flex items-center justify-end gap-3 py-2">
-                    <Label htmlFor="terms-seller" className="text-sm font-bold cursor-pointer">
-                      لقد قرأت <Link href="/privacy-policy" className="text-secondary underline">سياسة الخصوصية</Link> و <Link href="/terms-of-service" className="text-secondary underline">شروط الخدمة</Link> وأوافق عليهما.
-                    </Label>
-                    <Checkbox 
-                      id="terms-seller" 
-                      checked={agreed} 
-                      onCheckedChange={(val) => setAgreed(!!val)} 
-                    />
+                    <Label htmlFor="terms-seller" className="text-sm font-bold cursor-pointer">أوافق على الشروط والأحكام وسياسة الخصوصية.</Label>
+                    <Checkbox id="terms-seller" checked={agreed} onCheckedChange={(val) => setAgreed(!!val)} />
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full h-16 text-xl font-black shadow-2xl rounded-2xl gap-3" 
-                    disabled={loading || !agreed}
-                  >
-                    {loading ? "جاري إنشاء المتجر..." : "تسجيل وتفعيل المتجر"} <ArrowRight className="rotate-180" size={24} />
+                  <Button type="submit" className="w-full h-16 text-xl font-black shadow-2xl rounded-2xl gap-3" disabled={loading || !agreed}>
+                    {loading ? <Loader2 className="animate-spin" /> : <>تسجيل وتفعيل المتجر <ArrowRight className="rotate-180" /></>}
                   </Button>
                 </form>
               </CardContent>
