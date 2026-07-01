@@ -38,6 +38,7 @@ export default function LoginPage() {
       // 1. منطق تسجيل الدخول بالمعرف الرقمي
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
+        // البحث عن المعرف في حقول المتجر أو العميل
         const qStore = query(usersRef, where("storeId", "==", finalEmail), limit(1));
         const qCustomer = query(usersRef, where("customerId", "==", finalEmail), limit(1));
         
@@ -61,12 +62,12 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 3. التحقق من وجود ملف المستخدم
+      // 3. التحقق من وجود ملف المستخدم في Firestore
       const userDocRef = doc(firestore, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       
       if (!userDoc.exists()) {
-        throw new Error("حسابك موجود في نظام الدخول ولكن لا يوجد لك ملف شخصي (Firestore). يرجى مراجعة الإدارة.");
+        throw new Error("تم تسجيل دخولك ولكن لم يتم العثور على ملفك الشخصي في Firestore. يرجى مراجعة الإدارة.");
       }
 
       const profile = userDoc.data();
@@ -75,11 +76,11 @@ export default function LoginPage() {
         throw new Error("عذراً، هذا الحساب محظور من دخول النظام.");
       }
 
-      // 4. التوجيه بناءً على الدور الوظيفي
+      // 4. التوجيه بناءً على الدور الوظيفي الحقيقي من Firestore
       const role = profile?.role;
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       
-      toast({ title: "تم الدخول بنجاح", description: `مرحباً بك مجدداً.` });
+      toast({ title: "تم الدخول بنجاح", description: `مرحباً بك مجدداً ${profile.name || ''}.` });
 
       if (adminRoles.includes(role)) {
         router.push("/admin/dashboard");
@@ -90,8 +91,8 @@ export default function LoginPage() {
       }
 
     } catch (error: any) {
-      console.error("LOGIN ERROR:", error);
-      let errorMessage = error.message || "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
+      console.error("FULL LOGIN ERROR", error);
+      let errorMessage = error.message;
       
       if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";

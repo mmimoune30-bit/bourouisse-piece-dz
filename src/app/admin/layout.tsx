@@ -52,7 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     // التحقق من الدور الوظيفي بشكل قطعي من Firestore
-    if (!profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
+    if (profile && !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
       toast({
         variant: "destructive",
         title: "منع الوصول",

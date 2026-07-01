@@ -20,7 +20,7 @@ export default function SetupAdminPage() {
   const { auth } = useAuth();
   const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
-  const [success, setSubmitted] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -44,7 +44,7 @@ export default function SetupAdminPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
-      // 2. إنشاء مستند Firestore باستخدام الـ UID الحقيقي
+      // 2. إنشاء مستند Firestore باستخدام الـ UID الحقيقي لضمان الربط الصحيح
       const profileData = {
         uid: user.uid,
         name: "Super Administrator",
@@ -56,10 +56,10 @@ export default function SetupAdminPage() {
 
       await setDoc(doc(firestore, "users", user.uid), profileData);
 
-      toast({ title: "تم التأسيس بنجاح", description: "تم إنشاء حساب المدير الرئيسي وربطه بـ Firestore." });
-      setSubmitted(true);
+      toast({ title: "تم التأسيس بنجاح", description: "تم إنشاء حساب المدير الرئيسي وربطه بقاعدة البيانات." });
+      setSuccess(true);
       
-      // التوجيه التلقائي بعد 2 ثانية
+      // التوجيه التلقائي بعد ثانيتين
       setTimeout(() => {
         router.push("/admin/dashboard");
       }, 2000);
@@ -108,13 +108,13 @@ export default function SetupAdminPage() {
                   <ShieldAlert size={32} className="text-secondary" />
                </div>
                <CardTitle className="text-3xl font-black">تأسيس المدير الرئيسي</CardTitle>
-               <CardDescription className="text-zinc-400">نظام التشغيل الأول (Bootstrap) - أنشئ حساب الإدارة الأول</CardDescription>
+               <CardDescription className="text-zinc-400">نظام التشغيل الأول (Bootstrap)</CardDescription>
             </CardHeader>
             <CardContent className="p-8">
                <form onSubmit={handleCreateAdmin} className="space-y-6 text-right" dir="rtl">
                   <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6">
                     <p className="text-[11px] text-amber-800 font-bold leading-relaxed">
-                      تنبيه: هذه الصفحة مخصصة لإنشاء حساب الإدارة الرئيسي الأول فقط. سيتم ربط الـ UID في Authentication بملف Super Admin في Firestore تلقائياً.
+                      ملاحظة: هذه الصفحة تستخدم لإنشاء أول حساب إدارة في النظام لضمان الربط السليم بين نظام الدخول وقاعدة البيانات.
                     </p>
                   </div>
 
