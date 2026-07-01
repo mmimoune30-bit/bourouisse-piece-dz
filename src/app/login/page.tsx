@@ -35,11 +35,10 @@ export default function LoginPage() {
     try {
       let finalEmail = emailOrId.trim();
 
-      // إذا كان تسجيل الدخول بالمعرف الرقمي، نبحث عن الإيميل المرتبط به
+      // 1. منطق تسجيل الدخول بالمعرف الرقمي
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
-        
-        // البحث عن المعرف في حقل storeId أو customerId
+        // البحث في الحقلين الممكنين للمعرف
         const qStore = query(usersRef, where("storeId", "==", finalEmail), limit(1));
         const qCustomer = query(usersRef, where("customerId", "==", finalEmail), limit(1));
         
@@ -59,60 +58,57 @@ export default function LoginPage() {
         finalEmail = foundUserDoc.data().email;
       }
 
-      // تسجيل الدخول عبر Firebase Auth
+      // 2. تسجيل الدخول عبر Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // جلب ملف المستخدم للتوجيه
+      // 3. التحقق من وجود ملف المستخدم أو إنشاؤه (لأغراض إعادة الضبط)
       const userDocRef = doc(firestore, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       
       let profile;
 
-      if (!userDoc.exists()) {
-        // حالة استثنائية للإصلاح الذاتي للمسؤول
-        const isAdmin = finalEmail === "mmimoune30@gmail.com"; 
+      // إذا كان هذا هو المسؤول الأول (mmimoune30@gmail.com) والمستند غير موجود (بعد المسح)
+      if (!userDoc.exists() && finalEmail === "mmimoune30@gmail.com") {
         profile = {
           uid: user.uid,
-          name: user.displayName || finalEmail.split('@')[0],
+          name: "Admin Principal",
           email: finalEmail,
-          role: isAdmin ? "Super Admin" : "Customer",
+          role: "Super Admin",
           status: "Active",
           createdAt: serverTimestamp()
         };
         await setDoc(userDocRef, profile);
+        toast({ title: "تم تأسيس النظام", description: "تم إنشاء ملف المسؤول الأول بنجاح." });
+      } else if (!userDoc.exists()) {
+        throw new Error("حسابك موجود في نظام الدخول ولكن لا يوجد لك ملف شخصي. يرجى مراجعة الإدارة.");
       } else {
         profile = userDoc.data();
       }
 
-      // التوجيه بناءً على الدور
-      const role = profile.role;
+      if (profile?.status === "Blocked") {
+        throw new Error("عذراً، هذا الحساب محظور من دخول النظام.");
+      }
+
+      // 4. التوجيه بناءً على الدور الوظيفي
+      const role = profile?.role;
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       
       if (adminRoles.includes(role)) {
-        toast({ title: "تم الدخول كمسؤول", description: `مرحباً بك مجدداً، ${profile.name}.` });
+        toast({ title: "مرحباً بك", description: `تم الدخول بصلاحية ${role}.` });
         router.push("/admin/dashboard");
       } else if (role === "Seller") {
-        toast({ title: "تم الدخول للمتجر", description: `مرحباً بك في لوحة تحكم متجرك.` });
         router.push("/seller/dashboard");
       } else {
-        toast({ title: "تم الدخول بنجاح", description: `مرحباً بك في بورويس بـيـس.` });
         router.push("/customer/dashboard");
       }
 
     } catch (error: any) {
-      console.error("FULL LOGIN ERROR", error);
-      alert(JSON.stringify({
-        code: error.code,
-        message: error.message
-      }, null, 2));
-
-      let errorMessage = "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
+      console.error("LOGIN ERROR:", error);
+      let errorMessage = error.message || "فشل تسجيل الدخول. يرجى التأكد من البيانات.";
       
       if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-      } else if (error.message) {
-        errorMessage = error.message;
       }
 
       toast({ 
@@ -135,25 +131,25 @@ export default function LoginPage() {
                <div className="mx-auto w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4">
                   <ShieldCheck size={32} />
                </div>
-               <CardTitle className="text-3xl font-black">تسجيل الدخول</CardTitle>
-               <CardDescription className="text-blue-100">ادخل إلى حسابك لمتابعة نشاطك</CardDescription>
+               <CardTitle className="text-3xl font-black">بوابة الدخول</CardTitle>
+               <CardDescription className="text-blue-100">سجل دخولك لإدارة حسابك بأمان</CardDescription>
             </CardHeader>
             <CardContent className="p-8">
                <Tabs defaultValue="email" onValueChange={setLoginMethod} className="w-full">
                   <TabsList className="grid grid-cols-2 mb-8 bg-zinc-100 p-1 h-12 rounded-xl">
                     <TabsTrigger value="email" className="font-bold rounded-lg">البريد الإلكتروني</TabsTrigger>
-                    <TabsTrigger value="id" className="font-bold rounded-lg">المعرف الرقمي ID</TabsTrigger>
+                    <TabsTrigger value="id" className="font-bold rounded-lg">المعرف الرقمي</TabsTrigger>
                   </TabsList>
                   
                   <form onSubmit={handleLogin} className="space-y-6 text-right" dir="rtl">
                     <div className="space-y-2">
-                      <Label className="font-bold">{loginMethod === 'email' ? 'البريد الإلكتروني' : 'معرف الحساب (Account ID)'}</Label>
+                      <Label className="font-bold">{loginMethod === 'email' ? 'البريد الإلكتروني' : 'معرف الحساب (BR-ID)'}</Label>
                       <div className="relative">
                         <Input 
                           type="text"
                           value={emailOrId}
                           onChange={(e) => setEmailOrId(e.target.value)}
-                          placeholder={loginMethod === 'email' ? 'email@example.com' : 'مثلاً: BR-S-1234'} 
+                          placeholder={loginMethod === 'email' ? 'email@example.com' : 'مثلاً: BR-S-1001'} 
                           className="h-14 pr-12 text-lg border-2 focus:border-secondary rounded-xl text-right" 
                           required
                         />

@@ -3,11 +3,9 @@
 
 import { 
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  User as FirebaseUser
+  signOut
 } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp, Firestore } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, Firestore } from "firebase/firestore";
 import { Auth } from "firebase/auth";
 
 /**
@@ -29,8 +27,10 @@ export interface CreateUserOptions {
  * إنشاء حساب مستخدم جديد مع وثيقة Firestore مقابلة له (UID Mapping)
  */
 export async function registerUser(auth: Auth, db: Firestore, options: CreateUserOptions, password: string) {
+  // 1. إنشاء المستخدم في Firebase Authentication
   const { user } = await createUserWithEmailAndPassword(auth, options.email, password);
   
+  // 2. تحضير بيانات الملف الشخصي
   const profile = {
     uid: user.uid,
     name: options.name,
@@ -42,8 +42,9 @@ export async function registerUser(auth: Auth, db: Firestore, options: CreateUse
     createdAt: serverTimestamp()
   };
 
-  // القاعدة الذهبية: استخدام الـ UID كاسم للمستند
+  // 3. القاعدة الذهبية: استخدام الـ UID كاسم للمستند في Firestore
   await setDoc(doc(db, "users", user.uid), profile);
+  
   return user;
 }
 
@@ -52,8 +53,4 @@ export async function registerUser(auth: Auth, db: Firestore, options: CreateUse
  */
 export async function logoutUser(auth: Auth) {
   await signOut(auth);
-  // تنظيف أي بيانات محلية متبقية
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem("user_role");
-  }
 }

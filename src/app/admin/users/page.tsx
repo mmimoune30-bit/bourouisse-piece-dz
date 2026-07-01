@@ -54,7 +54,7 @@ export default function UserManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
 
-  // 1. جلب البيانات اللحظي (Real-time Fetching)
+  // جلب البيانات اللحظي
   useEffect(() => {
     if (!firestore) return;
 
@@ -75,8 +75,6 @@ export default function UserManagement() {
     return () => unsubscribe();
   }, [firestore]);
 
-  // 2. إضافة مستخدم (Firestore Record)
-  // ملاحظة: إنشاء حساب Auth يتطلب Server-side، هنا ننشئ السجل الذي سيتم "ربطه" عند تسجيل دخول المستخدم
   const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!firestore) return;
@@ -85,8 +83,9 @@ export default function UserManagement() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     
-    // نستخدم الإيميل كمعرف مؤقت حتى يقوم المستخدم بالتسجيل الفعلي، أو نولد ID فريد
-    const tempId = `user_${Date.now()}`; 
+    // ملاحظة: إنشاء حساب Auth يجب أن يتم عبر Firebase Console أو Cloud Function
+    // هنا نقوم بإنشاء سجلFirestore فقط للتأسيس
+    const tempId = `new_user_${Date.now()}`; 
 
     const newUser = {
       uid: tempId,
@@ -99,37 +98,34 @@ export default function UserManagement() {
 
     try {
       await setDoc(doc(firestore, "users", tempId), newUser);
-      toast({ title: "تمت إضافة السجل", description: "تم إنشاء ملف المستخدم بنجاح في قاعدة البيانات." });
+      toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات." });
       setIsAddDialogOpen(false);
     } catch (err) {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "create", requestResourceData: newUser }));
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "create" }));
     }
   };
 
-  // 3. تحديث الحالة (Active/Blocked)
   const handleToggleStatus = (id: string, currentStatus: string) => {
     if (!firestore) return;
     const newStatus = currentStatus === "Active" ? "Blocked" : "Active";
     
     updateDoc(doc(firestore, "users", id), { status: newStatus })
-      .then(() => toast({ title: "تحديث الحالة", description: `تم تغيير حالة الحساب إلى ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` }))
+      .then(() => toast({ title: "تم تحديث الحالة", description: `الحساب الآن ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` }))
       .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" })));
   };
 
-  // 4. تحديث الدور (Change Role)
   const handleUpdateRole = (id: string, newRole: string) => {
     if (!firestore) return;
     updateDoc(doc(firestore, "users", id), { role: newRole })
-      .then(() => toast({ title: "تحديث الصلاحيات", description: `تم تغيير دور المستخدم إلى ${newRole}.` }))
+      .then(() => toast({ title: "تحديث الصلاحيات", description: `تم تغيير الدور إلى ${newRole}.` }))
       .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" })));
   };
 
-  // 5. الحذف (Delete)
   const handleDeleteUser = (id: string) => {
-    if (!firestore || !confirm("تحذير: سيتم حذف سجل المستخدم نهائياً من قاعدة البيانات. هل أنت متأكد؟")) return;
+    if (!firestore || !confirm("تحذير: سيتم حذف سجل المستخدم نهائياً. هل أنت متأكد؟")) return;
     
     deleteDoc(doc(firestore, "users", id))
-      .then(() => toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة سجل المستخدم من النظام." }))
+      .then(() => toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة السجل بالكامل." }))
       .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "delete" })));
   };
 
@@ -141,7 +137,7 @@ export default function UserManagement() {
   if (!mounted) return (
     <div className="h-screen flex flex-col items-center justify-center font-black text-primary animate-pulse">
       <Loader2 className="animate-spin mb-4 text-secondary" size={48} />
-      جاري مزامنة سجلات المستخدمين...
+      جاري مزامنة بيانات المستخدمين...
     </div>
   );
 
@@ -169,17 +165,17 @@ export default function UserManagement() {
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="space-y-2">
-                  <Label className="text-right block">الاسم الكامل</Label>
-                  <Input name="name" placeholder="الاسم واللقب" className="h-11" required />
+                  <Label className="text-right block font-bold">الاسم الكامل</Label>
+                  <Input name="name" placeholder="الاسم واللقب" className="h-11 border-2" required />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-right block">البريد الإلكتروني</Label>
-                  <Input name="email" type="email" placeholder="example@mail.com" className="h-11" required />
+                  <Label className="text-right block font-bold">البريد الإلكتروني</Label>
+                  <Input name="email" type="email" placeholder="example@mail.com" className="h-11 border-2" required />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-right block">الدور الوظيفي</Label>
+                  <Label className="text-right block font-bold">الدور الوظيفي</Label>
                   <Select value={selectedRole} onValueChange={setSelectedRole}>
-                    <SelectTrigger className="h-11"><SelectValue placeholder="اختر الدور" /></SelectTrigger>
+                    <SelectTrigger className="h-11 border-2"><SelectValue placeholder="اختر الدور" /></SelectTrigger>
                     <SelectContent>
                       {STANDARDIZED_ROLES.map(role => <SelectItem key={role} value={role}>{role}</SelectItem>)}
                     </SelectContent>
@@ -207,7 +203,7 @@ export default function UserManagement() {
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-primary/5 h-12 px-6 flex items-center gap-3 font-black rounded-2xl">
              <ShieldCheck size={20} className="text-secondary" /> 
-             {filteredUsers.length} حساب نشط في النظام
+             {filteredUsers.length} مستخدم مسجل
           </Badge>
         </div>
       </div>
@@ -216,10 +212,10 @@ export default function UserManagement() {
         <Table>
           <TableHeader className="bg-zinc-50 border-b">
             <TableRow>
-              <TableHead className="text-right pr-8 h-14">المستخدم</TableHead>
-              <TableHead className="text-right h-14">الدور الوظيفي</TableHead>
-              <TableHead className="text-right h-14">الحالة</TableHead>
-              <TableHead className="text-left pl-8 h-14">إجراءات</TableHead>
+              <TableHead className="text-right pr-8 h-14 font-black">المستخدم</TableHead>
+              <TableHead className="text-right h-14 font-black">الدور الوظيفي</TableHead>
+              <TableHead className="text-right h-14 font-black">الحالة</TableHead>
+              <TableHead className="text-left pl-8 h-14 font-black">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -236,7 +232,7 @@ export default function UserManagement() {
                         <span className="text-[11px] text-muted-foreground flex items-center gap-1 justify-end">
                           {user.email} <Mail size={10} />
                         </span>
-                        <span className="text-[9px] font-mono text-zinc-400 mt-1">UID: {user.uid?.substring(0, 12)}...</span>
+                        <span className="text-[9px] font-mono text-zinc-400 mt-1 uppercase">UID: {user.uid?.substring(0, 10)}...</span>
                       </div>
                     </div>
                   </TableCell>
@@ -274,15 +270,15 @@ export default function UserManagement() {
                         
                         <DropdownMenuItem className="justify-end gap-3 cursor-pointer py-3 rounded-xl font-bold" onClick={() => handleToggleStatus(user.id, user.status)}>
                           {user.status === 'Active' ? (
-                            <><span className="text-destructive">حظر الحساب فوراً</span> <Ban size={18} className="text-destructive" /></>
+                            <><span className="text-destructive font-black">حظر الحساب</span> <Ban size={18} className="text-destructive" /></>
                           ) : (
-                            <><span className="text-green-600">تنشيط الحساب</span> <CheckCircle2 size={18} className="text-green-600" /></>
+                            <><span className="text-green-600 font-black">تنشيط الحساب</span> <CheckCircle2 size={18} className="text-green-600" /></>
                           )}
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator />
                         
-                        <DropdownMenuLabel className="text-right text-[10px] text-muted-foreground uppercase py-2">تعديل الدور الوظيفي</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-right text-[10px] text-muted-foreground uppercase py-2">تغيير الصلاحيات</DropdownMenuLabel>
                         {STANDARDIZED_ROLES.filter(r => r !== user.role).map(role => (
                           <DropdownMenuItem 
                             key={role} 
@@ -298,7 +294,7 @@ export default function UserManagement() {
                           className="justify-end gap-3 cursor-pointer py-3 rounded-xl text-destructive font-black bg-red-50 hover:bg-red-100" 
                           onClick={() => handleDeleteUser(user.id)}
                         >
-                          حذف نهائي للمستند <Trash2 size={18} />
+                          حذف السجل نهائياً <Trash2 size={18} />
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -310,7 +306,8 @@ export default function UserManagement() {
                 <TableCell colSpan={4} className="text-center py-32 text-muted-foreground">
                   <div className="flex flex-col items-center gap-4 opacity-30">
                     <Search size={64} />
-                    <p className="text-2xl font-black">لا توجد سجلات تطابق البحث</p>
+                    <p className="text-2xl font-black">لا توجد بيانات مستخدمين بعد</p>
+                    <p className="text-sm font-bold">سجل دخولك كمسؤول لبدء تأسيس النظام</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -322,17 +319,12 @@ export default function UserManagement() {
       <div className="bg-zinc-900 p-8 rounded-[40px] text-white flex flex-col md:flex-row-reverse items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 text-right space-y-2">
           <h3 className="text-2xl font-black flex items-center justify-end gap-3 text-secondary">
-            نظام الرقابة الموحد <ShieldCheck size={28} />
+            نظام الحماية والرقابة <ShieldCheck size={28} />
           </h3>
           <p className="text-zinc-400 max-w-xl font-bold text-sm">
-            كافة التغييرات التي تجريها على الأدوار أو الحالات يتم تسجيلها في سجل العمليات (Audit Logs) لضمان أعلى معايير الأمان والشفافية في إدارة الطاقم.
+            تم إعادة ضبط النظام بنجاح. يرجى التأكد من تطابق الـ UID بين Firebase Auth و Firestore لضمان عمل الصلاحيات بشكل صحيح.
           </p>
         </div>
-        <div className="flex gap-4 relative z-10">
-          <Button variant="secondary" className="font-black h-12 px-8 rounded-xl shadow-lg hover:scale-105 transition-transform">تنزيل تقرير المستخدمين</Button>
-          <Button variant="outline" className="font-black h-12 px-8 rounded-xl border-white/20 text-white hover:bg-white/10 transition-all" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>العودة للأعلى</Button>
-        </div>
-        <ShieldCheck size={200} className="absolute -bottom-10 -left-10 opacity-5 rotate-12 scale-150" />
       </div>
     </div>
   );
