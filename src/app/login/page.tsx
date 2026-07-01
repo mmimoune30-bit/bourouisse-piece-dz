@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,7 +38,6 @@ export default function LoginPage() {
       // 1. منطق تسجيل الدخول بالمعرف الرقمي
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
-        // البحث في الحقلين الممكنين للمعرف
         const qStore = query(usersRef, where("storeId", "==", finalEmail), limit(1));
         const qCustomer = query(usersRef, where("customerId", "==", finalEmail), limit(1));
         
@@ -62,29 +61,15 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 3. التحقق من وجود ملف المستخدم أو إنشاؤه (لأغراض إعادة الضبط)
+      // 3. التحقق من وجود ملف المستخدم
       const userDocRef = doc(firestore, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       
-      let profile;
-
-      // إذا كان هذا هو المسؤول الأول (mmimoune30@gmail.com) والمستند غير موجود (بعد المسح)
-      if (!userDoc.exists() && finalEmail === "mmimoune30@gmail.com") {
-        profile = {
-          uid: user.uid,
-          name: "Admin Principal",
-          email: finalEmail,
-          role: "Super Admin",
-          status: "Active",
-          createdAt: serverTimestamp()
-        };
-        await setDoc(userDocRef, profile);
-        toast({ title: "تم تأسيس النظام", description: "تم إنشاء ملف المسؤول الأول بنجاح." });
-      } else if (!userDoc.exists()) {
-        throw new Error("حسابك موجود في نظام الدخول ولكن لا يوجد لك ملف شخصي. يرجى مراجعة الإدارة.");
-      } else {
-        profile = userDoc.data();
+      if (!userDoc.exists()) {
+        throw new Error("حسابك موجود في نظام الدخول ولكن لا يوجد لك ملف شخصي (Firestore). يرجى مراجعة الإدارة.");
       }
+
+      const profile = userDoc.data();
 
       if (profile?.status === "Blocked") {
         throw new Error("عذراً، هذا الحساب محظور من دخول النظام.");
@@ -94,8 +79,9 @@ export default function LoginPage() {
       const role = profile?.role;
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       
+      toast({ title: "تم الدخول بنجاح", description: `مرحباً بك مجدداً.` });
+
       if (adminRoles.includes(role)) {
-        toast({ title: "مرحباً بك", description: `تم الدخول بصلاحية ${role}.` });
         router.push("/admin/dashboard");
       } else if (role === "Seller") {
         router.push("/seller/dashboard");
