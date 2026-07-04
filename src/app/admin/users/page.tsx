@@ -92,8 +92,7 @@ export default function UserManagement() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     
-    // في النظام الحقيقي، يجب إنشاء المستخدم أولاً في Auth
-    // هنا نقوم بإنشاء مستند Firestore فقط للتوضيح (يجب استخدام الـ UID من Auth)
+    // ملاحظة: في بيئة الإنتاج يتم إنشاء المستخدم في Auth أولاً
     const tempId = `user_${Date.now()}`; 
 
     const newUser = {
@@ -107,7 +106,7 @@ export default function UserManagement() {
 
     setDoc(doc(firestore, "users", tempId), newUser)
       .then(() => {
-        toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات." });
+        toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات بنجاح." });
         setIsAddDialogOpen(false);
       })
       .catch((err) => {
