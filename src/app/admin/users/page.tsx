@@ -36,7 +36,7 @@ import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, set
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
-interface UserProfile {
+interface User {
   id: string;
   uid: string;
   name: string;
@@ -60,7 +60,7 @@ const STANDARDIZED_ROLES = [
 export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
@@ -73,7 +73,7 @@ export default function UserManagement() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as Omit<UserProfile, "id">),
+          ...(doc.data() as Omit<User, "id">),
         }));
 
         setUsers(data);
@@ -92,7 +92,6 @@ export default function UserManagement() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     
-    // ملاحظة: في بيئة الإنتاج يتم إنشاء المستخدم في Auth أولاً
     const tempId = `user_${Date.now()}`; 
 
     const newUser = {
@@ -207,7 +206,7 @@ export default function UserManagement() {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl border shadow-sm">
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-md">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <Input 
             placeholder="بحث بالاسم، البريد الإلكتروني..." 
