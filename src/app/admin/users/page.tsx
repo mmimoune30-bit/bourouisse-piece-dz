@@ -36,8 +36,7 @@ import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, set
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
-// استخدام اسم فريد لتجنب التعارض مع Firebase User
-interface AppUserProfile {
+interface User {
   id: string;
   uid: string;
   name: string;
@@ -61,12 +60,11 @@ const STANDARDIZED_ROLES = [
 export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState<AppUserProfile[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
 
-  // الربط اللحظي بـ Firestore كما طلبت
   useEffect(() => {
     if (!firestore) return;
 
@@ -75,14 +73,11 @@ export default function UserManagement() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as Omit<AppUserProfile, "id">),
+          ...(doc.data() as Omit<User, "id">),
         }));
 
         setUsers(data);
         setMounted(true);
-      },
-      (error) => {
-        console.error("Firestore sync error:", error);
       }
     );
 
