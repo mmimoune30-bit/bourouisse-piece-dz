@@ -55,7 +55,7 @@ Ensure that the CLI is on `genkit-cli` version >= 1.29.0. If not, or if an older
         ```
     -   **Example (Batch Input)**:
         ```bash
-        genkit eval:flow answerQuestion --input inputs.json
+        genkit eanswerQuestion --input inputs.json
         ```
     -   **Single Command (spin up runtime & evaluate flow)**:
         ```bash

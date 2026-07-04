@@ -102,7 +102,7 @@ export default function UserManagement() {
     const name = formData.get("name") as string;
     
     // ملاحظة: إنشاء حساب Auth يجب أن يتم برمجياً أو عبر صفحة التأسيس
-    // هنا نقوم بإنشاء سجل Firestore للتأسيس
+    // هنا نقوم بإنشاء سجل Firestore للتأسيس بمعرف عشوائي مؤقت
     const tempId = `user_${Date.now()}`; 
 
     const newUser = {
