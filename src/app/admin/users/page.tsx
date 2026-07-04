@@ -36,8 +36,8 @@ import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, set
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
-// تعريف واجهة المستخدم لضمان سلامة الأنواع
-interface User {
+// استخدام اسم فريد لتجنب التعارض مع Firebase User
+interface AppUserProfile {
   id: string;
   uid: string;
   name: string;
@@ -61,12 +61,12 @@ const STANDARDIZED_ROLES = [
 export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AppUserProfile[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
 
-  // جلب البيانات اللحظي من Firestore
+  // الربط اللحظي بـ Firestore كما طلبت
   useEffect(() => {
     if (!firestore) return;
 
@@ -75,18 +75,14 @@ export default function UserManagement() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as Omit<User, "id">),
+          ...(doc.data() as Omit<AppUserProfile, "id">),
         }));
 
         setUsers(data);
         setMounted(true);
       },
       (error) => {
-        const permissionError = new FirestorePermissionError({ 
-          path: "users", 
-          operation: "list" 
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        console.error("Firestore sync error:", error);
       }
     );
 
@@ -101,8 +97,6 @@ export default function UserManagement() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     
-    // ملاحظة: إنشاء حساب Auth يجب أن يتم برمجياً أو عبر صفحة التأسيس
-    // هنا نقوم بإنشاء سجل Firestore للتأسيس بمعرف عشوائي مؤقت
     const tempId = `user_${Date.now()}`; 
 
     const newUser = {
@@ -120,7 +114,12 @@ export default function UserManagement() {
         setIsAddDialogOpen(false);
       })
       .catch((err) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "create", requestResourceData: newUser }));
+        const permissionError = new FirestorePermissionError({ 
+          path: "users", 
+          operation: "create", 
+          requestResourceData: newUser 
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
   };
 
@@ -130,7 +129,9 @@ export default function UserManagement() {
     
     updateDoc(doc(firestore, "users", id), { status: newStatus })
       .then(() => toast({ title: "تم تحديث الحالة", description: `الحساب الآن ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` }))
-      .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" })));
+      .catch((err) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" }));
+      });
   };
 
   const handleUpdateRole = (id: string, newRole: string) => {
