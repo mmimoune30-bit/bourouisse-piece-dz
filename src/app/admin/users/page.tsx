@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -33,9 +32,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore } from "@/firebase";
-import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, setDoc, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+
+// تعريف واجهة المستخدم لضمان سلامة الأنواع
+interface User {
+  id: string;
+  uid: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  storeId?: string;
+  customerId?: string;
+  createdAt: any;
+}
 
 const STANDARDIZED_ROLES = [
   "Super Admin", 
@@ -49,25 +61,31 @@ const STANDARDIZED_ROLES = [
 export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
 
-  // جلب البيانات اللحظي
+  // جلب البيانات اللحظي من Firestore
   useEffect(() => {
     if (!firestore) return;
 
-    const q = query(collection(firestore, "users"), orderBy("createdAt", "desc"));
-    
-    const unsubscribe = onSnapshot(q, 
+    const unsubscribe = onSnapshot(
+      collection(firestore, "users"),
       (snapshot) => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<User, "id">),
+        }));
+
         setUsers(data);
         setMounted(true);
       },
-      async (error) => {
-        const permissionError = new FirestorePermissionError({ path: "users", operation: "list" });
+      (error) => {
+        const permissionError = new FirestorePermissionError({ 
+          path: "users", 
+          operation: "list" 
+        });
         errorEmitter.emit('permission-error', permissionError);
       }
     );
@@ -83,9 +101,9 @@ export default function UserManagement() {
     const email = formData.get("email") as string;
     const name = formData.get("name") as string;
     
-    // ملاحظة: إنشاء حساب Auth يجب أن يتم عبر Firebase Console أو Cloud Function
-    // هنا نقوم بإنشاء سجلFirestore فقط للتأسيس
-    const tempId = `new_user_${Date.now()}`; 
+    // ملاحظة: إنشاء حساب Auth يجب أن يتم برمجياً أو عبر صفحة التأسيس
+    // هنا نقوم بإنشاء سجل Firestore للتأسيس
+    const tempId = `user_${Date.now()}`; 
 
     const newUser = {
       uid: tempId,
@@ -96,13 +114,14 @@ export default function UserManagement() {
       createdAt: serverTimestamp()
     };
 
-    try {
-      await setDoc(doc(firestore, "users", tempId), newUser);
-      toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات." });
-      setIsAddDialogOpen(false);
-    } catch (err) {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "create" }));
-    }
+    setDoc(doc(firestore, "users", tempId), newUser)
+      .then(() => {
+        toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات." });
+        setIsAddDialogOpen(false);
+      })
+      .catch((err) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: "users", operation: "create", requestResourceData: newUser }));
+      });
   };
 
   const handleToggleStatus = (id: string, currentStatus: string) => {
@@ -122,7 +141,7 @@ export default function UserManagement() {
   };
 
   const handleDeleteUser = (id: string) => {
-    if (!firestore || !confirm("تحذير: سيتم حذف سجل المستخدم نهائياً. هل أنت متأكد؟")) return;
+    if (!firestore || !confirm("تحذير: سيتم حذف سجل المستخدم نهائياً من Firestore. هل أنت متأكد؟")) return;
     
     deleteDoc(doc(firestore, "users", id))
       .then(() => toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة السجل بالكامل." }))
@@ -148,7 +167,7 @@ export default function UserManagement() {
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
             <UserCog size={32} className="text-secondary" /> إدارة الهوية والصلاحيات
           </h1>
-          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين، حالات الحسابات، والرقابة الأمنية.</p>
+          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين، حالات الحسابات، والرقابة الأمنية اللحظية.</p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -319,10 +338,10 @@ export default function UserManagement() {
       <div className="bg-zinc-900 p-8 rounded-[40px] text-white flex flex-col md:flex-row-reverse items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 text-right space-y-2">
           <h3 className="text-2xl font-black flex items-center justify-end gap-3 text-secondary">
-            نظام الحماية والرقابة <ShieldCheck size={28} />
+            نظام الحماية والرقابة اللحظي <ShieldCheck size={28} />
           </h3>
           <p className="text-zinc-400 max-w-xl font-bold text-sm">
-            تم إعادة ضبط النظام بنجاح. يرجى التأكد من تطابق الـ UID بين Firebase Auth و Firestore لضمان عمل الصلاحيات بشكل صحيح.
+            كافة التغييرات التي تجريها هنا تنعكس فوراً على صلاحيات دخول المستخدمين بفضل الربط المباشر مع Firestore. يرجى الحذر عند تعديل الأدوار الحساسة.
           </p>
         </div>
       </div>
