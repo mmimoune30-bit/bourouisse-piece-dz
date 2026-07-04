@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Users, Store, Package, CreditCard, 
   Settings, ShieldAlert, FileText, LogOut, Menu, X, 
   Bell, Search, Ticket, Layout as LayoutIcon, ShieldCheck, 
-  History, UserPlus, ShoppingBag, UserCircle, Loader2
+  History, UserPlus, ShoppingBag, UserCircle, Loader2, AlertTriangle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,10 @@ const ADMIN_MENU = [
   { name: "طلبات الشراء", href: "/admin/purchase-requests", icon: ShoppingBag },
   { name: "المدفوعات", href: "/admin/payments", icon: CreditCard },
   { name: "الاشتراكات", href: "/admin/subscriptions", icon: Ticket },
-  { name: "خطط الأسعار", href: "/admin/plans", icon: ShieldCheck },
   { name: "البنرات", href: "/admin/banners", icon: LayoutIcon },
   { name: "الشكاوى", href: "/admin/complaints", icon: ShieldAlert },
   { name: "سجل العمليات", href: "/admin/audit-logs", icon: History },
+  { name: "منطقة الخطر", href: "/admin/reset", icon: AlertTriangle },
   { name: "الإعدادات", href: "/admin/settings", icon: Settings },
 ];
 
@@ -42,16 +42,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    // ننتظر حتى ينتهي التحميل تماماً من Firestore
     if (loading) return;
 
-    // إذا لم يكن هناك مستخدم مسجل
     if (!user) {
       router.push("/login");
       return;
     }
 
-    // التحقق من الدور الوظيفي بشكل قطعي من Firestore
     if (profile && !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
       toast({
         variant: "destructive",
@@ -73,7 +70,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  // عرض شاشة تحميل أثناء مزامنة الجلسة
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white">
@@ -83,7 +79,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // إذا لم يكن مخولاً، لا نعرض أي شيء (سوف يتم التوجيه بواسطة useEffect)
   if (!user || !profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
     return null;
   }
@@ -115,8 +110,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     : "text-zinc-400 hover:bg-white/5 hover:text-white"
                 )}
               >
-                <Icon size={20} />
-                {isSidebarOpen && <span className="text-sm">{item.name}</span>}
+                <Icon size={20} className={cn(item.name === "منطقة الخطر" && !isActive && "text-red-500")} />
+                {isSidebarOpen && <span className={cn("text-sm", item.name === "منطقة الخطر" && !isActive && "text-red-500")}>{item.name}</span>}
               </a>
             );
           })}
