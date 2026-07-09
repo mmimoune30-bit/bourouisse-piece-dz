@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -15,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, limit, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,7 +37,6 @@ export default function LoginPage() {
       // 1. منطق تسجيل الدخول بالمعرف الرقمي
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
-        // البحث عن المعرف في حقول المتجر أو العميل
         const qStore = query(usersRef, where("storeId", "==", finalEmail), limit(1));
         const qCustomer = query(usersRef, where("customerId", "==", finalEmail), limit(1));
         
@@ -62,10 +60,24 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 3. التحقق من وجود ملف المستخدم في Firestore
+      // 3. التحقق من وجود ملف المستخدم في Firestore (مع دعم التأسيس التلقائي للمدير)
       const userDocRef = doc(firestore, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
+      let userDoc = await getDoc(userDocRef);
       
+      // منطق خاص: إذا كان الإيميل هو ايميل الإدارة ولم يتم العثور على الوثيقة، نقوم بإنشائها فوراً
+      if (!userDoc.exists() && user.email === "mmimoune30@gmail.com") {
+        const adminProfile = {
+          uid: user.uid,
+          name: "Super Administrator",
+          email: user.email,
+          role: "Super Admin",
+          status: "Active",
+          createdAt: serverTimestamp()
+        };
+        await setDoc(userDocRef, adminProfile);
+        userDoc = await getDoc(userDocRef); // إعادة جلب الوثيقة بعد إنشائها
+      }
+
       if (!userDoc.exists()) {
         throw new Error("تم تسجيل دخولك ولكن لم يتم العثور على ملفك الشخصي في Firestore. يرجى مراجعة الإدارة.");
       }
