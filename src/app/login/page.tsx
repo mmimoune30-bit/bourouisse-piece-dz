@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -60,11 +61,11 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 3. التحقق من وجود ملف المستخدم في Firestore (مع دعم التأسيس التلقائي للمدير)
+      // 3. التحقق من وجود ملف المستخدم في Firestore
       const userDocRef = doc(firestore, "users", user.uid);
       let userDoc = await getDoc(userDocRef);
       
-      // منطق خاص: إذا كان الإيميل هو ايميل الإدارة ولم يتم العثور على الوثيقة، نقوم بإنشائها فوراً
+      // التأسيس التلقائي للمدير الرئيسي إذا لم يوجد المستند
       if (!userDoc.exists() && user.email === "mmimoune30@gmail.com") {
         const adminProfile = {
           uid: user.uid,
@@ -75,11 +76,11 @@ export default function LoginPage() {
           createdAt: serverTimestamp()
         };
         await setDoc(userDocRef, adminProfile);
-        userDoc = await getDoc(userDocRef); // إعادة جلب الوثيقة بعد إنشائها
+        userDoc = await getDoc(userDocRef);
       }
 
       if (!userDoc.exists()) {
-        throw new Error("تم تسجيل دخولك ولكن لم يتم العثور على ملفك الشخصي في Firestore. يرجى مراجعة الإدارة.");
+        throw new Error("تم تسجيل دخولك ولكن لم يتم العثور على ملفك الشخصي. يرجى مراجعة الإدارة.");
       }
 
       const profile = userDoc.data();
@@ -88,7 +89,6 @@ export default function LoginPage() {
         throw new Error("عذراً، هذا الحساب محظور من دخول النظام.");
       }
 
-      // 4. التوجيه بناءً على الدور الوظيفي الحقيقي من Firestore
       const role = profile?.role;
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       

@@ -23,7 +23,7 @@ export default function SetupAdminPage() {
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: "",
+    email: "mmimoune30@gmail.com",
     password: "",
     confirmPassword: ""
   });
@@ -31,6 +31,11 @@ export default function SetupAdminPage() {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth || !firestore) return;
+
+    if (formData.password.length < 6) {
+      toast({ variant: "destructive", title: "خطأ", description: "كلمة المرور يجب أن تكون 6 أحرف على الأقل." });
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
@@ -44,7 +49,7 @@ export default function SetupAdminPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
-      // 2. إنشاء مستند Firestore باستخدام الـ UID الحقيقي لضمان الربط الصحيح
+      // 2. إنشاء مستند Firestore باستخدام الـ UID الحقيقي
       const profileData = {
         uid: user.uid,
         name: "Super Administrator",
@@ -56,20 +61,23 @@ export default function SetupAdminPage() {
 
       await setDoc(doc(firestore, "users", user.uid), profileData);
 
-      toast({ title: "تم التأسيس بنجاح", description: "تم إنشاء حساب المدير الرئيسي وربطه بقاعدة البيانات." });
+      toast({ title: "تم التأسيس بنجاح", description: "تم إنشاء حساب المدير الرئيسي بنجاح." });
       setSuccess(true);
       
-      // التوجيه التلقائي بعد ثانيتين
       setTimeout(() => {
         router.push("/admin/dashboard");
       }, 2000);
 
     } catch (error: any) {
       console.error("SETUP ERROR:", error);
+      let msg = error.message;
+      if (error.code === 'auth/email-already-in-use') {
+        msg = "هذا الحساب موجود بالفعل في نظام الـ Auth. جرب تسجيل الدخول مباشرة.";
+      }
       toast({ 
         variant: "destructive", 
         title: "فشل التأسيس", 
-        description: error.message || "حدث خطأ أثناء إنشاء الحساب." 
+        description: msg
       });
     } finally {
       setLoading(false);
@@ -87,7 +95,7 @@ export default function SetupAdminPage() {
             </div>
             <h1 className="text-3xl font-black text-primary mb-2">اكتمل الإعداد!</h1>
             <p className="text-muted-foreground font-bold mb-8">
-              تم إنشاء حساب Super Admin بنجاح. يتم الآن توجيهك إلى لوحة التحكم...
+              تم إنشاء حساب Super Admin. يتم الآن توجيهك إلى لوحة التحكم...
             </p>
             <Loader2 className="animate-spin mx-auto text-primary" size={32} />
           </Card>
@@ -103,61 +111,52 @@ export default function SetupAdminPage() {
       <main className="flex-grow pt-[235px] pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-lg">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
-            <CardHeader className="bg-zinc-900 text-white p-8 text-center">
-               <div className="mx-auto w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4 border border-white/20">
+            <CardHeader className="bg-primary text-white p-8 text-center">
+               <div className="mx-auto w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4">
                   <ShieldAlert size={32} className="text-secondary" />
                </div>
                <CardTitle className="text-3xl font-black">تأسيس المدير الرئيسي</CardTitle>
-               <CardDescription className="text-zinc-400">نظام التشغيل الأول (Bootstrap)</CardDescription>
+               <CardDescription className="text-blue-100">أنشئ كلمة المرور الخاصة بحسابك الإداري</CardDescription>
             </CardHeader>
             <CardContent className="p-8">
                <form onSubmit={handleCreateAdmin} className="space-y-6 text-right" dir="rtl">
-                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6">
-                    <p className="text-[11px] text-amber-800 font-bold leading-relaxed">
-                      ملاحظة: هذه الصفحة تستخدم لإنشاء أول حساب إدارة في النظام لضمان الربط السليم بين نظام الدخول وقاعدة البيانات.
-                    </p>
-                  </div>
-
                   <div className="space-y-2">
-                    <Label className="font-bold">البريد الإلكتروني للإدارة</Label>
+                    <Label className="font-bold">البريد الإلكتروني المخصص</Label>
                     <Input 
                       type="email" 
                       value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="admin@example.com" 
-                      className="h-14 border-2 rounded-xl text-right" 
-                      required 
+                      readOnly
+                      className="h-14 border-2 rounded-xl bg-zinc-50 text-zinc-500 font-bold"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="font-bold">كلمة المرور</Label>
-                      <Input 
-                        type="password" 
-                        value={formData.password}
-                        onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        placeholder="••••••••" 
-                        className="h-14 border-2 rounded-xl text-right" 
-                        required 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">تأكيد كلمة المرور</Label>
-                      <Input 
-                        type="password" 
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                        placeholder="••••••••" 
-                        className="h-14 border-2 rounded-xl text-right" 
-                        required 
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label className="font-bold">اختر كلمة مرور قوية</Label>
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="h-14 border-2 rounded-xl text-right" 
+                      required 
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="font-bold">تأكيد كلمة المرور</Label>
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="h-14 border-2 rounded-xl text-right" 
+                      required 
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    />
                   </div>
 
                   <Button className="w-full h-16 text-xl font-black gap-3 shadow-xl rounded-xl bg-primary text-white hover:bg-secondary hover:text-primary transition-all" disabled={loading}>
                      {loading ? <Loader2 className="animate-spin" size={24} /> : <UserPlus size={24} />}
-                     {loading ? "جاري الإنشاء..." : "إنشاء حساب المدير الرئيسي"}
+                     {loading ? "جاري التأسيس..." : "إنشاء الحساب والدخول"}
                   </Button>
 
                   <div className="pt-4 text-center border-t">
