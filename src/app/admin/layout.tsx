@@ -120,10 +120,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content - Correct Offset */}
+      {/* Main Content - Correct Offset to prevent overlap */}
       <main className={cn(
         "flex-grow transition-all duration-300 min-h-screen flex flex-col",
-        isSidebarOpen ? "pl-64" : "pl-20"
+        isSidebarOpen ? "ml-64" : "ml-20"
       )} dir="rtl">
         <header className="h-20 bg-white border-b flex items-center justify-between px-8 sticky top-0 z-40">
           <div className="flex items-center gap-6">
