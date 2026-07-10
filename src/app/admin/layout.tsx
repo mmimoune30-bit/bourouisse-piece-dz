@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { 
   LayoutDashboard, Users, Store, Package, CreditCard, 
   Settings, ShieldAlert, LogOut, Menu, X, 
-  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle
+  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle, Ticket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -153,5 +153,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-
-import { Ticket } from "lucide-react";
