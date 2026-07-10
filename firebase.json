@@ -1,20 +1,5 @@
 {
-  "firestore": {
-    "database": "(default)",
-    "location": "us-central1",
-    "rules": "firestore.rules",
-    "indexes": "studio-6660467819-36b41"
-  },
   "hosting": {
-    "source": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "frameworkConfig": {
-      "appId": "bourouisse-piecedz",
-      "region": "us-central1"
-    }
+    "source": "."
   }
 }

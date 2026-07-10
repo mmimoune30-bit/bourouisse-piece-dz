@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Store, CheckCircle, XCircle, Ban, Eye, Search, AlertCircle } from "lucide-react";
+import { Store, CheckCircle, XCircle, Ban, Eye, Search, AlertCircle, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -37,6 +37,11 @@ export default function StoreManagement() {
       title: "تم تحديث الحالة",
       description: `تم تغيير حالة المتجر بنجاح إلى ${statusText}.`,
     });
+  };
+
+  const handlePreviewStore = (name: string) => {
+    // توجيه لصفحة الكتالوج مع تفعيل الفلتر لاسم المتجر
+    window.open(`/catalog?query=${encodeURIComponent(name)}`, '_blank');
   };
 
   const filteredStores = stores.filter(s => 
@@ -96,10 +101,11 @@ export default function StoreManagement() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      title="معاينة"
-                      onClick={() => toast({ title: "معاينة المتجر", description: `جاري فتح ملف متجر ${store.name}...` })}
+                      className="gap-2 font-bold"
+                      title="معاينة المتجر"
+                      onClick={() => handlePreviewStore(store.name)}
                     >
-                      <Eye size={16} />
+                      <Eye size={16} /> معاينة
                     </Button>
                     {store.status !== 'Approved' && (
                       <Button 

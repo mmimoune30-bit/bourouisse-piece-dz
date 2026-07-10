@@ -2,23 +2,32 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  ImagePlus, Save, Layout, Languages, Trash2, 
-  Plus, Eye, MoveUp, MoveDown, AlertCircle, Sparkles 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogDescription
+} from "@/components/ui/dialog";
+import { 
+  ImagePlus, Save, Layout, Trash2, 
+  Plus, Eye, MoveUp, MoveDown, AlertCircle, Sparkles, ArrowLeft, ChevronRight 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const INITIAL_BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/auto-hero-1/800/400",
+    image: "https://picsum.photos/seed/auto-hero-1/1200/400",
     ar: {
       title: "انضم إلى منصتنا اليوم",
       description: "سجل متجرك لقطع غيار السيارات ووصل إلى آلاف العملاء في مختلف الولايات.",
@@ -35,7 +44,8 @@ const INITIAL_BANNERS = [
 
 export default function BannerManagement() {
   const [banners, setBanners] = useState(INITIAL_BANNERS);
-  const [editingBanner, setEditingBanner] = useState<any>(null);
+  const [editingBanner, setEditingBanner] = useState(INITIAL_BANNERS[0]);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleSave = () => {
     toast({
@@ -47,12 +57,14 @@ export default function BannerManagement() {
   const addBanner = () => {
     const newBanner = {
       id: Date.now(),
-      image: "https://picsum.photos/seed/new/800/400",
-      ar: { title: "", description: "", button: "" },
-      en: { title: "", description: "", button: "" },
+      image: "https://picsum.photos/seed/new/1200/400",
+      ar: { title: "عنوان جديد بالعربية", description: "وصف جديد للبانر بالعربية", button: "ابدأ الآن" },
+      en: { title: "New English Title", description: "New English description for the banner", button: "Start Now" },
       active: true
     };
     setBanners([...banners, newBanner]);
+    setEditingBanner(newBanner);
+    toast({ title: "تمت الإضافة", description: "يمكنك الآن تعديل بيانات البانر الجديد." });
   };
 
   return (
@@ -73,13 +85,20 @@ export default function BannerManagement() {
         {/* Banner List */}
         <div className="xl:col-span-1 space-y-4">
           <h3 className="font-black text-lg border-r-4 border-secondary pr-3">قائمة البنرات الحالية</h3>
-          {banners.map((banner, index) => (
-            <Card key={banner.id} className="border-none shadow-sm overflow-hidden group cursor-pointer hover:ring-2 hover:ring-secondary transition-all" onClick={() => setEditingBanner(banner)}>
+          {banners.map((banner) => (
+            <Card 
+              key={banner.id} 
+              className={cn(
+                "border-none shadow-sm overflow-hidden group cursor-pointer transition-all",
+                editingBanner.id === banner.id ? "ring-2 ring-secondary" : "hover:ring-1 hover:ring-zinc-200"
+              )} 
+              onClick={() => setEditingBanner(banner)}
+            >
               <div className="relative aspect-video">
                 <Image src={banner.image} alt="Banner" fill className="object-cover" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                    <Button variant="secondary" size="sm" className="font-bold gap-2">
-                     <Eye size={14} /> معاينة وتعديل
+                     <Eye size={14} /> تعديل البيانات
                    </Button>
                 </div>
               </div>
@@ -121,15 +140,30 @@ export default function BannerManagement() {
                 <TabsContent value="ar" className="space-y-6">
                   <div className="space-y-2 text-right">
                     <Label className="font-black text-lg">العنوان (العربية)</Label>
-                    <Input placeholder="أدخل العنوان الجذاب هنا..." className="h-14 text-xl font-bold border-2" />
+                    <Input 
+                      placeholder="أدخل العنوان الجذاب هنا..." 
+                      className="h-14 text-xl font-bold border-2" 
+                      value={editingBanner.ar.title}
+                      onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, title: e.target.value}})}
+                    />
                   </div>
                   <div className="space-y-2 text-right">
                     <Label className="font-black">الوصف (العربية)</Label>
-                    <Textarea placeholder="شرح موجز للعرض أو الخدمة..." className="min-h-[120px] text-lg leading-relaxed border-2" />
+                    <Textarea 
+                      placeholder="شرح موجز للعرض أو الخدمة..." 
+                      className="min-h-[120px] text-lg leading-relaxed border-2" 
+                      value={editingBanner.ar.description}
+                      onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, description: e.target.value}})}
+                    />
                   </div>
                   <div className="space-y-2 text-right">
                     <Label className="font-black">نص الزر (العربية)</Label>
-                    <Input placeholder="مثلاً: ابدأ الآن، اشترك معنا..." className="h-12 font-bold border-2" />
+                    <Input 
+                      placeholder="مثلاً: ابدأ الآن، اشترك معنا..." 
+                      className="h-12 font-bold border-2" 
+                      value={editingBanner.ar.button}
+                      onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, button: e.target.value}})}
+                    />
                   </div>
                 </TabsContent>
 
@@ -137,15 +171,33 @@ export default function BannerManagement() {
                 <TabsContent value="en" className="space-y-6 text-left">
                   <div className="space-y-2">
                     <Label className="font-black text-lg">Title (English)</Label>
-                    <Input placeholder="Enter catchy title..." className="h-14 text-xl font-bold border-2" dir="ltr" />
+                    <Input 
+                      placeholder="Enter catchy title..." 
+                      className="h-14 text-xl font-bold border-2" 
+                      dir="ltr" 
+                      value={editingBanner.en.title}
+                      onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, title: e.target.value}})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="font-black">Description (English)</Label>
-                    <Textarea placeholder="Brief explanation of offer..." className="min-h-[120px] text-lg leading-relaxed border-2" dir="ltr" />
+                    <Textarea 
+                      placeholder="Brief explanation of offer..." 
+                      className="min-h-[120px] text-lg leading-relaxed border-2" 
+                      dir="ltr" 
+                      value={editingBanner.en.description}
+                      onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, description: e.target.value}})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="font-black">Button Text (English)</Label>
-                    <Input placeholder="e.g. Join Now, Start Here..." className="h-12 font-bold border-2" dir="ltr" />
+                    <Input 
+                      placeholder="e.g. Join Now, Start Here..." 
+                      className="h-12 font-bold border-2" 
+                      dir="ltr" 
+                      value={editingBanner.en.button}
+                      onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, button: e.target.value}})}
+                    />
                   </div>
                 </TabsContent>
               </Tabs>
@@ -166,9 +218,54 @@ export default function BannerManagement() {
                       <Button className="w-full h-12 bg-secondary text-primary font-black hover:bg-white" onClick={handleSave}>
                         <Save size={18} /> حفظ التغييرات
                       </Button>
-                      <Button variant="outline" className="w-full h-12 border-white/20 text-white hover:bg-white/10">
-                        معاينة حية
-                      </Button>
+                      
+                      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="w-full h-12 border-white/20 text-white hover:bg-white/10">
+                            معاينة حية للمستخدم <Eye size={18} className="mr-2" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-5xl h-[80vh] overflow-y-auto" dir="rtl">
+                          <DialogHeader>
+                            <DialogTitle className="text-right font-black text-2xl">معاينة البانر على الموقع</DialogTitle>
+                            <DialogDescription className="text-right">هذا هو الشكل الذي سيراه المستخدم النهائي عند زيارة الصفحة الرئيسية.</DialogDescription>
+                          </DialogHeader>
+                          
+                          <div className="space-y-12 py-8">
+                             {/* AR Preview */}
+                             <section className="space-y-4">
+                               <Badge className="bg-secondary text-primary font-black">العربية (RTL)</Badge>
+                               <div className="relative h-[300px] w-full rounded-[32px] overflow-hidden flex items-center justify-end px-12 text-right">
+                                  <Image src={editingBanner.image} alt="Preview" fill className="object-cover" />
+                                  <div className="absolute inset-0 bg-black/60" />
+                                  <div className="relative z-10 max-w-xl space-y-4">
+                                     <h2 className="text-3xl font-black text-white leading-tight">{editingBanner.ar.title}</h2>
+                                     <p className="text-blue-100 font-bold">{editingBanner.ar.description}</p>
+                                     <Button className="bg-secondary text-primary font-black h-12 px-8 rounded-xl gap-2">
+                                       {editingBanner.ar.button} <ArrowLeft size={18} />
+                                     </Button>
+                                  </div>
+                               </div>
+                             </section>
+
+                             {/* EN Preview */}
+                             <section className="space-y-4">
+                               <Badge className="bg-primary text-white font-black">English (LTR)</Badge>
+                               <div className="relative h-[300px] w-full rounded-[32px] overflow-hidden flex items-center justify-start px-12 text-left" dir="ltr">
+                                  <Image src={editingBanner.image} alt="Preview" fill className="object-cover" />
+                                  <div className="absolute inset-0 bg-black/60" />
+                                  <div className="relative z-10 max-w-xl space-y-4">
+                                     <h2 className="text-3xl font-black text-white leading-tight">{editingBanner.en.title}</h2>
+                                     <p className="text-blue-100 font-bold">{editingBanner.en.description}</p>
+                                     <Button className="bg-secondary text-primary font-black h-12 px-8 rounded-xl gap-2">
+                                       {editingBanner.en.button} <ChevronRight size={18} />
+                                     </Button>
+                                  </div>
+                               </div>
+                             </section>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
                 </div>
