@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -273,48 +274,50 @@ export default function UserManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-left pl-8">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/5 transition-all">
-                          <MoreVertical size={20} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-64 p-2 rounded-2xl shadow-2xl border-2" dir="rtl">
-                        <DropdownMenuLabel className="text-right flex items-center justify-end gap-2 text-primary">
-                          خيارات الإدارة <Shield size={14} />
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        
-                        <DropdownMenuItem className="justify-end gap-3 cursor-pointer py-3 rounded-xl font-bold" onClick={() => handleToggleStatus(user.id, user.status)}>
-                          {user.status === 'Active' ? (
-                            <><span className="text-destructive font-black">حظر الحساب</span> <Ban size={18} className="text-destructive" /></>
-                          ) : (
-                            <><span className="text-green-600 font-black">تنشيط الحساب</span> <CheckCircle2 size={18} className="text-green-600" /></>
-                          )}
-                        </DropdownMenuItem>
+                    <div className="flex items-center gap-2">
+                       <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                           <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/5 transition-all">
+                             <MoreVertical size={20} />
+                           </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align="start" className="w-64 p-2 rounded-2xl shadow-2xl border-2" dir="rtl">
+                           <DropdownMenuLabel className="text-right flex items-center justify-end gap-2 text-primary">
+                             خيارات الإدارة <Shield size={14} />
+                           </DropdownMenuLabel>
+                           <DropdownMenuSeparator />
+                           
+                           <DropdownMenuItem className="justify-end gap-3 cursor-pointer py-3 rounded-xl font-bold" onClick={() => handleToggleStatus(user.id, user.status)}>
+                             {user.status === 'Active' ? (
+                               <><span className="text-destructive font-black">حظر الحساب</span> <Ban size={18} className="text-destructive" /></>
+                             ) : (
+                               <><span className="text-green-600 font-black">تنشيط الحساب</span> <CheckCircle2 size={18} className="text-green-600" /></>
+                             )}
+                           </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
-                        
-                        <DropdownMenuLabel className="text-right text-[10px] text-muted-foreground uppercase py-2">تغيير الصلاحيات</DropdownMenuLabel>
-                        {STANDARDIZED_ROLES.filter(r => r !== user.role).map(role => (
-                          <DropdownMenuItem 
-                            key={role} 
-                            className="justify-end gap-3 cursor-pointer py-2 rounded-lg text-xs font-bold hover:bg-zinc-50"
-                            onClick={() => handleUpdateRole(user.id, role)}
-                          >
-                            تعيين كـ {role}
-                          </DropdownMenuItem>
-                        ))}
+                           <DropdownMenuSeparator />
+                           
+                           <DropdownMenuLabel className="text-right text-[10px] text-muted-foreground uppercase py-2">تغيير الصلاحيات</DropdownMenuLabel>
+                           {STANDARDIZED_ROLES.filter(r => r !== user.role).map(role => (
+                             <DropdownMenuItem 
+                               key={role} 
+                               className="justify-end gap-3 cursor-pointer py-2 rounded-lg text-xs font-bold hover:bg-zinc-50"
+                               onClick={() => handleUpdateRole(user.id, role)}
+                             >
+                               تعيين كـ {role}
+                             </DropdownMenuItem>
+                           ))}
 
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="justify-end gap-3 cursor-pointer py-3 rounded-xl text-destructive font-black bg-red-50 hover:bg-red-100" 
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          حذف السجل نهائياً <Trash2 size={18} />
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                           <DropdownMenuSeparator />
+                           <DropdownMenuItem 
+                             className="justify-end gap-3 cursor-pointer py-3 rounded-xl text-destructive font-black bg-red-50 hover:bg-red-100" 
+                             onClick={() => handleDeleteUser(user.id)}
+                           >
+                             حذف السجل نهائياً <Trash2 size={18} />
+                           </DropdownMenuItem>
+                         </DropdownMenuContent>
+                       </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -332,17 +335,6 @@ export default function UserManagement() {
           </TableBody>
         </Table>
       </Card>
-
-      <div className="bg-zinc-900 p-8 rounded-[40px] text-white flex flex-col md:flex-row-reverse items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
-        <div className="relative z-10 text-right space-y-2">
-          <h3 className="text-2xl font-black flex items-center justify-end gap-3 text-secondary">
-            نظام الحماية والرقابة اللحظي <ShieldCheck size={28} />
-          </h3>
-          <p className="text-zinc-400 max-w-xl font-bold text-sm">
-            كافة التغييرات التي تجريها هنا تنعكس فوراً على صلاحيات دخول المستخدمين بفضل الربط المباشر مع Firestore. يرجى الحذر عند تعديل الأدوار الحساسة.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

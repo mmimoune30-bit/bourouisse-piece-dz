@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -35,7 +34,6 @@ export default function LoginPage() {
     try {
       let finalEmail = emailOrId.trim();
 
-      // 1. منطق تسجيل الدخول بالمعرف الرقمي
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
         const qStore = query(usersRef, where("storeId", "==", finalEmail), limit(1));
@@ -51,21 +49,18 @@ export default function LoginPage() {
         else if (!customerSnap.empty) foundUserDoc = customerSnap.docs[0];
 
         if (!foundUserDoc) {
-          throw new Error("عذراً، المعرف الرقمي الذي أدخلته غير موجود في النظام.");
+          throw new Error("عذراً، المعرف الرقمي الذي أدخلته غير موجود.");
         }
-
         finalEmail = foundUserDoc.data().email;
       }
 
-      // 2. تسجيل الدخول عبر Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 3. التحقق من وجود ملف المستخدم في Firestore
       const userDocRef = doc(firestore, "users", user.uid);
       let userDoc = await getDoc(userDocRef);
       
-      // التأسيس التلقائي للمدير الرئيسي إذا لم يوجد المستند
+      // التأسيس التلقائي للمدير الرئيسي
       if (!userDoc.exists() && user.email === "mmimoune30@gmail.com") {
         const adminProfile = {
           uid: user.uid,
@@ -80,19 +75,18 @@ export default function LoginPage() {
       }
 
       if (!userDoc.exists()) {
-        throw new Error("تم تسجيل دخولك ولكن لم يتم العثور على ملفك الشخصي. يرجى مراجعة الإدارة.");
+        throw new Error("لم يتم العثور على ملفك الشخصي. يرجى مراجعة الإدارة.");
       }
 
       const profile = userDoc.data();
-
       if (profile?.status === "Blocked") {
-        throw new Error("عذراً، هذا الحساب محظور من دخول النظام.");
+        throw new Error("هذا الحساب محظور.");
       }
 
       const role = profile?.role;
       const adminRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
       
-      toast({ title: "تم الدخول بنجاح", description: `مرحباً بك مجدداً ${profile.name || ''}.` });
+      toast({ title: "تم الدخول بنجاح", description: `مرحباً ${profile.name || ''}.` });
 
       if (adminRoles.includes(role)) {
         router.push("/admin/dashboard");
@@ -103,18 +97,12 @@ export default function LoginPage() {
       }
 
     } catch (error: any) {
-      console.error("FULL LOGIN ERROR", error);
+      console.error("LOGIN ERROR", error);
       let errorMessage = error.message;
-      
-      if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+      if (error.code === "auth/invalid-credential") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
-
-      toast({ 
-        variant: "destructive", 
-        title: "خطأ في الدخول", 
-        description: errorMessage 
-      });
+      toast({ variant: "destructive", title: "خطأ في الدخول", description: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -127,64 +115,49 @@ export default function LoginPage() {
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
             <CardHeader className="bg-primary text-white p-8 text-center">
-               <div className="mx-auto w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-4">
-                  <ShieldCheck size={32} />
-               </div>
+               <ShieldCheck className="mx-auto w-16 h-16 bg-white/20 rounded-2xl p-3 mb-4" />
                <CardTitle className="text-3xl font-black">بوابة الدخول</CardTitle>
-               <CardDescription className="text-blue-100">سجل دخولك لإدارة حسابك بأمان</CardDescription>
+               <CardDescription className="text-blue-100">سجل دخولك لإدارة حسابك</CardDescription>
             </CardHeader>
             <CardContent className="p-8">
                <Tabs defaultValue="email" onValueChange={setLoginMethod} className="w-full">
                   <TabsList className="grid grid-cols-2 mb-8 bg-zinc-100 p-1 h-12 rounded-xl">
-                    <TabsTrigger value="email" className="font-bold rounded-lg">البريد الإلكتروني</TabsTrigger>
-                    <TabsTrigger value="id" className="font-bold rounded-lg">المعرف الرقمي</TabsTrigger>
+                    <TabsTrigger value="email" className="font-bold">البريد</TabsTrigger>
+                    <TabsTrigger value="id" className="font-bold">المعرف</TabsTrigger>
                   </TabsList>
                   
                   <form onSubmit={handleLogin} className="space-y-6 text-right" dir="rtl">
                     <div className="space-y-2">
                       <Label className="font-bold">{loginMethod === 'email' ? 'البريد الإلكتروني' : 'معرف الحساب (BR-ID)'}</Label>
-                      <div className="relative">
-                        <Input 
-                          type="text"
-                          value={emailOrId}
-                          onChange={(e) => setEmailOrId(e.target.value)}
-                          placeholder={loginMethod === 'email' ? 'email@example.com' : 'مثلاً: BR-S-1001'} 
-                          className="h-14 pr-12 text-lg border-2 focus:border-secondary rounded-xl text-right" 
-                          required
-                        />
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                          {loginMethod === 'email' ? <Mail size={20} /> : <User size={20} />}
-                        </div>
-                      </div>
+                      <Input 
+                        value={emailOrId}
+                        onChange={(e) => setEmailOrId(e.target.value)}
+                        placeholder={loginMethod === 'email' ? 'email@example.com' : 'مثلاً: BR-S-1001'} 
+                        className="h-14 border-2 rounded-xl text-right" 
+                        required
+                      />
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center flex-row-reverse">
-                         <Label className="font-bold">كلمة المرور</Label>
-                         <Link href="#" className="text-xs text-secondary font-black hover:underline">نسيت كلمة المرور؟</Link>
-                      </div>
-                      <div className="relative">
-                        <Input 
-                          type="password" 
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••" 
-                          className="h-14 pr-12 text-lg border-2 focus:border-secondary rounded-xl text-right" 
-                          required
-                        />
-                        <Key className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-                      </div>
+                      <Label className="font-bold">كلمة المرور</Label>
+                      <Input 
+                        type="password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••" 
+                        className="h-14 border-2 rounded-xl text-right" 
+                        required
+                      />
                     </div>
 
-                    <Button className="w-full h-14 text-lg font-black gap-2 shadow-xl rounded-xl bg-primary text-white hover:bg-secondary hover:text-primary transition-all" disabled={loading}>
-                       {loading ? <Loader2 className="animate-spin" size={20} /> : <LogIn size={20} />}
+                    <Button className="w-full h-14 text-lg font-black gap-2 shadow-xl rounded-xl bg-primary" disabled={loading}>
+                       {loading ? <Loader2 className="animate-spin" /> : <LogIn size={20} />}
                        {loading ? "جاري التحقق..." : "دخول آمن"}
                     </Button>
 
                     <div className="pt-4 text-center">
-                       <p className="text-sm text-muted-foreground mb-4">ليس لديك حساب؟</p>
                        <Link href="/join">
-                          <Button variant="outline" className="w-full h-12 font-bold gap-2 border-2 border-zinc-200 rounded-xl">
+                          <Button variant="outline" className="w-full h-12 font-bold gap-2 border-2 rounded-xl">
                              إنشاء حساب جديد <ArrowLeft size={18} />
                           </Button>
                        </Link>
