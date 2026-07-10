@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -33,6 +32,8 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFirestore } from "@/firebase";
 import { collection, query, orderBy, limit, getCountFromServer, onSnapshot } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function AdminDashboard() {
   const { firestore } = useFirestore();
@@ -44,7 +45,6 @@ export default function AdminDashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
 
-  // 1. جلب الإحصائيات (عدادات المجموعات)
   useEffect(() => {
     const fetchStats = async () => {
       if (!firestore) return;
@@ -69,7 +69,6 @@ export default function AdminDashboard() {
     fetchStats();
   }, [firestore]);
 
-  // 2. مراقبة العمليات المالية بشكل لحظي (onSnapshot)
   useEffect(() => {
     if (!firestore) return;
 
@@ -86,6 +85,13 @@ export default function AdminDashboard() {
       }));
 
       setTransactions(data);
+      setLoadingTransactions(false);
+    }, async (err) => {
+      const permissionError = new FirestorePermissionError({
+        path: "payments",
+        operation: 'list',
+      });
+      errorEmitter.emit('permission-error', permissionError);
       setLoadingTransactions(false);
     });
 

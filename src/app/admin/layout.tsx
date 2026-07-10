@@ -120,7 +120,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content - Correct Offset to prevent overlap */}
+      {/* Main Content - Offset margin depends on sidebar width to prevent overlap */}
       <main className={cn(
         "flex-grow transition-all duration-300 min-h-screen flex flex-col",
         isSidebarOpen ? "ml-64" : "ml-20"
