@@ -4,7 +4,7 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Heart, 
@@ -94,7 +94,7 @@ export default function CustomerDashboard() {
             <Card className="border-none shadow-xl bg-white rounded-[40px] overflow-hidden">
                <CardHeader className="flex flex-row-reverse items-center justify-between border-b p-8 bg-zinc-50/50">
                   <div className="text-right">
-                    <CardTitle className="text-2xl font-black flex items-center justify-end gap-2">المفضلة <Heart className="text-red-500" /></CardTitle>
+                    <CardTitle, CardDescription className="text-2xl font-black flex items-center justify-end gap-2">المفضلة <Heart className="text-red-500" /></CardTitle>
                     <CardDescription className="font-bold">القطع التي قمت بحفظها مؤخراً لمراجعتها</CardDescription>
                   </div>
                   <Button variant="ghost" className="font-black text-primary">تفريغ الكل</Button>

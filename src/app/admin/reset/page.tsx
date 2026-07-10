@@ -145,7 +145,7 @@ export default function AdminResetPage() {
             <p>لإتمام عملية "إعادة الضبط الكاملة" بنجاح، اتبع الخطوات التالية:</p>
             <ol className="list-decimal list-inside space-y-4 pr-4">
               <li>استخدم الأزرار في الجهة المقابلة لمسح كافة المستندات من Firestore.</li>
-              <li>اذهب إلى <a href="https://console.firebase.google.com/" target="_blank" className="text-blue-600 underline">Firebase Console</a> -> Authentication.</li>
+              <li>اذهب إلى <a href="https://console.firebase.google.com/" target="_blank" className="text-blue-600 underline">Firebase Console</a> → Authentication.</li>
               <li>اختر كافة المستخدمين وقم بعمل "Delete Account".</li>
               <li>بمجرد إفراغ النظام، اذهب إلى صفحة <Button variant="link" className="p-0 font-black h-auto" onClick={() => router.push("/setup-admin")}>تأسيس المدير الرئيسي</Button> لإنشاء حسابك الجديد.</li>
             </ol>

@@ -35,7 +35,7 @@ import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, set
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
-interface AppUser {
+interface User {
   id: string;
   uid: string;
   name: string;
@@ -59,7 +59,7 @@ const STANDARDIZED_ROLES = [
 export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [users, setUsers] = useState<AppUser[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
@@ -72,7 +72,7 @@ export default function UserManagement() {
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as Omit<AppUser, "id">),
+          ...(doc.data() as Omit<User, "id">),
         }));
 
         setUsers(data);
