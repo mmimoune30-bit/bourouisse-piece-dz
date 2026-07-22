@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Search, Settings
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Search, Settings, Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,6 +60,14 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-4 border-l flex items-center gap-2">
+            {/* زر العودة للرئيسية */}
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
+                <Home size={16} className="text-primary" />
+                {lang === 'AR' ? 'العودة للرئيسية' : 'Back to Home'}
+              </Button>
+            </Link>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
