@@ -21,10 +21,15 @@ service cloud.firestore {
       );
     }
 
-    // التحقق من صلاحيات الطاقم الإداري
+    // التحقق من صلاحيات الطاقم الإداري (Super Admin, Manager, etc.)
     function isAdmin() {
       return isAuthenticated() && 
         getUserData(request.auth.uid).role in ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
+    }
+
+    // التحقق من صلاحية المدير (Manager) تحديداً
+    function isManager() {
+      return isAuthenticated() && getUserData(request.auth.uid).role == "Manager";
     }
 
     function isOwner(userId) {
@@ -33,12 +38,6 @@ service cloud.firestore {
 
     function isActive() {
       return isAuthenticated() && getUserData(request.auth.uid).status == "Active";
-    }
-
-    // التحقق من أن المستخدم لا يمنح نفسه صلاحيات أدمن عند الإنشاء
-    function isValidInitialRole() {
-      let role = request.resource.data.role;
-      return role in ["Customer", "Seller"] || request.auth.token.email == "mmimoune30@gmail.com";
     }
 
     function isOwnerUpdatingAllowedFields() {
@@ -50,10 +49,9 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAdmin() || isOwner(userId);
       
-      // منع إنشاء حساب أدمن إلا للبريد المخصص
       allow create: if isAuthenticated() 
                    && request.auth.uid == userId 
-                   && isValidInitialRole();
+                   && (request.resource.data.role in ["Customer", "Seller"] || request.auth.token.email == "mmimoune30@gmail.com");
       
       allow update: if isSuperAdmin() 
                    || (isAdmin() && userId != request.auth.uid)
@@ -71,10 +69,12 @@ service cloud.firestore {
                    && isActive()
                    && (request.resource.data.sellerId == request.auth.uid);
                    
+      // الإدارة والمالك يمكنهم التعديل (إخفاء/تغيير بيانات)
       allow update: if collectionName in ["listings", "products"] 
                            && (isAdmin() || (resource.data.sellerId == request.auth.uid));
 
-      allow delete: if isAdmin() || (isAuthenticated() && resource.data.sellerId == request.auth.uid);
+      // الحذف النهائي مقتصر على الإدارة فقط (Super Admin & Manager)
+      allow delete: if isAdmin();
     }
 
     // --- 3. طلبات الشراء (Purchase Requests) ---
@@ -92,14 +92,13 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // --- 5. الشكاوى والبلاغات (Complaints) ---
+    // --- بقية المجموعات ---
     match /complaints/{complaintId} {
       allow create: if isAuthenticated() && isActive();
       allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
       allow update, delete: if isAdmin();
     }
 
-    // --- 6. الإعدادات والبنرات ---
     match /banners/{bannerId} {
       allow read: if true;
       allow write: if isAdmin();
