@@ -8,33 +8,73 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Mail, Phone, Lock, ArrowLeft, MapPin, User } from "lucide-react";
+import { UserPlus, Mail, Phone, Lock, ArrowLeft, MapPin, User, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { WILAYAS_DATA } from "@/lib/algeria-locations";
+import { useAuth, useFirestore } from "@/firebase";
+import { registerUser } from "@/services/auth-service";
+import { useRouter } from "next/navigation";
 
 export default function BuyerRegister() {
+  const router = useRouter();
+  const { auth } = useAuth();
+  const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
-  const customerId = `BR-C-${Math.floor(1000 + Math.random() * 9000)}`;
+  
+  const customerId = useMemo(() => `BR-C-${Math.floor(1000 + Math.random() * 9000)}`, []);
 
   const communesList = useMemo(() => {
     return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
   }, [selectedWilaya]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!agreed) {
       toast({ variant: "destructive", title: "تنبيه", description: "يجب الموافقة على الشروط والأحكام أولاً." });
       return;
     }
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!email && !phone) {
+      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى إدخال رقم الهاتف أو البريد الإلكتروني على الأقل." });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
+      return;
+    }
+
+    if (!auth || !firestore) return;
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await registerUser(auth, firestore, {
+        name: formData.get("fullName") as string,
+        email: email,
+        phone: phone,
+        role: "Customer",
+        customerId: customerId,
+        wilaya: selectedWilaya,
+        commune: formData.get("commune") as string
+      }, password);
+
       toast({ title: "تم التسجيل بنجاح", description: `معرفك الخاص هو ${customerId}. استخدمه للدخول مستقبلاً.` });
-    }, 1500);
+      router.push("/customer/dashboard");
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "فشل التسجيل", description: err.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,17 +99,17 @@ export default function BuyerRegister() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label className="font-bold flex items-center justify-end gap-2"><User size={16} /> الاسم الكامل</Label>
-                  <Input placeholder="أدخل اسمك بالكامل" className="h-14 text-lg border-2" required />
+                  <Input name="fullName" placeholder="أدخل اسمك بالكامل" className="h-14 text-lg border-2" required />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="font-bold flex items-center justify-end gap-2"><Phone size={16} /> رقم الهاتف</Label>
-                    <Input placeholder="05/06/07..." className="h-14 text-lg border-2" required />
+                    <Label className="font-bold flex items-center justify-end gap-2"><Phone size={16} /> رقم الهاتف (اختياري)</Label>
+                    <Input name="phone" placeholder="05/06/07..." className="h-14 text-lg border-2" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-bold flex items-center justify-end gap-2"><Mail size={16} /> البريد الإلكتروني</Label>
-                    <Input type="email" placeholder="email@example.com" className="h-14 text-lg border-2" required />
+                    <Label className="font-bold flex items-center justify-end gap-2"><Mail size={16} /> البريد الإلكتروني (اختياري)</Label>
+                    <Input name="email" type="email" placeholder="email@example.com" className="h-14 text-lg border-2" />
                   </div>
                 </div>
 
@@ -85,7 +125,7 @@ export default function BuyerRegister() {
                   </div>
                   <div className="space-y-2">
                     <Label className="font-bold">البلدية</Label>
-                    <Select required disabled={!selectedWilaya}>
+                    <Select name="commune" required disabled={!selectedWilaya}>
                       <SelectTrigger className="h-14 text-lg border-2"><SelectValue placeholder="اختر البلدية" /></SelectTrigger>
                       <SelectContent>
                         {communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -97,11 +137,11 @@ export default function BuyerRegister() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="font-bold flex items-center justify-end gap-2"><Lock size={16} /> كلمة المرور</Label>
-                    <Input type="password" placeholder="••••••••" className="h-14 text-lg border-2" required />
+                    <Input name="password" type="password" placeholder="••••••••" className="h-14 text-lg border-2" required />
                   </div>
                   <div className="space-y-2">
                     <Label className="font-bold">تأكيد كلمة المرور</Label>
-                    <Input type="password" placeholder="••••••••" className="h-14 text-lg border-2" required />
+                    <Input name="confirmPassword" type="password" placeholder="••••••••" className="h-14 text-lg border-2" required />
                   </div>
                 </div>
 
@@ -120,7 +160,7 @@ export default function BuyerRegister() {
                   className="w-full h-16 text-xl font-black gap-3 shadow-xl rounded-2xl" 
                   disabled={loading || !agreed}
                 >
-                  {loading ? "جاري إنشاء الحساب..." : "تأكيد التسجيل الآن"} <ArrowLeft size={24} />
+                  {loading ? <Loader2 className="animate-spin" /> : "تأكيد التسجيل الآن"} <ArrowLeft size={24} />
                 </Button>
               </form>
 

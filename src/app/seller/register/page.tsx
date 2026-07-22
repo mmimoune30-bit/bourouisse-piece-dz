@@ -65,8 +65,15 @@ export default function SellerRegister() {
     }
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!email && !phone) {
+      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى إدخال رقم الهاتف أو البريد الإلكتروني على الأقل." });
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
@@ -79,9 +86,12 @@ export default function SellerRegister() {
     try {
       await registerUser(auth, firestore, {
         name: formData.get("storeName") as string,
-        email: formData.get("email") as string,
+        email: email,
+        phone: phone,
         role: "Seller",
-        storeId: storeId
+        storeId: storeId,
+        wilaya: selectedWilaya,
+        commune: formData.get("commune") as string
       }, password);
 
       toast({ title: "تم إنشاء المتجر", description: `معرف متجرك هو ${storeId}. يمكنك استخدامه للدخول.` });
@@ -148,16 +158,16 @@ export default function SellerRegister() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                      <Label className="font-bold">رقم الهاتف</Label>
-                      <Input name="phone" placeholder="05/06/07..." className="h-12 border-2" required />
+                      <Label className="font-bold">رقم الهاتف (اختياري)</Label>
+                      <Input name="phone" placeholder="05/06/07..." className="h-12 border-2" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-bold">رقم الواتساب</Label>
                       <Input name="whatsapp" placeholder="05/06/07..." className="h-12 border-2 border-green-100" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="font-bold">البريد الإلكتروني</Label>
-                      <Input name="email" type="email" placeholder="email@example.com" className="h-12 border-2" required />
+                      <Label className="font-bold">البريد الإلكتروني (اختياري)</Label>
+                      <Input name="email" type="email" placeholder="email@example.com" className="h-12 border-2" />
                     </div>
                   </div>
 
