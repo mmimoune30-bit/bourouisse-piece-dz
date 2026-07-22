@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -74,7 +73,7 @@ export default function SellerPurchaseRequests() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12">
+      <main className="flex-grow pt-20 pb-12">
         <div className="container mx-auto px-4">
           <header className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-6 mb-10">
             <div className="text-right">

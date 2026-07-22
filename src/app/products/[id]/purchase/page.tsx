@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useMemo } from "react";
@@ -94,7 +93,7 @@ export default function PurchasePage({ params }: { params: Promise<{ id: string 
     return (
       <div className="min-h-screen bg-zinc-50 flex flex-col">
         <Navbar />
-        <main className="flex-grow pt-[235px] flex items-center justify-center p-4">
+        <main className="flex-grow pt-20 flex items-center justify-center p-4">
           <Card className="max-w-md w-full border-none shadow-2xl text-center p-12 rounded-[40px] bg-white">
             <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 size={48} />
@@ -121,7 +120,7 @@ export default function PurchasePage({ params }: { params: Promise<{ id: string 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12">
+      <main className="flex-grow pt-20 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="mb-8 flex items-center justify-between flex-row-reverse">
              <div className="text-right">

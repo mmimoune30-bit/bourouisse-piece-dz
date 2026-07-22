@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -59,7 +58,7 @@ export default function NewListing() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 pt-[290px] pb-12">
+      <main className="flex-grow container mx-auto px-4 pt-20 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
           
           <div className="text-right" dir="rtl">

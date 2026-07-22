@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -88,7 +87,7 @@ export default function SetupAdminPage() {
     return (
       <div className="min-h-screen bg-zinc-50 flex flex-col">
         <Navbar />
-        <main className="flex-grow pt-[235px] flex items-center justify-center p-4">
+        <main className="flex-grow pt-20 flex items-center justify-center p-4">
           <Card className="max-w-md w-full border-none shadow-2xl text-center p-12 rounded-[40px] bg-white">
             <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 size={48} />
@@ -108,7 +107,7 @@ export default function SetupAdminPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12 flex items-center justify-center">
+      <main className="flex-grow pt-20 pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-lg">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
             <CardHeader className="bg-primary text-white p-8 text-center">
