@@ -60,13 +60,15 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-4 border-l flex items-center gap-2">
-            {/* زر العودة للرئيسية */}
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
-                <Home size={16} className="text-primary" />
-                {lang === 'AR' ? 'العودة للرئيسية' : 'Back to Home'}
-              </Button>
-            </Link>
+            {/* زر الرجوع للرئيسية - يختفي في الصفحة الرئيسية */}
+            {!isHome && (
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
+                  <Home size={16} className="text-primary" />
+                  {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+                </Button>
+              </Link>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
