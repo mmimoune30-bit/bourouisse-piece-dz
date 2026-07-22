@@ -10,11 +10,15 @@ service cloud.firestore {
     }
     
     function getUserData(uid) {
-      // جلب بيانات المستخدم من Firestore للتحقق من الدور
       return get(/databases/$(database)/documents/users/$(uid)).data;
     }
 
-    // التحقق من صلاحيات المدير (Super Admin, Manager, Financial Officer, Customer Service)
+    // التحقق من صلاحيات المدير العام (Super Admin فقط)
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserData(request.auth.uid).role == "Super Admin";
+    }
+
+    // التحقق من صلاحيات الطاقم الإداري (إدارة العمليات اليومية)
     function isAdmin() {
       return isAuthenticated() && 
         getUserData(request.auth.uid).role in ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
@@ -25,32 +29,40 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // التحقق من أن الحساب ليس محظوراً (Active)
+    // التحقق من أن الحساب ليس محظوراً
     function isActive() {
       return isAuthenticated() && getUserData(request.auth.uid).status == "Active";
     }
 
+    // التحقق من الحقول المسموح للمستخدم العادي تعديلها في ملفه الشخصي
+    function isOwnerUpdatingAllowedFields() {
+      let allowedFields = ["name", "phone", "wilaya", "commune", "avatarUrl", "location"];
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
+    }
+
     // --- 1. مجموعة المستخدمين (Users) ---
     match /users/{userId} {
-      // حماية البيانات الشخصية: القراءة فقط للمالك أو الأدمن
       allow read: if isAdmin() || isOwner(userId);
-      // الإنشاء مسموح فقط للمستخدم المصادق عليه لنفسه
+      
+      // الإنشاء مسموح للمستخدم لنفسه (مع فرض دور Customer افتراضياً إذا لم يكن أدمن)
       allow create: if isAuthenticated() && request.auth.uid == userId;
-      // التحديث للمالك (بيانات محدودة) أو الأدمن
-      allow update: if isAdmin() || isOwner(userId);
-      // الحذف للأدمن فقط
-      allow delete: if isAdmin();
+      
+      allow update: if isSuperAdmin() 
+                   || (isAdmin() && userId != request.auth.uid) // الأدمن يعدل الآخرين ولا يعدل نفسه (لتجنب تغيير رتبته)
+                   || (isOwner(userId) && isOwnerUpdatingAllowedFields()); // المالك يعدل بياناته المحدودة فقط
+      
+      // الحذف حصري للمدير العام
+      allow delete: if isSuperAdmin();
     }
 
     // --- 2. المنتجات والإعلانات (Products & Listings) ---
-    // قراءة عامة للجميع، كتابة للمالك (البائع) أو الأدمن
     match /{collectionName}/{docId} {
       allow read: if collectionName in ["listings", "products"];
       
       allow create: if collectionName in ["listings", "products"] 
                    && isAuthenticated() 
                    && isActive()
-                   && (isAdmin() || (request.resource.data.sellerId == request.auth.uid));
+                   && (request.resource.data.sellerId == request.auth.uid);
                    
       allow update, delete: if collectionName in ["listings", "products"] 
                            && (isAdmin() || (resource.data.sellerId == request.auth.uid));
@@ -69,7 +81,7 @@ service cloud.firestore {
       allow update: if collectionName in ["purchase_requests", "orders"]
                    && (isAdmin() || (isAuthenticated() && resource.data.sellerId == request.auth.uid));
 
-      allow delete: if isAdmin();
+      allow delete: if isSuperAdmin();
     }
 
     // --- 4. العمليات المالية (Payments) ---
@@ -93,8 +105,8 @@ service cloud.firestore {
     }
     
     match /plans/{planId} {
-      allow read: if true; // جداول الأسعار عامة للمقارنة
-      allow write: if isAdmin();
+      allow read: if true;
+      allow write: if isSuperAdmin(); // تغيير أسعار الباقات حصري للمدير العام
     }
 
     // --- 7. المحتوى التسويقي والإعدادات (Banners & Settings) ---
@@ -104,13 +116,14 @@ service cloud.firestore {
     }
     
     match /settings/{settingId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read: if true; // القراءة عامة لعرض هوية الموقع
+      allow write: if isSuperAdmin(); // التعديل حصري للمدير العام
     }
 
     // --- 8. سجل الرقابة والعمليات (Audit Logs) ---
     match /audit_logs/{logId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow write: if false; // لا يمكن لأي شخص الكتابة مباشرة في السجل، يتم عبر Cloud Functions أو النظام فقط
     }
   }
 }
