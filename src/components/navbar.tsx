@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Search, Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import AISearchBox from "@/components/ai-search-box";
+import { cn } from "@/lib/utils";
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -19,6 +23,8 @@ const WhatsAppIcon = () => (
 );
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
@@ -33,7 +39,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
+      {/* السطر الأول: التيكر ووسائل التواصل (دائم الظهور) */}
       <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -52,7 +59,7 @@ export default function Navbar() {
                </div>
             </div>
           </div>
-          <div className="shrink-0 pl-4 border-l">
+          <div className="shrink-0 pl-4 border-l flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
@@ -69,6 +76,60 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* السطور الإضافية (تظهر في الصفحة الرئيسية فقط) */}
+      {isHome && (
+        <>
+          {/* سطر الشعار والأزرار */}
+          <div className="bg-white py-4 border-b">
+            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
+              {/* Logo Area */}
+              <Link href="/" className="flex items-center gap-3" dir="ltr">
+                <div className="bg-primary p-2 rounded-xl text-white">
+                  <Settings size={28} className="animate-spin-slow" />
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-black text-primary tracking-tighter">BOUROUISSE <span className="text-secondary">PIECE-DZ</span></span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">بورويس لقطع الغيار - M-M CHLEF</span>
+                </div>
+              </Link>
+
+              {/* Auth & Seller Buttons */}
+              <div className="flex flex-wrap items-center gap-2 justify-center" dir="rtl">
+                <Link href="/seller/register">
+                  <Button className="bg-secondary text-primary font-black hover:bg-zinc-900 hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/20 h-12 transition-all">
+                    <Store size={18} /> كن بائعاً معنا
+                  </Button>
+                </Link>
+                <Link href="/join">
+                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 transition-all">
+                    <UserPlus size={18} /> إضافة حساب
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12">
+                    <LogIn size={18} /> الدخول إلى الحساب
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* الشريط الأزرق مع خانة البحث */}
+          <div className="bg-primary py-4 shadow-inner relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+               <div className="grid grid-cols-8 gap-4 rotate-12 scale-150">
+                  {[...Array(24)].map((_, i) => <Settings key={i} size={48} className="text-white" />)}
+               </div>
+            </div>
+            
+            <div className="container mx-auto px-4 relative z-10">
+              <AISearchBox />
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 }

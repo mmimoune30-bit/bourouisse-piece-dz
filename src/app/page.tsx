@@ -113,7 +113,8 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-12">
+      {/* Padding to account for the large header on Home page */}
+      <main className="flex-grow pt-[235px]">
         {/* Dynamic Multi-language Hero Section */}
         <section className="relative w-full">
           <Carousel 
