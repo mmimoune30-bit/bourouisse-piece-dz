@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react";
@@ -116,12 +117,7 @@ export default function UserManagement() {
         setIsAddDialogOpen(false);
       })
       .catch((err) => {
-        const permissionError = new FirestorePermissionError({ 
-          path: "users", 
-          operation: "create", 
-          requestResourceData: newUser 
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        toast({ variant: "destructive", title: "فشل الإنشاء", description: "ليس لديك صلاحية لإضافة هذا الدور." });
       });
   };
 
@@ -132,7 +128,7 @@ export default function UserManagement() {
     updateDoc(doc(firestore, "users", id), { status: newStatus })
       .then(() => toast({ title: "تم تحديث الحالة", description: `الحساب الآن ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` }))
       .catch((err) => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" }));
+        toast({ variant: "destructive", title: "خطأ", description: "لا يمكن تعديل حالة هذا المستخدم." });
       });
   };
 
@@ -140,7 +136,7 @@ export default function UserManagement() {
     if (!firestore) return;
     updateDoc(doc(firestore, "users", id), { role: newRole })
       .then(() => toast({ title: "تحديث الصلاحيات", description: `تم تغيير الدور إلى ${newRole}.` }))
-      .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "update" })));
+      .catch(() => toast({ variant: "destructive", title: "فشل التعديل", description: "ليس لديك صلاحية تغيير الأدوار." }));
   };
 
   const handleDeleteUser = (id: string) => {
@@ -148,7 +144,7 @@ export default function UserManagement() {
     
     deleteDoc(doc(firestore, "users", id))
       .then(() => toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة السجل بالكامل." }))
-      .catch(() => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${id}`, operation: "delete" })));
+      .catch(() => toast({ variant: "destructive", title: "فشل الحذف", description: "فقط Super Admin يمكنه حذف المستخدمين." }));
   };
 
   const filteredUsers = users.filter(u => 
@@ -170,7 +166,7 @@ export default function UserManagement() {
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
             <UserCog size={32} className="text-secondary" /> إدارة الهوية والصلاحيات
           </h1>
-          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين، حالات الحسابات، والرقابة الأمنية اللحظية.</p>
+          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين وحالات الحسابات بشكل آمن.</p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -213,7 +209,7 @@ export default function UserManagement() {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl border shadow-sm">
-        <div className="relative w-full max-md">
+        <div className="relative w-full max-w-md">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <Input 
             placeholder="بحث بالاسم، البريد الإلكتروني..." 
@@ -254,7 +250,6 @@ export default function UserManagement() {
                         <span className="text-[11px] text-muted-foreground flex items-center gap-1 justify-end">
                           {user.email} <Mail size={10} />
                         </span>
-                        <span className="text-[9px] font-mono text-zinc-400 mt-1 uppercase">UID: {user.uid?.substring(0, 10)}...</span>
                       </div>
                     </div>
                   </TableCell>
@@ -328,11 +323,7 @@ export default function UserManagement() {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-32 text-muted-foreground">
-                  <div className="flex flex-col items-center gap-4 opacity-30">
-                    <Search size={64} />
-                    <p className="text-2xl font-black">لا توجد بيانات مستخدمين بعد</p>
-                    <p className="text-sm font-bold">سجل دخولك كمسؤول لبدء تأسيس النظام</p>
-                  </div>
+                  لا توجد بيانات مستخدمين بعد
                 </TableCell>
               </TableRow>
             )}
