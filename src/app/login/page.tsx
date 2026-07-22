@@ -60,7 +60,6 @@ export default function LoginPage() {
       const userDocRef = doc(firestore, "users", user.uid);
       let userDoc = await getDoc(userDocRef);
       
-      // التأسيس التلقائي للمدير الرئيسي
       if (!userDoc.exists() && user.email === "mmimoune30@gmail.com") {
         const adminProfile = {
           uid: user.uid,
@@ -111,7 +110,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12 flex items-center justify-center">
+      <main className="flex-grow pt-16 pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
             <CardHeader className="bg-primary text-white p-8 text-center">

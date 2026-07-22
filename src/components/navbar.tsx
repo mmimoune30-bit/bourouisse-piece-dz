@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { 
-  Globe, ChevronDown, LogIn, UserPlus, Store, Phone, Mail, ArrowRight
+  Phone, Mail, Globe, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,28 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { useRouter, usePathname } from "next/navigation";
-import AISearchBox from "./ai-search-box";
-
-const translations = {
-  AR: { 
-    buyer: "حساب جديد", 
-    seller: "كن بائعاً معنا", 
-    contact: "للاستفسار:",
-    login: "الدخول إلى حسابي",
-    back: "رجوع",
-    categories: ["الهيكل", "المحرك", "التوازي و التوازن", "الكهرباء", "الإطارات", "الأكسيسوارات"]
-  },
-  EN: {
-    buyer: "New Account",
-    seller: "Become a Seller",
-    contact: "Inquiry:",
-    login: "Login to My Account",
-    back: "Back",
-    categories: ["Body", "Engine", "Suspension", "Electric", "Tires", "Accessories"]
-  }
-};
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -41,32 +18,12 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-const WheelIcon = () => (
-  <div className="relative w-8 h-8 md:w-10 md:h-10 animate-spin-slow text-secondary">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="2" />
-      <line x1="12" y1="2" x2="12" y2="22" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-      <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
-    </svg>
-  </div>
-);
-
 export default function Navbar() {
-  const router = useRouter();
-  const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
-    const checkLang = () => {
-      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
-      if (savedLang) setLang(savedLang);
-    };
-    checkLang();
-    window.addEventListener("languageChange", checkLang);
-    return () => window.removeEventListener("languageChange", checkLang);
+    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+    if (savedLang) setLang(savedLang);
   }, []);
 
   const toggleLang = (newLang: "AR" | "EN") => {
@@ -75,25 +32,20 @@ export default function Navbar() {
     window.dispatchEvent(new Event("languageChange"));
   };
 
-  const t = translations[lang];
-  const siteName = "Bourouisse -Piece DT-dz";
-  const subtext = lang === 'AR' ? "بورويس لقطع الغيار - M-M CHLEF" : "Bourouisse Parts - M-M CHLEF";
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-xl">
-      {/* 1. Top Contact Bar (White) */}
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
       <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
-                  <span className="text-primary tracking-widest">{t.contact}</span>
+                  <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
                </div>
                <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
-                  <span className="text-primary tracking-widest">{t.contact}</span>
+                  <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
@@ -116,94 +68,6 @@ export default function Navbar() {
             </DropdownMenu>
           </div>
         </div>
-      </div>
-
-      {/* 2. Logo & Main Actions Bar (White) */}
-      <div className={cn(
-        "container mx-auto px-4 py-3 flex items-center justify-between gap-4",
-        lang === 'AR' ? "flex-row-reverse" : "flex-row"
-      )}>
-        <Link href="/" className="flex items-center gap-3 group px-4 py-2 hover:bg-zinc-50 rounded-2xl transition-colors">
-          <WheelIcon />
-          <div className="flex flex-col items-center">
-            <div className="flex gap-[1px]" dir="ltr">
-              {siteName.split("").map((letter, i) => (
-                <span 
-                  key={i} 
-                  className={cn(
-                    "text-xl md:text-2xl font-black inline-block animate-logo-ripple",
-                    letter === "-" || i > 12 ? "text-secondary" : "text-black"
-                  )}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {letter === " " ? "\u00A0" : letter}
-                </span>
-              ))}
-            </div>
-            <p className="text-[8px] md:text-[10px] font-bold text-primary tracking-tighter" dir={lang === 'AR' ? "rtl" : "ltr"}>
-              {subtext}
-            </p>
-          </div>
-        </Link>
-
-        <div className={cn(
-          "flex items-center gap-3",
-          lang === 'AR' ? "flex-row-reverse" : "flex-row"
-        )}>
-          <Button variant="outline" className="font-black text-sm h-11 px-6 rounded-xl border-2" asChild>
-            <Link href="/login" className="flex gap-2 items-center">
-              <LogIn size={18} />
-              <span className="hidden lg:inline">{t.login}</span>
-            </Link>
-          </Button>
-          <Button variant="outline" className="font-black text-sm h-11 px-6 rounded-xl border-2" asChild>
-            <Link href="/join" className="flex gap-2 items-center">
-              <UserPlus size={18} />
-              <span className="hidden lg:inline">{t.buyer}</span>
-            </Link>
-          </Button>
-          <Button variant="default" className="bg-secondary text-primary hover:bg-white font-black text-sm h-11 px-6 rounded-xl shadow-lg transition-all" asChild>
-            <Link href="/seller/register" className="flex gap-2 items-center">
-              <Store size={18} />
-              <span className="hidden lg:inline">{t.seller}</span>
-            </Link>
-          </Button>
-          {pathname !== "/" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-11 w-11 rounded-xl border-2"
-              onClick={() => router.back()}
-            >
-              <ArrowRight size={24} className={cn(lang === 'EN' && "rotate-180")} />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* 3. Blue Categories Bar */}
-      <section className="bg-primary text-white h-[65px] flex items-center shadow-inner">
-        <div className="container mx-auto px-4 flex items-center justify-center overflow-x-auto no-scrollbar">
-          <div className={cn(
-            "flex items-center gap-6 md:gap-10",
-            lang === 'AR' ? "flex-row-reverse" : "flex-row"
-          )}>
-            {t.categories.map((cat, i) => (
-              <Link
-                key={i}
-                href={`/catalog?category=${encodeURIComponent(cat)}`}
-                className="text-sm font-black whitespace-nowrap hover:text-secondary transition-colors"
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Gray AI Search Bar (Unified & Filter-focused) */}
-      <div className="bg-zinc-100 py-3 border-t border-zinc-200">
-         <AISearchBox />
       </div>
     </nav>
   );

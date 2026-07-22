@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -114,7 +113,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[275px]">
+      <main className="flex-grow pt-12">
         {/* Dynamic Multi-language Hero Section */}
         <section className="relative w-full">
           <Carousel 
@@ -128,7 +127,7 @@ export default function Home() {
                 const content = lang === "AR" ? banner.ar : banner.en;
                 return (
                   <CarouselItem key={banner.id}>
-                    <div className="relative h-[400px] flex items-center justify-center overflow-hidden">
+                    <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
                       <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
                         <Image
                           src={banner.image}
@@ -146,10 +145,10 @@ export default function Home() {
                           "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
                           lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
-                          <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-4 uppercase drop-shadow-2xl leading-tight">
+                          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-4 uppercase drop-shadow-2xl leading-tight">
                             {content.title}
                           </h1>
-                          <p className="text-sm md:text-lg text-secondary font-bold italic mb-8 leading-relaxed max-w-2xl opacity-90">
+                          <p className="text-base md:text-xl text-secondary font-bold italic mb-8 leading-relaxed max-w-2xl opacity-90">
                             {content.description}
                           </p>
                           <div className={cn(
@@ -157,12 +156,12 @@ export default function Home() {
                             lang === "AR" ? "sm:justify-start" : "sm:justify-start"
                           )}>
                             <Link href={banner.link}>
-                              <Button size="lg" className="h-14 px-10 text-lg font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-2xl shadow-2xl">
+                              <Button size="lg" className="h-16 px-10 text-xl font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-2xl shadow-2xl">
                                 {content.button} {lang === 'AR' ? <ArrowLeft size={20} /> : <ChevronRight size={20} />}
                               </Button>
                             </Link>
                             <Link href="/catalog">
-                              <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-2xl shadow-2xl">
+                              <Button size="lg" variant="outline" className="h-16 px-10 text-xl font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-2xl shadow-2xl">
                                 {lang === 'AR' ? 'تصفح كافة القطع' : 'Browse All Parts'}
                               </Button>
                             </Link>
@@ -193,7 +192,7 @@ export default function Home() {
         </section>
 
         {/* Featured Stores */}
-        <section className="container mx-auto px-4 py-12">
+        <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"

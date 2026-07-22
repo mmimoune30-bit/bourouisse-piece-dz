@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -12,7 +11,7 @@ export default function JoinSelectionPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12 flex items-center">
+      <main className="flex-grow pt-16 pb-12 flex items-center">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
              <h1 className="text-4xl font-black text-primary mb-4">انضم إلى مجتمع بورويس</h1>
@@ -20,7 +19,6 @@ export default function JoinSelectionPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Seller Option */}
             <Card className="border-none shadow-xl hover:shadow-2xl transition-all group overflow-hidden bg-white">
               <div className="h-2 bg-secondary" />
               <CardContent className="p-8 text-center space-y-6">
@@ -49,7 +47,6 @@ export default function JoinSelectionPage() {
               </CardContent>
             </Card>
 
-            {/* Customer Option */}
             <Card className="border-none shadow-xl hover:shadow-2xl transition-all group overflow-hidden bg-white">
               <div className="h-2 bg-primary" />
               <CardContent className="p-8 text-center space-y-6">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useEffect } from "react";
@@ -16,7 +15,6 @@ import {
   Heart, 
   AlertCircle, 
   MessageCircle,
-  Settings,
   ShoppingCart,
   Zap
 } from "lucide-react";
@@ -24,7 +22,6 @@ import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 
-// Custom Social Icons
 const ViberIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.514 10.603a1.5 1.5 0 1 1-2.923-.66 5.864 5.864 0 0 0-4.534-4.534 1.5 1.5 0 1 1-.66-2.923 8.864 8.864 0 0 1 8.117 8.117zm-4.321 0a1.5 1.5 0 1 1-2.923-.66c.21-.926.862-1.683 1.734-2.1l1.189 2.76zm8.807 1.397c0 8.837-7.163 16-16 16S0 20.837 0 12 7.163-4 16-4s16 7.163 16 16zm-7.608 2.015s-.764-1.254-1.04-1.854l-1.012.357s-.348.125-.563-.122l-1.554-1.802s-.216-.247-.091-.462l.357-1.012c-.6-.276-1.854-1.04-1.854-1.04-.333-.146-.68.126-.68.126l-1.002 1.488s-.361.542-.11 1.25c.346.974 1.63 2.94 2.808 4.043 1.178 1.103 3.327 2.128 4.293 2.3 1.05.187 1.517-.23 1.517-.23l1.411-1.127s.245-.333.02-.562l-2.5-2.247s-.233-.208-.51 0z"/></svg>
 );
@@ -86,7 +83,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-[245px] pb-12">
+      <main className="flex-grow pt-16 pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           
           <div className="mb-6 text-center">
@@ -102,7 +99,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6" dir="rtl">
             
             <div className="lg:col-span-1 space-y-4">
-              
               <Card className="border-orange-500 border-2 shadow-xl rounded-2xl overflow-hidden">
                 <CardContent className="p-5 flex flex-col items-center text-center gap-3">
                    <div className="text-3xl font-black text-orange-600">{formattedPrice} دج</div>

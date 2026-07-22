@@ -12,7 +12,6 @@ import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES } from "@/lib/vehic
 import { Filter, Search, RotateCcw } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 
-// Mock Data for live filtering demonstration
 const MOCK_CATALOG_PRODUCTS = [
   { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: "https://picsum.photos/seed/p1/400/400", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, brand: "Renault", model: "Clio IV", year: "2018" },
   { id: "p2", name: "محرك كامل 1.5 dCi", price: 450000, image: "https://picsum.photos/seed/p2/400/400", category: "المحرك", seller: "Bourouisse Parts", condition: "Used" as const, brand: "Renault", model: "Megane", year: "2015" },
@@ -24,7 +23,6 @@ function CatalogContent() {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState<"ar" | "en">("ar");
 
-  // Selection States
   const [brand, setBrand] = useState<string>(searchParams.get("brand") || "");
   const [model, setModel] = useState<string>(searchParams.get("model") || "");
   const [year, setYear] = useState<string>(searchParams.get("year") || "");
@@ -36,13 +34,11 @@ function CatalogContent() {
     if (savedLang) setLang(savedLang);
   }, []);
 
-  // Sync local textSearch state with searchParams (for Navbar AI Search Box)
   useEffect(() => {
     setTextSearch(searchParams.get("query") || "");
     setCategory(searchParams.get("category") || "");
   }, [searchParams]);
 
-  // Real-time Filtering Logic
   const filteredProducts = useMemo(() => {
     return MOCK_CATALOG_PRODUCTS.filter(p => {
       const q = textSearch.toLowerCase();
@@ -80,7 +76,7 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[295px] pb-12">
+      <main className="flex-grow pt-16 pb-12">
         <div className="container mx-auto px-4">
           
           <div className="mb-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4">
@@ -95,9 +91,8 @@ function CatalogContent() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Advanced Filters Sidebar */}
             <aside className="lg:col-span-1 space-y-6">
-              <Card className="border-none shadow-xl sticky top-[300px]">
+              <Card className="border-none shadow-xl sticky top-20">
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
                     <h3 className="font-black text-xl text-primary">فلاتر متقدمة</h3>
@@ -155,7 +150,6 @@ function CatalogContent() {
               </Card>
             </aside>
 
-            {/* Results Grid */}
             <div className="lg:col-span-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                  {filteredProducts.length > 0 ? (
