@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Link from "next/link";
-import { Package, Plus, Search, Edit3, Archive, Eye, MoreVertical, AlertCircle, ShoppingCart } from "lucide-react";
+import { Package, Plus, Search, Edit3, Archive, Eye, MoreVertical, AlertCircle, ShoppingCart, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Mock Data
 const MOCK_LISTINGS = [
@@ -37,6 +38,7 @@ const MOCK_LISTINGS = [
 ];
 
 export default function SellerListingsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [listings, setListings] = useState(MOCK_LISTINGS);
 
@@ -55,11 +57,16 @@ export default function SellerListingsPage() {
           <div className="text-right" dir="rtl">
             <header className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-6 mb-10">
               <div>
+                <div className="flex items-center justify-end gap-2 mb-2">
+                  <Button variant="ghost" size="sm" onClick={() => router.push('/seller/dashboard')} className="font-bold gap-2">
+                    <ChevronRight size={16} /> الرجوع للوحة التحكم
+                  </Button>
+                </div>
                 <h1 className="text-4xl font-black text-primary mb-1">إدارة إعلاناتي</h1>
                 <p className="text-muted-foreground font-bold">يمكنك هنا تعديل، أرشفة أو إضافة قطع غيار جديدة.</p>
               </div>
               <Link href="/seller/listings/new">
-                <Button className="font-black gap-2 h-12 px-6 rounded-xl shadow-lg">
+                <Button className="font-black gap-2 h-12 px-6 rounded-xl shadow-lg bg-primary">
                   <Plus size={18} /> إضافة قطعة جديدة
                 </Button>
               </Link>
@@ -128,7 +135,7 @@ export default function SellerListingsPage() {
                                  <Button variant="ghost" size="icon" className="rounded-xl"><MoreVertical size={18} /></Button>
                                </DropdownMenuTrigger>
                                <DropdownMenuContent align="start" dir="rtl" className="w-48 p-2 rounded-2xl shadow-2xl">
-                                  <DropdownMenuItem className="justify-end gap-2 font-bold py-3 cursor-pointer rounded-xl hover:bg-zinc-50">
+                                  <DropdownMenuItem className="justify-end gap-2 font-bold py-3 cursor-pointer rounded-xl hover:bg-zinc-50" onClick={() => router.push(`/products/${item.id}`)}>
                                      <Eye size={16} /> معاينة الإعلان
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="justify-end gap-2 font-bold py-3 cursor-pointer rounded-xl hover:bg-zinc-50">

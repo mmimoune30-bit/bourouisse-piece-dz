@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Store, User, CreditCard, ShieldCheck, Save, ImagePlus, Globe } from "lucide-react";
+import { Store, User, CreditCard, ShieldCheck, Save, ImagePlus, Globe, ChevronRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 
 export default function SellerSettings() {
+  const router = useRouter();
   const handleSave = () => {
     toast({ title: "تم الحفظ", description: "تم تحديث بيانات المتجر بنجاح." });
   };
@@ -23,7 +26,15 @@ export default function SellerSettings() {
       <main className="flex-grow pt-20 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-right" dir="rtl">
-            <h1 className="text-4xl font-black text-primary mb-10">إعدادات المتجر</h1>
+            <header className="mb-10">
+              <div className="flex items-center justify-end gap-2 mb-2">
+                <Button variant="ghost" size="sm" onClick={() => router.push('/seller/dashboard')} className="font-bold gap-2">
+                  <ChevronRight size={16} /> الرجوع للوحة التحكم
+                </Button>
+              </div>
+              <h1 className="text-4xl font-black text-primary">إعدادات المتجر</h1>
+              <p className="text-muted-foreground font-bold">إدارة ملفك التجاري، الحساب الشخصي، وتفاصيل الاشتراك.</p>
+            </header>
             
             <Tabs defaultValue="store" className="space-y-8">
               <TabsList className="bg-white p-1 h-14 rounded-2xl shadow-sm border w-full md:w-auto overflow-x-auto no-scrollbar flex flex-row-reverse">
@@ -63,7 +74,7 @@ export default function SellerSettings() {
                       </div>
                     </div>
 
-                    <Button onClick={handleSave} className="w-full h-14 text-lg font-black gap-2 mt-4 shadow-xl">
+                    <Button onClick={handleSave} className="w-full h-14 text-lg font-black gap-2 mt-4 shadow-xl bg-primary">
                       <Save size={20} /> حفظ التغييرات
                     </Button>
                   </CardContent>
@@ -71,7 +82,7 @@ export default function SellerSettings() {
               </TabsContent>
 
               <TabsContent value="account">
-                <Card className="border-none shadow-xl rounded-[32px] p-8">
+                <Card className="border-none shadow-xl rounded-[32px] p-8 bg-white">
                   <h3 className="text-xl font-black mb-6">بيانات تسجيل الدخول والأمان</h3>
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -84,7 +95,7 @@ export default function SellerSettings() {
                         <Input defaultValue="0778428977" className="h-12 border-2" />
                       </div>
                     </div>
-                    <Button onClick={handleSave} className="font-black px-12 h-12 rounded-xl">تحديث الحساب</Button>
+                    <Button onClick={handleSave} className="font-black px-12 h-12 rounded-xl bg-primary">تحديث الحساب</Button>
                   </div>
                 </Card>
               </TabsContent>
@@ -106,13 +117,13 @@ export default function SellerSettings() {
                       <Button className="w-full bg-white text-primary hover:bg-secondary font-black h-14 rounded-2xl shadow-lg">تجديد أو ترقية الباقة</Button>
                    </Card>
                    
-                   <Card className="border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center justify-center text-center">
+                   <Card className="border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center justify-center text-center bg-white">
                       <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4">
                          <Globe size={32} />
                       </div>
-                      <h4 className="font-black mb-2">خدمة الزبائن</h4>
+                      <h4 className="font-black mb-2">مركز المساعدة</h4>
                       <p className="text-xs text-muted-foreground font-bold mb-6 leading-relaxed">إذا كنت تواجه مشكلة في الدفع أو التفعيل، تواصل معنا.</p>
-                      <Button variant="outline" className="w-full font-black border-2 h-12 rounded-xl">مركز المساعدة</Button>
+                      <Button variant="outline" className="w-full font-black border-2 h-12 rounded-xl" onClick={() => router.push('/seller/complaints/new')}>تواصل مع الدعم</Button>
                    </Card>
                 </div>
               </TabsContent>

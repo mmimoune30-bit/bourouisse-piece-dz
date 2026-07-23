@@ -1,9 +1,10 @@
+
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -13,15 +14,11 @@ import {
   XCircle, 
   Phone, 
   User, 
-  Calendar, 
   Clock, 
   MoreVertical, 
   Search,
-  Filter,
-  Eye,
-  MessageCircle,
   Truck,
-  ArrowRight
+  ChevronRight
 } from "lucide-react";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where, updateDoc, doc, orderBy } from "firebase/firestore";
@@ -35,6 +32,7 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 const STATUS_LABELS: Record<string, string> = {
   "New": "جديد",
@@ -45,12 +43,13 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function SellerPurchaseRequests() {
+  const router = useRouter();
   const { firestore } = useFirestore();
   const [search, setSearch] = useState("");
 
   const requestsQuery = query(
     collection(firestore!, "purchase_requests"),
-    where("sellerId", "==", "S-99182"), // In real app, use user.uid after linking seller account
+    where("sellerId", "==", "S-99182"), // Replace with current seller ID
     orderBy("createdAt", "desc")
   );
 
@@ -77,6 +76,11 @@ export default function SellerPurchaseRequests() {
         <div className="container mx-auto px-4">
           <header className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-6 mb-10">
             <div className="text-right">
+              <div className="flex items-center justify-end gap-2 mb-2">
+                <Button variant="ghost" size="sm" onClick={() => router.push('/seller/dashboard')} className="font-bold gap-2">
+                  <ChevronRight size={16} /> الرجوع للوحة التحكم
+                </Button>
+              </div>
               <h1 className="text-4xl font-black text-primary mb-1">طلبات الشراء الواردة</h1>
               <p className="text-muted-foreground font-bold">إدارة المبيعات والتواصل مع المشترين.</p>
             </div>
@@ -123,7 +127,7 @@ export default function SellerPurchaseRequests() {
                         <TableCell>
                           <div className="flex flex-col text-right">
                             <span className="font-bold text-sm flex items-center justify-end gap-1"><User size={12} /> {req.buyerName}</span>
-                            <span className="text-[10px] font-mono text-muted-foreground">{req.buyerPhone}</span>
+                            <span className="text-[10px] font-mono text-muted-foreground" dir="ltr">{req.buyerPhone}</span>
                           </div>
                         </TableCell>
                         <TableCell>
