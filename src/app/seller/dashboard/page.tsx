@@ -5,7 +5,7 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Link from "next/link";
-import { Package, ShoppingBag, Settings, Plus, TrendingUp, MessageSquare, ArrowLeft, Heart, BarChart3 } from "lucide-react";
+import { Package, ShoppingBag, Settings, Plus, MessageSquare, Heart, BarChart3, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -73,6 +73,7 @@ export default function SellerDashboard() {
                      </div>
                   </CardContent>
                </Card>
+
                <Card className="border-none shadow-sm overflow-hidden group">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div className="text-right">
@@ -85,6 +86,7 @@ export default function SellerDashboard() {
                      </div>
                   </CardContent>
                </Card>
+
                <Card className="border-none shadow-sm overflow-hidden group">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div className="text-right">
@@ -97,6 +99,7 @@ export default function SellerDashboard() {
                      </div>
                   </CardContent>
                </Card>
+
                <Card className="border-none shadow-sm overflow-hidden group">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div className="text-right">
@@ -108,7 +111,7 @@ export default function SellerDashboard() {
                         <Heart size={24} />
                      </div>
                   </CardContent>
-               </div>
+               </Card>
             </div>
             
             {/* Main Menu Cards */}
@@ -154,3 +157,4 @@ export default function SellerDashboard() {
     </div>
   );
 }
+
