@@ -1,3 +1,4 @@
+
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -34,20 +35,66 @@ export default function SellerRegister() {
     return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
   }, [selectedWilaya]);
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;
+          const MAX_HEIGHT = 500;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const handleLogoClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast({ variant: "destructive", title: "خطأ في الحجم", description: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت." });
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ variant: "destructive", title: "خطأ في الحجم", description: "يجب أن يكون حجم الصورة أقل من 10 ميجابايت." });
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => setLogoPreview(reader.result as string);
-      reader.readAsDataURL(file);
+      setLoading(true);
+      try {
+        const compressed = await compressImage(file);
+        setLogoPreview(compressed);
+      } catch (err) {
+        toast({ variant: "destructive", title: "خطأ", description: "فشل معالجة الشعار." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -202,8 +249,11 @@ export default function SellerRegister() {
                   <div className="space-y-4">
                     <Label className="font-bold">شعار المتجر (Logo)</Label>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoChange} />
-                    <div onClick={handleLogoClick} className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]">
-                       {logoPreview ? (
+                    <div onClick={() => !loading && handleLogoClick()} className={cn(
+                      "border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]",
+                      loading && "opacity-50 cursor-not-allowed"
+                    )}>
+                       {loading ? <Loader2 className="animate-spin text-primary" size={48} /> : logoPreview ? (
                          <div className="relative w-full h-full flex items-center justify-center">
                            <Image src={logoPreview} alt="Store Logo Preview" width={150} height={150} className="object-contain max-h-[180px] rounded-xl" />
                            <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 rounded-full h-8 w-8 shadow-lg" onClick={removeLogo}><X size={16} /></Button>
@@ -212,7 +262,7 @@ export default function SellerRegister() {
                          <>
                            <ImagePlus size={48} className="mb-4 group-hover:scale-110 transition-transform text-primary/40" />
                            <span className="font-bold text-primary">انقر لرفع شعار متجرك</span>
-                           <span className="text-[10px] mt-2 tracking-widest opacity-50 uppercase">PNG, JPG (أقل من 2MB)</span>
+                           <span className="text-[10px] mt-2 tracking-widest opacity-50 uppercase">PNG, JPG (بحد أقصى 10MB)</span>
                          </>
                        )}
                     </div>

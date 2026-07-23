@@ -52,12 +52,62 @@ export default function SupportCenter() {
 
   const { data: tickets, loading: loadingTickets } = useCollection(ticketsQuery);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setAttachment(reader.result as string);
-      reader.readAsDataURL(file);
+      if (file.size > 15 * 1024 * 1024) {
+        toast({ variant: "destructive", title: "حجم كبير جداً", description: "المرفقات يجب ألا تتجاوز 15 ميجابايت." });
+        return;
+      }
+      setLoading(true);
+      try {
+        const compressed = await compressImage(file);
+        setAttachment(compressed);
+      } catch (err) {
+        toast({ variant: "destructive", title: "خطأ", description: "فشل معالجة المرفق." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -172,21 +222,24 @@ export default function SupportCenter() {
                      </div>
                      
                      <div className="space-y-4">
-                        <Label className="font-black">إرفاق لقطة شاشة (اختياري)</Label>
+                        <Label className="font-black">إرفاق لقطة شاشة (اختياري، بحد أقصى 15MB)</Label>
                         <div className="relative">
                            <Input type="file" className="hidden" id="support-file" accept="image/*" onChange={handleFileChange} />
                            <label 
                               htmlFor="support-file"
-                              className="border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-zinc-400 hover:bg-zinc-50 cursor-pointer transition-all"
+                              className={cn(
+                                "border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-zinc-400 hover:bg-zinc-50 cursor-pointer transition-all",
+                                loading && "opacity-50 cursor-not-allowed"
+                              )}
                            >
-                              {attachment ? (
+                              {loading ? <Loader2 className="animate-spin text-primary" size={32} /> : attachment ? (
                                 <div className="relative w-full aspect-video rounded-xl overflow-hidden">
-                                   <Image src={attachment} alt="Attachment" fill className="object-contain" />
+                                   <Image src={attachment} alt="Attachment" fill className="object-cover" />
                                    <Button 
                                       type="button" 
                                       variant="destructive" 
                                       size="icon" 
-                                      className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                                      className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg"
                                       onClick={(e) => { e.preventDefault(); setAttachment(null); }}
                                    >
                                       <X size={14} />

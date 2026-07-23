@@ -43,6 +43,46 @@ export default function NewListing() {
     if (savedLang) setLang(savedLang);
   }, []);
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const availableBrands = useMemo(() => {
     if (!vehicleType || vehicleType === "Any") {
       const allBrands = new Set<string>();
@@ -57,20 +97,26 @@ export default function NewListing() {
     return brand && brand !== "Any" ? BRAND_MODELS[brand] || [] : [];
   }, [brand]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
-        if (file.size > 2 * 1024 * 1024) {
-          toast({ variant: "destructive", title: "حجم كبير", description: "يجب أن تكون الصور أقل من 2 ميجابايت." });
-          return;
+      setLoading(true);
+      try {
+        const processedImages: string[] = [];
+        for (const file of Array.from(files)) {
+          if (file.size > 10 * 1024 * 1024) {
+            toast({ variant: "destructive", title: "حجم كبير جداً", description: `الصورة ${file.name} تتجاوز 10 ميجابايت.` });
+            continue;
+          }
+          const compressed = await compressImage(file);
+          processedImages.push(compressed);
         }
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImages(prev => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
-      });
+        setImages(prev => [...prev, ...processedImages]);
+      } catch (err) {
+        toast({ variant: "destructive", title: "خطأ", description: "فشل معالجة بعض الصور." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -224,7 +270,7 @@ export default function NewListing() {
               </div>
 
               <div className="space-y-4">
-                <Label className="font-black">الصور (يمكنك إضافة عدة صور)</Label>
+                <Label className="font-black">الصور (يمكنك إضافة عدة صور، بحد أقصى 10MB للصورة)</Label>
                 <input type="file" multiple ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {images.map((img, idx) => (
@@ -240,11 +286,18 @@ export default function NewListing() {
                     </div>
                   ))}
                   <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="aspect-square rounded-2xl border-4 border-dashed border-zinc-100 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-50 transition-all group"
+                    onClick={() => !loading && fileInputRef.current?.click()}
+                    className={cn(
+                      "aspect-square rounded-2xl border-4 border-dashed border-zinc-100 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-50 transition-all group",
+                      loading && "opacity-50 cursor-not-allowed"
+                    )}
                   >
-                     <ImagePlus size={32} className="text-zinc-300 group-hover:text-primary transition-colors" />
-                     <span className="text-[10px] font-black text-zinc-400 mt-2">إضافة صور</span>
+                     {loading ? <Loader2 className="animate-spin text-primary" size={32} /> : (
+                       <>
+                         <ImagePlus size={32} className="text-zinc-300 group-hover:text-primary transition-colors" />
+                         <span className="text-[10px] font-black text-zinc-400 mt-2">إضافة صور</span>
+                       </>
+                     )}
                   </div>
                 </div>
               </div>
@@ -255,7 +308,7 @@ export default function NewListing() {
              <Button 
               type="submit"
               className="flex-1 h-20 text-2xl font-black rounded-[24px] shadow-2xl gap-3"
-              disabled={loading}
+              disabled={loading || images.length === 0}
              >
                {loading ? <Loader2 className="animate-spin" size={24} /> : <>نشر الإعلان الآن <Send size={24} /></>}
              </Button>
