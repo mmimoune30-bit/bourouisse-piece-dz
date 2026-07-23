@@ -1,17 +1,17 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   Ticket, Search, CheckCircle2, XCircle, Clock, Eye, 
-  ExternalLink, Filter, Download, User, CreditCard, ShieldCheck
+  ExternalLink, Filter, Download, User, CreditCard, ShieldCheck, ImagePlus, Loader2
 } from "lucide-react";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, orderBy, updateDoc, doc, getDoc } from "firebase/firestore";
+import { collection, query, orderBy, updateDoc, doc, addDoc, serverTimestamp } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -21,19 +21,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export default function SubscriptionRequestsAdmin() {
   const { firestore } = useFirestore();
   const [search, setSearch] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [processing, setProcessing] = useState<string | null>(null);
 
-  const { data: requests, loading } = useCollection(
-    query(collection(firestore!, "subscription_requests"), orderBy("createdAt", "desc"))
-  );
+  const requestsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "subscription_requests"), orderBy("createdAt", "desc"));
+  }, [firestore]);
+
+  const { data: requests, loading } = useCollection(requestsQuery);
 
   const handleApprove = async (request: any) => {
     if (!firestore) return;
+    setProcessing(request.id);
     try {
       // 1. تحديث حالة الطلب
       await updateDoc(doc(firestore, "subscription_requests", request.id), { status: "Approved" });
@@ -62,12 +70,14 @@ export default function SubscriptionRequestsAdmin() {
       toast({ title: "تم التفعيل", description: "تم تحديث اشتراك البائع وإرسال إشعار له." });
     } catch (e) {
       toast({ variant: "destructive", title: "خطأ", description: "حدث خطأ أثناء التفعيل." });
+    } finally {
+      setProcessing(null);
     }
   };
 
   const filtered = requests?.filter(r => 
-    r.sellerName.toLowerCase().includes(search.toLowerCase()) || 
-    r.planName.toLowerCase().includes(search.toLowerCase())
+    r.sellerName?.toLowerCase().includes(search.toLowerCase()) || 
+    r.planName?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -111,7 +121,10 @@ export default function SubscriptionRequestsAdmin() {
           <TableBody>
             {loading ? (
               <TableRow><TableCell colSpan={6} className="text-center py-10 animate-pulse">جاري جلب البيانات...</TableCell></TableRow>
-            ) : filtered?.map((req) => (
+            ) : filtered?.length === 0 ? (
+              <TableRow><TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">لا توجد طلبات مسجلة حالياً.</TableCell></TableRow>
+            ) : (
+              filtered?.map((req) => (
               <TableRow key={req.id}>
                 <TableCell className="pr-6">
                   <div className="flex flex-col">
@@ -143,23 +156,39 @@ export default function SubscriptionRequestsAdmin() {
                        </DialogTrigger>
                        <DialogContent className="max-w-2xl text-right" dir="rtl">
                           <DialogHeader><DialogTitle className="text-right">تفاصيل طلب الاشتراك</DialogTitle></DialogHeader>
-                          <div className="grid grid-cols-2 gap-6 py-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                              <div className="space-y-4">
                                 <div><p className="text-xs text-muted-foreground">البائع:</p><p className="font-bold">{selectedRequest?.sellerName}</p></div>
                                 <div><p className="text-xs text-muted-foreground">الباقة:</p><p className="font-black text-primary">{selectedRequest?.planName}</p></div>
+                                <div><p className="text-xs text-muted-foreground">المبلغ:</p><p className="font-black text-green-600">{selectedRequest?.amount} دج</p></div>
                                 <div><p className="text-xs text-muted-foreground">المرجع:</p><p className="font-mono">{selectedRequest?.refNumber}</p></div>
                              </div>
-                             <div className="border rounded-xl p-2 bg-zinc-50 flex items-center justify-center">
-                                <div className="text-center space-y-2">
-                                   <ImagePlus size={32} className="mx-auto opacity-20" />
-                                   <p className="text-[10px] font-bold">صورة الوصل (قيد التطوير)</p>
-                                </div>
+                             <div className="border rounded-2xl p-2 bg-zinc-50 flex items-center justify-center relative aspect-square">
+                                {selectedRequest?.attachment ? (
+                                  <Image src={selectedRequest.attachment} alt="Receipt" fill className="object-contain rounded-xl" />
+                                ) : (
+                                  <div className="text-center space-y-2">
+                                     <ImagePlus size={32} className="mx-auto opacity-20" />
+                                     <p className="text-[10px] font-bold">لم يتم إرفاق صورة للوصل</p>
+                                  </div>
+                                )}
                              </div>
                           </div>
                           {selectedRequest?.status === 'Pending' && (
-                            <DialogFooter className="gap-2">
-                               <Button className="bg-green-600 hover:bg-green-700 font-black h-12" onClick={() => handleApprove(selectedRequest)}>قبول وتفعيل الباقة</Button>
-                               <Button variant="destructive" className="font-black h-12" onClick={() => toast({ title: "تم الرفض" })}>رفض الطلب</Button>
+                            <DialogFooter className="gap-2 sm:justify-start">
+                               <Button 
+                                  className="bg-green-600 hover:bg-green-700 font-black h-12 gap-2" 
+                                  onClick={() => handleApprove(selectedRequest)}
+                                  disabled={!!processing}
+                               >
+                                 {processing === selectedRequest.id ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={18} />}
+                                 قبول وتفعيل الباقة
+                               </Button>
+                               <DialogClose asChild>
+                                  <Button variant="destructive" className="font-black h-12 gap-2">
+                                    <XCircle size={18} /> رفض الطلب
+                                  </Button>
+                               </DialogClose>
                             </DialogFooter>
                           )}
                        </DialogContent>
@@ -167,14 +196,11 @@ export default function SubscriptionRequestsAdmin() {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+            )}
           </TableBody>
         </Table>
       </Card>
     </div>
   );
 }
-
-import { addDoc, serverTimestamp } from "firebase/firestore";
-import { Input } from "@/components/ui/input";
-import { ImagePlus } from "lucide-react";

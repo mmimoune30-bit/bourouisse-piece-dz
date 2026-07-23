@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -52,8 +53,8 @@ export default function AdminDashboard() {
         setLoadingStats(true);
         const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
           getCountFromServer(collection(firestore, "users")),
-          getCountFromServer(collection(firestore, "products")),
-          getCountFromServer(collection(firestore, "orders"))
+          getCountFromServer(collection(firestore, "listings")),
+          getCountFromServer(collection(firestore, "purchase_requests"))
         ]);
 
         setUsersCount(usersSnap.data().count);
@@ -69,16 +70,19 @@ export default function AdminDashboard() {
     fetchStats();
   }, [firestore]);
 
-  useEffect(() => {
-    if (!firestore) return;
-
-    const q = query(
-      collection(firestore, "payments"),
+  const transactionsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(
+      collection(firestore, "subscription_requests"),
       orderBy("createdAt", "desc"),
       limit(10)
     );
+  }, [firestore]);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  useEffect(() => {
+    if (!transactionsQuery) return;
+
+    const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -88,7 +92,7 @@ export default function AdminDashboard() {
       setLoadingTransactions(false);
     }, async (err) => {
       const permissionError = new FirestorePermissionError({
-        path: "payments",
+        path: "subscription_requests",
         operation: 'list',
       });
       errorEmitter.emit('permission-error', permissionError);
@@ -96,7 +100,7 @@ export default function AdminDashboard() {
     });
 
     return () => unsubscribe();
-  }, [firestore]);
+  }, [transactionsQuery]);
 
   const STATS = [
     {
@@ -109,7 +113,7 @@ export default function AdminDashboard() {
     },
     {
       label: "المتاجر النشطة",
-      value: "72", 
+      value: usersCount > 2 ? Math.floor(usersCount * 0.4) : usersCount, 
       trend: "+5%",
       up: true,
       icon: Store,
@@ -180,8 +184,8 @@ export default function AdminDashboard() {
         {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
-            <CardTitle className="text-xl font-black">آخر عمليات الدفع (تحديث لحظي)</CardTitle>
-            <Link href="/admin/payments">
+            <CardTitle className="text-xl font-black">آخر عمليات الاشتراك (تحديث لحظي)</CardTitle>
+            <Link href="/admin/subscriptions">
               <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
             </Link>
           </CardHeader>
@@ -189,11 +193,11 @@ export default function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-right pr-6">رقم العملية</TableHead>
-                  <TableHead className="text-right">المتجر</TableHead>
+                  <TableHead className="text-right pr-6">المتجر</TableHead>
+                  <TableHead className="text-right">الباقة</TableHead>
                   <TableHead className="text-right">المبلغ</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
-                  <TableHead className="text-left pl-6">الوسيلة</TableHead>
+                  <TableHead className="text-left pl-6">التاريخ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -206,9 +210,9 @@ export default function AdminDashboard() {
                 ) : transactions.length > 0 ? (
                   transactions.map((tx, i) => (
                     <TableRow key={i}>
-                      <TableCell className="pr-6 font-mono text-xs">{tx.id}</TableCell>
-                      <TableCell className="font-bold">{tx.store || tx.storeName || "N/A"}</TableCell>
-                      <TableCell className="font-black text-green-600">{tx.amount}</TableCell>
+                      <TableCell className="pr-6 font-bold">{tx.sellerName || "N/A"}</TableCell>
+                      <TableCell><Badge variant="outline">{tx.planName}</Badge></TableCell>
+                      <TableCell className="font-black text-green-600">{tx.amount} دج</TableCell>
 
                       <TableCell>
                         <Badge
@@ -221,12 +225,12 @@ export default function AdminDashboard() {
                           }
                           className="font-bold"
                         >
-                          {tx.status}
+                          {tx.status === 'Approved' ? 'مقبول' : tx.status === 'Pending' ? 'معلق' : 'مرفوض'}
                         </Badge>
                       </TableCell>
 
-                      <TableCell className="text-left pl-6 text-muted-foreground">
-                        {tx.method}
+                      <TableCell className="text-left pl-6 text-muted-foreground text-xs">
+                        {tx.createdAt?.toDate().toLocaleDateString('ar-DZ')}
                       </TableCell>
                     </TableRow>
                   ))
@@ -257,10 +261,10 @@ export default function AdminDashboard() {
 
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-black text-right">أحدث الطلبات</CardTitle>
+              <CardTitle className="text-lg font-black text-right">أحدث الطلبات التجارية</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-xs text-center text-muted-foreground py-4 italic">راجع صفحة "Purchase Requests" لمتابعة تفاصيل الطلبات التجارية الحية.</p>
+              <p className="text-xs text-center text-muted-foreground py-4 italic">تتبع كافة عمليات بيع وشراء قطع الغيار بين المستخدمين.</p>
               <Link href="/admin/purchase-requests">
                 <Button variant="outline" className="w-full font-bold">عرض كافة الطلبات</Button>
               </Link>
