@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, Mail, Key, LogIn, User, ArrowLeft, Loader2 } from "lucide-react";
+import { ShieldCheck, LogIn, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
@@ -60,6 +60,7 @@ export default function LoginPage() {
       const userDocRef = doc(firestore, "users", user.uid);
       let userDoc = await getDoc(userDocRef);
       
+      // Auto-provision Super Admin profile if it doesn't exist
       if (!userDoc.exists() && user.email === "mmimoune30@gmail.com") {
         const adminProfile = {
           uid: user.uid,
@@ -98,7 +99,7 @@ export default function LoginPage() {
     } catch (error: any) {
       console.error("LOGIN ERROR", error);
       let errorMessage = error.message;
-      if (error.code === "auth/invalid-credential") {
+      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
       toast({ variant: "destructive", title: "خطأ في الدخول", description: errorMessage });
@@ -110,7 +111,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-16 pb-12 flex items-center justify-center">
+      <main className="flex-grow pt-24 pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
             <CardHeader className="bg-primary text-white p-8 text-center">
@@ -149,7 +150,7 @@ export default function LoginPage() {
                       />
                     </div>
 
-                    <Button className="w-full h-14 text-lg font-black gap-2 shadow-xl rounded-xl bg-primary" disabled={loading}>
+                    <Button className="w-full h-14 text-lg font-black gap-2 shadow-xl rounded-xl bg-primary text-white" disabled={loading}>
                        {loading ? <Loader2 className="animate-spin" /> : <LogIn size={20} />}
                        {loading ? "جاري التحقق..." : "دخول آمن"}
                     </Button>

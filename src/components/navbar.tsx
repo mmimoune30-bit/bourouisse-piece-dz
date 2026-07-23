@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Search, Settings, Home
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Settings, Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,18 +40,18 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* السطر الأول: التيكر ووسائل التواصل (دائم الظهور) */}
-      <div className="bg-white border-b border-zinc-100 py-2 overflow-hidden">
+      {/* الطبقة الأولى: المعلومات الثابتة واللغة (تظهر دائماً) */}
+      <div className="bg-white border-b border-zinc-100 py-2">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
+               <div className="flex items-center gap-8 text-black font-black uppercase text-[10px] md:text-[11px]">
                   <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
                </div>
-               <div className="flex items-center gap-8 text-black font-black uppercase text-[11px]">
+               <div className="flex items-center gap-8 text-black font-black uppercase text-[10px] md:text-[11px]">
                   <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
@@ -60,22 +60,21 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-4 border-l flex items-center gap-2">
-            {/* زر الرجوع للرئيسية - يختفي في الصفحة الرئيسية */}
             {!isHome && (
               <Link href="/">
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
-                  <Home size={16} className="text-primary" />
-                  {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold h-8">
+                  <Home size={14} className="text-primary" />
+                  <span className="hidden sm:inline">{lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}</span>
                 </Button>
               </Link>
             )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold">
-                  <Globe size={16} className="text-primary" />
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold h-8">
+                  <Globe size={14} className="text-primary" />
                   {lang === 'AR' ? 'العربية' : 'English'}
-                  <ChevronDown size={14} />
+                  <ChevronDown size={12} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={lang === 'AR' ? "end" : "start"} className="w-32">
@@ -87,24 +86,24 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* السطور الإضافية (تظهر في الصفحة الرئيسية فقط) */}
+      {/* تظهر الطبقات الإضافية في الصفحة الرئيسية فقط كما طلب المستخدم */}
       {isHome && (
         <>
-          {/* سطر الشعار والأزرار */}
+          {/* الطبقة الثانية: الشعار والأزرار */}
           <div className="bg-white py-4 border-b">
             <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
-              {/* Logo Area */}
+              {/* الشعار على اليمين */}
               <Link href="/" className="flex items-center gap-3" dir="ltr">
                 <div className="bg-primary p-2 rounded-xl text-white">
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl font-black text-primary tracking-tighter">BOUROUISSE <span className="text-secondary">PIECE-DZ</span></span>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">بورويس لقطع الغيار - M-M CHLEF</span>
+                  <span className="text-2xl font-black text-primary tracking-tighter uppercase">BOUROUISSE <span className="text-secondary">PIECE-DZ</span></span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">بورويس لقطع الغيار - M-M CHLEF</span>
                 </div>
               </Link>
 
-              {/* Auth & Seller Buttons */}
+              {/* الأزرار على اليسار */}
               <div className="flex flex-wrap items-center gap-2 justify-center" dir="rtl">
                 <Link href="/seller/register">
                   <Button className="bg-secondary text-primary font-black hover:bg-zinc-900 hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/20 h-12 transition-all">
@@ -125,15 +124,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* الشريط الأزرق مع خانة البحث */}
-          <div className="bg-primary py-4 shadow-inner relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-               <div className="grid grid-cols-8 gap-4 rotate-12 scale-150">
-                  {[...Array(24)].map((_, i) => <Settings key={i} size={48} className="text-white" />)}
-               </div>
-            </div>
-            
+          {/* الطبقة الثالثة: شريط البحث الأزرق الداكن */}
+          <div className="bg-[#1a237e] py-4 shadow-inner relative overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
               <AISearchBox />
             </div>

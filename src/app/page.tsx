@@ -113,9 +113,9 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      {/* Padding to account for the large header on Home page */}
-      <main className="flex-grow pt-[235px]">
-        {/* Dynamic Multi-language Hero Section */}
+      {/* الهامش العلوي يتوافق مع ارتفاع الطبقات الثلاث للنافبار */}
+      <main className="flex-grow pt-[215px]">
+        {/* قسم الـ Hero التفاعلي */}
         <section className="relative w-full">
           <Carousel 
             setApi={setApi}
@@ -192,7 +192,7 @@ export default function Home() {
           </Carousel>
         </section>
 
-        {/* Featured Stores */}
+        {/* أقسام المحتوى الأخرى تتبع هنا */}
         <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
@@ -237,33 +237,6 @@ export default function Home() {
                     </div>
                  </div>
               </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Featured Products */}
-        <section className="container mx-auto px-4 py-16 bg-white rounded-[64px] shadow-inner mb-16">
-          <div className={cn(
-            "flex items-center justify-between mb-12",
-            lang === 'AR' ? "flex-row-reverse" : "flex-row"
-          )}>
-            <div className={lang === 'AR' ? "text-right" : "text-left"}>
-              <h2 className="text-4xl font-black text-primary mb-2">
-                {lang === 'AR' ? 'أحدث العروض' : 'Latest Offers'}
-              </h2>
-              <p className="text-base text-muted-foreground font-bold">
-                {lang === 'AR' ? 'قطع غيار حقيقية تم التحقق منها من كافة الولايات' : 'Verified genuine spare parts from all wilayas'}
-              </p>
-            </div>
-            <Link href="/catalog">
-              <Button variant="outline" className="rounded-full px-8 h-12 text-sm font-black border-2 border-primary hover:bg-primary hover:text-white transition-all">
-                {lang === 'AR' ? 'تصفح الكتالوج الشامل' : 'Browse Catalog'}
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {FEATURED_PRODUCTS.map((product) => (
-              <ProductCard key={product.id} {...product} />
             ))}
           </div>
         </section>
