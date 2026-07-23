@@ -8,14 +8,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+impor
+t { Textarea } from "@/components/ui/textarea";
 import { 
-  HelpCircle, Send, Paperclip, MessageSquare, History, CheckCircle, 
-  Clock, ShieldAlert, ArrowRight, Store, User 
-} from "lucide-react";
+    HelpCircle,
+    Send,
+    Paperclip,
+    MessageSquare,
+    History,
+    CheckCircle,
+    Clock,
+    ShieldAlert,
+    ArrowRight,
+    ChevronRight,
+    Store,
+    User,
+  } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const MOCK_TICKETS = [
   { id: "T-9912", subject: "مشكلة في تفعيل باقة Gold", status: "Resolved", date: "2024-05-10", lastMsg: "تم تفعيل حسابك، شكراً لصبرك." },
@@ -120,5 +132,3 @@ export default function SupportCenter() {
   );
 }
 
-import { cn } from "@/lib/utils";
-import { ChevronRight as ChevronRightIcon } from "lucide-react";
