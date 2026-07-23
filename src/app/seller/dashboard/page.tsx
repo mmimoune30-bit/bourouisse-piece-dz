@@ -1,23 +1,56 @@
 
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Link from "next/link";
-import { Package, ShoppingBag, Settings, Plus, MessageSquare, Heart, BarChart3, ArrowLeft, Bell, ShieldCheck, HelpCircle } from "lucide-react";
+import { 
+  Package, 
+  ShoppingBag, 
+  Plus, 
+  MessageSquare, 
+  Heart, 
+  BarChart3, 
+  Bell, 
+  ShieldCheck, 
+  HelpCircle,
+  AlertTriangle 
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useUser, useCollection } from "@/firebase";
+import { useUser, useCollection, useFirestore } from "@/firebase";
 import { collection, query, where } from "firebase/firestore";
+import { cn } from "@/lib/utils";
+import { differenceInDays } from "date-fns";
 
 export default function SellerDashboard() {
   const { user, profile } = useUser();
+  const { firestore } = useFirestore();
   
   // جلب الإشعارات غير المقروءة
-  const { data: notifications } = useCollection(
-    user ? query(collection(useFirestore().firestore!, "notifications"), where("userId", "==", user.uid), where("read", "==", false)) : null
-  );
+  const notificationsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, "notifications"), 
+      where("userId", "==", user.uid), 
+      where("read", "==", false)
+    );
+  }, [firestore, user]);
+
+  const { data: notifications } = useCollection(notificationsQuery);
+
+  // حساب الأيام المتبقية للاشتراك
+  const daysLeft = useMemo(() => {
+    if (!profile?.subscription?.endDate) return 0;
+    try {
+      const end = new Date(profile.subscription.endDate);
+      const diff = differenceInDays(end, new Date());
+      return diff > 0 ? diff : 0;
+    } catch (e) {
+      return 0;
+    }
+  }, [profile]);
 
   const menuItems = [
     {
@@ -66,7 +99,7 @@ export default function SellerDashboard() {
                   <div className="p-3 bg-white rounded-2xl shadow-sm border group-hover:bg-primary group-hover:text-white transition-all">
                      <Bell size={24} />
                   </div>
-                  {notifications?.length > 0 && (
+                  {notifications && notifications.length > 0 && (
                     <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg animate-pulse">
                       {notifications.length}
                     </span>
@@ -90,8 +123,13 @@ export default function SellerDashboard() {
              ].map((stat, i) => (
                <Card key={i} className="border-none shadow-sm group hover:shadow-md transition-all">
                  <CardContent className="p-6 flex items-center justify-between">
-                   <div><p className="text-[10px] font-black text-muted-foreground uppercase">{stat.label}</p><h3 className="text-2xl font-black text-primary">{stat.value}</h3></div>
-                   <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}><stat.icon size={24} /></div>
+                   <div>
+                     <p className="text-[10px] font-black text-muted-foreground uppercase">{stat.label}</p>
+                     <h3 className="text-2xl font-black text-primary">{stat.value}</h3>
+                   </div>
+                   <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>
+                     <stat.icon size={24} />
+                   </div>
                  </CardContent>
                </Card>
              ))}
@@ -101,7 +139,9 @@ export default function SellerDashboard() {
              {menuItems.map((item, idx) => (
                <Link key={idx} href={item.href} className="block group">
                  <div className="bg-white p-10 rounded-[40px] shadow-sm border-2 border-transparent group-hover:border-primary/10 group-hover:shadow-xl transition-all flex flex-col items-center text-center relative overflow-hidden h-full min-h-[300px]">
-                    <div className={cn("mb-6 p-6 rounded-3xl", item.bg, item.color)}><item.icon size={48} strokeWidth={2.5} /></div>
+                    <div className={cn("mb-6 p-6 rounded-3xl", item.bg, item.color)}>
+                      <item.icon size={48} strokeWidth={2.5} />
+                    </div>
                     <h3 className="font-black text-2xl text-primary mb-3">{item.title}</h3>
                     <p className="text-muted-foreground font-bold leading-relaxed text-sm">{item.description}</p>
                  </div>
@@ -113,7 +153,9 @@ export default function SellerDashboard() {
           {(!profile?.subscription?.endDate || daysLeft < 7) && (
             <div className="mt-12 bg-amber-50 p-8 rounded-[32px] border-2 border-amber-200 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
               <div className="flex items-center gap-4 text-right">
-                <div className="p-4 bg-amber-100 text-amber-600 rounded-2xl"><AlertTriangle size={32} /></div>
+                <div className="p-4 bg-amber-100 text-amber-600 rounded-2xl">
+                  <AlertTriangle size={32} />
+                </div>
                 <div>
                    <h4 className="text-xl font-black text-amber-900">تنبيه: اشتراكك أوشك على الانتهاء</h4>
                    <p className="text-amber-800 font-bold text-sm">جدد اشتراكك الآن لضمان استمرارية ظهور إعلاناتك للمشترين.</p>
@@ -130,6 +172,3 @@ export default function SellerDashboard() {
     </div>
   );
 }
-
-import { cn } from "@/lib/utils";
-import { useFirestore } from "@/firebase/provider";
