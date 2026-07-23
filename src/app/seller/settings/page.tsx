@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,15 +9,48 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Store, User, CreditCard, ShieldCheck, Save, ImagePlus, Globe, ChevronRight } from "lucide-react";
+import { 
+  Store, User, CreditCard, ShieldCheck, Save, ImagePlus, Globe, 
+  ChevronRight, CheckCircle, Package, Clock, Zap 
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+const AVAILABLE_PLANS = [
+  { id: "silver", name: "الباقة الفضية (Silver)", price: 3000, duration: "30 يوم", limit: "50 منتج", color: "bg-zinc-100 text-zinc-700" },
+  { id: "gold", name: "الباقة الذهبية (Gold)", price: 5000, duration: "30 يوم", limit: "غير محدود", color: "bg-amber-100 text-amber-700" },
+  { id: "professional", name: "الباقة الاحترافية (Professional)", price: 12000, duration: "90 يوم", limit: "غير محدود", color: "bg-blue-100 text-blue-700" },
+];
 
 export default function SellerSettings() {
   const router = useRouter();
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
   const handleSave = () => {
     toast({ title: "تم الحفظ", description: "تم تحديث بيانات المتجر بنجاح." });
+  };
+
+  const handleUpgradeRequest = () => {
+    if (!selectedPlan) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار باقة أولاً." });
+      return;
+    }
+    toast({ 
+      title: "تم إرسال الطلب", 
+      description: "سيقوم فريق الإدارة بمراجعة طلب الترقية والتواصل معك لإتمام عملية الدفع." 
+    });
+    setIsUpgradeOpen(false);
   };
 
   return (
@@ -114,7 +147,41 @@ export default function SellerSettings() {
                          <div className="flex justify-between text-zinc-400"><span>تاريخ التجديد:</span> <span className="text-white font-bold">2024-12-18</span></div>
                          <div className="flex justify-between text-zinc-400"><span>حالة الاشتراك:</span> <span className="text-green-400 font-bold">نشط</span></div>
                       </div>
-                      <Button className="w-full bg-white text-primary hover:bg-secondary font-black h-14 rounded-2xl shadow-lg">تجديد أو ترقية الباقة</Button>
+
+                      <Dialog open={isUpgradeOpen} onOpenChange={setIsUpgradeOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="w-full bg-white text-primary hover:bg-secondary font-black h-14 rounded-2xl shadow-lg">تجديد أو ترقية الباقة</Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl" dir="rtl">
+                          <DialogHeader>
+                            <DialogTitle className="text-right text-2xl font-black">ترقية باقة متجرك</DialogTitle>
+                            <DialogDescription className="text-right">اختر الخطة التي تناسب حجم نشاطك التجاري لزيادة مبيعاتك.</DialogDescription>
+                          </DialogHeader>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
+                            {AVAILABLE_PLANS.map((plan) => (
+                              <div 
+                                key={plan.id}
+                                onClick={() => setSelectedPlan(plan.id)}
+                                className={`p-6 rounded-[24px] border-2 cursor-pointer transition-all flex flex-col gap-3 relative ${selectedPlan === plan.id ? 'border-primary bg-primary/5 shadow-inner' : 'border-zinc-100 hover:border-zinc-200'}`}
+                              >
+                                {selectedPlan === plan.id && <CheckCircle className="absolute top-3 left-3 text-primary" size={20} />}
+                                <Badge className={`w-fit font-black ${plan.color}`}>{plan.name.split(' ')[0]}</Badge>
+                                <div className="text-2xl font-black text-primary">{plan.price.toLocaleString()} <span className="text-xs">دج</span></div>
+                                <div className="space-y-2 mt-2">
+                                  <div className="flex items-center gap-2 text-xs font-bold"><Clock size={12} /> {plan.duration}</div>
+                                  <div className="flex items-center gap-2 text-xs font-bold"><Package size={12} /> {plan.limit}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <DialogFooter className="gap-2 sm:justify-start">
+                             <Button className="h-12 px-8 font-black gap-2" onClick={handleUpgradeRequest}>
+                               إرسال طلب الترقية <Zap size={16} />
+                             </Button>
+                             <Button variant="outline" className="h-12" onClick={() => setIsUpgradeOpen(false)}>إلغاء</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                    </Card>
                    
                    <Card className="border-none shadow-xl rounded-[32px] p-8 flex flex-col items-center justify-center text-center bg-white">
