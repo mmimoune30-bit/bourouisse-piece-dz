@@ -6,34 +6,53 @@
       "description": "بيانات حساب المستخدم وصلاحياته في النظام",
       "type": "object",
       "properties": {
-        "uid": { "type": "string", "description": "معرف المستخدم الفريد من Firebase Auth" },
-        "name": { "type": "string", "description": "الاسم الكامل" },
-        "email": { "type": "string", "format": "email", "description": "البريد الإلكتروني" },
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
         "role": { 
           "type": "string", 
-          "enum": ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Seller", "Customer"],
-          "description": "الدور الوظيفي للمستخدم" 
+          "enum": ["Super Admin", "Manager", "Financial Officer", "Customer Service", "Seller", "Customer"]
         },
-        "status": { "type": "string", "enum": ["Active", "Blocked"], "description": "حالة الحساب" },
-        "storeId": { "type": "string", "description": "معرف المتجر (خاص بالبائعين فقط)" },
+        "status": { "type": "string", "enum": ["Active", "Blocked"] },
+        "subscription": {
+          "type": "object",
+          "properties": {
+            "plan": { "type": "string" },
+            "startDate": { "type": "string", "format": "date-time" },
+            "endDate": { "type": "string", "format": "date-time" },
+            "status": { "type": "string" }
+          }
+        },
         "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["uid", "name", "email", "role", "status"]
+      }
     },
-    "Listing": {
-      "title": "إعلان قطعة غيار",
-      "description": "بيانات تفصيلية لقطعة غيار معروضة للبيع",
+    "SubscriptionRequest": {
+      "title": "طلب اشتراك",
+      "description": "طلب تفعيل أو تجديد باقة من قبل البائع",
       "type": "object",
       "properties": {
-        "vehicleType": { "type": "string" },
-        "brand": { "type": "string" },
-        "model": { "type": "string" },
-        "year": { "type": "string" },
-        "category": { "type": "string" },
-        "partName": { "type": "string" },
-        "price": { "type": "number" },
         "sellerId": { "type": "string" },
-        "status": { "type": "string", "enum": ["Active", "Sold"] }
+        "sellerName": { "type": "string" },
+        "planId": { "type": "string" },
+        "type": { "type": "string", "enum": ["New", "Renew", "Upgrade"] },
+        "paymentMethod": { "type": "string" },
+        "receiptUrl": { "type": "string" },
+        "refNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Notification": {
+      "title": "إشعار",
+      "description": "تنبيهات النظام للمستخدمين",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
       }
     }
   },
@@ -41,13 +60,8 @@
     "providers": ["password", "google.com"]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": "User",
-      "description": "سجلات المستخدمين والصلاحيات"
-    },
-    "/listings/{listingId}": {
-      "schema": "Listing",
-      "description": "مجموعة الإعلانات وقطع الغيار"
-    }
+    "/users/{userId}": { "schema": "User", "description": "سجلات المستخدمين" },
+    "/subscription_requests/{requestId}": { "schema": "SubscriptionRequest", "description": "طلبات الدفع والتنشيط" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "إشعارات النظام" }
   }
 }
