@@ -1,11 +1,11 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Link from "next/link";
-import { Package, Plus, Search, Edit3, Archive, Eye, MoreVertical, AlertCircle, ShoppingCart, ChevronRight } from "lucide-react";
+import { Package, Plus, Search, Edit3, Archive, Eye, MoreVertical, AlertCircle, ChevronRight, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,25 +29,45 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-// Mock Data
-const MOCK_LISTINGS = [
-  { id: "L1", name: "مصباح أمامي أيمن Clio 4", price: 8500, category: "إضاءة", status: "Active", date: "2024-05-18", image: "https://picsum.photos/seed/p1/100/100" },
-  { id: "L2", name: "محرك كامل 1.5 dCi", price: 450000, category: "المحرك", status: "Active", date: "2024-05-15", image: "https://picsum.photos/seed/p2/100/100" },
-  { id: "L3", name: "رادياتور Peugeot 208", price: 12000, category: "التبريد", status: "Archived", date: "2024-05-10", image: "https://picsum.photos/seed/p3/100/100" },
-];
+import { useFirestore, useUser, useCollection } from "@/firebase";
+import { collection, query, where, orderBy, updateDoc, doc } from "firebase/firestore";
 
 export default function SellerListingsPage() {
   const router = useRouter();
+  const { firestore } = useFirestore();
+  const { user } = useUser();
   const [search, setSearch] = useState("");
-  const [listings, setListings] = useState(MOCK_LISTINGS);
 
-  const handleArchive = (id: string) => {
-    setListings(prev => prev.map(l => l.id === id ? { ...l, status: l.status === 'Archived' ? 'Active' : 'Archived' } : l));
-    toast({ title: "تم تحديث الحالة", description: "تم تغيير حالة الإعلان بنجاح." });
+  // استعلام جلب الإعلانات الخاصة بالبائع الحالي فقط
+  const listingsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, "listings"),
+      where("sellerId", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
+  }, [firestore, user]);
+
+  const { data: listings, loading } = useCollection(listingsQuery);
+
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    if (!firestore) return;
+    const newStatus = currentStatus === 'Active' ? 'Archived' : 'Active';
+    
+    try {
+      await updateDoc(doc(firestore, "listings", id), { status: newStatus });
+      toast({ title: "تم تحديث الحالة", description: `تم تغيير حالة الإعلان إلى ${newStatus === 'Active' ? 'نشط' : 'مؤرشف'}.` });
+    } catch (e) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر تحديث حالة الإعلان." });
+    }
   };
 
-  const filtered = listings.filter(l => l.name.includes(search));
+  const filtered = useMemo(() => {
+    return listings?.filter(l => 
+      l.name?.toLowerCase().includes(search.toLowerCase()) || 
+      l.category?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [listings, search]);
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
@@ -85,7 +105,7 @@ export default function SellerListingsPage() {
                     />
                   </div>
                   <Badge variant="outline" className="h-10 px-4 bg-white border-2 font-bold flex items-center gap-2">
-                    <Package size={16} /> {filtered.length} قطعة معروضة
+                    <Package size={16} /> {filtered?.length || 0} قطعة معروضة
                   </Badge>
                 </div>
 
@@ -101,24 +121,35 @@ export default function SellerListingsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.length === 0 ? (
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-20">
+                          <Loader2 className="animate-spin mx-auto text-primary" size={32} />
+                          <p className="mt-2 font-bold text-muted-foreground">جاري تحميل إعلاناتك...</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : filtered?.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">
-                           لا توجد إعلانات مطابقة لبحثك.
+                           {search ? "لا توجد إعلانات مطابقة لبحثك." : "لم تقم بنشر أي إعلانات بعد."}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filtered.map((item) => (
+                      filtered?.map((item) => (
                         <TableRow key={item.id} className="hover:bg-zinc-50 transition-colors">
                           <TableCell className="pr-8 py-4">
                              <div className="flex items-center gap-4 justify-start flex-row-reverse">
-                                <div className="w-12 h-12 rounded-xl relative overflow-hidden bg-zinc-100 border">
-                                   <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                <div className="w-12 h-12 rounded-xl relative overflow-hidden bg-zinc-100 border shrink-0">
+                                   {item.images?.[0] ? (
+                                     <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+                                   ) : (
+                                     <div className="flex items-center justify-center h-full"><Package size={20} className="text-zinc-300" /></div>
+                                   )}
                                 </div>
-                                <span className="font-black text-primary">{item.name}</span>
+                                <span className="font-black text-primary line-clamp-1">{item.name}</span>
                              </div>
                           </TableCell>
-                          <TableCell className="font-bold text-green-600">{item.price.toLocaleString()}</TableCell>
+                          <TableCell className="font-bold text-green-600">{Number(item.price).toLocaleString()}</TableCell>
                           <TableCell className="text-sm font-bold">{item.category}</TableCell>
                           <TableCell>
                              <Badge className={cn(
@@ -128,7 +159,9 @@ export default function SellerListingsPage() {
                                {item.status === 'Active' ? 'نشط' : 'مؤرشف'}
                              </Badge>
                           </TableCell>
-                          <TableCell className="text-xs font-bold text-muted-foreground">{item.date}</TableCell>
+                          <TableCell className="text-xs font-bold text-muted-foreground">
+                            {item.createdAt?.toDate().toLocaleDateString('ar-DZ')}
+                          </TableCell>
                           <TableCell className="text-left pl-8">
                              <DropdownMenu>
                                <DropdownMenuTrigger asChild>
@@ -144,7 +177,7 @@ export default function SellerListingsPage() {
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem 
                                     className="justify-end gap-2 font-bold py-3 cursor-pointer rounded-xl text-amber-600 hover:bg-amber-50"
-                                    onClick={() => handleArchive(item.id)}
+                                    onClick={() => handleToggleStatus(item.id, item.status)}
                                   >
                                      <Archive size={16} /> {item.status === 'Active' ? 'أرشفة المنتج' : 'تنشيط المنتج'}
                                   </DropdownMenuItem>
