@@ -41,7 +41,7 @@ export default function FeaturedStoresAdmin() {
   const { data: allUsers, loading: loadingUsers, error: usersError } = useCollection(usersQuery);
   const { data: campaigns, loading: loadingCampaigns, error: campaignsError } = useCollection(campaignsQuery);
 
-  // تحديث: جلب المتاجر التي تحمل دور بائع وحالتها نشطة (معتمدة) فقط
+  // جلب المتاجر التي تحمل دور بائع وحالتها نشطة (معتمدة) فقط
   const sellersList = useMemo(() => {
     return allUsers
       ?.filter(u => u.role === 'Seller' && u.status === 'Active')
@@ -130,7 +130,7 @@ export default function FeaturedStoresAdmin() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <Input 
               placeholder="بحث في الحملات..." 
-              className="pr-10"
+              className="pr-10 border-2"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -147,12 +147,6 @@ export default function FeaturedStoresAdmin() {
                       <DialogTitle className="text-right font-black text-xl">تفعيل ميزة "حصري / مميز"</DialogTitle>
                    </DialogHeader>
                    
-                   {(usersError) && (
-                     <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2 text-sm font-bold mt-4">
-                       <AlertCircle size={18} /> خطأ في جلب بيانات المتاجر. تأكد من اتصال الإنترنت.
-                     </div>
-                   )}
-
                    <div className="grid gap-6 py-6">
                       <div className="space-y-2">
                          <Label className="font-bold">اختر المتجر من القائمة المعتمدة (النشطة فقط)</Label>
@@ -169,7 +163,7 @@ export default function FeaturedStoresAdmin() {
                                  <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
                                ) : sellersList.length > 0 ? (
                                  sellersList.map(s => (
-                                   <SelectItem key={s.uid} value={s.uid} className="text-right flex-row-reverse">
+                                   <SelectItem key={s.uid} value={s.uid} className="text-right">
                                      {s.name} ({s.wilaya || 'بدون ولاية'})
                                    </SelectItem>
                                  ))
@@ -193,18 +187,18 @@ export default function FeaturedStoresAdmin() {
                          </div>
                          <div className="space-y-2">
                             <Label className="font-bold">ترتيب الظهور (0-100)</Label>
-                            <Input name="priority" type="number" defaultValue="10" className="h-11" />
+                            <Input name="priority" type="number" defaultValue="10" className="h-11 border-2" />
                          </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label className="font-bold">تاريخ البداية</Label>
-                            <Input name="startDate" type="date" className="h-11" required />
+                            <Input name="startDate" type="date" className="h-11 border-2" required />
                          </div>
                          <div className="space-y-2">
                             <Label className="font-bold">تاريخ الانتهاء</Label>
-                            <Input name="endDate" type="date" className="h-11" required />
+                            <Input name="endDate" type="date" className="h-11 border-2" required />
                          </div>
                       </div>
 
@@ -231,17 +225,16 @@ export default function FeaturedStoresAdmin() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
          <Card className="border-none shadow-sm bg-white p-6">
             <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر حصرية نشطة</p><h3 className="text-3xl font-black text-primary">{sortedCampaigns.filter(c => c.tier === 'Exclusive').length}</h3></div>
+               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر حصرية</p><h3 className="text-3xl font-black text-primary">{sortedCampaigns.filter(c => c.tier === 'Exclusive').length}</h3></div>
                <div className="p-3 bg-secondary/10 text-secondary rounded-xl"><Crown /></div>
             </div>
          </Card>
          <Card className="border-none shadow-sm bg-white p-6">
             <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر مميزة نشطة</p><h3 className="text-3xl font-black text-blue-600">{sortedCampaigns.filter(c => c.tier === 'Featured').length}</h3></div>
+               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر مميزة</p><h3 className="text-3xl font-black text-blue-600">{sortedCampaigns.filter(c => c.tier === 'Featured').length}</h3></div>
                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Star /></div>
             </div>
          </Card>
@@ -262,15 +255,13 @@ export default function FeaturedStoresAdmin() {
                      <TableHead className="text-right">الفئة</TableHead>
                      <TableHead className="text-right">الأولوية</TableHead>
                      <TableHead className="text-right">الفترة الزمنية</TableHead>
-                     <TableHead className="text-right">الأداء (Clicks/Imp)</TableHead>
+                     <TableHead className="text-right">الأداء</TableHead>
                      <TableHead className="text-left pl-8">الإجراءات</TableHead>
                   </TableRow>
                </TableHeader>
                <TableBody>
                   {loadingCampaigns ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 animate-pulse font-bold">جاري تحميل الحملات...</TableCell></TableRow>
-                  ) : (campaignsError) ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-20 text-destructive font-bold">تعذر تحميل بيانات الحملات من السيرفر.</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">لا توجد حملات إعلانية مفعلة حالياً.</TableCell></TableRow>
                   ) : (
@@ -303,9 +294,7 @@ export default function FeaturedStoresAdmin() {
                            </div>
                         </TableCell>
                         <TableCell className="text-left pl-8">
-                           <div className="flex gap-2">
-                              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(c.id)}><Trash2 size={18} /></Button>
-                           </div>
+                           <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(c.id)}><Trash2 size={18} /></Button>
                         </TableCell>
                       </TableRow>
                     ))
@@ -317,4 +306,3 @@ export default function FeaturedStoresAdmin() {
     </div>
   );
 }
-
