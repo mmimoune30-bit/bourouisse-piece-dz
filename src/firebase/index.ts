@@ -9,16 +9,28 @@ let app: FirebaseApp;
 let firestore: Firestore;
 let auth: Auth;
 
+/**
+ * تهيئة Firebase بشكل آمن ومستقر.
+ * تضمن هذه الوظيفة عدم تكرار إنشاء النسخ (Singletons) لتجنب أخطاء Firestore Assertion.
+ */
 export function initializeFirebase() {
   if (typeof window !== 'undefined') {
+    // 1. تهيئة التطبيق (App)
     if (getApps().length === 0) {
       app = initializeApp(firebaseConfig);
     } else {
       app = getApp();
     }
-    firestore = getFirestore(app);
-    auth = getAuth(app);
+
+    // 2. تهيئة الخدمات (Services) لمرة واحدة فقط
+    if (!firestore) {
+      firestore = getFirestore(app);
+    }
+    if (!auth) {
+      auth = getAuth(app);
+    }
   }
+
   return { app, firestore, auth };
 }
 
