@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -7,7 +8,7 @@ import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, MapPin, ChevronRight, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -45,22 +46,6 @@ const BANNERS = [
       title: "Find Auto Parts Easily",
       description: "Advanced search by brand, model and manufacturing year.",
       button: "Start Searching"
-    }
-  },
-  {
-    id: 3,
-    image: PlaceHolderImages.find(img => img.id === "hero-banner-3")?.imageUrl || "https://picsum.photos/seed/scrap/1200/400",
-    link: "/catalog",
-    hint: "car scrapyard",
-    ar: {
-      title: "أكبر تجمع لقطع الغيار في الجزائر",
-      description: "منتجات حقيقية من ساحات الخردة والمتاجر المعتمدة في منصة واحدة.",
-      button: "تصفح الإعلانات"
-    },
-    en: {
-      title: "Largest Parts Hub in Algeria",
-      description: "Real products from scrapyards and certified stores in one platform.",
-      button: "Browse Listings"
     }
   }
 ];
@@ -107,92 +92,103 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[145px]">
-        <section className="relative w-full">
-          <Carousel 
-            setApi={setApi}
-            className="w-full" 
-            opts={{ loop: true, duration: 50 }}
-            plugins={[Autoplay({ delay: 5000, stopOnInteraction: true }), Fade()]}
-          >
-            <CarouselContent>
-              {BANNERS.map((banner) => {
-                const content = lang === "AR" ? banner.ar : banner.en;
-                return (
-                  <CarouselItem key={banner.id}>
-                    <div className="relative h-[250px] flex items-center justify-center overflow-hidden">
-                      <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
-                        <Image
-                          src={banner.image}
-                          alt={content.title}
-                          fill
-                          className="object-cover animate-ken-burns"
-                          data-ai-hint={banner.hint}
-                          priority
-                        />
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] group-hover:bg-black/50 transition-colors" />
-                      </Link>
+        {/* New Hero Section Split into Two Parts */}
+        <section className="container mx-auto px-4 mt-6">
+          <div className="flex flex-col md:flex-row-reverse gap-4" dir="rtl">
+            
+            {/* Part 1: Featured Stores (Right - 3/4 Width) */}
+            <div className="md:w-3/4 h-[250px] bg-white rounded-[32px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col">
+              <div className="bg-primary/5 px-6 py-3 border-b flex items-center justify-between">
+                 <h2 className="font-black text-primary flex items-center gap-2">
+                   <Star size={18} className="text-secondary fill-secondary" /> متاجر متميزة (حصري)
+                 </h2>
+                 <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline flex items-center gap-1">
+                   عرض كافة المتاجر <ArrowLeft size={14} />
+                 </Link>
+              </div>
+              <div className="flex-grow p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                 {FEATURED_STORES.map((store, i) => (
+                   <Link 
+                     key={i} 
+                     href={`/catalog?query=${encodeURIComponent(store.name)}`}
+                     className="bg-zinc-50 hover:bg-zinc-100 p-4 rounded-2xl border flex flex-col items-center text-center group transition-all"
+                   >
+                     <div className="w-16 h-16 rounded-xl overflow-hidden relative mb-3 border-2 border-white shadow-sm group-hover:scale-105 transition-transform">
+                        <Image src={store.logo} alt={store.name} fill className="object-cover" />
+                     </div>
+                     <h3 className="font-black text-sm text-primary line-clamp-1 group-hover:text-secondary transition-colors">{store.name}</h3>
+                     <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1 mt-1">
+                        <MapPin size={10} className="text-secondary" /> {store.location}
+                     </p>
+                     <div className="mt-2 flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-blue-500" />
+                        <span className="text-[8px] font-black text-blue-600 uppercase">موثق</span>
+                     </div>
+                   </Link>
+                 ))}
+              </div>
+            </div>
 
-                      <div className="container mx-auto px-4 z-10 pointer-events-none">
-                        <div className={cn(
-                          "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
-                          lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
-                        )} dir={lang === "AR" ? "rtl" : "ltr"}>
-                          <h1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-2 uppercase drop-shadow-2xl leading-tight">
-                            {content.title}
-                          </h1>
-                          <p className="text-sm md:text-lg text-secondary font-bold italic mb-4 leading-relaxed max-w-2xl opacity-90 line-clamp-1">
-                            {content.description}
-                          </p>
-                          <div className={cn(
-                            "flex flex-col sm:flex-row gap-3",
-                            lang === "AR" ? "sm:justify-start" : "sm:justify-start"
-                          )}>
-                            <Link href={banner.link}>
-                              <Button size="lg" className="h-12 px-8 text-lg font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-xl shadow-2xl">
-                                {content.button} {lang === 'AR' ? <ArrowLeft size={18} /> : <ChevronRight size={18} />}
-                              </Button>
-                            </Link>
-                            <Link href="/catalog">
-                              <Button size="lg" variant="outline" className="h-12 px-8 text-lg font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-xl shadow-2xl">
-                                {lang === 'AR' ? 'تصفح الكل' : 'Browse All'}
-                              </Button>
-                            </Link>
+            {/* Part 2: Banners & Promos (Left - 1/4 Width) */}
+            <div className="md:w-1/4 h-[250px] relative rounded-[32px] overflow-hidden group shadow-xl border-4 border-white">
+              <Carousel 
+                setApi={setApi}
+                className="w-full h-full" 
+                opts={{ loop: true, duration: 50 }}
+                plugins={[Autoplay({ delay: 4000, stopOnInteraction: true }), Fade()]}
+              >
+                <CarouselContent className="h-[250px]">
+                  {BANNERS.map((banner) => {
+                    const content = lang === "AR" ? banner.ar : banner.en;
+                    return (
+                      <CarouselItem key={banner.id} className="h-full">
+                        <div className="relative h-full w-full flex items-center justify-center">
+                          <Image
+                            src={banner.image}
+                            alt={content.title}
+                            fill
+                            className="object-cover animate-ken-burns"
+                            priority
+                          />
+                          <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" />
+                          
+                          <div className="relative z-10 p-6 text-center text-white space-y-3">
+                             <h3 className="text-xl font-black leading-tight tracking-tight">{content.title}</h3>
+                             <p className="text-[10px] text-blue-100 font-bold opacity-80 line-clamp-2">{content.description}</p>
+                             <Link href={banner.link} className="block">
+                                <Button size="sm" className="w-full bg-secondary text-primary font-black rounded-xl h-10 hover:bg-white transition-all shadow-lg">
+                                  {content.button}
+                                </Button>
+                             </Link>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </CarouselItem>
-                );
-              })}
-            </CarouselContent>
-            
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
-               <div className="flex gap-2">
+                      </CarouselItem>
+                    );
+                  })}
+                </CarouselContent>
+              </Carousel>
+              {/* Dots for the mini carousel */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-1">
                  {BANNERS.map((_, index) => (
-                   <button
-                     key={index}
-                     onClick={() => onDotButtonClick(index)}
-                     className={cn(
-                       "w-2 h-2 rounded-full transition-all duration-300",
-                       current === index ? "bg-secondary w-6" : "bg-white/40 hover:bg-white/60"
-                     )}
-                   />
+                   <div key={index} className={cn("w-1.5 h-1.5 rounded-full transition-all", current === index ? "bg-secondary w-4" : "bg-white/30")} />
                  ))}
-               </div>
+              </div>
             </div>
-          </Carousel>
+
+          </div>
         </section>
 
+        {/* Bottom Section (Featured Stores) - Retained but labelled as "Explore All" */}
         <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
             lang === 'AR' ? "flex-row-reverse" : "flex-row"
           )}>
              <h2 className="text-3xl font-black text-primary">
-               {lang === 'AR' ? 'متاجر مميزة' : 'Featured Stores'}
+               {lang === 'AR' ? 'تصفح كافة المتاجر' : 'Explore All Stores'}
              </h2>
              <Link href="/catalog" className="text-sm font-bold text-muted-foreground hover:text-secondary">
-               {lang === 'AR' ? 'عرض كل المتاجر' : 'View All Stores'}
+               {lang === 'AR' ? 'مشاهدة المزيد' : 'View More'}
              </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
