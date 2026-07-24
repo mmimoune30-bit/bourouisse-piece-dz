@@ -25,6 +25,8 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function FeaturedStoresAdmin() {
   const { firestore } = useFirestore();
@@ -33,7 +35,6 @@ export default function FeaturedStoresAdmin() {
   const [loading, setLoading] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  // تثبيت الاستعلامات لتجنب إعادة التحميل المستمرة
   const usersQuery = useMemo(() => firestore ? collection(firestore, "users") : null, [firestore]);
   const campaignsQuery = useMemo(() => firestore ? collection(firestore, "featured_stores") : null, [firestore]);
 
@@ -74,26 +75,37 @@ export default function FeaturedStoresAdmin() {
       createdAt: serverTimestamp()
     };
 
-    try {
-      await addDoc(collection(firestore, "featured_stores"), data);
-      toast({ title: "تم تفعيل الحملة", description: `المتجر ${data.storeName} يظهر الآن في القائمة المميزة.` });
-      setIsAddOpen(false);
-      setSelectedStoreId("");
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر إنشاء الحملة. تأكد من الصلاحيات." });
-    } finally {
-      setLoading(false);
-    }
+    addDoc(collection(firestore, "featured_stores"), data)
+      .then(() => {
+        toast({ title: "تم تفعيل الحملة", description: `المتجر ${data.storeName} يظهر الآن في القائمة المميزة.` });
+        setIsAddOpen(false);
+        setSelectedStoreId("");
+        setLoading(false);
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: "featured_stores",
+          operation: 'create',
+          requestResourceData: data
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setLoading(false);
+      });
   };
 
   const handleDelete = async (id: string) => {
     if (!firestore || !confirm("هل تريد إنهاء هذه الحملة الإعلانية؟")) return;
-    try {
-      await deleteDoc(doc(firestore, "featured_stores", id));
-      toast({ title: "تم الإزالة", description: "تم حذف المتجر من القائمة المميزة." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر الحذف." });
-    }
+    deleteDoc(doc(firestore, "featured_stores", id))
+      .then(() => {
+        toast({ title: "تم الإزالة", description: "تم حذف المتجر من القائمة المميزة." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `featured_stores/${id}`,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
   const filtered = sortedCampaigns.filter(c => 
