@@ -8,7 +8,7 @@ import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store, ExternalLink } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -79,26 +79,18 @@ export default function Home() {
     });
   }, [api]);
 
-  const onDotButtonClick = useCallback(
-    (index: number) => {
-      if (!api) return;
-      api.scrollTo(index);
-    },
-    [api]
-  );
-
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
       <main className="flex-grow pt-[145px]">
-        {/* New Hero Section Split into Two Parts */}
+        {/* Hero Section Split into Two Parts */}
         <section className="container mx-auto px-4 mt-6">
           <div className="flex flex-col md:flex-row-reverse gap-4" dir="rtl">
             
-            {/* Part 1: Featured Stores (Right - 3/4 Width) */}
+            {/* Part 1: Featured Stores (Right - 3/4 Width) - Dynamic Slider */}
             <div className="md:w-3/4 h-[250px] bg-white rounded-[32px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col">
-              <div className="bg-primary/5 px-6 py-3 border-b flex items-center justify-between">
+              <div className="bg-primary/5 px-6 py-3 border-b flex items-center justify-between shrink-0">
                  <h2 className="font-black text-primary flex items-center gap-2">
                    <Star size={18} className="text-secondary fill-secondary" /> متاجر متميزة (حصري)
                  </h2>
@@ -106,26 +98,43 @@ export default function Home() {
                    عرض كافة المتاجر <ArrowLeft size={14} />
                  </Link>
               </div>
-              <div className="flex-grow p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                 {FEATURED_STORES.map((store, i) => (
-                   <Link 
-                     key={i} 
-                     href={`/catalog?query=${encodeURIComponent(store.name)}`}
-                     className="bg-zinc-50 hover:bg-zinc-100 p-4 rounded-2xl border flex flex-col items-center text-center group transition-all"
-                   >
-                     <div className="w-16 h-16 rounded-xl overflow-hidden relative mb-3 border-2 border-white shadow-sm group-hover:scale-105 transition-transform">
-                        <Image src={store.logo} alt={store.name} fill className="object-cover" />
-                     </div>
-                     <h3 className="font-black text-sm text-primary line-clamp-1 group-hover:text-secondary transition-colors">{store.name}</h3>
-                     <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1 mt-1">
-                        <MapPin size={10} className="text-secondary" /> {store.location}
-                     </p>
-                     <div className="mt-2 flex items-center gap-1">
-                        <ShieldCheck size={12} className="text-blue-500" />
-                        <span className="text-[8px] font-black text-blue-600 uppercase">موثق</span>
-                     </div>
-                   </Link>
-                 ))}
+              
+              <div className="flex-grow relative">
+                <Carousel 
+                  opts={{ loop: true }} 
+                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+                  className="w-full h-full"
+                >
+                  <CarouselContent className="h-[194px]">
+                    {FEATURED_STORES.map((store, i) => (
+                      <CarouselItem key={i} className="h-full">
+                        <Link 
+                          href={`/catalog?query=${encodeURIComponent(store.name)}`}
+                          className="w-full h-full flex items-center gap-8 px-10 hover:bg-zinc-50/50 transition-colors group"
+                        >
+                          <div className="w-32 h-32 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0 group-hover:scale-105 transition-transform">
+                             <Image src={store.logo} alt={store.name} fill className="object-cover" />
+                          </div>
+                          <div className="flex flex-col gap-2">
+                             <div className="flex items-center gap-2">
+                                <ShieldCheck size={20} className="text-blue-500" />
+                                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">موثق</span>
+                             </div>
+                             <h3 className="font-black text-3xl text-primary group-hover:text-secondary transition-colors">{store.name}</h3>
+                             <p className="text-sm text-muted-foreground font-bold flex items-center gap-2">
+                                <MapPin size={16} className="text-secondary" /> مقر المتجر: {store.location}
+                             </p>
+                             <div className="mt-2 flex gap-3">
+                                <Button size="sm" variant="outline" className="rounded-xl font-bold border-2 gap-2">
+                                   زيارة المتجر <ExternalLink size={14} />
+                                </Button>
+                             </div>
+                          </div>
+                        </Link>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
               </div>
             </div>
 
@@ -178,7 +187,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Bottom Section (Featured Stores) - Retained but labelled as "Explore All" */}
+        {/* Bottom Section (Explore All) */}
         <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
@@ -232,3 +241,4 @@ export default function Home() {
     </div>
   );
 }
+
