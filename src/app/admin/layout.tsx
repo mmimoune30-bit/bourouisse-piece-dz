@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { 
   LayoutDashboard, Users, Store, Package, CreditCard, 
   Settings, ShieldAlert, LogOut, Menu, X, 
-  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle, Ticket
+  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle, Ticket, Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ const ADMIN_MENU = [
   { name: "لوحة التحكم", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "المستخدمين", href: "/admin/users", icon: Users },
   { name: "المتاجر", href: "/admin/stores", icon: Store },
+  { name: "المتاجر المميزة", href: "/admin/featured-stores", icon: Star },
   { name: "المنتجات", href: "/admin/products", icon: Package },
   { name: "طلبات الشراء", href: "/admin/purchase-requests", icon: ShoppingBag },
   { name: "المدفوعات", href: "/admin/payments", icon: CreditCard },
