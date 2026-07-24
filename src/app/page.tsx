@@ -15,7 +15,8 @@ import Autoplay from "embla-carousel-autoplay";
 import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, updateDoc, doc, increment } from "firebase/firestore";
+import { collection, query, where, updateDoc, doc, increment } from "firebase/firestore";
+import { Badge } from "@/components/ui/badge";
 
 const BANNERS = [
   {
@@ -58,31 +59,30 @@ export default function Home() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  // جلب المتاجر الحصرية (Exclusive) للظهور في السلايدر العلوي
-  const exclusiveQuery = useMemo(() => {
+  // جلب كافة الحملات الإعلانية النشطة
+  const allCampaignsQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
       collection(firestore, "featured_stores"),
-      where("tier", "==", "Exclusive"),
-      where("status", "==", "Active"),
-      orderBy("priority", "desc")
+      where("status", "==", "Active")
     );
   }, [firestore]);
 
-  const { data: exclusiveStores, loading: loadingExclusive } = useCollection(exclusiveQuery);
+  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(allCampaignsQuery);
 
-  // جلب المتاجر المميزة (Featured) للظهور في القسم السفلي
-  const featuredQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(
-      collection(firestore, "featured_stores"),
-      where("tier", "==", "Featured"),
-      where("status", "==", "Active"),
-      orderBy("priority", "desc")
-    );
-  }, [firestore]);
+  // فرز المتاجر الحصرية برمجياً
+  const exclusiveStores = useMemo(() => {
+    return (allCampaigns || [])
+      .filter(c => c.tier === "Exclusive")
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [allCampaigns]);
 
-  const { data: featuredStores } = useCollection(featuredQuery);
+  // فرز المتاجر المميزة برمجياً
+  const featuredStores = useMemo(() => {
+    return (allCampaigns || [])
+      .filter(c => c.tier === "Featured")
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [allCampaigns]);
 
   useEffect(() => {
     const checkLang = () => {
@@ -130,12 +130,13 @@ export default function Home() {
               </div>
               
               <div className="flex-grow relative">
-                {loadingExclusive ? (
+                {loadingCampaigns ? (
                   <div className="h-full w-full flex items-center justify-center animate-pulse bg-zinc-50">
                     <span className="font-bold text-zinc-400">جاري جلب المتاجر المميزة...</span>
                   </div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel 
+                    setApi={setApi}
                     opts={{ loop: true }} 
                     plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
                     className="w-full h-full"
@@ -158,7 +159,7 @@ export default function Home() {
                                   </Badge>
                                   <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">موثق</span>
                                </div>
-                               <h3 className="font-black text-3xl text-primary group-hover:text-secondary transition-colors">{campaign.storeName}</h3>
+                               <h3 className="font-black text-3xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
                                <p className="text-sm text-muted-foreground font-bold flex items-center gap-2">
                                   <MapPin size={16} className="text-secondary" /> مقر المتجر: {campaign.storeLocation}
                                </p>
@@ -184,7 +185,6 @@ export default function Home() {
             {/* Part 2: Banners & Promos (Left - 1/4 Width) */}
             <div className="md:w-1/4 h-[250px] relative rounded-[32px] overflow-hidden group shadow-xl border-4 border-white">
               <Carousel 
-                setApi={setApi}
                 className="w-full h-full" 
                 opts={{ loop: true, duration: 50 }}
                 plugins={[Autoplay({ delay: 4000, stopOnInteraction: true }), Fade()]}
@@ -267,7 +267,7 @@ export default function Home() {
           </section>
         )}
 
-        {/* Bottom Section (All Stores) */}
+        {/* Bottom Section (All Stores Sample) */}
         <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
@@ -281,7 +281,6 @@ export default function Home() {
              </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8" dir="rtl">
-            {/* عرض عينة من المتاجر العادية */}
             {Array.from({ length: 6 }).map((_, i) => (
               <div 
                 key={i} 

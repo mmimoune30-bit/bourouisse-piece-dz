@@ -35,12 +35,13 @@ export default function FeaturedStoresAdmin() {
   const [loading, setLoading] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  // استعلام جلب كافة البائعين المسجلين في النظام
+  // جلب كافة المتاجر (Seller) بدون فلترة الحالة للسماح بتمييز أي متجر
   const sellersQuery = useMemo(() => {
     if (!firestore) return null;
     return query(collection(firestore, "users"), where("role", "==", "Seller"));
   }, [firestore]);
 
+  // جلب الحملات بدون orderBy لتجنب الحاجة للفهارس (Indexes)
   const campaignsQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_stores");
@@ -49,6 +50,7 @@ export default function FeaturedStoresAdmin() {
   const { data: sellersList, loading: loadingSellers } = useCollection(sellersQuery);
   const { data: campaigns, loading: loadingCampaigns } = useCollection(campaignsQuery);
 
+  // ترتيب الحملات برمجياً في الذاكرة بدلاً من Firestore
   const sortedCampaigns = useMemo(() => {
     return [...(campaigns || [])].sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [campaigns]);
@@ -96,6 +98,7 @@ export default function FeaturedStoresAdmin() {
         setLoading(false);
       })
       .catch(async (err) => {
+        console.error("ADD CAMPAIGN ERROR:", err);
         const permissionError = new FirestorePermissionError({
           path: "featured_stores",
           operation: 'create',
@@ -197,7 +200,7 @@ export default function FeaturedStoresAdmin() {
                                <SelectContent>
                                   <SelectItem value="Exclusive">👑 متجر حصري (أعلى الصفحة)</SelectItem>
                                   <SelectItem value="Featured">⭐ متجر مميز (قائمة عرضية)</SelectItem>
-                               </SelectContent>
+                                </SelectContent>
                             </Select>
                          </div>
                          <div className="space-y-2">
