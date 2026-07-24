@@ -64,7 +64,6 @@ export const BRAND_MODELS: Record<string, string[]> = {
   "Massey Ferguson": ["MF 285", "MF 399", "MF 385", "MF 440"],
   "Caterpillar": ["320D", "950H", "428F", "D8R"],
   "Yamaha": ["T-Max", "R1", "R6", "MT-07", "MT-09"],
-  // More brands added dynamically or mapped to defaults if missing
 };
 
 export const PART_CATEGORIES: Translation[] = [
@@ -81,6 +80,14 @@ export const PART_CATEGORIES: Translation[] = [
   { ar: "الداخلية", en: "Interior" },
   { ar: "الأكسيسوارات", en: "Accessories" },
   { ar: "الإضاءة", en: "Lighting" }
+];
+
+export const FUEL_TYPES: Translation[] = [
+  { ar: "بنزين", en: "Gasoline" },
+  { ar: "ديزل / مازوت", en: "Diesel" },
+  { ar: "غاز (GPL/GNC)", en: "LPG/CNG" },
+  { ar: "كهرباء", en: "Electric" },
+  { ar: "هجين (Hybrid)", en: "Hybrid" }
 ];
 
 export const YEARS = Array.from({ length: 2027 - 1990 }, (_, i) => (2026 - i).toString());

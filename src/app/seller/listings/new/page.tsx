@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES } from "@/lib/vehicle-data";
-import { Send, ImagePlus, Car, Settings, Tags, AlertCircle, X, Loader2 } from "lucide-react";
+import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES } from "@/lib/vehicle-data";
+import { Send, ImagePlus, Car, Settings, Tags, AlertCircle, X, Loader2, Zap } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -34,6 +34,7 @@ export default function NewListing() {
   const [brand, setBrand] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [year, setYear] = useState<string>("");
+  const [fuelType, setFuelType] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [condition, setCondition] = useState<string>("used");
   const [images, setImages] = useState<string[]>([]);
@@ -104,8 +105,8 @@ export default function NewListing() {
       try {
         const processedImages: string[] = [];
         for (const file of Array.from(files)) {
-          if (file.size > 10 * 1024 * 1024) {
-            toast({ variant: "destructive", title: "حجم كبير جداً", description: `الصورة ${file.name} تتجاوز 10 ميجابايت.` });
+          if (file.size > 15 * 1024 * 1024) {
+            toast({ variant: "destructive", title: "حجم كبير جداً", description: `الصورة ${file.name} تتجاوز 15 ميجابايت.` });
             continue;
           }
           const compressed = await compressImage(file);
@@ -139,6 +140,7 @@ export default function NewListing() {
       brand,
       model,
       year,
+      fuelType,
       condition,
       description: formData.get("description") as string,
       images,
@@ -223,6 +225,16 @@ export default function NewListing() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="font-black text-sm">نوع الطاقة (Fuel Type)</Label>
+                  <Select value={fuelType} onValueChange={setFuelType} required>
+                    <SelectTrigger className="h-14 border-2"><SelectValue placeholder="اختر نوع الطاقة" /></SelectTrigger>
+                    <SelectContent>
+                      {FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en}>{f[lang]}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -270,7 +282,7 @@ export default function NewListing() {
               </div>
 
               <div className="space-y-4">
-                <Label className="font-black">الصور (يمكنك إضافة عدة صور، بحد أقصى 10MB للصورة)</Label>
+                <Label className="font-black">الصور (يمكنك إضافة عدة صور، بحد أقصى 15MB للصورة)</Label>
                 <input type="file" multiple ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {images.map((img, idx) => (

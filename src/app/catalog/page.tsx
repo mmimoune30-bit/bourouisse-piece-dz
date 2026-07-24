@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -8,26 +9,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES } from "@/lib/vehicle-data";
+import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES } from "@/lib/vehicle-data";
 import { Filter, Search, RotateCcw } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
-
-const MOCK_CATALOG_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: "https://picsum.photos/seed/p1/400/400", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, brand: "Renault", model: "Clio IV", year: "2018" },
-  { id: "p2", name: "محرك كامل 1.5 dCi", price: 450000, image: "https://picsum.photos/seed/p2/400/400", category: "المحرك", seller: "Bourouisse Parts", condition: "Used" as const, brand: "Renault", model: "Megane", year: "2015" },
-  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: "https://picsum.photos/seed/p3/400/400", category: "التبريد", seller: "Pièces Renault DZ", condition: "New" as const, brand: "Peugeot", model: "208", year: "2019" },
-  { id: "p4", name: "علبة سرعة VW Golf 7", price: 65000, image: "https://picsum.photos/seed/p4/400/400", category: "علبة السرعة", seller: "EliteMotors DZ", condition: "Used" as const, brand: "Volkswagen", model: "Golf", year: "2017" },
-];
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
 
 function CatalogContent() {
   const searchParams = useSearchParams();
+  const { firestore } = useFirestore();
   const [lang, setLang] = useState<"ar" | "en">("ar");
 
   const [brand, setBrand] = useState<string>(searchParams.get("brand") || "");
   const [model, setModel] = useState<string>(searchParams.get("model") || "");
   const [year, setYear] = useState<string>(searchParams.get("year") || "");
   const [category, setCategory] = useState<string>(searchParams.get("category") || "");
+  const [fuelType, setFuelType] = useState<string>(searchParams.get("fuelType") || "");
   const [textSearch, setTextSearch] = useState<string>(searchParams.get("query") || "");
+
+  // Fetch real products from Firestore
+  const productsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "listings"), orderBy("createdAt", "desc"));
+  }, [firestore]);
+
+  const { data: dbProducts, loading } = useCollection(productsQuery);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang")?.toLowerCase() as "ar" | "en";
@@ -40,19 +46,22 @@ function CatalogContent() {
   }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
-    return MOCK_CATALOG_PRODUCTS.filter(p => {
+    if (!dbProducts) return [];
+    return dbProducts.filter(p => {
       const q = textSearch.toLowerCase();
       const matchesText = !textSearch || 
-                          p.name.toLowerCase().includes(q) || 
-                          p.brand.toLowerCase().includes(q) ||
-                          p.model.toLowerCase().includes(q);
+                          p.name?.toLowerCase().includes(q) || 
+                          p.brand?.toLowerCase().includes(q) ||
+                          p.model?.toLowerCase().includes(q) ||
+                          p.description?.toLowerCase().includes(q);
       const matchesBrand = !brand || brand === "Any" || p.brand === brand;
       const matchesModel = !model || model === "Any" || p.model === model;
       const matchesYear = !year || year === "Any" || p.year === year;
-      const matchesCategory = !category || category === "Any" || p.category.includes(category) || category.includes(p.category);
-      return matchesText && matchesBrand && matchesModel && matchesYear && matchesCategory;
+      const matchesFuel = !fuelType || fuelType === "Any" || p.fuelType === fuelType;
+      const matchesCategory = !category || category === "Any" || p.category === category;
+      return matchesText && matchesBrand && matchesModel && matchesYear && matchesFuel && matchesCategory && p.status === 'Active';
     });
-  }, [textSearch, brand, model, year, category]);
+  }, [dbProducts, textSearch, brand, model, year, fuelType, category]);
 
   const availableBrands = useMemo(() => {
     const allBrands = new Set<string>();
@@ -69,6 +78,7 @@ function CatalogContent() {
     setModel("");
     setYear("");
     setCategory("");
+    setFuelType("");
     setTextSearch("");
     window.history.pushState({}, "", "/catalog");
   };
@@ -76,7 +86,7 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-16 pb-12">
+      <main className="flex-grow pt-[235px] pb-12">
         <div className="container mx-auto px-4">
           
           <div className="mb-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4">
@@ -86,13 +96,13 @@ function CatalogContent() {
             </div>
             <div className="bg-white px-6 py-3 rounded-2xl border shadow-sm flex items-center gap-3 text-sm font-bold text-primary" dir="rtl">
               <span className="text-secondary">نتائج الفلترة:</span>
-              <span className="opacity-70">{filteredProducts.length} قطعة مطابقة</span>
+              <span className="opacity-70">{loading ? "..." : filteredProducts.length} قطعة مطابقة</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <aside className="lg:col-span-1 space-y-6">
-              <Card className="border-none shadow-xl sticky top-20">
+              <Card className="border-none shadow-xl sticky top-[250px]">
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
                     <h3 className="font-black text-xl text-primary">فلاتر متقدمة</h3>
@@ -133,6 +143,17 @@ function CatalogContent() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label className="font-black text-xs text-muted-foreground">نوع الطاقة</Label>
+                    <Select value={fuelType} onValueChange={setFuelType}>
+                      <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Any">كل الأنواع</SelectItem>
+                        {FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en}>{f[lang]}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label className="font-black text-xs text-muted-foreground">تصنيف القطعة</Label>
                     <Select value={category} onValueChange={setCategory}>
                       <SelectTrigger className="h-11 border-2"><SelectValue placeholder="الكل" /></SelectTrigger>
@@ -152,9 +173,22 @@ function CatalogContent() {
 
             <div className="lg:col-span-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                 {filteredProducts.length > 0 ? (
+                 {loading ? (
+                   Array.from({ length: 6 }).map((_, i) => (
+                     <div key={i} className="h-80 bg-zinc-200 animate-pulse rounded-[32px]" />
+                   ))
+                 ) : filteredProducts.length > 0 ? (
                    filteredProducts.map((product) => (
-                     <ProductCard key={product.id} {...product} />
+                     <ProductCard 
+                        key={product.id} 
+                        id={product.id}
+                        name={product.name}
+                        price={product.price}
+                        image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
+                        category={product.category}
+                        seller={product.sellerName}
+                        condition={product.condition === 'new' ? 'New' : 'Used'}
+                     />
                    ))
                  ) : (
                    <div className="col-span-full py-32 bg-white rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
