@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -20,40 +21,52 @@ export default function SiteLogo({ className, subtextClassName, showTagline = tr
   }, []);
 
   return (
-    <div className={cn("flex flex-col items-center gap-0 min-w-[200px]", className)} dir="ltr">
-      {/* Logo Text Area with Animation */}
-      <div className="flex flex-col items-center leading-none transition-all duration-1000 ease-in-out">
-        {isArabic ? (
-          <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-1000">
-            <span className="text-[18px] md:text-[22px] font-black tracking-tight text-primary whitespace-nowrap" dir="rtl">
-              بورويس لقطع الغيار
-            </span>
-            <span className="text-[16px] md:text-[20px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
-              DT - DZ
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-1000">
-            <span className="text-[20px] md:text-[24px] font-black tracking-tighter text-primary uppercase whitespace-nowrap">
-              BOUROUISSE PIECE
-            </span>
-            <span className="text-[16px] md:text-[20px] font-black text-secondary tracking-tighter mt-[-4px] uppercase whitespace-nowrap">
-              DT - DZ
-            </span>
-          </div>
-        )}
+    <div className={cn("flex flex-col items-center gap-0 min-w-[220px] relative overflow-hidden", className)} dir="ltr">
+      {/* الوعاء الرئيسي للشعار مع تحديد ارتفاع ثابت لمنع القفز في الواجهة */}
+      <div className="relative w-full h-[45px] md:h-[55px]">
         
-        {showTagline && (
-          <div className="flex flex-col items-center mt-2">
-            <span className={cn("text-[10px] md:text-[12px] font-black text-primary/90 text-center", subtextClassName)} dir="rtl">
-              لقطع غيارات المركبات الجديدة و المستعملة
-            </span>
-            <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-1 border-t border-zinc-100 pt-1 w-full text-center">
-              M-M CHLEF
-            </span>
-          </div>
-        )}
+        {/* النسخة الإنجليزية */}
+        <div 
+          className={cn(
+            "absolute inset-0 flex flex-col items-center leading-none transition-all duration-1000 ease-in-out",
+            isArabic ? "-translate-x-full opacity-0 pointer-events-none" : "translate-x-0 opacity-100"
+          )}
+        >
+          <span className="text-[20px] md:text-[24px] font-black tracking-tighter text-primary uppercase whitespace-nowrap">
+            BOUROUISSE PIECE
+          </span>
+          <span className="text-[14px] md:text-[16px] font-black text-secondary tracking-tighter mt-[-4px] uppercase whitespace-nowrap">
+            DT - DZ
+          </span>
+        </div>
+
+        {/* النسخة العربية */}
+        <div 
+          className={cn(
+            "absolute inset-0 flex flex-col items-center leading-none transition-all duration-1000 ease-in-out",
+            isArabic ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
+          )}
+        >
+          <span className="text-[18px] md:text-[22px] font-black tracking-tight text-primary whitespace-nowrap" dir="rtl">
+            بورويس لقطع الغيار
+          </span>
+          <span className="text-[14px] md:text-[16px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
+            DT - DZ
+          </span>
+        </div>
       </div>
+      
+      {/* العبارة الوصفية - تظل ثابتة لتعزيز استقرار الهوية البصرية */}
+      {showTagline && (
+        <div className="flex flex-col items-center mt-1 w-full border-t border-zinc-100 pt-1">
+          <span className={cn("text-[9px] md:text-[11px] font-black text-primary/90 text-center leading-tight", subtextClassName)} dir="rtl">
+            لقطع غيارات المركبات الجديدة و المستعملة
+          </span>
+          <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-0.5 text-center">
+            M-M CHLEF
+          </span>
+        </div>
+      )}
     </div>
   );
 }
