@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -19,11 +20,11 @@ export default function Footer() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
-    const userRole = localStorage.getItem("user_role");
+    const userRole = typeof window !== 'undefined' ? localStorage.getItem("user_role") : null;
     const allowedRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
     setIsAdmin(allowedRoles.includes(userRole || ""));
     
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+    const savedLang = typeof window !== 'undefined' ? localStorage.getItem("app_lang") as "AR" | "EN" : "AR";
     if (savedLang) setLang(savedLang);
   }, []);
 
@@ -37,7 +38,10 @@ export default function Footer() {
           
           <div className="lg:col-span-2 space-y-8 flex flex-col items-center md:items-start">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <SiteLogo subtextClassName="text-blue-100" />
+              <SiteLogo 
+                brandClassName="text-white" 
+                subtextClassName="text-blue-100" 
+              />
             </Link>
             
             <p className="text-sm text-blue-100/60 leading-relaxed max-w-sm text-center md:text-right">

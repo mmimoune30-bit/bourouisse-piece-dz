@@ -6,11 +6,17 @@ import { cn } from "@/lib/utils";
 
 interface SiteLogoProps {
   className?: string;
+  brandClassName?: string;
   subtextClassName?: string;
   showTagline?: boolean;
 }
 
-export default function SiteLogo({ className, subtextClassName, showTagline = true }: SiteLogoProps) {
+export default function SiteLogo({ 
+  className, 
+  brandClassName, 
+  subtextClassName, 
+  showTagline = true 
+}: SiteLogoProps) {
   const [isArabic, setIsArabic] = useState(false);
 
   useEffect(() => {
@@ -32,7 +38,7 @@ export default function SiteLogo({ className, subtextClassName, showTagline = tr
             isArabic ? "-translate-x-full opacity-0 pointer-events-none" : "translate-x-0 opacity-100"
           )}
         >
-          <span className="text-[16px] md:text-[19px] font-black tracking-tighter text-primary uppercase whitespace-nowrap">
+          <span className={cn("text-[16px] md:text-[19px] font-black tracking-tighter uppercase whitespace-nowrap", brandClassName || "text-primary")}>
             BOUROUISSE PIECE
           </span>
           <span className="text-[11px] md:text-[13px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
@@ -47,7 +53,7 @@ export default function SiteLogo({ className, subtextClassName, showTagline = tr
             isArabic ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
           )}
         >
-          <span className="text-[15px] md:text-[18px] font-black tracking-tight text-primary whitespace-nowrap" dir="rtl">
+          <span className={cn("text-[15px] md:text-[18px] font-black tracking-tight whitespace-nowrap", brandClassName || "text-primary")} dir="rtl">
             بورويس لقطع الغيار
           </span>
           <span className="text-[11px] md:text-[13px] font-black text-secondary tracking-tighter mt-[-1px] uppercase whitespace-nowrap">
@@ -58,11 +64,11 @@ export default function SiteLogo({ className, subtextClassName, showTagline = tr
       
       {/* العبارة الوصفية - تم تقليل الهوامش والمسافات */}
       {showTagline && (
-        <div className="flex flex-col items-center mt-0.5 w-full border-t border-zinc-100 pt-0.5">
-          <span className={cn("text-[8px] md:text-[10px] font-black text-primary/90 text-center leading-none", subtextClassName)} dir="rtl">
+        <div className="flex flex-col items-center mt-0.5 w-full border-t border-white/10 pt-0.5">
+          <span className={cn("text-[8px] md:text-[10px] font-black text-center leading-none", subtextClassName || "text-primary/90")} dir="rtl">
             لقطع غيارات المركبات الجديدة و المستعملة
           </span>
-          <span className="text-[7px] md:text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-0.5 text-center">
+          <span className={cn("text-[7px] md:text-[8px] font-bold uppercase tracking-[0.2em] mt-0.5 text-center", subtextClassName ? "opacity-60" : "text-muted-foreground")}>
             M-M CHLEF
           </span>
         </div>
