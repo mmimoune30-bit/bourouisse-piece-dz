@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Navy Blue from Logo */
+    /* Standard Navy & Gold Theme */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -13,7 +13,7 @@
     --popover-foreground: 222 47% 11%;
     --primary: 222 47% 20%; /* Navy Blue */
     --primary-foreground: 210 40% 98%;
-    --secondary: 43 65% 50%; /* Gold from Logo */
+    --secondary: 43 65% 50%; /* Gold */
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 92%;
     --muted-foreground: 215 16% 47%;
@@ -25,27 +25,6 @@
     --input: 214 32% 91%;
     --ring: 222 47% 20%;
     --radius: 1rem;
-  }
-  .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 43 65% 50%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 222 47% 20%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 20%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 222 47% 20%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 20%;
-    --input: 222 47% 20%;
-    --ring: 43 65% 50%;
   }
 }
 
