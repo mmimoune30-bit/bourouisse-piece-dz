@@ -14,7 +14,7 @@ import {
   Settings, Loader2, CheckCircle2, AlertTriangle, Eye, TrendingUp 
 } from "lucide-react";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
@@ -32,16 +32,25 @@ export default function FeaturedStoresAdmin() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // جلب كافة المتاجر من أجل اختيار متجر للحملة
-  const { data: allSellers } = useCollection(
-    firestore ? query(collection(firestore, "users"), orderBy("name")) : null
+  // جلب كافة المستخدمين لفلترة المتاجر منهم
+  // تمت إزالة orderBy لتجنب أخطاء الفهارس (Index errors)
+  const { data: allUsers, loading: loadingUsers } = useCollection(
+    firestore ? collection(firestore, "users") : null
   );
-  const sellersList = useMemo(() => allSellers?.filter(u => u.role === 'Seller') || [], [allSellers]);
+
+  const sellersList = useMemo(() => {
+    return allUsers?.filter(u => u.role === 'Seller').sort((a, b) => (a.name || '').localeCompare(b.name || '')) || [];
+  }, [allUsers]);
 
   // جلب سجلات الحملات الإعلانية
   const { data: campaigns, loading: loadingCampaigns } = useCollection(
-    firestore ? query(collection(firestore, "featured_stores"), orderBy("priority", "desc")) : null
+    firestore ? collection(firestore, "featured_stores") : null
   );
+
+  // ترتيب الحملات في الذاكرة لتجنب الحاجة لفهارس Firestore يدوية
+  const sortedCampaigns = useMemo(() => {
+    return [...(campaigns || [])].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [campaigns]);
 
   const handleAddCampaign = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,13 +59,20 @@ export default function FeaturedStoresAdmin() {
 
     const formData = new FormData(e.currentTarget);
     const storeId = formData.get("storeId") as string;
+    
+    if (!storeId || storeId === "none") {
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار متجر من القائمة." });
+      setLoading(false);
+      return;
+    }
+
     const store = sellersList.find(s => s.uid === storeId);
 
     const data = {
       storeId,
       storeName: store?.name || "Unknown",
       storeLocation: store?.wilaya || "غير محدد",
-      storeLogo: `https://api.dicebear.com/7.x/initials/svg?seed=${store?.name}`,
+      storeLogo: store?.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store?.name || 'Store'}`,
       tier: formData.get("tier") as string,
       placement: formData.get("placement") as string,
       priority: Number(formData.get("priority")),
@@ -71,8 +87,9 @@ export default function FeaturedStoresAdmin() {
       await addDoc(collection(firestore, "featured_stores"), data);
       toast({ title: "تم تفعيل الحملة", description: `المتجر ${data.storeName} يظهر الآن في القائمة المميزة.` });
       setIsAddOpen(false);
-    } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر إنشاء الحملة." });
+    } catch (e: any) {
+      console.error("ADD CAMPAIGN ERROR:", e);
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر إنشاء الحملة. تأكد من الصلاحيات." });
     } finally {
       setLoading(false);
     }
@@ -88,8 +105,8 @@ export default function FeaturedStoresAdmin() {
     }
   };
 
-  const filtered = campaigns?.filter(c => 
-    c.storeName.toLowerCase().includes(search.toLowerCase())
+  const filtered = sortedCampaigns.filter(c => 
+    c.storeName?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -104,7 +121,7 @@ export default function FeaturedStoresAdmin() {
         
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
            <DialogTrigger asChild>
-             <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary">
+             <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary text-white">
                 <Plus size={18} /> إضافة متجر للقائمة
              </Button>
            </DialogTrigger>
@@ -118,10 +135,20 @@ export default function FeaturedStoresAdmin() {
                        <Label className="font-bold">اختر المتجر</Label>
                        <Select name="storeId" required>
                           <SelectTrigger className="h-11">
-                             <SelectValue placeholder="بحث في المتاجر الموثقة..." />
+                             <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "بحث في المتاجر الموثقة..."} />
                           </SelectTrigger>
                           <SelectContent>
-                             {sellersList.map(s => <SelectItem key={s.uid} value={s.uid}>{s.name} ({s.wilaya})</SelectItem>)}
+                             {loadingUsers ? (
+                               <SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+                             ) : sellersList.length > 0 ? (
+                               sellersList.map(s => (
+                                 <SelectItem key={s.uid} value={s.uid}>
+                                   {s.name} ({s.wilaya || 'بدون ولاية'})
+                                 </SelectItem>
+                               ))
+                             ) : (
+                               <SelectItem value="none" disabled>لا يوجد بائعين مسجلين حالياً</SelectItem>
+                             )}
                           </SelectContent>
                        </Select>
                     </div>
@@ -180,13 +207,13 @@ export default function FeaturedStoresAdmin() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
          <Card className="border-none shadow-sm bg-white p-6">
             <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر حصرية نشطة</p><h3 className="text-3xl font-black text-primary">{campaigns?.filter(c => c.tier === 'Exclusive').length || 0}</h3></div>
+               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر حصرية نشطة</p><h3 className="text-3xl font-black text-primary">{sortedCampaigns.filter(c => c.tier === 'Exclusive').length}</h3></div>
                <div className="p-3 bg-secondary/10 text-secondary rounded-xl"><Crown /></div>
             </div>
          </Card>
          <Card className="border-none shadow-sm bg-white p-6">
             <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر مميزة نشطة</p><h3 className="text-3xl font-black text-blue-600">{campaigns?.filter(c => c.tier === 'Featured').length || 0}</h3></div>
+               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر مميزة نشطة</p><h3 className="text-3xl font-black text-blue-600">{sortedCampaigns.filter(c => c.tier === 'Featured').length}</h3></div>
                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Star /></div>
             </div>
          </Card>
@@ -214,10 +241,10 @@ export default function FeaturedStoresAdmin() {
                <TableBody>
                   {loadingCampaigns ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 animate-pulse font-bold">جاري تحميل الحملات...</TableCell></TableRow>
-                  ) : filtered?.length === 0 ? (
+                  ) : filtered.length === 0 ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">لا توجد حملات إعلانية مفعلة حالياً.</TableCell></TableRow>
                   ) : (
-                    filtered?.map((c) => (
+                    filtered.map((c) => (
                       <TableRow key={c.id} className="hover:bg-zinc-50/50 transition-colors">
                         <TableCell className="pr-8 py-4">
                            <div className="flex flex-col">
@@ -241,8 +268,8 @@ export default function FeaturedStoresAdmin() {
                         </TableCell>
                         <TableCell>
                            <div className="flex items-center gap-4 text-xs font-black">
-                              <span className="flex items-center gap-1 text-blue-600"><Eye size={12} /> {c.stats.impressions}</span>
-                              <span className="flex items-center gap-1 text-orange-600"><TrendingUp size={12} /> {c.stats.clicks}</span>
+                              <span className="flex items-center gap-1 text-blue-600"><Eye size={12} /> {c.stats?.impressions || 0}</span>
+                              <span className="flex items-center gap-1 text-orange-600"><TrendingUp size={12} /> {c.stats?.clicks || 0}</span>
                            </div>
                         </TableCell>
                         <TableCell className="text-left pl-8">
