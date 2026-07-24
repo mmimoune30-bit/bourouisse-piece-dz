@@ -41,7 +41,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* Layer 1: Top Info Bar (Reduced padding) */}
+      {/* Layer 1: Top Info Bar */}
       <div className="bg-white border-b border-zinc-100 py-1">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -87,10 +87,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layers 2 & 3 (Only on Home Page - Reduced padding) */}
+      {/* Layers 2 & 3 (Only on Home Page) */}
       {isHome && (
         <>
-          {/* Layer 2: Main Branding (Reduced padding py-6 to py-2) */}
+          {/* Layer 2: Main Branding */}
           <div className="bg-white py-2 border-b">
             <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
               {/* Site Logo */}
@@ -119,16 +119,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Layer 3: Search Bar (Reduced padding py-5 to py-1.5) */}
-          <div className="bg-primary py-1.5 shadow-inner relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10">
-              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-                <pattern id="pattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <circle cx="1" cy="1" r="1" fill="#fff" />
-                </pattern>
-                <rect width="100" height="100" fill="url(#pattern)" />
-              </svg>
-            </div>
+          {/* Layer 3: Search Bar - Changed to White Background */}
+          <div className="bg-white py-1.5 border-b shadow-sm relative">
             <div className="container mx-auto px-4 relative z-10">
               <AISearchBox />
             </div>
