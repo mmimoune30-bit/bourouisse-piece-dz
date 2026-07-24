@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Settings, Home
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AISearchBox from "@/components/ai-search-box";
+import SiteLogo from "@/components/site-logo";
 import { cn } from "@/lib/utils";
 
 const WhatsAppIcon = () => (
@@ -40,7 +41,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* الطبقة الأولى: المعلومات الثابتة واللغة (تظهر دائماً) */}
+      {/* Layer 1: Top Info Bar (Always visible) */}
       <div className="bg-white border-b border-zinc-100 py-2">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -86,49 +87,49 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* تظهر الطبقات الإضافية في الصفحة الرئيسية فقط كما طلب المستخدم */}
+      {/* Layers 2 & 3: Logo and Search (Only on Home Page) */}
       {isHome && (
         <>
-          {/* الطبقة الثانية: الشعار والأزرار */}
-          <div className="bg-white py-4 border-b">
-            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
-              {/* الشعار على اليمين */}
-              <Link href="/" className="flex items-center gap-3" dir="ltr">
-                <div className="bg-primary p-2 rounded-xl text-white">
-                  <Settings size={28} className="animate-spin-slow" />
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-xl md:text-2xl font-black text-primary tracking-tighter uppercase">BOUROUISSE <span className="text-secondary">PIECE-DT DZ</span></span>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-black text-primary leading-tight" dir="rtl">لقطع غيارات المركبات الجديدة و المستعملة</span>
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">M-M CHLEF</span>
-                  </div>
-                </div>
+          {/* Layer 2: Main Branding */}
+          <div className="bg-white py-6 border-b">
+            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-8">
+              {/* The NEW Logo from Image */}
+              <Link href="/" className="hover:opacity-90 transition-opacity">
+                <SiteLogo />
               </Link>
 
-              {/* الأزرار على اليسار */}
-              <div className="flex flex-wrap items-center gap-2 justify-center" dir="rtl">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 justify-center" dir="rtl">
                 <Link href="/seller/register">
-                  <Button className="bg-secondary text-primary font-black hover:bg-zinc-900 hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/20 h-12 transition-all">
-                    <Store size={18} /> كن بائعاً معنا
+                  <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-xl shadow-secondary/20 h-14 px-8 transition-all scale-105 active:scale-95">
+                    <Store size={20} /> كن بائعاً معنا
                   </Button>
                 </Link>
                 <Link href="/join">
-                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 transition-all">
-                    <UserPlus size={18} /> إضافة حساب
+                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-14 px-8 transition-all">
+                    <UserPlus size={20} /> إضافة حساب
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12">
-                    <LogIn size={18} /> الدخول إلى الحساب
+                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-14 px-6">
+                    <LogIn size={20} /> دخول
                   </Button>
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* الطبقة الثالثة: شريط البحث الأزرق الداكن */}
-          <div className="bg-[#1a237e] py-4 shadow-inner relative overflow-hidden">
+          {/* Layer 3: Search Bar */}
+          <div className="bg-primary py-5 shadow-inner relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+                <pattern id="pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="1" cy="1" r="1" fill="#fff" />
+                </pattern>
+                <rect width="100" height="100" fill="url(#pattern)" />
+              </svg>
+            </div>
             <div className="container mx-auto px-4 relative z-10">
               <AISearchBox />
             </div>

@@ -4,52 +4,48 @@
 
 @layer base {
   :root {
-    --background: 240 45% 96%;
-    --foreground: 240 53% 15%;
+    /* Navy Blue from Logo */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 240 53% 15%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 53% 15%;
-    --primary: 240 53% 26%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 47 95% 55%;
-    --secondary-foreground: 240 53% 15%;
-    --muted: 240 20% 90%;
-    --muted-foreground: 240 10% 40%;
-    --accent: 47 95% 55%;
-    --accent-foreground: 240 53% 15%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 47% 20%; /* Navy Blue */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 43 65% 50%; /* Gold from Logo */
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 92%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 43 65% 50%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 20% 88%;
-    --input: 240 20% 88%;
-    --ring: 240 53% 26%;
-    --radius: 0.75rem;
-    --chart-1: 240 53% 26%;
-    --chart-2: 47 95% 55%;
-    --chart-3: 195 70% 40%;
-    --chart-4: 240 30% 50%;
-    --chart-5: 47 95% 80%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 47% 20%;
+    --radius: 1rem;
   }
   .dark {
-    --background: 240 53% 10%;
-    --foreground: 240 10% 96%;
-    --card: 240 53% 12%;
-    --card-foreground: 240 10% 96%;
-    --popover: 240 53% 12%;
-    --popover-foreground: 240 10% 96%;
-    --primary: 47 95% 55%;
-    --primary-foreground: 240 53% 10%;
-    --secondary: 240 53% 20%;
-    --secondary-foreground: 240 10% 96%;
-    --muted: 240 30% 20%;
-    --muted-foreground: 240 10% 70%;
-    --accent: 47 95% 55%;
-    --accent-foreground: 240 53% 10%;
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 43 65% 50%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 222 47% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 20%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 240 10% 96%;
-    --border: 240 30% 25%;
-    --input: 240 30% 25%;
-    --ring: 47 95% 55%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 43 65% 50%;
   }
 }
 
@@ -59,9 +55,6 @@
   }
   body {
     @apply bg-background text-foreground font-body;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-bold;
   }
 }
 
@@ -73,12 +66,7 @@
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.02); }
+  50% { transform: translateY(-15px); }
 }
 
 @keyframes spin-slow {
@@ -86,27 +74,9 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes scroll-left {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 @keyframes ticker-ltr {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
-}
-
-@keyframes gradient-move {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes logo-ripple {
-  0% { transform: translateY(0); }
-  5% { transform: translateY(-8px); }
-  10% { transform: translateY(0); }
-  100% { transform: translateY(0); }
 }
 
 .animate-ken-burns {
@@ -117,35 +87,12 @@
   animation: float 6s ease-in-out infinite;
 }
 
-.animate-float-delayed {
-  animation: float 8s ease-in-out infinite;
-  animation-delay: 2s;
-}
-
-.animate-pulse-soft {
-  animation: pulse-soft 4s ease-in-out infinite;
-}
-
 .animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
-}
-
-.animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
+  animation: spin-slow 12s linear infinite;
 }
 
 .animate-ticker-ltr {
   animation: ticker-ltr 30s linear infinite;
-}
-
-.animate-gradient-dynamic {
-  background-size: 200% 200%;
-  animation: gradient-move 8s ease infinite;
-}
-
-.animate-logo-ripple {
-  display: inline-block;
-  animation: logo-ripple 8s ease-in-out infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar {
