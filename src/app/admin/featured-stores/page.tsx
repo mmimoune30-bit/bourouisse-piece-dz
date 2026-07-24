@@ -41,8 +41,11 @@ export default function FeaturedStoresAdmin() {
   const { data: allUsers, loading: loadingUsers, error: usersError } = useCollection(usersQuery);
   const { data: campaigns, loading: loadingCampaigns, error: campaignsError } = useCollection(campaignsQuery);
 
+  // تحديث: جلب المتاجر التي تحمل دور بائع وحالتها نشطة (معتمدة) فقط
   const sellersList = useMemo(() => {
-    return allUsers?.filter(u => u.role === 'Seller').sort((a, b) => (a.name || '').localeCompare(b.name || '')) || [];
+    return allUsers
+      ?.filter(u => u.role === 'Seller' && u.status === 'Active')
+      .sort((a, b) => (a.name || '').localeCompare(b.name || '')) || [];
   }, [allUsers]);
 
   const sortedCampaigns = useMemo(() => {
@@ -122,99 +125,110 @@ export default function FeaturedStoresAdmin() {
           <p className="text-muted-foreground mt-1">بيع وإدارة مساحات العرض الحصرية والمميزة في الصفحة الرئيسية.</p>
         </div>
         
-        <Dialog open={isAddOpen} onOpenChange={(val) => { setIsAddOpen(val); if(!val) setSelectedStoreId(""); }}>
-           <DialogTrigger asChild>
-             <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary text-white">
-                <Plus size={18} /> إضافة متجر للقائمة
-             </Button>
-           </DialogTrigger>
-           <DialogContent className="max-w-xl" dir="rtl">
-              <form onSubmit={handleAddCampaign}>
-                 <DialogHeader>
-                    <DialogTitle className="text-right font-black text-xl">تفعيل ميزة "حصري / مميز"</DialogTitle>
-                 </DialogHeader>
-                 
-                 {(usersError) && (
-                   <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2 text-sm font-bold">
-                     <AlertCircle size={18} /> خطأ في جلب بيانات المتاجر. تأكد من اتصال الإنترنت.
+        <div className="flex gap-4">
+          <div className="relative w-64">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+            <Input 
+              placeholder="بحث في الحملات..." 
+              className="pr-10"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Dialog open={isAddOpen} onOpenChange={(val) => { setIsAddOpen(val); if(!val) setSelectedStoreId(""); }}>
+             <DialogTrigger asChild>
+               <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary text-white">
+                  <Plus size={18} /> إضافة متجر للقائمة
+               </Button>
+             </DialogTrigger>
+             <DialogContent className="max-w-xl" dir="rtl">
+                <form onSubmit={handleAddCampaign}>
+                   <DialogHeader>
+                      <DialogTitle className="text-right font-black text-xl">تفعيل ميزة "حصري / مميز"</DialogTitle>
+                   </DialogHeader>
+                   
+                   {(usersError) && (
+                     <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2 text-sm font-bold mt-4">
+                       <AlertCircle size={18} /> خطأ في جلب بيانات المتاجر. تأكد من اتصال الإنترنت.
+                     </div>
+                   )}
+
+                   <div className="grid gap-6 py-6">
+                      <div className="space-y-2">
+                         <Label className="font-bold">اختر المتجر من القائمة المعتمدة (النشطة فقط)</Label>
+                         <Select 
+                          value={selectedStoreId} 
+                          onValueChange={setSelectedStoreId}
+                          required
+                         >
+                            <SelectTrigger className="h-14 border-2 bg-white">
+                               <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "اختر المتجر..."} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                               {loadingUsers ? (
+                                 <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
+                               ) : sellersList.length > 0 ? (
+                                 sellersList.map(s => (
+                                   <SelectItem key={s.uid} value={s.uid} className="text-right flex-row-reverse">
+                                     {s.name} ({s.wilaya || 'بدون ولاية'})
+                                   </SelectItem>
+                                 ))
+                               ) : (
+                                 <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين معتمدين نشطين حالياً</div>
+                               )}
+                            </SelectContent>
+                         </Select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                         <div className="space-y-2">
+                            <Label className="font-bold">فئة الإعلان</Label>
+                            <Select name="tier" defaultValue="Featured">
+                               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                               <SelectContent>
+                                  <SelectItem value="Exclusive">👑 متجر حصري (أعلى الصفحة)</SelectItem>
+                                  <SelectItem value="Featured">⭐ متجر مميز (قائمة عرضية)</SelectItem>
+                               </SelectContent>
+                            </Select>
+                         </div>
+                         <div className="space-y-2">
+                            <Label className="font-bold">ترتيب الظهور (0-100)</Label>
+                            <Input name="priority" type="number" defaultValue="10" className="h-11" />
+                         </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                         <div className="space-y-2">
+                            <Label className="font-bold">تاريخ البداية</Label>
+                            <Input name="startDate" type="date" className="h-11" required />
+                         </div>
+                         <div className="space-y-2">
+                            <Label className="font-bold">تاريخ الانتهاء</Label>
+                            <Input name="endDate" type="date" className="h-11" required />
+                         </div>
+                      </div>
+
+                      <div className="space-y-2">
+                         <Label className="font-bold">مكان الظهور</Label>
+                         <Select name="placement" defaultValue="Home">
+                            <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                               <SelectItem value="Home">الصفحة الرئيسية فقط</SelectItem>
+                               <SelectItem value="Search">صفحة البحث فقط</SelectItem>
+                               <SelectItem value="Both">الرئيسية والبحث</SelectItem>
+                            </SelectContent>
+                         </Select>
+                      </div>
                    </div>
-                 )}
-
-                 <div className="grid gap-6 py-6">
-                    <div className="space-y-2">
-                       <Label className="font-bold">اختر المتجر من القائمة الموثقة</Label>
-                       <Select 
-                        value={selectedStoreId} 
-                        onValueChange={setSelectedStoreId}
-                        required
-                       >
-                          <SelectTrigger className="h-14 border-2 bg-white">
-                             <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "اختر المتجر..."} />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-[300px]">
-                             {loadingUsers ? (
-                               <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
-                             ) : sellersList.length > 0 ? (
-                               sellersList.map(s => (
-                                 <SelectItem key={s.uid} value={s.uid} className="text-right flex-row-reverse">
-                                   {s.name} ({s.wilaya || 'بدون ولاية'})
-                                 </SelectItem>
-                               ))
-                             ) : (
-                               <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين مسجلين حالياً</div>
-                             )}
-                          </SelectContent>
-                       </Select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                          <Label className="font-bold">فئة الإعلان</Label>
-                          <Select name="tier" defaultValue="Featured">
-                             <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
-                             <SelectContent>
-                                <SelectItem value="Exclusive">👑 متجر حصري (أعلى الصفحة)</SelectItem>
-                                <SelectItem value="Featured">⭐ متجر مميز (قائمة عرضية)</SelectItem>
-                             </SelectContent>
-                          </Select>
-                       </div>
-                       <div className="space-y-2">
-                          <Label className="font-bold">ترتيب الظهور (0-100)</Label>
-                          <Input name="priority" type="number" defaultValue="10" className="h-11" />
-                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                          <Label className="font-bold">تاريخ البداية</Label>
-                          <Input name="startDate" type="date" className="h-11" required />
-                       </div>
-                       <div className="space-y-2">
-                          <Label className="font-bold">تاريخ الانتهاء</Label>
-                          <Input name="endDate" type="date" className="h-11" required />
-                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                       <Label className="font-bold">مكان الظهور</Label>
-                       <Select name="placement" defaultValue="Home">
-                          <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                             <SelectItem value="Home">الصفحة الرئيسية فقط</SelectItem>
-                             <SelectItem value="Search">صفحة البحث فقط</SelectItem>
-                             <SelectItem value="Both">الرئيسية والبحث</SelectItem>
-                          </SelectContent>
-                       </Select>
-                    </div>
-                 </div>
-                 <DialogFooter className="gap-2 sm:justify-start">
-                    <Button type="submit" disabled={loading || !selectedStoreId} className="font-black h-12 px-10 min-w-[150px]">
-                       {loading ? <Loader2 className="animate-spin" /> : "تفعيل الميزة الآن"}
-                    </Button>
-                 </DialogFooter>
-              </form>
-           </DialogContent>
-        </Dialog>
+                   <DialogFooter className="gap-2 sm:justify-start">
+                      <Button type="submit" disabled={loading || !selectedStoreId} className="font-black h-12 px-10 min-w-[150px]">
+                         {loading ? <Loader2 className="animate-spin" /> : "تفعيل الميزة الآن"}
+                      </Button>
+                   </DialogFooter>
+                </form>
+             </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -233,7 +247,7 @@ export default function FeaturedStoresAdmin() {
          </Card>
          <Card className="border-none shadow-sm bg-primary text-white p-6">
             <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-blue-100 uppercase">إجمالي النقرات اليوم</p><h3 className="text-3xl font-black text-secondary">1.4K</h3></div>
+               <div><p className="text-xs font-black text-blue-100 uppercase">إجمالي الحملات</p><h3 className="text-3xl font-black text-secondary">{sortedCampaigns.length}</h3></div>
                <div className="p-3 bg-white/10 text-white rounded-xl"><TrendingUp /></div>
             </div>
          </Card>
@@ -303,3 +317,4 @@ export default function FeaturedStoresAdmin() {
     </div>
   );
 }
+
