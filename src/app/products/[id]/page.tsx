@@ -18,7 +18,8 @@ import {
   MessageCircle,
   ShoppingCart,
   Zap,
-  Loader2
+  Loader2,
+  Cpu
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
@@ -253,6 +254,13 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                             <span className="text-zinc-500 font-bold">نوع الطاقة:</span>
                             <span className="font-black text-primary">{product.fuelType || "غير محدد"}</span>
                          </div>
+                         {/* عرض نوع المحرك إذا توفر */}
+                         {product.engineType && (
+                           <div className="flex justify-between border-b pb-2">
+                              <span className="text-zinc-500 font-bold flex items-center gap-1">نوع المحرك <Cpu size={12} />:</span>
+                              <span className="font-black text-primary uppercase">{product.engineType}</span>
+                           </div>
+                         )}
                       </div>
                       <div className="space-y-4">
                          <div className="flex justify-between border-b pb-2">
