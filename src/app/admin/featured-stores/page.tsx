@@ -14,7 +14,7 @@ import {
   Settings, Loader2, CheckCircle2, AlertTriangle, Eye, TrendingUp, AlertCircle 
 } from "lucide-react";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, addDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, where } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
@@ -35,18 +35,19 @@ export default function FeaturedStoresAdmin() {
   const [loading, setLoading] = useState(false);
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  const usersQuery = useMemo(() => firestore ? collection(firestore, "users") : null, [firestore]);
-  const campaignsQuery = useMemo(() => firestore ? collection(firestore, "featured_stores") : null, [firestore]);
+  // استعلام جلب كافة البائعين المسجلين في النظام
+  const sellersQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "users"), where("role", "==", "Seller"));
+  }, [firestore]);
 
-  const { data: allUsers, loading: loadingUsers, error: usersError } = useCollection(usersQuery);
-  const { data: campaigns, loading: loadingCampaigns, error: campaignsError } = useCollection(campaignsQuery);
+  const campaignsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "featured_stores");
+  }, [firestore]);
 
-  // جلب المتاجر التي تحمل دور بائع وحالتها نشطة (معتمدة) فقط
-  const sellersList = useMemo(() => {
-    return allUsers
-      ?.filter(u => u.role === 'Seller' && u.status === 'Active')
-      .sort((a, b) => (a.name || '').localeCompare(b.name || '')) || [];
-  }, [allUsers]);
+  const { data: sellersList, loading: loadingSellers } = useCollection(sellersQuery);
+  const { data: campaigns, loading: loadingCampaigns } = useCollection(campaignsQuery);
 
   const sortedCampaigns = useMemo(() => {
     return [...(campaigns || [])].sort((a, b) => (b.priority || 0) - (a.priority || 0));
@@ -55,19 +56,25 @@ export default function FeaturedStoresAdmin() {
   const handleAddCampaign = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!firestore || !selectedStoreId) {
-      toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار متجر من القائمة." });
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار متجر من القائمة أولاً." });
       return;
     }
     
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const store = sellersList.find(s => s.uid === selectedStoreId);
+    const store = sellersList.find(s => s.id === selectedStoreId);
+
+    if (!store) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر العثور على بيانات المتجر المختار." });
+      setLoading(false);
+      return;
+    }
 
     const data = {
       storeId: selectedStoreId,
-      storeName: store?.name || "Unknown",
-      storeLocation: store?.wilaya || "غير محدد",
-      storeLogo: store?.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store?.name || 'Store'}`,
+      storeName: store.name || "Unknown Store",
+      storeLocation: store.wilaya || "غير محدد",
+      storeLogo: store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name || 'Store'}`,
       tier: formData.get("tier") as string,
       placement: formData.get("placement") as string,
       priority: Number(formData.get("priority")),
@@ -80,7 +87,10 @@ export default function FeaturedStoresAdmin() {
 
     addDoc(collection(firestore, "featured_stores"), data)
       .then(() => {
-        toast({ title: "تم تفعيل الحملة", description: `المتجر ${data.storeName} يظهر الآن في القائمة المميزة.` });
+        toast({ 
+          title: "تم التفعيل بنجاح ✅", 
+          description: `المتجر ${data.storeName} أصبح الآن ضمن القائمة المميزة.` 
+        });
         setIsAddOpen(false);
         setSelectedStoreId("");
         setLoading(false);
@@ -100,7 +110,7 @@ export default function FeaturedStoresAdmin() {
     if (!firestore || !confirm("هل تريد إنهاء هذه الحملة الإعلانية؟")) return;
     deleteDoc(doc(firestore, "featured_stores", id))
       .then(() => {
-        toast({ title: "تم الإزالة", description: "تم حذف المتجر من القائمة المميزة." });
+        toast({ title: "تم الحذف", description: "تمت إزالة المتجر من القائمة المميزة." });
       })
       .catch(async (err) => {
         const permissionError = new FirestorePermissionError({
@@ -122,7 +132,7 @@ export default function FeaturedStoresAdmin() {
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
              إدارة المتاجر المميزة <Crown size={32} className="text-secondary" />
           </h1>
-          <p className="text-muted-foreground mt-1">بيع وإدارة مساحات العرض الحصرية والمميزة في الصفحة الرئيسية.</p>
+          <p className="text-muted-foreground mt-1">تفعيل ميزات الظهور الحصري للمتاجر الموثقة.</p>
         </div>
         
         <div className="flex gap-4">
@@ -147,28 +157,33 @@ export default function FeaturedStoresAdmin() {
                       <DialogTitle className="text-right font-black text-xl">تفعيل ميزة "حصري / مميز"</DialogTitle>
                    </DialogHeader>
                    
-                   <div className="grid gap-6 py-6">
+                   <div className="grid gap-6 py-6 text-right">
                       <div className="space-y-2">
-                         <Label className="font-bold">اختر المتجر من القائمة المعتمدة (النشطة فقط)</Label>
+                         <Label className="font-bold">اختر المتجر من قائمة كافة المتاجر</Label>
                          <Select 
                           value={selectedStoreId} 
                           onValueChange={setSelectedStoreId}
                           required
                          >
-                            <SelectTrigger className="h-14 border-2 bg-white">
-                               <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "اختر المتجر..."} />
+                            <SelectTrigger className="h-14 border-2 bg-white text-right">
+                               <SelectValue placeholder={loadingSellers ? "جاري التحميل..." : "اختر المتجر من هنا..."} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
-                               {loadingUsers ? (
+                               {loadingSellers ? (
                                  <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
-                               ) : sellersList.length > 0 ? (
+                               ) : sellersList?.length > 0 ? (
                                  sellersList.map(s => (
-                                   <SelectItem key={s.uid} value={s.uid} className="text-right">
-                                     {s.name} ({s.wilaya || 'بدون ولاية'})
+                                   <SelectItem key={s.id} value={s.id} className="text-right">
+                                     <div className="flex flex-col text-right">
+                                        <span className="font-bold">{s.name}</span>
+                                        <span className={cn("text-[10px]", s.status === 'Active' ? 'text-green-600' : 'text-red-500')}>
+                                          {s.status === 'Active' ? 'نشط/معتمد' : 'محظور'} - {s.wilaya || 'بدون ولاية'}
+                                        </span>
+                                     </div>
                                    </SelectItem>
                                  ))
                                ) : (
-                                 <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين معتمدين نشطين حالياً</div>
+                                 <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين مسجلين حالياً</div>
                                )}
                             </SelectContent>
                          </Select>
