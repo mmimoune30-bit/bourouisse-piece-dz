@@ -44,8 +44,8 @@ export default function Footer() {
     if (savedLang) setLang(savedLang);
   }, []);
 
-  const siteName = "Bourouisse -Piece DT-dz";
-  const subtext = lang === 'AR' ? "بورويس لقطع الغيار - M-M CHLEF" : "Bourouisse Parts - M-M CHLEF";
+  const siteName = "BOUROUISSE PIECE-DT DZ";
+  const subtext = lang === 'AR' ? "لقطع غيارات المركبات الجديدة و المستعملة - M-M CHLEF" : "Auto Parts (New & Used) - M-M CHLEF";
 
   return (
     <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-secondary/30">
@@ -130,7 +130,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4 text-xs text-blue-100/30">
-          <p className="font-bold">© 2024 Bourouisse Piece-Dz. جميع الحقوق محفوظة.</p>
+          <p className="font-bold">© 2024 {siteName}. جميع الحقوق محفوظة.</p>
           <div className="flex gap-6">
             <Link href="/terms-of-service" className="hover:text-white">شروط الخدمة</Link>
             <Link href="/privacy-policy" className="hover:text-white">سياسة الخصوصية</Link>

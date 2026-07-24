@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
@@ -273,7 +272,7 @@ export default function PaymentManagement() {
                                 <Settings size={32} />
                               </div>
                               <div className="flex flex-col">
-                                <span className="font-black text-2xl text-primary tracking-tighter">BOUROUISSE PIECE-DZ</span>
+                                <span className="font-black text-2xl text-primary tracking-tighter">BOUROUISSE PIECE-DT DZ</span>
                                 <span className="text-xs font-bold text-muted-foreground">بوابة الإدارة المالية - وصل رقم: {selectedPayment?.id}</span>
                               </div>
                             </div>
@@ -457,15 +456,3 @@ function DialogClose({ children, asChild }: { children: React.ReactNode, asChild
     </DialogTrigger>
   );
 }
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-} from "@/components/ui/dropdown-menu";

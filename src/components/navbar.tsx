@@ -98,8 +98,11 @@ export default function Navbar() {
                   <Settings size={28} className="animate-spin-slow" />
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl font-black text-primary tracking-tighter uppercase">BOUROUISSE <span className="text-secondary">PIECE-DZ</span></span>
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">بورويس لقطع الغيار - M-M CHLEF</span>
+                  <span className="text-xl md:text-2xl font-black text-primary tracking-tighter uppercase">BOUROUISSE <span className="text-secondary">PIECE-DT DZ</span></span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-black text-primary leading-tight" dir="rtl">لقطع غيارات المركبات الجديدة و المستعملة</span>
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest" dir="rtl">M-M CHLEF</span>
+                  </div>
                 </div>
               </Link>
 

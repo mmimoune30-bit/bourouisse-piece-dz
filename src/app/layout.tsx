@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from "@/firebase";
 
 export const metadata: Metadata = {
-  title: 'Bourouisse Piece-Dz | Premium Auto Parts Marketplace',
-  description: 'Find genuine and high-quality auto parts in Algeria. Connect with verified sellers across the nation.',
+  title: 'BOUROUISSE PIECE-DT DZ | لقطع غيارات المركبات الجديدة و المستعملة',
+  description: 'Find genuine and high-quality auto parts in Algeria. Connect with verified sellers across the nation (M-M CHLEF).',
 };
 
 export default function RootLayout({
