@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -28,47 +27,47 @@ export default function SiteLogo({
 
   return (
     <div className={cn("flex flex-col items-center gap-0 min-w-[180px] relative overflow-hidden", className)} dir="ltr">
-      {/* الوعاء الرئيسي للشعار مع تقليل الارتفاع */}
-      <div className="relative w-full h-[32px] md:h-[38px]">
+      {/* Container for logo with absolute zero margins */}
+      <div className="relative w-full h-[28px] md:h-[32px]">
         
-        {/* النسخة الإنجليزية */}
+        {/* English Version */}
         <div 
           className={cn(
             "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
             isArabic ? "-translate-x-full opacity-0 pointer-events-none" : "translate-x-0 opacity-100"
           )}
         >
-          <span className={cn("text-[16px] md:text-[19px] font-black tracking-tighter uppercase whitespace-nowrap", brandClassName || "text-primary")}>
+          <span className={cn("text-[14px] md:text-[17px] font-black tracking-tighter uppercase whitespace-nowrap", brandClassName || "text-primary")}>
             BOUROUISSE PIECE
           </span>
-          <span className="text-[11px] md:text-[13px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
+          <span className="text-[10px] md:text-[12px] font-black text-secondary tracking-tighter mt-[-3px] uppercase whitespace-nowrap">
             DT - DZ
           </span>
         </div>
 
-        {/* النسخة العربية */}
+        {/* Arabic Version */}
         <div 
           className={cn(
             "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
             isArabic ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
           )}
         >
-          <span className={cn("text-[15px] md:text-[18px] font-black tracking-tight whitespace-nowrap", brandClassName || "text-primary")} dir="rtl">
+          <span className={cn("text-[13px] md:text-[16px] font-black tracking-tight whitespace-nowrap", brandClassName || "text-primary")} dir="rtl">
             بورويس لقطع الغيار
           </span>
-          <span className="text-[11px] md:text-[13px] font-black text-secondary tracking-tighter mt-[-1px] uppercase whitespace-nowrap">
+          <span className="text-[10px] md:text-[12px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
             DT - DZ
           </span>
         </div>
       </div>
       
-      {/* العبارة الوصفية - تم تقليل الهوامش والمسافات */}
+      {/* Tagline - Very tight margins */}
       {showTagline && (
-        <div className="flex flex-col items-center mt-0.5 w-full border-t border-white/10 pt-0.5">
-          <span className={cn("text-[8px] md:text-[10px] font-black text-center leading-none", subtextClassName || "text-primary/90")} dir="rtl">
+        <div className="flex flex-col items-center mt-0 w-full border-t border-white/5 pt-0.5">
+          <span className={cn("text-[8px] md:text-[9px] font-black text-center leading-none", subtextClassName || "text-primary/90")} dir="rtl">
             لقطع غيارات المركبات الجديدة و المستعملة
           </span>
-          <span className={cn("text-[7px] md:text-[8px] font-bold uppercase tracking-[0.2em] mt-0.5 text-center", subtextClassName ? "opacity-60" : "text-muted-foreground")}>
+          <span className={cn("text-[7px] md:text-[7.5px] font-bold uppercase tracking-[0.15em] mt-0.5 text-center", subtextClassName ? "opacity-60" : "text-muted-foreground")}>
             M-M CHLEF
           </span>
         </div>

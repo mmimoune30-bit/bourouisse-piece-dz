@@ -1,4 +1,3 @@
-
 "use client";
 
 import { use, useState, useEffect } from "react";
@@ -93,7 +92,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-[235px] pb-12">
+      {/* Adjusted padding-top from 235px to 80px */}
+      <main className="flex-grow pt-[80px] pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           
           <div className="mb-6 text-center">

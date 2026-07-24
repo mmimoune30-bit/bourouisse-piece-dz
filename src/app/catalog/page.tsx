@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -86,7 +85,8 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12">
+      {/* Adjusted padding-top from 235px to 80px since Layer 2/3 are hidden on non-home pages */}
+      <main className="flex-grow pt-[80px] pb-12">
         <div className="container mx-auto px-4">
           
           <div className="mb-8 flex flex-col md:flex-row-reverse justify-between items-center gap-4">
@@ -102,7 +102,7 @@ function CatalogContent() {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <aside className="lg:col-span-1 space-y-6">
-              <Card className="border-none shadow-xl sticky top-[250px]">
+              <Card className="border-none shadow-xl sticky top-[100px]">
                 <CardContent className="p-6 space-y-6 text-right" dir="rtl">
                   <div className="flex items-center justify-between border-b pb-4">
                     <h3 className="font-black text-xl text-primary">فلاتر متقدمة</h3>

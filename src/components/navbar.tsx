@@ -41,8 +41,8 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* Layer 1: Top Info Bar (Always visible) */}
-      <div className="bg-white border-b border-zinc-100 py-2">
+      {/* Layer 1: Top Info Bar (Reduced padding) */}
+      <div className="bg-white border-b border-zinc-100 py-1">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -87,13 +87,13 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layers 2 & 3: Logo and Search (Only on Home Page) */}
+      {/* Layers 2 & 3 (Only on Home Page - Reduced padding) */}
       {isHome && (
         <>
-          {/* Layer 2: Main Branding */}
-          <div className="bg-white py-6 border-b">
-            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-8">
-              {/* The NEW Logo from Image */}
+          {/* Layer 2: Main Branding (Reduced padding py-6 to py-2) */}
+          <div className="bg-white py-2 border-b">
+            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
+              {/* Site Logo */}
               <Link href="/" className="hover:opacity-90 transition-opacity">
                 <SiteLogo />
               </Link>
@@ -101,27 +101,26 @@ export default function Navbar() {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 justify-center" dir="rtl">
                 <Link href="/seller/register">
-                  <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-xl shadow-secondary/20 h-14 px-8 transition-all scale-105 active:scale-95">
-                    <Store size={20} /> كن بائعاً معنا
+                  <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-12 px-6 transition-all active:scale-95">
+                    <Store size={18} /> كن بائعاً معنا
                   </Button>
                 </Link>
                 <Link href="/join">
-                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-14 px-8 transition-all">
-                    <UserPlus size={20} /> إضافة حساب
+                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 px-6 transition-all">
+                    <UserPlus size={18} /> إضافة حساب
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-14 px-6">
-                    <LogIn size={20} /> دخول
+                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12 px-4">
+                    <LogIn size={18} /> دخول
                   </Button>
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Layer 3: Search Bar */}
-          <div className="bg-primary py-5 shadow-inner relative overflow-hidden">
-            {/* Background pattern */}
+          {/* Layer 3: Search Bar (Reduced padding py-5 to py-1.5) */}
+          <div className="bg-primary py-1.5 shadow-inner relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
               <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
                 <pattern id="pattern" width="20" height="20" patternUnits="userSpaceOnUse">

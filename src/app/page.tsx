@@ -65,13 +65,6 @@ const BANNERS = [
   }
 ];
 
-const FEATURED_PRODUCTS = [
-  { id: "p1", name: "مصباح أمامي أيمن Clio 4", price: 8500, image: PlaceHolderImages.find(img => img.id === "product-headlight")?.imageUrl || "https://picsum.photos/seed/headlight/400/300", category: "إضاءة", seller: "Auto Pièces Chlef", condition: "New" as const, hint: "car headlight" },
-  { id: "p3", name: "رادياتور Peugeot 208", price: 12000, image: PlaceHolderImages.find(img => img.id === "product-radiator")?.imageUrl || "https://picsum.photos/seed/radiator/400/300", category: "المحرك", seller: "Pièces Renault DZ", condition: "New" as const, hint: "car radiator" },
-  { id: "p2", name: "باب أمامي أيسر Clio 4", price: 25000, image: PlaceHolderImages.find(img => img.id === "product-door")?.imageUrl || "https://picsum.photos/seed/door/400/300", category: "هيكل", seller: "Auto Pièces Chlef", condition: "Used" as const, hint: "car door" },
-  { id: "p4", name: "صدام أمامي Peugeot 301", price: 18000, image: PlaceHolderImages.find(img => img.id === "product-bumper")?.imageUrl || "https://picsum.photos/seed/bumper/400/300", category: "هيكل", seller: "Pièces Renault DZ", condition: "Used" as const, hint: "car bumper" }
-];
-
 const FEATURED_STORES = [
   { name: "Auto Pièces Chlef", location: "الشلف", logo: PlaceHolderImages.find(img => img.id === "store-logo-1")?.imageUrl || "https://picsum.photos/seed/shop1/100/100", hint: "automotive shop" },
   { name: "Pièces Renault DZ", location: "الجزائر", logo: PlaceHolderImages.find(img => img.id === "store-logo-2")?.imageUrl || "https://picsum.photos/seed/shop2/100/100", hint: "renault parts" },
@@ -113,9 +106,8 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      {/* الهامش العلوي يتوافق مع ارتفاع الطبقات الثلاث للنافبار */}
-      <main className="flex-grow pt-[215px]">
-        {/* قسم الـ Hero التفاعلي */}
+      {/* Reduced padding-top from 215px to 145px to match smaller navbar height */}
+      <main className="flex-grow pt-[145px]">
         <section className="relative w-full">
           <Carousel 
             setApi={setApi}
@@ -192,7 +184,6 @@ export default function Home() {
           </Carousel>
         </section>
 
-        {/* أقسام المحتوى الأخرى تتبع هنا */}
         <section className="container mx-auto px-4 py-16">
           <div className={cn(
             "flex items-center justify-between mb-8 border-b-4 border-secondary pb-3",
