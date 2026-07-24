@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Star, Crown, Plus, Search, Calendar, BarChart2, Edit3, Trash2, 
-  Settings, Loader2, CheckCircle2, AlertTriangle, Eye, TrendingUp 
+  Settings, Loader2, CheckCircle2, AlertTriangle, Eye, TrendingUp, AlertCircle 
 } from "lucide-react";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, addDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
@@ -31,45 +31,36 @@ export default function FeaturedStoresAdmin() {
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>("");
 
-  // جلب كافة المستخدمين لفلترة المتاجر منهم
-  // تمت إزالة orderBy لتجنب أخطاء الفهارس (Index errors)
-  const { data: allUsers, loading: loadingUsers } = useCollection(
-    firestore ? collection(firestore, "users") : null
-  );
+  // تثبيت الاستعلامات لتجنب إعادة التحميل المستمرة
+  const usersQuery = useMemo(() => firestore ? collection(firestore, "users") : null, [firestore]);
+  const campaignsQuery = useMemo(() => firestore ? collection(firestore, "featured_stores") : null, [firestore]);
+
+  const { data: allUsers, loading: loadingUsers, error: usersError } = useCollection(usersQuery);
+  const { data: campaigns, loading: loadingCampaigns, error: campaignsError } = useCollection(campaignsQuery);
 
   const sellersList = useMemo(() => {
     return allUsers?.filter(u => u.role === 'Seller').sort((a, b) => (a.name || '').localeCompare(b.name || '')) || [];
   }, [allUsers]);
 
-  // جلب سجلات الحملات الإعلانية
-  const { data: campaigns, loading: loadingCampaigns } = useCollection(
-    firestore ? collection(firestore, "featured_stores") : null
-  );
-
-  // ترتيب الحملات في الذاكرة لتجنب الحاجة لفهارس Firestore يدوية
   const sortedCampaigns = useMemo(() => {
     return [...(campaigns || [])].sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [campaigns]);
 
   const handleAddCampaign = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore) return;
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const storeId = formData.get("storeId") as string;
-    
-    if (!storeId || storeId === "none") {
+    if (!firestore || !selectedStoreId) {
       toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار متجر من القائمة." });
-      setLoading(false);
       return;
     }
-
-    const store = sellersList.find(s => s.uid === storeId);
+    
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const store = sellersList.find(s => s.uid === selectedStoreId);
 
     const data = {
-      storeId,
+      storeId: selectedStoreId,
       storeName: store?.name || "Unknown",
       storeLocation: store?.wilaya || "غير محدد",
       storeLogo: store?.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store?.name || 'Store'}`,
@@ -87,8 +78,8 @@ export default function FeaturedStoresAdmin() {
       await addDoc(collection(firestore, "featured_stores"), data);
       toast({ title: "تم تفعيل الحملة", description: `المتجر ${data.storeName} يظهر الآن في القائمة المميزة.` });
       setIsAddOpen(false);
+      setSelectedStoreId("");
     } catch (e: any) {
-      console.error("ADD CAMPAIGN ERROR:", e);
       toast({ variant: "destructive", title: "خطأ", description: "تعذر إنشاء الحملة. تأكد من الصلاحيات." });
     } finally {
       setLoading(false);
@@ -119,7 +110,7 @@ export default function FeaturedStoresAdmin() {
           <p className="text-muted-foreground mt-1">بيع وإدارة مساحات العرض الحصرية والمميزة في الصفحة الرئيسية.</p>
         </div>
         
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <Dialog open={isAddOpen} onOpenChange={(val) => { setIsAddOpen(val); if(!val) setSelectedStoreId(""); }}>
            <DialogTrigger asChild>
              <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary text-white">
                 <Plus size={18} /> إضافة متجر للقائمة
@@ -130,24 +121,35 @@ export default function FeaturedStoresAdmin() {
                  <DialogHeader>
                     <DialogTitle className="text-right font-black text-xl">تفعيل ميزة "حصري / مميز"</DialogTitle>
                  </DialogHeader>
+                 
+                 {(usersError) && (
+                   <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2 text-sm font-bold">
+                     <AlertCircle size={18} /> خطأ في جلب بيانات المتاجر. تأكد من اتصال الإنترنت.
+                   </div>
+                 )}
+
                  <div className="grid gap-6 py-6">
                     <div className="space-y-2">
-                       <Label className="font-bold">اختر المتجر</Label>
-                       <Select name="storeId" required>
-                          <SelectTrigger className="h-11">
-                             <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "بحث في المتاجر الموثقة..."} />
+                       <Label className="font-bold">اختر المتجر من القائمة الموثقة</Label>
+                       <Select 
+                        value={selectedStoreId} 
+                        onValueChange={setSelectedStoreId}
+                        required
+                       >
+                          <SelectTrigger className="h-14 border-2 bg-white">
+                             <SelectValue placeholder={loadingUsers ? "جاري جلب المتاجر..." : "اختر المتجر..."} />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="max-h-[300px]">
                              {loadingUsers ? (
-                               <SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+                               <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
                              ) : sellersList.length > 0 ? (
                                sellersList.map(s => (
-                                 <SelectItem key={s.uid} value={s.uid}>
+                                 <SelectItem key={s.uid} value={s.uid} className="text-right flex-row-reverse">
                                    {s.name} ({s.wilaya || 'بدون ولاية'})
                                  </SelectItem>
                                ))
                              ) : (
-                               <SelectItem value="none" disabled>لا يوجد بائعين مسجلين حالياً</SelectItem>
+                               <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين مسجلين حالياً</div>
                              )}
                           </SelectContent>
                        </Select>
@@ -194,7 +196,7 @@ export default function FeaturedStoresAdmin() {
                     </div>
                  </div>
                  <DialogFooter className="gap-2 sm:justify-start">
-                    <Button type="submit" disabled={loading} className="font-black h-12 px-10">
+                    <Button type="submit" disabled={loading || !selectedStoreId} className="font-black h-12 px-10 min-w-[150px]">
                        {loading ? <Loader2 className="animate-spin" /> : "تفعيل الميزة الآن"}
                     </Button>
                  </DialogFooter>
@@ -241,6 +243,8 @@ export default function FeaturedStoresAdmin() {
                <TableBody>
                   {loadingCampaigns ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 animate-pulse font-bold">جاري تحميل الحملات...</TableCell></TableRow>
+                  ) : (campaignsError) ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-20 text-destructive font-bold">تعذر تحميل بيانات الحملات من السيرفر.</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
                     <TableRow><TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">لا توجد حملات إعلانية مفعلة حالياً.</TableCell></TableRow>
                   ) : (
