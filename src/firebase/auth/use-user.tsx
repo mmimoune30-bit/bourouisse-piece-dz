@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -18,8 +17,8 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // لا نغير حالة التحميل إذا لم تتوفر خدمات Firebase بعد
     if (!auth || !firestore) {
-      setLoading(false);
       return;
     }
 
@@ -27,14 +26,14 @@ export function useUser() {
       setUser(u);
       
       if (u) {
-        // الاستماع لتغييرات الملف الشخصي في Firestore باستخدام الـ UID
+        // الاستماع لتغييرات الملف الشخصي في Firestore
         const unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
           if (snap.exists()) {
             setProfile(snap.data());
           } else {
             setProfile(null);
           }
-          setLoading(false); // يتم إنهاء حالة التحميل فقط بعد الرد من Firestore
+          setLoading(false);
         }, (error) => {
           console.error("Error fetching user profile:", error);
           setLoading(false);

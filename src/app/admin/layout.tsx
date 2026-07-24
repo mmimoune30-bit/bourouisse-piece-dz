@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -41,18 +40,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
+    // ننتظر حتى ينتهي التحميل تماماً قبل اتخاذ أي قرار بالتوجيه
     if (loading) return;
+
     if (!user) {
-      router.push("/login");
+      // فقط إذا تأكدنا أن المستخدم غير موجود نوجهه للدخول
+      router.replace("/login");
       return;
     }
+
     if (profile && !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
       toast({
         variant: "destructive",
         title: "منع الوصول",
         description: "ليس لديك صلاحية للدخول إلى منطقة الإدارة.",
       });
-      router.push("/");
+      router.replace("/");
     }
   }, [user, profile, loading, router]);
 
@@ -67,17 +70,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  if (loading) {
+  // عرض شاشة التحميل طالما أن Firebase يتحقق من الجلسة
+  if (loading || !user || (user && !profile)) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white">
         <Loader2 className="animate-spin mb-4 text-secondary" size={64} />
-        <span className="font-black text-2xl tracking-widest uppercase">جاري التحقق...</span>
+        <span className="font-black text-2xl tracking-widest uppercase">جاري التحقق من الصلاحيات...</span>
       </div>
     );
-  }
-
-  if (!user || !profile || !ALLOWED_ADMIN_ROLES.includes(profile.role)) {
-    return null;
   }
 
   return (
@@ -122,7 +122,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content - Offset margin depends on sidebar width to prevent overlap */}
+      {/* Main Content */}
       <main className={cn(
         "flex-grow transition-all duration-300 min-h-screen flex flex-col",
         isSidebarOpen ? "ml-64" : "ml-20"
