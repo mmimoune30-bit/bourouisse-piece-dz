@@ -17,7 +17,7 @@ export default function SiteLogo({ className, subtextClassName, showTagline = tr
         <span className="text-[20px] md:text-[24px] font-black tracking-tighter text-primary uppercase whitespace-nowrap">
           BOUROUISSE PIECE
         </span>
-        <span className="text-[32px] md:text-[44px] font-black text-secondary tracking-tighter mt-[-6px] uppercase whitespace-nowrap">
+        <span className="text-[22px] md:text-[28px] font-black text-secondary tracking-tighter mt-[-4px] uppercase whitespace-nowrap">
           DT - DZ
         </span>
         
