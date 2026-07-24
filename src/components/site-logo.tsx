@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -54,9 +55,6 @@ export default function SiteLogo({
         >
           <span className={cn("text-[13px] md:text-[16px] font-black tracking-tight whitespace-nowrap", brandClassName || "text-primary")} dir="rtl">
             بورويس لقطع الغيار
-          </span>
-          <span className="text-[10px] md:text-[12px] font-black text-secondary tracking-tighter mt-[-2px] uppercase whitespace-nowrap">
-            DT - DZ
           </span>
         </div>
       </div>
