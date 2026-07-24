@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, ShieldCheck } from "lucide-react";
+import { Star, ShoppingCart, ShieldCheck, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -19,6 +19,7 @@ interface ProductCardProps {
   rating?: number;
   condition?: "New" | "Used" | "Refurbished";
   hint?: string;
+  createdAt?: any;
 }
 
 export default function ProductCard({
@@ -30,13 +31,20 @@ export default function ProductCard({
   seller,
   rating = 4.5,
   condition = "New",
-  hint = "car parts"
+  hint = "car parts",
+  createdAt
 }: ProductCardProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const formattedDate = createdAt ? (
+    typeof createdAt.toDate === 'function' 
+      ? createdAt.toDate().toLocaleDateString('ar-DZ') 
+      : new Date(createdAt).toLocaleDateString('ar-DZ')
+  ) : null;
 
   return (
     <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
@@ -72,7 +80,7 @@ export default function ProductCard({
             {name}
           </h3>
         </Link>
-        <div className="flex items-center justify-end gap-1 mb-3">
+        <div className="flex items-center justify-end gap-1 mb-2">
           <span className="text-xs text-muted-foreground font-bold">({rating})</span>
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
@@ -85,12 +93,19 @@ export default function ProductCard({
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-between flex-row-reverse">
+        <div className="flex items-center justify-between flex-row-reverse mb-2">
           <span className="text-2xl font-black text-primary">
             {mounted ? price.toLocaleString() : price} <span className="text-sm font-bold text-muted-foreground">دج</span>
           </span>
           <span className="text-[10px] text-muted-foreground font-bold">بواسطة: {seller}</span>
         </div>
+
+        {formattedDate && (
+          <div className="flex items-center justify-end gap-1 text-[10px] text-zinc-400 font-bold border-t pt-2 mt-2">
+            <span>نشر في: {formattedDate}</span>
+            <Calendar size={10} />
+          </div>
+        )}
       </CardContent>
       
       <CardFooter className="p-4 pt-0">

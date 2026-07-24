@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES } from "@/lib/vehicle-data";
-import { Send, ImagePlus, Car, Settings, Tags, AlertCircle, X, Loader2, Zap, Cpu } from "lucide-react";
+import { Send, ImagePlus, Car, Settings, Tags, AlertCircle, X, Loader2, Zap, Cpu, Hash } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -135,13 +135,14 @@ export default function NewListing() {
     const listingData = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
+      quantity: Number(formData.get("quantity") || 1),
       category,
       vehicleType,
       brand,
       model,
       year,
       fuelType,
-      engineType: formData.get("engineType") as string, // الحقل الجديد
+      engineType: formData.get("engineType") as string,
       condition,
       description: formData.get("description") as string,
       images,
@@ -237,12 +238,11 @@ export default function NewListing() {
                   </Select>
                 </div>
 
-                {/* الحقل الجديد: نوع المحرك */}
                 <div className="space-y-2">
                   <Label className="font-black text-sm flex items-center justify-end gap-2">نوع المحرك (Engine) <Cpu size={14} className="text-secondary" /></Label>
                   <Input 
                     name="engineType" 
-                    placeholder="مثلاً: 1.5 dCi, 2.0 TDI, V6 3.0..." 
+                    placeholder="مثلاً: 1.5 dCi, 2.0 TDI..." 
                     className="h-14 border-2" 
                   />
                 </div>
@@ -274,6 +274,10 @@ export default function NewListing() {
                 <div className="space-y-2">
                   <Label className="font-black">السعر (دج)</Label>
                   <Input name="price" type="number" placeholder="0.00" className="h-14 border-2" required />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black flex items-center justify-end gap-2">الكمية المتوفرة <Hash size={14} className="text-primary" /></Label>
+                  <Input name="quantity" type="number" defaultValue="1" min="1" className="h-14 border-2" required />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-black">الحالة</Label>

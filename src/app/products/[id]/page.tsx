@@ -19,7 +19,9 @@ import {
   ShoppingCart,
   Zap,
   Loader2,
-  Cpu
+  Cpu,
+  Calendar,
+  Hash
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
@@ -81,6 +83,11 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   }
 
   const formattedPrice = mounted ? Number(product.price).toLocaleString() : product.price;
+  const formattedDate = product.createdAt ? (
+    typeof product.createdAt.toDate === 'function' 
+      ? product.createdAt.toDate().toLocaleDateString('ar-DZ') 
+      : new Date(product.createdAt).toLocaleDateString('ar-DZ')
+  ) : "غير متاح";
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
@@ -247,6 +254,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                             <span className="font-black text-primary">{product.condition === 'new' ? 'جديد' : 'مستعمل'}</span>
                          </div>
                          <div className="flex justify-between border-b pb-2">
+                            <span className="text-zinc-500 font-bold flex items-center gap-1">الكمية المتوفرة <Hash size={12} />:</span>
+                            <span className="font-black text-orange-600">{product.quantity || 1} قطعة</span>
+                         </div>
+                         <div className="flex justify-between border-b pb-2">
                             <span className="text-zinc-500 font-bold">المتجر:</span>
                             <span className="font-black text-orange-600">{product.sellerName}</span>
                          </div>
@@ -254,7 +265,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                             <span className="text-zinc-500 font-bold">نوع الطاقة:</span>
                             <span className="font-black text-primary">{product.fuelType || "غير محدد"}</span>
                          </div>
-                         {/* عرض نوع المحرك إذا توفر */}
                          {product.engineType && (
                            <div className="flex justify-between border-b pb-2">
                               <span className="text-zinc-500 font-bold flex items-center gap-1">نوع المحرك <Cpu size={12} />:</span>
@@ -274,6 +284,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                          <div className="flex justify-between border-b pb-2">
                             <span className="text-zinc-500 font-bold">السنة:</span>
                             <span className="font-black text-primary">{product.year}</span>
+                         </div>
+                         <div className="flex justify-between border-b pb-2">
+                            <span className="text-zinc-500 font-bold flex items-center gap-1">تاريخ النشر <Calendar size={12} />:</span>
+                            <span className="font-black text-zinc-500">{formattedDate}</span>
                          </div>
                       </div>
                    </div>

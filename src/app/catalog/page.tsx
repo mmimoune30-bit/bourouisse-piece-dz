@@ -188,6 +188,7 @@ function CatalogContent() {
                         category={product.category}
                         seller={product.sellerName}
                         condition={product.condition === 'new' ? 'New' : 'Used'}
+                        createdAt={product.createdAt}
                      />
                    ))
                  ) : (
