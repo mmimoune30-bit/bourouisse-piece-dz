@@ -22,12 +22,12 @@ const BANNERS = [
     hint: "parts warehouse",
     ar: {
       title: "اشترك معنا واعرض منتجاتك",
-      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين في كافة الولايات.",
+      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين.",
       button: "سجل كبائع"
     },
     en: {
       title: "Join Us & List Your Products",
-      description: "List new and used spare parts and reach thousands of buyers across all wilayas.",
+      description: "List new and used spare parts and reach thousands of buyers.",
       button: "Register as Seller"
     }
   },
@@ -43,7 +43,7 @@ const BANNERS = [
     },
     en: {
       title: "Find Auto Parts Easily",
-      description: "Advanced search by brand, model and manufacturing year with extreme precision.",
+      description: "Advanced search by brand, model and manufacturing year.",
       button: "Start Searching"
     }
   },
@@ -106,7 +106,6 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      {/* Reduced padding-top from 215px to 145px to match smaller navbar height */}
       <main className="flex-grow pt-[145px]">
         <section className="relative w-full">
           <Carousel 
@@ -120,7 +119,7 @@ export default function Home() {
                 const content = lang === "AR" ? banner.ar : banner.en;
                 return (
                   <CarouselItem key={banner.id}>
-                    <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
+                    <div className="relative h-[250px] flex items-center justify-center overflow-hidden">
                       <Link href={banner.link} className="absolute inset-0 z-0 group cursor-pointer block">
                         <Image
                           src={banner.image}
@@ -138,24 +137,24 @@ export default function Home() {
                           "max-w-4xl transition-all duration-1000 transform translate-y-0 opacity-100 pointer-events-auto",
                           lang === "AR" ? "mr-auto text-right" : "ml-auto text-left"
                         )} dir={lang === "AR" ? "rtl" : "ltr"}>
-                          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-4 uppercase drop-shadow-2xl leading-tight">
+                          <h1 className="text-2xl md:text-4xl font-black text-white tracking-tighter mb-2 uppercase drop-shadow-2xl leading-tight">
                             {content.title}
                           </h1>
-                          <p className="text-base md:text-xl text-secondary font-bold italic mb-8 leading-relaxed max-w-2xl opacity-90">
+                          <p className="text-sm md:text-lg text-secondary font-bold italic mb-4 leading-relaxed max-w-2xl opacity-90 line-clamp-1">
                             {content.description}
                           </p>
                           <div className={cn(
-                            "flex flex-col sm:flex-row gap-4",
+                            "flex flex-col sm:flex-row gap-3",
                             lang === "AR" ? "sm:justify-start" : "sm:justify-start"
                           )}>
                             <Link href={banner.link}>
-                              <Button size="lg" className="h-16 px-10 text-xl font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-2xl shadow-2xl">
-                                {content.button} {lang === 'AR' ? <ArrowLeft size={20} /> : <ChevronRight size={20} />}
+                              <Button size="lg" className="h-12 px-8 text-lg font-black gap-2 bg-secondary text-primary hover:bg-white transition-all rounded-xl shadow-2xl">
+                                {content.button} {lang === 'AR' ? <ArrowLeft size={18} /> : <ChevronRight size={18} />}
                               </Button>
                             </Link>
                             <Link href="/catalog">
-                              <Button size="lg" variant="outline" className="h-16 px-10 text-xl font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-2xl shadow-2xl">
-                                {lang === 'AR' ? 'تصفح كافة القطع' : 'Browse All Parts'}
+                              <Button size="lg" variant="outline" className="h-12 px-8 text-lg font-black border-2 border-white text-white hover:bg-white hover:text-primary transition-all rounded-xl shadow-2xl">
+                                {lang === 'AR' ? 'تصفح الكل' : 'Browse All'}
                               </Button>
                             </Link>
                           </div>
@@ -167,15 +166,15 @@ export default function Home() {
               })}
             </CarouselContent>
             
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
-               <div className="flex gap-3">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+               <div className="flex gap-2">
                  {BANNERS.map((_, index) => (
                    <button
                      key={index}
                      onClick={() => onDotButtonClick(index)}
                      className={cn(
-                       "w-3 h-3 rounded-full transition-all duration-300",
-                       current === index ? "bg-secondary w-8" : "bg-white/40 hover:bg-white/60"
+                       "w-2 h-2 rounded-full transition-all duration-300",
+                       current === index ? "bg-secondary w-6" : "bg-white/40 hover:bg-white/60"
                      )}
                    />
                  ))}
