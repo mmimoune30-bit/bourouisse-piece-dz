@@ -128,15 +128,15 @@ export default function Home() {
 
       <main className="flex-grow pt-[170px]">
         {/* Hero Section - Exclusive Stores Slider */}
-        <section className="container mx-auto px-4 mt-6">
-          <div className="flex flex-col md:flex-row-reverse gap-4" dir="rtl">
-            <div className="md:w-3/4 h-[250px] bg-white rounded-[32px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
-              <div className="bg-primary/5 px-6 py-3 border-b flex items-center justify-between shrink-0 z-20">
-                 <h2 className="font-black text-primary flex items-center gap-2">
-                   <Crown size={18} className="text-secondary fill-secondary" /> متاجر حصرية
+        <section className="container mx-auto px-4 mt-2">
+          <div className="flex flex-col md:flex-row-reverse gap-3" dir="rtl">
+            <div className="md:w-3/4 h-[200px] bg-white rounded-[24px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
+              <div className="bg-primary/5 px-6 py-2 border-b flex items-center justify-between shrink-0 z-20">
+                 <h2 className="font-black text-sm text-primary flex items-center gap-2">
+                   <Crown size={16} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline flex items-center gap-1">
-                   تصفح كافة المتاجر <ArrowLeft size={14} />
+                 <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">
+                   تصفح كافة المتاجر <ArrowLeft size={12} />
                  </Link>
               </div>
               
@@ -145,17 +145,17 @@ export default function Home() {
                   <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
-                    <CarouselContent className="h-[194px]">
+                    <CarouselContent className="h-[156px]">
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
-                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-8 px-10 hover:bg-zinc-50/50 transition-colors group">
-                            <div className="w-32 h-32 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0">
+                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-6 px-8 hover:bg-zinc-50/50 transition-colors group">
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden relative border-4 border-white shadow-lg shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
-                            <div className="flex flex-col gap-2 text-right">
-                               <Badge className="bg-secondary text-primary font-black w-fit mr-auto"><Crown size={12} /> متجر حصري</Badge>
-                               <h3 className="font-black text-3xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-sm text-muted-foreground font-bold flex items-center gap-2 justify-end"><MapPin size={16} className="text-secondary" /> {campaign.storeLocation}</p>
+                            <div className="flex flex-col gap-1 text-right">
+                               <Badge className="bg-secondary text-primary font-black text-[10px] w-fit mr-auto py-0 h-5"><Crown size={10} /> متجر حصري</Badge>
+                               <h3 className="font-black text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-xs text-muted-foreground font-bold flex items-center gap-2 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -163,7 +163,7 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold italic px-10 text-center">
+                  <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold italic px-10 text-center text-xs">
                     لا توجد إعلانات حصرية نشطة حالياً. اشترك لظهور متجرك هنا!
                   </div>
                 )}
@@ -171,9 +171,9 @@ export default function Home() {
             </div>
 
             {/* Static Promotions Slider */}
-            <div className="md:w-1/4 h-[250px] relative rounded-[32px] overflow-hidden group shadow-xl border-4 border-white">
+            <div className="md:w-1/4 h-[200px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
-                <CarouselContent className="h-[250px]">
+                <CarouselContent className="h-[200px]">
                   {BANNERS.map((banner) => {
                     const content = lang === "AR" ? banner.ar : banner.en;
                     return (
@@ -181,9 +181,9 @@ export default function Home() {
                         <div className="relative h-full w-full flex items-center justify-center">
                           <Image src={banner.image} alt={content.title} fill className="object-cover" priority />
                           <div className="absolute inset-0 bg-black/70" />
-                          <div className="relative z-10 p-6 text-center text-white space-y-3">
-                             <h3 className="text-xl font-black">{content.title}</h3>
-                             <Link href={banner.link} className="block"><Button size="sm" className="w-full bg-secondary text-primary font-black rounded-xl">{content.button}</Button></Link>
+                          <div className="relative z-10 p-4 text-center text-white space-y-2">
+                             <h3 className="text-sm font-black leading-tight">{content.title}</h3>
+                             <Link href={banner.link} className="block"><Button size="sm" className="w-full h-8 text-xs bg-secondary text-primary font-black rounded-lg">{content.button}</Button></Link>
                           </div>
                         </div>
                       </CarouselItem>
@@ -195,21 +195,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Horizontal Scrollable Buttons */}
-        <section className="container mx-auto px-4 py-10 mt-4">
-          <div className="flex flex-col md:flex-row-reverse justify-between items-center mb-6 gap-3 border-b pb-4">
+        {/* Categories Section - Compact and Horizontal */}
+        <section className="container mx-auto px-4 py-4 mt-2">
+          <div className="flex flex-row-reverse justify-between items-center mb-4 gap-3 border-b pb-2">
              <div className="text-right">
-                <h2 className="text-2xl font-black text-primary flex items-center justify-end gap-3">
-                   تصنيفات قطع الغيار <Tags size={24} className="text-secondary" />
+                <h2 className="text-lg font-black text-primary flex items-center justify-end gap-2">
+                   تصنيفات قطع الغيار <Tags size={18} className="text-secondary" />
                 </h2>
-                <p className="text-xs text-muted-foreground font-bold mt-1">تصفح الكتالوج حسب نوع القطعة التي تبحث عنها</p>
              </div>
              <Link href="/catalog">
-               <Button variant="link" className="text-secondary font-black gap-2">عرض كافة التصنيفات <ArrowLeft size={16} /></Button>
+               <Button variant="link" className="text-secondary font-black text-xs h-auto p-0">عرض الكل <ArrowLeft size={14} /></Button>
              </Link>
           </div>
           
-          <div className="flex flex-row-reverse gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4" dir="rtl">
+          <div className="flex flex-row-reverse gap-2 overflow-x-auto pb-2 no-scrollbar -mx-4 px-4" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => (
               <Link 
                 key={i} 
@@ -218,9 +217,9 @@ export default function Home() {
               >
                 <Button 
                   variant="outline" 
-                  className="h-14 px-8 rounded-2xl border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black transition-all shadow-sm active:scale-95 flex items-center gap-2"
+                  className="h-10 px-6 rounded-xl border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-xs transition-all shadow-sm active:scale-95 flex items-center gap-2"
                 >
-                  <PackageSearch size={18} className="opacity-40" />
+                  <PackageSearch size={14} className="opacity-40" />
                   {lang === 'AR' ? cat.ar : cat.en}
                 </Button>
               </Link>
@@ -228,27 +227,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Slider - Small Cards */}
+        {/* Featured Slider - More Compact */}
         {featuredStores && featuredStores.length > 0 && (
-          <section className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-between mb-6 flex-row-reverse">
-              <h2 className="text-2xl font-black text-primary flex items-center gap-2">
-                <Star size={20} className="text-blue-500 fill-blue-500" /> متاجر مميزة
+          <section className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between mb-4 flex-row-reverse">
+              <h2 className="text-lg font-black text-primary flex items-center gap-2">
+                <Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة
               </h2>
             </div>
             <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
               <CarouselContent className="-ml-4" dir="rtl">
                 {featuredStores.map((campaign, i) => (
-                  <CarouselItem key={i} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/4">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-6 rounded-[32px] border-2 border-transparent hover:border-blue-100 hover:shadow-xl transition-all block text-center space-y-4 h-full">
-                       <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden relative border-2 border-zinc-50 shadow-sm">
+                  <CarouselItem key={i} className="pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/5">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-4 rounded-[24px] border-2 border-transparent hover:border-blue-100 hover:shadow-md transition-all block text-center space-y-3 h-full">
+                       <div className="w-14 h-14 mx-auto rounded-xl overflow-hidden relative border-2 border-zinc-50 shadow-sm">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
                        <div>
-                         <h4 className="font-black text-primary truncate">{campaign.storeName}</h4>
-                         <p className="text-xs text-muted-foreground font-bold">{campaign.storeLocation}</p>
+                         <h4 className="font-black text-primary text-xs truncate">{campaign.storeName}</h4>
+                         <p className="text-[10px] text-muted-foreground font-bold">{campaign.storeLocation}</p>
                        </div>
-                       <Badge variant="outline" className="text-[10px] border-blue-200 text-blue-600 bg-blue-50">متجر مميز</Badge>
+                       <Badge variant="outline" className="text-[9px] h-4 border-blue-200 text-blue-600 bg-blue-50">مميز</Badge>
                     </Link>
                   </CarouselItem>
                 ))}
@@ -258,32 +257,32 @@ export default function Home() {
         )}
 
         {/* Live Stores Section - All Verified */}
-        <section className="container mx-auto px-4 py-16">
-          <div className={cn("flex items-center justify-between mb-8 border-b-4 border-secondary pb-3", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <h2 className="text-3xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
-             <Link href="/catalog" className="text-sm font-bold text-muted-foreground hover:text-secondary">{lang === 'AR' ? 'مشاهدة المزيد' : 'View More'}</Link>
+        <section className="container mx-auto px-4 py-8">
+          <div className={cn("flex items-center justify-between mb-6 border-b-2 border-secondary pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+             <h2 className="text-xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
+             <Link href="/catalog" className="text-xs font-bold text-muted-foreground hover:text-secondary">{lang === 'AR' ? 'مشاهدة المزيد' : 'View More'}</Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8" dir="rtl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" dir="rtl">
             {loadingStores ? (
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-32 bg-zinc-200 animate-pulse rounded-3xl" />)
+              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 bg-zinc-200 animate-pulse rounded-2xl" />)
             ) : allStores?.length > 0 ? (
               allStores.slice(0, 12).map((store) => (
-                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-6 rounded-3xl shadow-sm border hover:shadow-xl transition-all flex items-center gap-6 flex-row-reverse text-right group">
-                   <div className="w-20 h-20 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shrink-0">
+                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 rounded-2xl shadow-sm border hover:shadow-lg transition-all flex items-center gap-4 flex-row-reverse text-right group">
+                   <div className="w-16 h-16 rounded-xl overflow-hidden relative border-2 border-zinc-100 shrink-0">
                      <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" />
                    </div>
                    <div className="flex-grow">
-                      <h3 className="font-black text-xl text-primary group-hover:text-secondary transition-colors">{store.name}</h3>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
-                      <div className="mt-2 flex items-center gap-2 justify-end">
-                        <ShieldCheck size={16} className="text-green-500" />
-                        <span className="text-[10px] font-black text-zinc-400 uppercase">متجر معتمد</span>
+                      <h3 className="font-black text-base text-primary group-hover:text-secondary transition-colors line-clamp-1">{store.name}</h3>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={12} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
+                      <div className="mt-1 flex items-center gap-1 justify-end">
+                        <ShieldCheck size={14} className="text-green-500" />
+                        <span className="text-[9px] font-black text-zinc-400 uppercase">متجر معتمد</span>
                       </div>
                    </div>
                 </Link>
               ))
             ) : (
-              <div className="col-span-full py-20 text-center text-muted-foreground font-bold">لا توجد متاجر نشطة حالياً في النظام.</div>
+              <div className="col-span-full py-10 text-center text-muted-foreground font-bold text-sm">لا توجد متاجر نشطة حالياً في النظام.</div>
             )}
           </div>
         </section>
@@ -292,3 +291,4 @@ export default function Home() {
     </div>
   );
 }
+
