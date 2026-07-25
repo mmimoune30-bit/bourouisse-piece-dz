@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -7,7 +8,7 @@ import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store, ExternalLink, Crown, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store, ExternalLink, Crown, Sparkles, Loader2, Tags, PackageSearch } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where, updateDoc, doc, increment } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
+import { PART_CATEGORIES } from "@/lib/vehicle-data";
 
 const BANNERS = [
   {
@@ -193,9 +195,42 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Categories Section - Horizontal Scrollable Buttons */}
+        <section className="container mx-auto px-4 py-10 mt-4">
+          <div className="flex flex-col md:flex-row-reverse justify-between items-center mb-6 gap-3 border-b pb-4">
+             <div className="text-right">
+                <h2 className="text-2xl font-black text-primary flex items-center justify-end gap-3">
+                   تصنيفات قطع الغيار <Tags size={24} className="text-secondary" />
+                </h2>
+                <p className="text-xs text-muted-foreground font-bold mt-1">تصفح الكتالوج حسب نوع القطعة التي تبحث عنها</p>
+             </div>
+             <Link href="/catalog">
+               <Button variant="link" className="text-secondary font-black gap-2">عرض كافة التصنيفات <ArrowLeft size={16} /></Button>
+             </Link>
+          </div>
+          
+          <div className="flex flex-row-reverse gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4" dir="rtl">
+            {PART_CATEGORIES.map((cat, i) => (
+              <Link 
+                key={i} 
+                href={`/catalog?category=${encodeURIComponent(cat.en)}`}
+                className="shrink-0"
+              >
+                <Button 
+                  variant="outline" 
+                  className="h-14 px-8 rounded-2xl border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black transition-all shadow-sm active:scale-95 flex items-center gap-2"
+                >
+                  <PackageSearch size={18} className="opacity-40" />
+                  {lang === 'AR' ? cat.ar : cat.en}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* Featured Slider - Small Cards */}
         {featuredStores && featuredStores.length > 0 && (
-          <section className="container mx-auto px-4 py-12">
+          <section className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-6 flex-row-reverse">
               <h2 className="text-2xl font-black text-primary flex items-center gap-2">
                 <Star size={20} className="text-blue-500 fill-blue-500" /> متاجر مميزة
