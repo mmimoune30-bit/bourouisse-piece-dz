@@ -10,6 +10,10 @@ import {
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
+/**
+ * خطاف مخصص للاستماع لمجموعات البيانات في Firestore.
+ * تم تحسين معالجة الأخطاء لمنع الوصول للخصائص الداخلية التي تسبب أخطاء Assertion.
+ */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,8 +36,9 @@ export function useCollection(query: Query | null) {
         setLoading(false);
       },
       async (err) => {
+        // نستخدم وصفاً نصياً بدلاً من محاولة جلب المسار من الخصائص الداخلية غير المستقرة
         const permError = new FirestorePermissionError({
-          path: (query as any)._query?.path?.toString() || 'unknown',
+          path: 'firestore_collection_query',
           operation: 'list'
         });
         errorEmitter.emit('permission-error', permError);

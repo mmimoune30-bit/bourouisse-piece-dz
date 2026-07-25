@@ -10,6 +10,9 @@ import {
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
+/**
+ * خطاف مخصص للاستماع لمستند واحد في Firestore.
+ */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +32,7 @@ export function useDoc(docRef: DocumentReference | null) {
       },
       async (err) => {
         const permError = new FirestorePermissionError({
-          path: docRef.path,
+          path: docRef.path || 'firestore_doc_query',
           operation: 'get'
         });
         errorEmitter.emit('permission-error', permError);
