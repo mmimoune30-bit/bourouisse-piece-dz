@@ -87,46 +87,41 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layers 2 & 3 (Only on Home Page) */}
-      {isHome && (
-        <>
-          {/* Layer 2: Main Branding */}
-          <div className="bg-white py-2 border-b">
-            <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
-              {/* Site Logo */}
-              <Link href="/" className="hover:opacity-90 transition-opacity">
-                <SiteLogo />
-              </Link>
+      {/* Layer 2: Main Branding - Now Global */}
+      <div className="bg-white py-2 border-b">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
+          {/* Site Logo */}
+          <Link href="/" className="hover:opacity-90 transition-opacity">
+            <SiteLogo />
+          </Link>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 justify-center" dir="rtl">
-                <Link href="/seller/register">
-                  <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-12 px-6 transition-all active:scale-95">
-                    <Store size={18} /> كن بائعاً معنا
-                  </Button>
-                </Link>
-                <Link href="/join">
-                  <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 px-6 transition-all">
-                    <UserPlus size={18} /> إضافة حساب
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12 px-4">
-                    <LogIn size={18} /> دخول
-                  </Button>
-                </Link>
-              </div>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3 justify-center" dir="rtl">
+            <Link href="/seller/register">
+              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-12 px-6 transition-all active:scale-95">
+                <Store size={18} /> كن بائعاً معنا
+              </Button>
+            </Link>
+            <Link href="/join">
+              <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 px-6 transition-all">
+                <UserPlus size={18} /> إضافة حساب
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12 px-4">
+                <LogIn size={18} /> دخول
+              </Button>
+            </Link>
           </div>
+        </div>
+      </div>
 
-          {/* Layer 3: Search Bar - Changed to White Background */}
-          <div className="bg-white py-1.5 border-b shadow-sm relative">
-            <div className="container mx-auto px-4 relative z-10">
-              <AISearchBox />
-            </div>
-          </div>
-        </>
-      )}
+      {/* Layer 3: Global Smart Search Bar */}
+      <div className="bg-white py-1.5 border-b shadow-sm relative">
+        <div className="container mx-auto px-4 relative z-10">
+          <AISearchBox />
+        </div>
+      </div>
     </nav>
   );
 }

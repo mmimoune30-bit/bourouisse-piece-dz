@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -10,7 +9,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[235px] pb-12">
+      <main className="flex-grow pt-[170px] pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <Card className="border-none shadow-2xl rounded-[40px] overflow-hidden bg-white">
             <div className="bg-primary p-10 text-white text-center">

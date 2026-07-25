@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -125,7 +124,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[145px]">
+      <main className="flex-grow pt-[170px]">
         {/* Hero Section - Exclusive Stores Slider */}
         <section className="container mx-auto px-4 mt-6">
           <div className="flex flex-col md:flex-row-reverse gap-4" dir="rtl">
