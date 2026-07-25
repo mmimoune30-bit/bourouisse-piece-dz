@@ -28,6 +28,10 @@ export default function Navbar() {
   const isHome = pathname === "/";
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
+  // الصفحات التي يجب إخفاء خانة البحث فيها
+  const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
+  const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
+
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
     if (savedLang) setLang(savedLang);
@@ -87,7 +91,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding - Now Global */}
+      {/* Layer 2: Main Branding */}
       <div className="bg-white py-2 border-b">
         <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
           {/* Site Logo */}
@@ -116,12 +120,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 3: Global Smart Search Bar */}
-      <div className="bg-white py-1.5 border-b shadow-sm relative">
-        <div className="container mx-auto px-4 relative z-10">
-          <AISearchBox />
+      {/* Layer 3: Global Smart Search Bar - Hidden on Auth Routes */}
+      {showSearch && (
+        <div className="bg-white py-1.5 border-b shadow-sm relative">
+          <div className="container mx-auto px-4 relative z-10">
+            <AISearchBox />
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
