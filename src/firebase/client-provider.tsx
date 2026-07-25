@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { initializeFirebase } from './index';
+import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
 /**
  * مزود Firebase للعميل (Client Provider).
- * يضمن تهيئة Firebase بعد تحميل المكون في المتصفح فقط لمنع أخطاء الحالة الداخلية.
+ * يضمن تهيئة Firebase بعد تحميل المكون في المتصفح فقط لكسر التعارضات.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [instances, setInstances] = useState<{
@@ -16,7 +16,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
 
   useEffect(() => {
-    // يتم التنفيذ فقط في المتصفح بعد الهيدريشن (Hydration)
+    // يتم التنفيذ فقط في المتصفح بعد الهيدريشن
     const firebase = initializeFirebase();
     setInstances({
       app: firebase.app || null,
@@ -25,8 +25,6 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
     });
   }, []);
 
-  // إذا لم تكتمل التهيئة بعد، نقوم بعرض الأطفال مع قيم null للمزود
-  // لضمان عدم توقف الموقع عن العمل أثناء التحميل الأولي
   return (
     <FirebaseProvider 
       firebaseApp={instances?.app || null} 
