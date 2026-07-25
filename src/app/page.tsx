@@ -57,18 +57,28 @@ export default function Home() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN">("AR");
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
 
-  // جلب كافة الحملات الإعلانية النشطة
+  // جلب كافة الحملات الإعلانية
   const allCampaignsQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(
-      collection(firestore, "featured_stores"),
-      where("status", "==", "Active")
-    );
+    return collection(firestore, "featured_stores");
   }, [firestore]);
 
-  // جلب كافة المتاجر المعتمدة (Seller) لعرضها في الأسفل
+  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(allCampaignsQuery);
+
+  const exclusiveStores = useMemo(() => {
+    return (allCampaigns || [])
+      .filter(c => c.tier === "Exclusive" && c.status === "Active")
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [allCampaigns]);
+
+  const featuredStores = useMemo(() => {
+    return (allCampaigns || [])
+      .filter(c => c.tier === "Featured" && c.status === "Active")
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [allCampaigns]);
+
+  // جلب كافة المتاجر المعتمدة
   const allStoresQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -78,20 +88,7 @@ export default function Home() {
     );
   }, [firestore]);
 
-  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(allCampaignsQuery);
   const { data: allStores, loading: loadingStores } = useCollection(allStoresQuery);
-
-  const exclusiveStores = useMemo(() => {
-    return (allCampaigns || [])
-      .filter(c => c.tier === "Exclusive")
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }, [allCampaigns]);
-
-  const featuredStores = useMemo(() => {
-    return (allCampaigns || [])
-      .filter(c => c.tier === "Featured")
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }, [allCampaigns]);
 
   useEffect(() => {
     const checkLang = () => {
@@ -102,13 +99,6 @@ export default function Home() {
     window.addEventListener("languageChange", checkLang);
     return () => window.removeEventListener("languageChange", checkLang);
   }, []);
-
-  useEffect(() => {
-    if (!api) return;
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
 
   const handleStoreClick = (campaignId: string) => {
     if (!firestore) return;
@@ -128,7 +118,7 @@ export default function Home() {
             <div className="md:w-3/4 h-[250px] bg-white rounded-[32px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col">
               <div className="bg-primary/5 px-6 py-3 border-b flex items-center justify-between shrink-0">
                  <h2 className="font-black text-primary flex items-center gap-2">
-                   <Crown size={18} className="text-secondary fill-secondary" /> متاجر حصرية (إعلان ممول)
+                   <Crown size={18} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
                  <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline flex items-center gap-1">
                    تصفح كافة المتاجر <ArrowLeft size={14} />
@@ -137,20 +127,18 @@ export default function Home() {
               
               <div className="flex-grow relative">
                 {loadingCampaigns ? (
-                  <div className="h-full w-full flex items-center justify-center animate-pulse bg-zinc-50"><Loader2 className="animate-spin text-primary" /></div>
+                  <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
-                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
+                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
                     <CarouselContent className="h-[194px]">
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
                           <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-8 px-10 hover:bg-zinc-50/50 transition-colors group">
-                            <div className="w-32 h-32 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0 group-hover:scale-105 transition-transform">
-                               <Image src={campaign.storeLogo || "https://picsum.photos/seed/store/200/200"} alt={campaign.storeName} fill className="object-cover" />
+                            <div className="w-32 h-32 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0">
+                               <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
                             <div className="flex flex-col gap-2 text-right">
-                               <div className="flex items-center gap-2 justify-end">
-                                  <Badge className="bg-secondary text-primary font-black px-3 py-1 flex items-center gap-1"><Crown size={12} /> حصري</Badge>
-                               </div>
+                               <Badge className="bg-secondary text-primary font-black w-fit mr-auto"><Crown size={12} /> متجر حصري</Badge>
                                <h3 className="font-black text-3xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
                                <p className="text-sm text-muted-foreground font-bold flex items-center gap-2 justify-end"><MapPin size={16} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
@@ -166,19 +154,18 @@ export default function Home() {
             </div>
 
             <div className="md:w-1/4 h-[250px] relative rounded-[32px] overflow-hidden group shadow-xl border-4 border-white">
-              <Carousel className="w-full h-full" opts={{ loop: true, duration: 50 }} plugins={[Autoplay({ delay: 4000, stopOnInteraction: true }), Fade()]}>
+              <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-[250px]">
                   {BANNERS.map((banner) => {
                     const content = lang === "AR" ? banner.ar : banner.en;
                     return (
                       <CarouselItem key={banner.id} className="h-full">
                         <div className="relative h-full w-full flex items-center justify-center">
-                          <Image src={banner.image} alt={content.title} fill className="object-cover animate-ken-burns" priority />
-                          <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" />
+                          <Image src={banner.image} alt={content.title} fill className="object-cover" priority />
+                          <div className="absolute inset-0 bg-black/70" />
                           <div className="relative z-10 p-6 text-center text-white space-y-3">
-                             <h3 className="text-xl font-black leading-tight tracking-tight">{content.title}</h3>
-                             <p className="text-[10px] text-blue-100 font-bold opacity-80 line-clamp-2">{content.description}</p>
-                             <Link href={banner.link} className="block"><Button size="sm" className="w-full bg-secondary text-primary font-black rounded-xl h-10 shadow-lg">{content.button}</Button></Link>
+                             <h3 className="text-xl font-black">{content.title}</h3>
+                             <Link href={banner.link} className="block"><Button size="sm" className="w-full bg-secondary text-primary font-black rounded-xl">{content.button}</Button></Link>
                           </div>
                         </div>
                       </CarouselItem>
@@ -201,7 +188,7 @@ export default function Home() {
                 {featuredStores.map((campaign, i) => (
                   <CarouselItem key={i} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/4">
                     <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-6 rounded-[32px] border-2 border-transparent hover:border-blue-100 hover:shadow-xl transition-all block text-center space-y-4">
-                       <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden relative border-2 border-zinc-50 shadow-sm"><Image src={campaign.storeLogo || "https://picsum.photos/seed/store/200/200"} alt={campaign.storeName} fill className="object-cover" /></div>
+                       <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden relative border-2 border-zinc-50 shadow-sm"><Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" /></div>
                        <div><h4 className="font-black text-primary truncate">{campaign.storeName}</h4><p className="text-xs text-muted-foreground font-bold">{campaign.storeLocation}</p></div>
                        <Badge variant="outline" className="text-[10px] border-blue-200 text-blue-600 bg-blue-50">متجر مميز</Badge>
                     </Link>

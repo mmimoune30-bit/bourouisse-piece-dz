@@ -33,15 +33,22 @@ export default function FeaturedStoresAdmin() {
   const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // States for the controlled form
   const [selectedStoreId, setSelectedStoreId] = useState<string>("");
+  const [selectedTier, setSelectedTier] = useState<string>("Featured");
+  const [selectedPlacement, setSelectedPlacement] = useState<string>("Home");
+  const [priority, setPriority] = useState<string>("10");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
-  // جلب كافة المتاجر (Seller) بدون فلترة الحالة للسماح بتمييز أي متجر
+  // جلب كافة المتاجر (Seller)
   const sellersQuery = useMemo(() => {
     if (!firestore) return null;
     return query(collection(firestore, "users"), where("role", "==", "Seller"));
   }, [firestore]);
 
-  // جلب الحملات بدون orderBy لتجنب الحاجة للفهارس (Indexes)
+  // جلب الحملات
   const campaignsQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_stores");
@@ -50,24 +57,22 @@ export default function FeaturedStoresAdmin() {
   const { data: sellersList, loading: loadingSellers } = useCollection(sellersQuery);
   const { data: campaigns, loading: loadingCampaigns } = useCollection(campaignsQuery);
 
-  // ترتيب الحملات برمجياً في الذاكرة بدلاً من Firestore
   const sortedCampaigns = useMemo(() => {
     return [...(campaigns || [])].sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [campaigns]);
 
-  const handleAddCampaign = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firestore || !selectedStoreId) {
-      toast({ variant: "destructive", title: "تنبيه", description: "يرجى اختيار متجر من القائمة أولاً." });
+    if (!firestore || !selectedStoreId || !startDate || !endDate) {
+      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى اختيار المتجر وتحديد المواعيد." });
       return;
     }
     
     setLoading(true);
-    const formData = new FormData(e.currentTarget);
-    const store = sellersList.find(s => s.id === selectedStoreId);
+    const store = (sellersList || []).find(s => s.id === selectedStoreId);
 
     if (!store) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر العثور على بيانات المتجر المختار." });
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر العثور على بيانات المتجر." });
       setLoading(false);
       return;
     }
@@ -77,11 +82,11 @@ export default function FeaturedStoresAdmin() {
       storeName: store.name || "Unknown Store",
       storeLocation: store.wilaya || "غير محدد",
       storeLogo: store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name || 'Store'}`,
-      tier: formData.get("tier") as string,
-      placement: formData.get("placement") as string,
-      priority: Number(formData.get("priority")),
-      startDate: formData.get("startDate") as string,
-      endDate: formData.get("endDate") as string,
+      tier: selectedTier,
+      placement: selectedPlacement,
+      priority: Number(priority),
+      startDate,
+      endDate,
       status: "Active",
       stats: { impressions: 0, clicks: 0 },
       createdAt: serverTimestamp()
@@ -91,14 +96,16 @@ export default function FeaturedStoresAdmin() {
       .then(() => {
         toast({ 
           title: "تم التفعيل بنجاح ✅", 
-          description: `المتجر ${data.storeName} أصبح الآن ضمن القائمة المميزة.` 
+          description: `المتجر ${data.storeName} متاح الآن في المساحات المميزة.` 
         });
         setIsAddOpen(false);
+        // Reset form
         setSelectedStoreId("");
+        setStartDate("");
+        setEndDate("");
         setLoading(false);
       })
       .catch(async (err) => {
-        console.error("ADD CAMPAIGN ERROR:", err);
         const permissionError = new FirestorePermissionError({
           path: "featured_stores",
           operation: 'create',
@@ -130,12 +137,12 @@ export default function FeaturedStoresAdmin() {
 
   return (
     <div className="space-y-8 text-right" dir="rtl">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
              إدارة المتاجر المميزة <Crown size={32} className="text-secondary" />
           </h1>
-          <p className="text-muted-foreground mt-1">تفعيل ميزات الظهور الحصري للمتاجر الموثقة.</p>
+          <p className="text-muted-foreground mt-1">تفعيل ميزات الظهور الحصري والممول للمتاجر.</p>
         </div>
         
         <div className="flex gap-4">
@@ -148,7 +155,7 @@ export default function FeaturedStoresAdmin() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Dialog open={isAddOpen} onOpenChange={(val) => { setIsAddOpen(val); if(!val) setSelectedStoreId(""); }}>
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
              <DialogTrigger asChild>
                <Button className="font-black gap-2 h-12 px-8 shadow-xl bg-primary text-white">
                   <Plus size={18} /> إضافة متجر للقائمة
@@ -162,32 +169,20 @@ export default function FeaturedStoresAdmin() {
                    
                    <div className="grid gap-6 py-6 text-right">
                       <div className="space-y-2">
-                         <Label className="font-bold">اختر المتجر من قائمة كافة المتاجر</Label>
-                         <Select 
-                          value={selectedStoreId} 
-                          onValueChange={setSelectedStoreId}
-                          required
-                         >
+                         <Label className="font-bold">اختر المتجر</Label>
+                         <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
                             <SelectTrigger className="h-14 border-2 bg-white text-right">
-                               <SelectValue placeholder={loadingSellers ? "جاري التحميل..." : "اختر المتجر من هنا..."} />
+                               <SelectValue placeholder={loadingSellers ? "جاري التحميل..." : "اختر المتجر..."} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
-                               {loadingSellers ? (
-                                 <div className="flex items-center justify-center p-4"><Loader2 className="animate-spin text-primary" /></div>
-                               ) : sellersList?.length > 0 ? (
-                                 sellersList.map(s => (
-                                   <SelectItem key={s.id} value={s.id} className="text-right">
-                                     <div className="flex flex-col text-right">
-                                        <span className="font-bold">{s.name}</span>
-                                        <span className={cn("text-[10px]", s.status === 'Active' ? 'text-green-600' : 'text-red-500')}>
-                                          {s.status === 'Active' ? 'نشط/معتمد' : 'محظور'} - {s.wilaya || 'بدون ولاية'}
-                                        </span>
-                                     </div>
-                                   </SelectItem>
-                                 ))
-                               ) : (
-                                 <div className="p-4 text-center text-xs font-bold text-muted-foreground">لا يوجد بائعين مسجلين حالياً</div>
-                               )}
+                               {sellersList?.map(s => (
+                                 <SelectItem key={s.id} value={s.id} className="text-right">
+                                   <div className="flex flex-col text-right">
+                                      <span className="font-bold">{s.name}</span>
+                                      <span className="text-[10px] text-muted-foreground">{s.wilaya} - {s.status === 'Active' ? 'نشط' : 'محظور'}</span>
+                                   </div>
+                                 </SelectItem>
+                               ))}
                             </SelectContent>
                          </Select>
                       </div>
@@ -195,34 +190,34 @@ export default function FeaturedStoresAdmin() {
                       <div className="grid grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label className="font-bold">فئة الإعلان</Label>
-                            <Select name="tier" defaultValue="Featured">
+                            <Select value={selectedTier} onValueChange={setSelectedTier}>
                                <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                                <SelectContent>
-                                  <SelectItem value="Exclusive">👑 متجر حصري (أعلى الصفحة)</SelectItem>
-                                  <SelectItem value="Featured">⭐ متجر مميز (قائمة عرضية)</SelectItem>
+                                  <SelectItem value="Exclusive">👑 متجر حصري</SelectItem>
+                                  <SelectItem value="Featured">⭐ متجر مميز</SelectItem>
                                 </SelectContent>
                             </Select>
                          </div>
                          <div className="space-y-2">
                             <Label className="font-bold">ترتيب الظهور (0-100)</Label>
-                            <Input name="priority" type="number" defaultValue="10" className="h-11 border-2" />
+                            <Input value={priority} onChange={(e) => setPriority(e.target.value)} type="number" className="h-11 border-2" />
                          </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                          <div className="space-y-2">
                             <Label className="font-bold">تاريخ البداية</Label>
-                            <Input name="startDate" type="date" className="h-11 border-2" required />
+                            <Input value={startDate} onChange={(e) => setStartDate(e.target.value)} type="date" className="h-11 border-2" required />
                          </div>
                          <div className="space-y-2">
                             <Label className="font-bold">تاريخ الانتهاء</Label>
-                            <Input name="endDate" type="date" className="h-11 border-2" required />
+                            <Input value={endDate} onChange={(e) => setEndDate(e.target.value)} type="date" className="h-11 border-2" required />
                          </div>
                       </div>
 
                       <div className="space-y-2">
                          <Label className="font-bold">مكان الظهور</Label>
-                         <Select name="placement" defaultValue="Home">
+                         <Select value={selectedPlacement} onValueChange={setSelectedPlacement}>
                             <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                             <SelectContent>
                                <SelectItem value="Home">الصفحة الرئيسية فقط</SelectItem>
@@ -232,8 +227,8 @@ export default function FeaturedStoresAdmin() {
                          </Select>
                       </div>
                    </div>
-                   <DialogFooter className="gap-2 sm:justify-start">
-                      <Button type="submit" disabled={loading || !selectedStoreId} className="font-black h-12 px-10 min-w-[150px]">
+                   <DialogFooter>
+                      <Button type="submit" disabled={loading} className="font-black h-12 px-10 w-full">
                          {loading ? <Loader2 className="animate-spin" /> : "تفعيل الميزة الآن"}
                       </Button>
                    </DialogFooter>
@@ -241,27 +236,6 @@ export default function FeaturedStoresAdmin() {
              </DialogContent>
           </Dialog>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-         <Card className="border-none shadow-sm bg-white p-6">
-            <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر حصرية</p><h3 className="text-3xl font-black text-primary">{sortedCampaigns.filter(c => c.tier === 'Exclusive').length}</h3></div>
-               <div className="p-3 bg-secondary/10 text-secondary rounded-xl"><Crown /></div>
-            </div>
-         </Card>
-         <Card className="border-none shadow-sm bg-white p-6">
-            <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-muted-foreground uppercase">متاجر مميزة</p><h3 className="text-3xl font-black text-blue-600">{sortedCampaigns.filter(c => c.tier === 'Featured').length}</h3></div>
-               <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Star /></div>
-            </div>
-         </Card>
-         <Card className="border-none shadow-sm bg-primary text-white p-6">
-            <div className="flex justify-between items-center">
-               <div><p className="text-xs font-black text-blue-100 uppercase">إجمالي الحملات</p><h3 className="text-3xl font-black text-secondary">{sortedCampaigns.length}</h3></div>
-               <div className="p-3 bg-white/10 text-white rounded-xl"><TrendingUp /></div>
-            </div>
-         </Card>
       </div>
 
       <Card className="border-none shadow-xl overflow-hidden rounded-[32px]">
@@ -272,19 +246,18 @@ export default function FeaturedStoresAdmin() {
                      <TableHead className="text-right pr-8">المتجر</TableHead>
                      <TableHead className="text-right">الفئة</TableHead>
                      <TableHead className="text-right">الأولوية</TableHead>
-                     <TableHead className="text-right">الفترة الزمنية</TableHead>
-                     <TableHead className="text-right">الأداء</TableHead>
-                     <TableHead className="text-left pl-8">الإجراءات</TableHead>
+                     <TableHead className="text-right">الحالة</TableHead>
+                     <TableHead className="text-left pl-8">إجراءات</TableHead>
                   </TableRow>
                </TableHeader>
                <TableBody>
                   {loadingCampaigns ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-20 animate-pulse font-bold">جاري تحميل الحملات...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center py-20 animate-pulse font-bold">جاري تحميل الحملات...</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-bold">لا توجد حملات إعلانية مفعلة حالياً.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center py-20 text-muted-foreground font-bold">لا توجد حملات إعلانية حالياً.</TableCell></TableRow>
                   ) : (
                     filtered.map((c) => (
-                      <TableRow key={c.id} className="hover:bg-zinc-50/50 transition-colors">
+                      <TableRow key={c.id} className="hover:bg-zinc-50/50">
                         <TableCell className="pr-8 py-4">
                            <div className="flex flex-col">
                               <span className="font-black text-primary">{c.storeName}</span>
@@ -292,25 +265,12 @@ export default function FeaturedStoresAdmin() {
                            </div>
                         </TableCell>
                         <TableCell>
-                           {c.tier === 'Exclusive' ? (
-                             <Badge className="bg-secondary text-primary font-black gap-1"><Crown size={12} /> حصري</Badge>
-                           ) : (
-                             <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50 font-black gap-1"><Star size={12} /> مميز</Badge>
-                           )}
+                           <Badge variant={c.tier === 'Exclusive' ? 'default' : 'outline'} className={cn(c.tier === 'Exclusive' ? 'bg-secondary text-primary' : 'text-blue-600 border-blue-200')}>
+                             {c.tier === 'Exclusive' ? 'حصري' : 'مميز'}
+                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono font-bold text-zinc-500">#{c.priority}</TableCell>
-                        <TableCell>
-                           <div className="flex flex-col text-[10px] font-bold">
-                              <span className="text-green-600">من: {c.startDate}</span>
-                              <span className="text-red-600">إلى: {c.endDate}</span>
-                           </div>
-                        </TableCell>
-                        <TableCell>
-                           <div className="flex items-center gap-4 text-xs font-black">
-                              <span className="flex items-center gap-1 text-blue-600"><Eye size={12} /> {c.stats?.impressions || 0}</span>
-                              <span className="flex items-center gap-1 text-orange-600"><TrendingUp size={12} /> {c.stats?.clicks || 0}</span>
-                           </div>
-                        </TableCell>
+                        <TableCell className="font-mono">#{c.priority}</TableCell>
+                        <TableCell><Badge className="bg-green-600">نشط</Badge></TableCell>
                         <TableCell className="text-left pl-8">
                            <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(c.id)}><Trash2 size={18} /></Button>
                         </TableCell>
