@@ -8,16 +8,34 @@ import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { ArrowLeft, MapPin, ChevronRight, ShieldCheck, Star, ArrowRight, Store, ExternalLink, Crown, Sparkles, Loader2, Tags, PackageSearch } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { 
+  ArrowLeft, 
+  MapPin, 
+  ChevronRight, 
+  ShieldCheck, 
+  Star, 
+  ArrowRight, 
+  Store, 
+  ExternalLink, 
+  Crown, 
+  Sparkles, 
+  Loader2, 
+  Tags, 
+  PackageSearch, 
+  ImagePlus,
+  Upload,
+  Camera
+} from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
-import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, updateDoc, doc, increment } from "firebase/firestore";
+import { useFirestore, useCollection, useUser } from "@/firebase";
+import { collection, query, where, updateDoc, doc, increment, setDoc } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
+import { toast } from "@/hooks/use-toast";
 
 const BANNERS = [
   {
@@ -56,8 +74,30 @@ const BANNERS = [
 
 export default function Home() {
   const { firestore } = useFirestore();
+  const { profile } = useUser();
   const [lang, setLang] = useState<"AR" | "EN">("AR");
   const [api, setApi] = useState<CarouselApi>();
+  const [uploadingCat, setUploadingCat] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentCatRef = useRef<string>("");
+
+  const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
+
+  // جلب ميتاداتا التصنيفات (الصور)
+  const categoryMetaQuery = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "categories_metadata");
+  }, [firestore]);
+
+  const { data: categoriesMeta } = useCollection(categoryMetaQuery);
+
+  const categoryImagesMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    categoriesMeta?.forEach(meta => {
+      map[meta.id] = meta.imageUrl;
+    });
+    return map;
+  }, [categoriesMeta]);
 
   // جلب كافة الحملات الإعلانية النشطة
   const allCampaignsQuery = useMemo(() => {
@@ -69,7 +109,7 @@ export default function Home() {
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  // المتاجر الحصرية (تظهر في السلايدر العلوي)
+  // المتاجر الحصرية
   const exclusiveStores = useMemo(() => {
     return (allCampaigns || [])
       .filter(c => 
@@ -81,7 +121,7 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  // المتاجر المميزة (تظهر في الشريط السفلي)
+  // المتاجر المميزة
   const featuredStores = useMemo(() => {
     return (allCampaigns || [])
       .filter(c => 
@@ -93,7 +133,7 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  // جلب كافة المتاجر المعتمدة (للقسم السفلي)
+  // جلب كافة المتاجر المعتمدة
   const allStoresQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -122,11 +162,67 @@ export default function Home() {
     });
   };
 
+  // معالجة رفع صورة التصنيف
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 400;
+          const MAX_HEIGHT = 400;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+          else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleUploadImage = async (categoryEn: string) => {
+    currentCatRef.current = categoryEn;
+    fileInputRef.current?.click();
+  };
+
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const catEn = currentCatRef.current;
+    if (!file || !firestore || !catEn) return;
+
+    setUploadingCat(catEn);
+    try {
+      const compressed = await compressImage(file);
+      await setDoc(doc(firestore, "categories_metadata", catEn), {
+        imageUrl: compressed,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      toast({ title: "تم التحديث", description: "تم تحديث صورة التصنيف بنجاح." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر رفع الصورة." });
+    } finally {
+      setUploadingCat(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
       <main className="flex-grow pt-[170px]">
+        {/* Hidden File Input for Admin */}
+        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
+
         {/* Hero Section - Exclusive Stores Slider */}
         <section className="container mx-auto px-4 mt-2">
           <div className="flex flex-col md:flex-row-reverse gap-3" dir="rtl">
@@ -170,7 +266,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Static Promotions Slider */}
             <div className="md:w-1/4 h-[200px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-[200px]">
@@ -195,7 +290,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Compact and Horizontal */}
+        {/* Categories Section - Now with Admin Image Upload */}
         <section className="container mx-auto px-4 py-4 mt-2">
           <div className="flex flex-row-reverse justify-between items-center mb-4 gap-3 border-b pb-2">
              <div className="text-right">
@@ -208,26 +303,51 @@ export default function Home() {
              </Link>
           </div>
           
-          <div className="flex flex-row-reverse gap-2 overflow-x-auto pb-2 no-scrollbar -mx-4 px-4" dir="rtl">
-            {PART_CATEGORIES.map((cat, i) => (
-              <Link 
-                key={i} 
-                href={`/catalog?category=${encodeURIComponent(cat.en)}`}
-                className="shrink-0"
-              >
-                <Button 
-                  variant="outline" 
-                  className="h-10 px-6 rounded-xl border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-xs transition-all shadow-sm active:scale-95 flex items-center gap-2"
-                >
-                  <PackageSearch size={14} className="opacity-40" />
-                  {lang === 'AR' ? cat.ar : cat.en}
-                </Button>
-              </Link>
-            ))}
+          <div className="flex flex-row-reverse gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4" dir="rtl">
+            {PART_CATEGORIES.map((cat, i) => {
+              const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
+              return (
+                <div key={i} className="flex flex-col items-center gap-2 shrink-0 group">
+                  <Link 
+                    href={`/catalog?category=${encodeURIComponent(cat.en)}`}
+                    className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/5 bg-white shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
+                  >
+                    <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                    <div className="absolute inset-0 bg-black/5" />
+                  </Link>
+                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
+                    <Button 
+                      variant="outline" 
+                      className="h-8 px-4 rounded-lg border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-[10px] transition-all"
+                    >
+                      {lang === 'AR' ? cat.ar : cat.en}
+                    </Button>
+                  </Link>
+                  
+                  {/* Admin Upload Trigger */}
+                  {isAdmin && (
+                    <button 
+                      onClick={() => handleUploadImage(cat.en)}
+                      disabled={uploadingCat === cat.en}
+                      className="mt-1 flex items-center gap-1 text-primary hover:text-secondary transition-colors"
+                    >
+                      {uploadingCat === cat.en ? (
+                        <Loader2 className="animate-spin" size={12} />
+                      ) : (
+                        <>
+                          <Camera size={12} />
+                          <span className="text-[9px] font-bold">تغيير الصورة</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 
-        {/* Featured Slider - More Compact */}
+        {/* Featured Slider */}
         {featuredStores && featuredStores.length > 0 && (
           <section className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4 flex-row-reverse">
@@ -291,4 +411,3 @@ export default function Home() {
     </div>
   );
 }
-
