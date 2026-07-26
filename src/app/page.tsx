@@ -39,14 +39,14 @@ import { toast } from "@/hooks/use-toast";
 const HERO_SIDE_BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/join-seller/400/300",
+    image: "https://picsum.photos/seed/join-seller/400/400",
     link: "/seller/register",
     title: "اشترك معنا واعرض منتجاتك",
     button: "سجل كبائع"
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/get-goods/400/300",
+    image: "https://picsum.photos/seed/get-goods/400/400",
     link: "/catalog",
     title: "اشترك معنا واحصل على سلعتك",
     button: "ابدأ التسوق"
@@ -176,8 +176,8 @@ export default function Home() {
 
         <section className="w-full px-1 md:px-1.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
-            {/* Exclusive Stores Slider */}
-            <div className="lg:w-3/4 h-[200px] md:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
+            {/* Exclusive Stores Slider - Precise Matched Height */}
+            <div className="lg:w-3/4 h-[280px] md:h-[320px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
               <div className="bg-primary/5 px-4 py-1 border-b flex items-center justify-between z-20">
                  <h2 className="font-black text-xs text-primary flex items-center gap-2">
                    <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
@@ -193,13 +193,13 @@ export default function Home() {
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
                           <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-4">
-                            <div className="w-20 h-20 md:w-32 md:h-32 rounded-xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
+                            <div className="w-24 h-24 md:w-48 md:h-48 rounded-xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
                             <div className="flex flex-col gap-1 text-right">
-                               <Badge className="bg-secondary text-primary font-black text-[9px] w-fit mr-auto">👑 متجر حصري</Badge>
-                               <h3 className="font-black text-lg md:text-3xl text-primary line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-xs text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={12} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <Badge className="bg-secondary text-primary font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
+                               <h3 className="font-black text-xl md:text-4xl text-primary line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-sm text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -212,8 +212,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Alternating Side Ads - Matched Height */}
-            <div className="lg:w-1/4 h-[200px] md:h-[220px] relative rounded-xl overflow-hidden shadow-sm">
+            {/* Alternating Side Ads - Precise Matched Height */}
+            <div className="lg:w-1/4 h-[280px] md:h-[320px] relative rounded-xl overflow-hidden shadow-sm">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-full">
                   {HERO_SIDE_BANNERS.map((banner) => (
@@ -221,10 +221,10 @@ export default function Home() {
                       <div className="relative h-full w-full flex items-center justify-center">
                         <Image src={banner.image} alt={banner.title} fill className="object-cover" />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-4 text-center text-white space-y-3">
-                           <h3 className="text-sm md:text-base font-black leading-tight">{banner.title}</h3>
+                        <div className="relative z-10 p-6 text-center text-white space-y-4">
+                           <h3 className="text-base md:text-xl font-black leading-tight">{banner.title}</h3>
                            <Link href={banner.link} className="block">
-                             <Button size="sm" className="w-full h-10 bg-secondary text-primary font-black rounded-lg text-xs md:text-sm">{banner.button}</Button>
+                             <Button className="w-full h-12 bg-secondary text-primary font-black rounded-lg text-sm md:text-base shadow-lg hover:bg-white transition-all">{banner.button}</Button>
                            </Link>
                         </div>
                       </div>
@@ -395,4 +395,3 @@ export default function Home() {
     </div>
   );
 }
-
