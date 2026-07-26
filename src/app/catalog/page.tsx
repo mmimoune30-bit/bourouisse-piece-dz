@@ -9,11 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES } from "@/lib/vehicle-data";
-import { Filter, Search, RotateCcw, X, SlidersHorizontal } from "lucide-react";
+import { Filter, Search, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 function CatalogContent() {
   const searchParams = useSearchParams();
@@ -169,7 +170,6 @@ function CatalogContent() {
                 <span className="opacity-70">{loading ? "..." : filteredProducts.length} قطعة</span>
               </div>
               
-              {/* Mobile Filter Trigger */}
               <div className="lg:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
@@ -191,7 +191,6 @@ function CatalogContent() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Desktop Sidebar */}
             <aside className="hidden lg:block lg:col-span-1">
               <Card className="border-none shadow-xl">
                 <CardContent className="p-6">
@@ -200,7 +199,6 @@ function CatalogContent() {
               </Card>
             </aside>
 
-            {/* Product Grid */}
             <div className="lg:col-span-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                  {loading ? (
@@ -223,7 +221,7 @@ function CatalogContent() {
                    ))
                  ) : (
                    <div className="col-span-full py-20 md:py-32 bg-white rounded-[32px] md:rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
-                      <Search size={48} md:size={64} className="opacity-10 mb-4" />
+                      <Search className="opacity-10 mb-4 w-12 h-12 md:w-16 md:h-16" />
                       <p className="font-black text-base md:text-lg text-primary/40 px-6 text-center">لا توجد نتائج مطابقة لبحثك حالياً</p>
                       <Button variant="link" onClick={handleReset} className="mt-2 font-bold text-secondary">إظهار كافة القطع</Button>
                    </div>

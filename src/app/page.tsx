@@ -6,7 +6,6 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -15,15 +14,12 @@ import {
   Star, 
   ArrowRight, 
   Store, 
-  ExternalLink, 
   Crown, 
   Sparkles, 
   Loader2, 
   Tags, 
-  PackageSearch, 
-  ImagePlus,
-  Upload,
-  Camera
+  Camera,
+  Search
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
@@ -41,7 +37,6 @@ const BANNERS = [
     id: 1,
     image: "https://picsum.photos/seed/warehouse-dz/1200/400",
     link: "/seller/register",
-    hint: "parts warehouse",
     ar: {
       title: "اشترك معنا واعرض منتجاتك",
       description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين.",
@@ -57,7 +52,6 @@ const BANNERS = [
     id: 2,
     image: "https://picsum.photos/seed/engine-dz/1200/400",
     link: "/catalog",
-    hint: "car engine",
     ar: {
       title: "ابحث عن قطع الغيار بسهولة",
       description: "محرك بحث متطور حسب الماركة والموديل وسنة الصنع بدقة متناهية.",
@@ -156,32 +150,6 @@ export default function Home() {
     });
   };
 
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new (window as any).Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 400;
-          const MAX_HEIGHT = 400;
-          let width = img.width;
-          let height = img.height;
-          if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-          else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-          canvas.width = width; canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.6));
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
-
   const handleUploadImage = async (categoryEn: string) => {
     currentCatRef.current = categoryEn;
     fileInputRef.current?.click();
@@ -194,17 +162,20 @@ export default function Home() {
 
     setUploadingCat(catEn);
     try {
-      const compressed = await compressImage(file);
-      await setDoc(doc(firestore, "categories_metadata", catEn), {
-        imageUrl: compressed,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-      toast({ title: "تم التحديث", description: "تم تحديث صورة التصنيف بنجاح." });
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async (event) => {
+        const compressed = event.target?.result as string;
+        await setDoc(doc(firestore, "categories_metadata", catEn), {
+          imageUrl: compressed,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        toast({ title: "تم التحديث", description: "تم تحديث صورة التصنيف بنجاح." });
+      };
     } catch (err) {
       toast({ variant: "destructive", title: "خطأ", description: "تعذر رفع الصورة." });
     } finally {
       setUploadingCat(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -215,11 +186,8 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        {/* Hero Section - Exclusive Stores Slider */}
         <section className="container mx-auto px-4 mt-2">
           <div className="flex flex-col lg:flex-row-reverse gap-4" dir="rtl">
-            
-            {/* Exclusive Stores - Fixed height but responsive width */}
             <div className="lg:w-3/4 min-h-[180px] md:h-[220px] bg-white rounded-[24px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
               <div className="bg-primary/5 px-4 md:px-6 py-2 border-b flex items-center justify-between shrink-0 z-20">
                  <h2 className="font-black text-xs md:text-sm text-primary flex items-center gap-2">
@@ -260,7 +228,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Sidebar Banners - Hidden on tiny screens or scaled */}
             <div className="lg:w-1/4 h-[120px] lg:h-[220px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-full">
@@ -287,7 +254,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Responsive Horizontal Scroll */}
         <section className="container mx-auto px-4 py-4 mt-2">
           <div className="flex flex-row-reverse justify-between items-center mb-4 gap-3 border-b pb-2">
              <div className="text-right">
@@ -343,7 +309,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Slider - Multi-column responsive */}
         {featuredStores && featuredStores.length > 0 && (
           <section className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4 flex-row-reverse">
@@ -372,7 +337,6 @@ export default function Home() {
           </section>
         )}
 
-        {/* Live Stores Section - Responsive Grid */}
         <section className="container mx-auto px-4 py-8">
           <div className={cn("flex items-center justify-between mb-6 border-b-2 border-secondary pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
              <h2 className="text-lg md:text-xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
@@ -398,7 +362,10 @@ export default function Home() {
                 </Link>
               ))
             ) : (
-              <div className="col-span-full py-10 text-center text-muted-foreground font-bold text-sm">لا توجد متاجر نشطة حالياً في النظام.</div>
+              <div className="col-span-full py-20 md:py-32 bg-white rounded-[32px] md:rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
+                  <Search className="opacity-10 mb-4 w-12 h-12 md:w-16 md:h-16" />
+                  <p className="font-black text-base md:text-lg text-primary/40 px-6 text-center">لا توجد متاجر نشطة حالياً في النظام.</p>
+              </div>
             )}
           </div>
         </section>
