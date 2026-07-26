@@ -64,7 +64,7 @@ export default function Home() {
 
   const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
 
-  // Memoized Queries to prevent ID: ca9 crash
+  // Memoized Queries
   const categoriesMetaQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "categories_metadata");
@@ -85,7 +85,6 @@ export default function Home() {
     return query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active"));
   }, [firestore]);
 
-  // NEW: Explore Listings Query
   const allListingsExploreQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -175,8 +174,8 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        <section className="w-full px-1 md:px-2 mt-1">
-          <div className="flex flex-col lg:flex-row-reverse gap-2" dir="rtl">
+        <section className="w-full px-1 md:px-1.5 mt-1">
+          <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
             {/* Exclusive Stores Slider */}
             <div className="lg:w-3/4 h-[200px] md:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
               <div className="bg-primary/5 px-4 py-1 border-b flex items-center justify-between z-20">
@@ -213,8 +212,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Alternating Side Ads */}
-            <div className="lg:w-1/4 h-[120px] lg:h-[220px] relative rounded-xl overflow-hidden shadow-sm">
+            {/* Alternating Side Ads - Matched Height */}
+            <div className="lg:w-1/4 h-[200px] md:h-[220px] relative rounded-xl overflow-hidden shadow-sm">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-full">
                   {HERO_SIDE_BANNERS.map((banner) => (
@@ -222,10 +221,10 @@ export default function Home() {
                       <div className="relative h-full w-full flex items-center justify-center">
                         <Image src={banner.image} alt={banner.title} fill className="object-cover" />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-4 text-center text-white space-y-2">
-                           <h3 className="text-xs md:text-sm font-black leading-tight">{banner.title}</h3>
+                        <div className="relative z-10 p-4 text-center text-white space-y-3">
+                           <h3 className="text-sm md:text-base font-black leading-tight">{banner.title}</h3>
                            <Link href={banner.link} className="block">
-                             <Button size="sm" className="w-full h-8 bg-secondary text-primary font-black rounded-lg text-[10px]">{banner.button}</Button>
+                             <Button size="sm" className="w-full h-10 bg-secondary text-primary font-black rounded-lg text-xs md:text-sm">{banner.button}</Button>
                            </Link>
                         </div>
                       </div>
@@ -237,23 +236,22 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="w-full px-1 md:px-2 py-2 mt-1">
-          <div className="flex flex-row-reverse justify-between items-center mb-2 px-2 border-b border-primary/5 pb-1">
-             <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
-             <Link href="/catalog"><Button variant="link" className="text-secondary font-black text-[9px] h-auto p-0">عرض الكل</Button></Link>
+        {/* Categories Section - Centered */}
+        <section className="w-full px-1 md:px-2 py-1 mt-0.5">
+          <div className="flex flex-row-reverse justify-center items-center mb-1 px-2 border-b border-primary/5 pb-0.5">
+             <h2 className="text-xs md:text-sm font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={14} className="text-secondary" /></h2>
           </div>
-          <div className="flex flex-row-reverse justify-center gap-3 md:gap-4 overflow-x-auto pb-2 no-scrollbar px-1" dir="rtl">
+          <div className="flex flex-row-reverse justify-center gap-3 md:gap-6 overflow-x-auto pb-1 no-scrollbar px-1" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
                 <div key={i} className="flex flex-col items-center gap-1 shrink-0">
-                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="relative w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-primary/5 bg-white shadow-sm hover:scale-105 transition-transform flex items-center justify-center">
+                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="relative w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border border-primary/5 bg-white shadow-sm hover:scale-105 transition-transform flex items-center justify-center">
                     <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-90" />
                     <div className="absolute inset-0 bg-black/5" />
                   </Link>
                   <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                    <span className="font-black text-[9px] text-primary bg-white px-2 py-0.5 rounded border border-zinc-100">{lang === 'AR' ? cat.ar : cat.en}</span>
+                    <span className="font-black text-[8px] md:text-[10px] text-primary bg-white px-2 py-0.5 rounded border border-zinc-100">{lang === 'AR' ? cat.ar : cat.en}</span>
                   </Link>
                   {isAdmin && (
                     <button onClick={() => handleUploadImage(cat.en)} className="text-[7px] font-bold text-secondary flex items-center gap-0.5"><Camera size={8} /> تعديل</button>
@@ -289,12 +287,12 @@ export default function Home() {
         )}
 
         {/* Verified Stores Grid */}
-        <section className="w-full px-1 md:px-2 py-4">
+        <section className="w-full px-1 md:px-1.5 py-4">
           <div className={cn("flex items-center justify-between mb-4 border-b-2 border-secondary pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
              <h2 className="text-base md:text-lg font-black text-primary">استكشف كافة المتاجر المعتمدة</h2>
              <Link href="/catalog" className="text-[10px] font-bold text-muted-foreground hover:text-secondary">مشاهدة المزيد</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 px-1" dir="rtl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 px-1" dir="rtl">
             {loadingStores ? (
               Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 bg-zinc-200 animate-pulse rounded-xl" />)
             ) : allStores?.length > 0 ? (
@@ -319,8 +317,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* NEW: Explore Car Parts Section */}
-        <section className="w-full px-1 md:px-2 py-6">
+        {/* Explore Car Parts Section */}
+        <section className="w-full px-1 md:px-1.5 py-6">
           <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
                 <h2 className="text-lg md:text-xl font-black text-primary flex items-center justify-end gap-2">
@@ -330,7 +328,7 @@ export default function Home() {
              </div>
              <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline">عرض كافة القطع</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-1" dir="rtl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir="rtl">
             {loadingExplore ? (
                Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-80 bg-zinc-200 animate-pulse rounded-[24px]" />)
             ) : exploreListings?.length > 0 ? (
@@ -356,9 +354,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* NEW: Featured Products Section */}
+        {/* Featured Products Section */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
-          <section className="w-full px-1 md:px-2 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
+          <section className="w-full px-1 md:px-1.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
             <div className="container mx-auto px-2">
               <div className="flex items-center justify-between mb-6 flex-row-reverse">
                  <div className="text-right">
@@ -397,3 +395,4 @@ export default function Home() {
     </div>
   );
 }
+
