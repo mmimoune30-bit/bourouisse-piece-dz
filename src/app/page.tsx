@@ -184,9 +184,9 @@ export default function Home() {
                   <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
-                    <CarouselContent className="h-full">
+                    <CarouselContent className="h-full -ml-0">
                       {exclusiveStores.map((campaign, i) => (
-                        <CarouselItem key={i} className="h-full">
+                        <CarouselItem key={i} className="h-full pl-0">
                           <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-4">
                             <div className="w-28 h-28 md:w-56 md:h-56 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
@@ -207,16 +207,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm">
+            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-white border border-primary/5">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}>
-                <CarouselContent className="h-full">
+                <CarouselContent className="h-full -ml-0">
                   {HERO_SIDE_BANNERS.map((banner) => (
-                    <CarouselItem key={banner.id} className="h-full">
-                      <div className="relative h-full w-full flex items-center justify-center">
+                    <CarouselItem key={banner.id} className="h-full pl-0">
+                      <div className="relative h-full w-full">
                         <Image src={banner.image} alt={banner.title} fill className="object-cover" data-ai-hint={banner.imageHint} />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-6 text-center text-white space-y-6 flex flex-col items-center justify-center h-full w-full">
-                           <h3 className="text-xl md:text-2xl font-black leading-tight mb-4">{banner.title}</h3>
+                        <div className="relative z-10 p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
+                           <h3 className="text-xl md:text-2xl font-black leading-tight">{banner.title}</h3>
                            <Link href={banner.link} className="w-full">
                              <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">{banner.button}</Button>
                            </Link>
