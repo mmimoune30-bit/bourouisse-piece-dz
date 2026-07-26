@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -83,7 +82,6 @@ export default function Home() {
 
   const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
 
-  // جلب ميتاداتا التصنيفات (الصور)
   const categoryMetaQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "categories_metadata");
@@ -99,7 +97,6 @@ export default function Home() {
     return map;
   }, [categoriesMeta]);
 
-  // جلب كافة الحملات الإعلانية النشطة
   const allCampaignsQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_stores");
@@ -109,7 +106,6 @@ export default function Home() {
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  // المتاجر الحصرية
   const exclusiveStores = useMemo(() => {
     return (allCampaigns || [])
       .filter(c => 
@@ -121,7 +117,6 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  // المتاجر المميزة
   const featuredStores = useMemo(() => {
     return (allCampaigns || [])
       .filter(c => 
@@ -133,7 +128,6 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  // جلب كافة المتاجر المعتمدة
   const allStoresQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -162,7 +156,6 @@ export default function Home() {
     });
   };
 
-  // معالجة رفع صورة التصنيف
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -219,20 +212,21 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[170px]">
-        {/* Hidden File Input for Admin */}
+      <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
         {/* Hero Section - Exclusive Stores Slider */}
         <section className="container mx-auto px-4 mt-2">
-          <div className="flex flex-col md:flex-row-reverse gap-3" dir="rtl">
-            <div className="md:w-3/4 h-[200px] bg-white rounded-[24px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
-              <div className="bg-primary/5 px-6 py-2 border-b flex items-center justify-between shrink-0 z-20">
-                 <h2 className="font-black text-sm text-primary flex items-center gap-2">
+          <div className="flex flex-col lg:flex-row-reverse gap-4" dir="rtl">
+            
+            {/* Exclusive Stores - Fixed height but responsive width */}
+            <div className="lg:w-3/4 min-h-[180px] md:h-[220px] bg-white rounded-[24px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
+              <div className="bg-primary/5 px-4 md:px-6 py-2 border-b flex items-center justify-between shrink-0 z-20">
+                 <h2 className="font-black text-xs md:text-sm text-primary flex items-center gap-2">
                    <Crown size={16} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
                  <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">
-                   تصفح كافة المتاجر <ArrowLeft size={12} />
+                   {lang === 'AR' ? 'تصفح كافة المتاجر' : 'Browse Stores'} <ArrowLeft size={12} />
                  </Link>
               </div>
               
@@ -241,17 +235,17 @@ export default function Home() {
                   <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
-                    <CarouselContent className="h-[156px]">
+                    <CarouselContent className="h-full">
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
-                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-6 px-8 hover:bg-zinc-50/50 transition-colors group">
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden relative border-4 border-white shadow-lg shrink-0">
+                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 md:gap-8 px-4 md:px-12 hover:bg-zinc-50/50 transition-colors group py-4">
+                            <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl overflow-hidden relative border-4 border-white shadow-lg shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
                             <div className="flex flex-col gap-1 text-right">
-                               <Badge className="bg-secondary text-primary font-black text-[10px] w-fit mr-auto py-0 h-5"><Crown size={10} /> متجر حصري</Badge>
-                               <h3 className="font-black text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-xs text-muted-foreground font-bold flex items-center gap-2 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <Badge className="bg-secondary text-primary font-black text-[10px] md:text-xs w-fit mr-auto py-0 h-5 md:h-6"><Crown size={10} className="hidden sm:inline" /> متجر حصري</Badge>
+                               <h3 className="font-black text-lg md:text-3xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-xs md:text-sm text-muted-foreground font-bold flex items-center gap-1 md:gap-2 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -259,16 +253,17 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold italic px-10 text-center text-xs">
-                    لا توجد إعلانات حصرية نشطة حالياً. اشترك لظهور متجرك هنا!
+                  <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold italic px-10 text-center text-xs md:text-sm">
+                    لا توجد إعلانات حصرية نشطة حالياً.
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="md:w-1/4 h-[200px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
+            {/* Sidebar Banners - Hidden on tiny screens or scaled */}
+            <div className="lg:w-1/4 h-[120px] lg:h-[220px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
-                <CarouselContent className="h-[200px]">
+                <CarouselContent className="h-full">
                   {BANNERS.map((banner) => {
                     const content = lang === "AR" ? banner.ar : banner.en;
                     return (
@@ -277,8 +272,10 @@ export default function Home() {
                           <Image src={banner.image} alt={content.title} fill className="object-cover" priority />
                           <div className="absolute inset-0 bg-black/70" />
                           <div className="relative z-10 p-4 text-center text-white space-y-2">
-                             <h3 className="text-sm font-black leading-tight">{content.title}</h3>
-                             <Link href={banner.link} className="block"><Button size="sm" className="w-full h-8 text-xs bg-secondary text-primary font-black rounded-lg">{content.button}</Button></Link>
+                             <h3 className="text-xs md:text-sm font-black leading-tight">{content.title}</h3>
+                             <Link href={banner.link} className="block">
+                               <Button size="sm" className="w-full h-8 md:h-10 text-[10px] md:text-xs bg-secondary text-primary font-black rounded-lg">{content.button}</Button>
+                             </Link>
                           </div>
                         </div>
                       </CarouselItem>
@@ -290,27 +287,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Now with Admin Image Upload */}
+        {/* Categories Section - Responsive Horizontal Scroll */}
         <section className="container mx-auto px-4 py-4 mt-2">
           <div className="flex flex-row-reverse justify-between items-center mb-4 gap-3 border-b pb-2">
              <div className="text-right">
-                <h2 className="text-lg font-black text-primary flex items-center justify-end gap-2">
+                <h2 className="text-base md:text-lg font-black text-primary flex items-center justify-end gap-2">
                    تصنيفات قطع الغيار <Tags size={18} className="text-secondary" />
                 </h2>
              </div>
              <Link href="/catalog">
-               <Button variant="link" className="text-secondary font-black text-xs h-auto p-0">عرض الكل <ArrowLeft size={14} /></Button>
+               <Button variant="link" className="text-secondary font-black text-[10px] md:text-xs h-auto p-0">عرض الكل <ArrowLeft size={14} /></Button>
              </Link>
           </div>
           
-          <div className="flex flex-row-reverse gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4" dir="rtl">
+          <div className="flex flex-row-reverse gap-4 md:gap-6 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 scroll-smooth" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
                 <div key={i} className="flex flex-col items-center gap-2 shrink-0 group">
                   <Link 
                     href={`/catalog?category=${encodeURIComponent(cat.en)}`}
-                    className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/5 bg-white shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
+                    className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-primary/5 bg-white shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
                   >
                     <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
                     <div className="absolute inset-0 bg-black/5" />
@@ -318,13 +315,12 @@ export default function Home() {
                   <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
                     <Button 
                       variant="outline" 
-                      className="h-8 px-4 rounded-lg border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-[10px] transition-all"
+                      className="h-7 md:h-8 px-3 md:px-4 rounded-lg border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-[9px] md:text-[10px] transition-all"
                     >
                       {lang === 'AR' ? cat.ar : cat.en}
                     </Button>
                   </Link>
                   
-                  {/* Admin Upload Trigger */}
                   {isAdmin && (
                     <button 
                       onClick={() => handleUploadImage(cat.en)}
@@ -332,11 +328,11 @@ export default function Home() {
                       className="mt-1 flex items-center gap-1 text-primary hover:text-secondary transition-colors"
                     >
                       {uploadingCat === cat.en ? (
-                        <Loader2 className="animate-spin" size={12} />
+                        <Loader2 className="animate-spin" size={10} />
                       ) : (
                         <>
-                          <Camera size={12} />
-                          <span className="text-[9px] font-bold">تغيير الصورة</span>
+                          <Camera size={10} />
+                          <span className="text-[8px] font-bold">تغيير الصورة</span>
                         </>
                       )}
                     </button>
@@ -347,27 +343,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Slider */}
+        {/* Featured Slider - Multi-column responsive */}
         {featuredStores && featuredStores.length > 0 && (
           <section className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4 flex-row-reverse">
-              <h2 className="text-lg font-black text-primary flex items-center gap-2">
+              <h2 className="text-base md:text-lg font-black text-primary flex items-center gap-2">
                 <Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة
               </h2>
             </div>
             <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
-              <CarouselContent className="-ml-4" dir="rtl">
+              <CarouselContent className="-ml-2 md:-ml-4" dir="rtl">
                 {featuredStores.map((campaign, i) => (
-                  <CarouselItem key={i} className="pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/5">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-4 rounded-[24px] border-2 border-transparent hover:border-blue-100 hover:shadow-md transition-all block text-center space-y-3 h-full">
-                       <div className="w-14 h-14 mx-auto rounded-xl overflow-hidden relative border-2 border-zinc-50 shadow-sm">
+                  <CarouselItem key={i} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/5 xl:basis-1/6">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-4 rounded-[24px] border-2 border-transparent hover:border-blue-100 hover:shadow-md transition-all block text-center space-y-2 h-full">
+                       <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-xl overflow-hidden relative border-2 border-zinc-50 shadow-sm">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
                        <div>
-                         <h4 className="font-black text-primary text-xs truncate">{campaign.storeName}</h4>
-                         <p className="text-[10px] text-muted-foreground font-bold">{campaign.storeLocation}</p>
+                         <h4 className="font-black text-primary text-[10px] md:text-xs truncate">{campaign.storeName}</h4>
+                         <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold">{campaign.storeLocation}</p>
                        </div>
-                       <Badge variant="outline" className="text-[9px] h-4 border-blue-200 text-blue-600 bg-blue-50">مميز</Badge>
+                       <Badge variant="outline" className="text-[8px] h-4 border-blue-200 text-blue-600 bg-blue-50">مميز</Badge>
                     </Link>
                   </CarouselItem>
                 ))}
@@ -376,27 +372,27 @@ export default function Home() {
           </section>
         )}
 
-        {/* Live Stores Section - All Verified */}
+        {/* Live Stores Section - Responsive Grid */}
         <section className="container mx-auto px-4 py-8">
           <div className={cn("flex items-center justify-between mb-6 border-b-2 border-secondary pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <h2 className="text-xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
+             <h2 className="text-lg md:text-xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
              <Link href="/catalog" className="text-xs font-bold text-muted-foreground hover:text-secondary">{lang === 'AR' ? 'مشاهدة المزيد' : 'View More'}</Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" dir="rtl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" dir="rtl">
             {loadingStores ? (
               Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 bg-zinc-200 animate-pulse rounded-2xl" />)
             ) : allStores?.length > 0 ? (
               allStores.slice(0, 12).map((store) => (
-                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 rounded-2xl shadow-sm border hover:shadow-lg transition-all flex items-center gap-4 flex-row-reverse text-right group">
-                   <div className="w-16 h-16 rounded-xl overflow-hidden relative border-2 border-zinc-100 shrink-0">
+                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border hover:shadow-lg transition-all flex items-center gap-4 md:gap-6 flex-row-reverse text-right group">
+                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl overflow-hidden relative border-2 border-zinc-100 shrink-0">
                      <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" />
                    </div>
                    <div className="flex-grow">
-                      <h3 className="font-black text-base text-primary group-hover:text-secondary transition-colors line-clamp-1">{store.name}</h3>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={12} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
+                      <h3 className="font-black text-sm md:text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{store.name}</h3>
+                      <p className="text-[10px] md:text-sm text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
                       <div className="mt-1 flex items-center gap-1 justify-end">
                         <ShieldCheck size={14} className="text-green-500" />
-                        <span className="text-[9px] font-black text-zinc-400 uppercase">متجر معتمد</span>
+                        <span className="text-[8px] md:text-[9px] font-black text-zinc-400 uppercase">متجر معتمد</span>
                       </div>
                    </div>
                 </Link>

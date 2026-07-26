@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +27,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [lang, setLang] = useState<"AR" | "EN">("AR");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // الصفحات التي يجب إخفاء خانة البحث فيها
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
 
@@ -45,8 +45,8 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* Layer 1: Top Info Bar */}
-      <div className="bg-white border-b border-zinc-100 py-1">
+      {/* Layer 1: Top Info Bar - Optimized for visibility */}
+      <div className="bg-white border-b border-zinc-100 py-1 overflow-hidden">
         <div className="container mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -65,20 +65,11 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-4 border-l flex items-center gap-2">
-            {!isHome && (
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold h-8">
-                  <Home size={14} className="text-primary" />
-                  <span className="hidden sm:inline">{lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}</span>
-                </Button>
-              </Link>
-            )}
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-2 font-bold h-8">
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-1 md:gap-2 font-bold h-7 md:h-8 px-2">
                   <Globe size={14} className="text-primary" />
-                  {lang === 'AR' ? 'العربية' : 'English'}
+                  <span className="text-[10px] md:text-sm">{lang === 'AR' ? 'العربية' : 'English'}</span>
                   <ChevronDown size={12} />
                 </Button>
               </DropdownMenuTrigger>
@@ -91,38 +82,79 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding */}
-      <div className="bg-white py-2 border-b">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-6">
-          {/* Site Logo */}
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <SiteLogo />
+      {/* Layer 2: Main Branding & Responsive Actions */}
+      <div className="bg-white py-3 border-b">
+        <div className="container mx-auto px-4 flex items-center justify-between gap-4 md:gap-6">
+          
+          {/* Logo - Always visible and centered on small screens if needed, but left/right here */}
+          <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
+            <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
           </Link>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 justify-center" dir="rtl">
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-3" dir="rtl">
             <Link href="/seller/register">
-              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-12 px-6 transition-all active:scale-95">
+              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-11 px-5 transition-all">
                 <Store size={18} /> كن بائعاً معنا
               </Button>
             </Link>
             <Link href="/join">
-              <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-12 px-6 transition-all">
+              <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-11 px-5 transition-all">
                 <UserPlus size={18} /> إضافة حساب
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-12 px-4">
+              <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-4">
                 <LogIn size={18} /> دخول
               </Button>
             </Link>
           </div>
+
+          {/* Mobile Menu Trigger */}
+          <div className="lg:hidden flex items-center gap-2">
+            {!isHome && (
+              <Link href="/">
+                <Button variant="outline" size="icon" className="rounded-xl border-2">
+                  <Home size={18} className="text-primary" />
+                </Button>
+              </Link>
+            )}
+            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Layer 3: Global Smart Search Bar - Hidden on Auth Routes */}
+      {/* Mobile Sidebar/Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4 animate-in slide-in-from-top duration-300" dir="rtl">
+          <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}>
+             <Button className="w-full bg-secondary text-primary font-black h-14 rounded-2xl gap-3 text-lg">
+                <Store size={20} /> كن بائعاً معنا
+             </Button>
+          </Link>
+          <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}>
+             <Button variant="outline" className="w-full border-2 border-primary text-primary font-black h-14 rounded-2xl gap-3 text-lg">
+                <UserPlus size={20} /> إضافة حساب
+             </Button>
+          </Link>
+          <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+             <Button variant="ghost" className="w-full text-zinc-600 font-black h-14 rounded-2xl gap-3 text-lg">
+                <LogIn size={20} /> دخول الحساب
+             </Button>
+          </Link>
+          <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+             <Button variant="ghost" className="w-full text-primary font-black h-12 rounded-xl gap-3">
+                <Home size={18} /> الصفحة الرئيسية
+             </Button>
+          </Link>
+        </div>
+      )}
+
+      {/* Layer 3: Global Smart Search Bar */}
       {showSearch && (
-        <div className="bg-white py-1.5 border-b shadow-sm relative">
+        <div className="bg-white py-2 border-b shadow-sm relative">
           <div className="container mx-auto px-4 relative z-10">
             <AISearchBox />
           </div>
