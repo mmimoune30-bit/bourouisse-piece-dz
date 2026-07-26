@@ -63,17 +63,39 @@ export default function Home() {
 
   const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
 
-  // جلب ميتاداتا التصنيفات
-  const { data: categoriesMeta } = useCollection(firestore ? collection(firestore, "categories_metadata") : null);
+  // Memoized Queries to prevent ID: ca9 crash
+  const categoriesMetaQuery = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "categories_metadata");
+  }, [firestore]);
+
+  const featuredStoresQuery = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "featured_stores");
+  }, [firestore]);
+
+  const featuredProductsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "featured_products");
+  }, [firestore]);
+
+  const allStoresQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active"));
+  }, [firestore]);
+
+  const { data: categoriesMeta } = useCollection(categoriesMetaQuery);
+  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(featuredStoresQuery);
+  const { data: featuredProducts, loading: loadingFeaturedProducts } = useCollection(featuredProductsQuery);
+  const { data: allStores, loading: loadingStores } = useCollection(allStoresQuery);
+
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
     categoriesMeta?.forEach(meta => { map[meta.id] = meta.imageUrl; });
     return map;
   }, [categoriesMeta]);
-
-  // جلب المتاجر المميزة والحصرية
-  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(firestore ? collection(firestore, "featured_stores") : null);
-  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const exclusiveStores = useMemo(() => {
     return (allCampaigns || [])
@@ -87,18 +109,11 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  // جلب المنتجات المميزة المروجة
-  const { data: featuredProducts, loading: loadingFeaturedProducts } = useCollection(firestore ? collection(firestore, "featured_products") : null);
   const activeFeaturedProducts = useMemo(() => {
     return (featuredProducts || [])
       .filter(p => p.startDate <= today && p.endDate >= today)
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [featuredProducts, today]);
-
-  // جلب كافة المتاجر
-  const { data: allStores, loading: loadingStores } = useCollection(
-    firestore ? query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active")) : null
-  );
 
   useEffect(() => {
     const checkLang = () => {

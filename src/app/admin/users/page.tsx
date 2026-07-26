@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,11 +66,17 @@ export default function UserManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
 
+  // Stable reference to collection
+  const usersCollectionRef = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "users");
+  }, [firestore]);
+
   useEffect(() => {
-    if (!firestore) return;
+    if (!usersCollectionRef) return;
 
     const unsubscribe = onSnapshot(
-      collection(firestore, "users"),
+      usersCollectionRef,
       (snapshot) => {
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -90,7 +96,7 @@ export default function UserManagement() {
     );
 
     return () => unsubscribe();
-  }, [firestore]);
+  }, [usersCollectionRef]);
 
   const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -166,7 +172,7 @@ export default function UserManagement() {
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
             <UserCog size={32} className="text-secondary" /> إدارة الهوية والصلاحيات
           </h1>
-          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين وحالات الحسابات بشكل آمن.</p>
+          <p className="text-muted-foreground mt-1">التحكم in أدوار المستخدمين وحالات الحسابات بشكل آمن.</p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -28,6 +29,7 @@ function CatalogContent() {
   const [fuelType, setFuelType] = useState<string>(searchParams.get("fuelType") || "");
   const [textSearch, setTextSearch] = useState<string>(searchParams.get("query") || "");
 
+  // Memoized Query to prevent ID: ca9 crash
   const productsQuery = useMemo(() => {
     if (!firestore) return null;
     return query(collection(firestore, "listings"), orderBy("createdAt", "desc"));

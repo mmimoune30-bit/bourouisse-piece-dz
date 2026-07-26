@@ -1,6 +1,7 @@
+
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -40,9 +41,13 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const resolvedParams = use(params);
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
-  const productRef = resolvedParams.id ? doc(firestore!, "listings", resolvedParams.id) : null;
+  // Memoize document reference to prevent crash
+  const productRef = useMemo(() => {
+    if (!firestore || !resolvedParams.id) return null;
+    return doc(firestore, "listings", resolvedParams.id);
+  }, [firestore, resolvedParams.id]);
+
   const { data: product, loading } = useDoc(productRef);
 
   useEffect(() => {
@@ -106,7 +111,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" dir="rtl">
             
-            {/* Left Column (Actions & Info) - Fixed bottom on mobile, side on desktop */}
+            {/* Left Column (Actions & Info) */}
             <div className="lg:col-span-1 space-y-6">
               <Card className="border-orange-500 border-2 shadow-xl rounded-2xl md:rounded-[24px] overflow-hidden">
                 <CardContent className="p-6 md:p-8 flex flex-col items-center text-center gap-4">
