@@ -42,14 +42,16 @@ const HERO_SIDE_BANNERS = [
     image: "https://picsum.photos/seed/join-seller/400/400",
     link: "/seller/register",
     title: "اشترك معنا واعرض منتجاتك",
-    button: "سجل كبائع"
+    button: "سجل كبائع",
+    imageHint: "car seller"
   },
   {
     id: 2,
     image: "https://picsum.photos/seed/get-goods/400/400",
     link: "/catalog",
     title: "اشترك معنا واحصل على سلعتك",
-    button: "ابدأ التسوق"
+    button: "ابدأ التسوق",
+    imageHint: "happy customer"
   }
 ];
 
@@ -174,15 +176,16 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        <section className="w-full px-1 md:px-1.5 mt-1">
+        {/* Hero Section - Matched Heights */}
+        <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
-            {/* Exclusive Stores Slider - Precise Matched Height */}
-            <div className="lg:w-3/4 h-[280px] md:h-[320px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
-              <div className="bg-primary/5 px-4 py-1 border-b flex items-center justify-between z-20">
+            {/* Exclusive Stores Slider */}
+            <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
+              <div className="bg-primary/5 px-4 py-1.5 border-b flex items-center justify-between z-20">
                  <h2 className="font-black text-xs text-primary flex items-center gap-2">
                    <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-[9px] font-bold text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={10} /></Link>
+                 <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
               </div>
               <div className="flex-grow relative">
                 {loadingCampaigns ? (
@@ -193,13 +196,13 @@ export default function Home() {
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
                           <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-4">
-                            <div className="w-24 h-24 md:w-48 md:h-48 rounded-xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
+                            <div className="w-28 h-28 md:w-56 md:h-56 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
-                            <div className="flex flex-col gap-1 text-right">
+                            <div className="flex flex-col gap-2 text-right">
                                <Badge className="bg-secondary text-primary font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
-                               <h3 className="font-black text-xl md:text-4xl text-primary line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-sm text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <h3 className="font-black text-2xl md:text-5xl text-primary line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-sm md:text-lg text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -212,19 +215,19 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Alternating Side Ads - Precise Matched Height */}
-            <div className="lg:w-1/4 h-[280px] md:h-[320px] relative rounded-xl overflow-hidden shadow-sm">
+            {/* Alternating Side Ads - Exactly Matching Height */}
+            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-full">
                   {HERO_SIDE_BANNERS.map((banner) => (
                     <CarouselItem key={banner.id} className="h-full">
                       <div className="relative h-full w-full flex items-center justify-center">
-                        <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                        <Image src={banner.image} alt={banner.title} fill className="object-cover" data-ai-hint={banner.imageHint} />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-6 text-center text-white space-y-4">
-                           <h3 className="text-base md:text-xl font-black leading-tight">{banner.title}</h3>
+                        <div className="relative z-10 p-6 text-center text-white space-y-6">
+                           <h3 className="text-xl md:text-2xl font-black leading-tight">{banner.title}</h3>
                            <Link href={banner.link} className="block">
-                             <Button className="w-full h-12 bg-secondary text-primary font-black rounded-lg text-sm md:text-base shadow-lg hover:bg-white transition-all">{banner.button}</Button>
+                             <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">{banner.button}</Button>
                            </Link>
                         </div>
                       </div>
@@ -236,12 +239,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Centered */}
-        <section className="w-full px-1 md:px-2 py-1 mt-0.5">
+        {/* Categories Section - Centered with Minimal Margins */}
+        <section className="w-full px-0.5 py-1">
           <div className="flex flex-row-reverse justify-center items-center mb-1 px-2 border-b border-primary/5 pb-0.5">
              <h2 className="text-xs md:text-sm font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={14} className="text-secondary" /></h2>
           </div>
-          <div className="flex flex-row-reverse justify-center gap-3 md:gap-6 overflow-x-auto pb-1 no-scrollbar px-1" dir="rtl">
+          <div className="flex flex-row-reverse justify-center gap-3 md:gap-8 overflow-x-auto pb-1 no-scrollbar px-1" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
@@ -264,7 +267,7 @@ export default function Home() {
 
         {/* Featured Stores Slider */}
         {featuredStores && featuredStores.length > 0 && (
-          <section className="w-full px-1 md:px-2 py-2">
+          <section className="w-full px-0.5 py-2">
             <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse">
               <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2"><Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة</h2>
             </div>
@@ -273,7 +276,7 @@ export default function Home() {
                 {featuredStores.map((campaign, i) => (
                   <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
                     <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border hover:shadow-md transition-all block text-center space-y-1">
-                       <div className="w-10 h-10 mx-auto rounded-lg overflow-hidden relative border shadow-sm">
+                       <div className="w-12 h-12 mx-auto rounded-lg overflow-hidden relative border shadow-sm">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
                        <h4 className="font-black text-primary text-[9px] truncate">{campaign.storeName}</h4>
@@ -287,24 +290,24 @@ export default function Home() {
         )}
 
         {/* Verified Stores Grid */}
-        <section className="w-full px-1 md:px-1.5 py-4">
+        <section className="w-full px-0.5 py-4">
           <div className={cn("flex items-center justify-between mb-4 border-b-2 border-secondary pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
              <h2 className="text-base md:text-lg font-black text-primary">استكشف كافة المتاجر المعتمدة</h2>
              <Link href="/catalog" className="text-[10px] font-bold text-muted-foreground hover:text-secondary">مشاهدة المزيد</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 px-1" dir="rtl">
             {loadingStores ? (
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 bg-zinc-200 animate-pulse rounded-xl" />)
+              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 bg-zinc-200 animate-pulse rounded-xl" />)
             ) : allStores?.length > 0 ? (
               allStores.slice(0, 12).map((store) => (
-                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-3 rounded-xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 flex-row-reverse text-right group">
-                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden relative border shrink-0">
+                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 flex-row-reverse text-right group">
+                   <div className="w-16 h-16 rounded-xl overflow-hidden relative border shrink-0">
                      <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover" />
                    </div>
                    <div className="flex-grow">
-                      <h3 className="font-black text-xs md:text-sm text-primary group-hover:text-secondary truncate">{store.name}</h3>
-                      <p className="text-[9px] text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={10} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
-                      <div className="mt-0.5 flex items-center gap-1 justify-end"><ShieldCheck size={10} className="text-green-500" /><span className="text-[7px] font-black text-zinc-400">معتمد</span></div>
+                      <h3 className="font-black text-sm md:text-base text-primary group-hover:text-secondary truncate">{store.name}</h3>
+                      <p className="text-[10px] text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={10} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
+                      <div className="mt-1 flex items-center gap-1 justify-end"><ShieldCheck size={12} className="text-green-500" /><span className="text-[8px] font-black text-zinc-400">معتمد</span></div>
                    </div>
                 </Link>
               ))
@@ -318,7 +321,7 @@ export default function Home() {
         </section>
 
         {/* Explore Car Parts Section */}
-        <section className="w-full px-1 md:px-1.5 py-6">
+        <section className="w-full px-0.5 py-6">
           <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
                 <h2 className="text-lg md:text-xl font-black text-primary flex items-center justify-end gap-2">
@@ -356,7 +359,7 @@ export default function Home() {
 
         {/* Featured Products Section */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
-          <section className="w-full px-1 md:px-1.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
+          <section className="w-full px-0.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
             <div className="container mx-auto px-2">
               <div className="flex items-center justify-between mb-6 flex-row-reverse">
                  <div className="text-right">
