@@ -22,7 +22,8 @@ import {
   Camera,
   Search,
   Zap,
-  ShoppingBag
+  ShoppingBag,
+  Package
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
@@ -30,7 +31,7 @@ import Autoplay from "embla-carousel-autoplay";
 import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useUser } from "@/firebase";
-import { collection, query, where, updateDoc, doc, increment, setDoc } from "firebase/firestore";
+import { collection, query, where, updateDoc, doc, increment, setDoc, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { toast } from "@/hooks/use-toast";
@@ -84,10 +85,22 @@ export default function Home() {
     return query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active"));
   }, [firestore]);
 
+  // NEW: Explore Listings Query
+  const allListingsExploreQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(
+      collection(firestore, "listings"),
+      where("status", "==", "Active"),
+      orderBy("createdAt", "desc"),
+      limit(12)
+    );
+  }, [firestore]);
+
   const { data: categoriesMeta } = useCollection(categoriesMetaQuery);
   const { data: allCampaigns, loading: loadingCampaigns } = useCollection(featuredStoresQuery);
   const { data: featuredProducts, loading: loadingFeaturedProducts } = useCollection(featuredProductsQuery);
   const { data: allStores, loading: loadingStores } = useCollection(allStoresQuery);
+  const { data: exploreListings, loading: loadingExplore } = useCollection(allListingsExploreQuery);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -302,6 +315,43 @@ export default function Home() {
                   <Search size={32} className="opacity-10 mb-2" />
                   <p className="font-black text-xs">لا توجد متاجر نشطة حالياً.</p>
               </div>
+            )}
+          </div>
+        </section>
+
+        {/* NEW: Explore Car Parts Section */}
+        <section className="w-full px-1 md:px-2 py-6">
+          <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
+             <div className="text-right">
+                <h2 className="text-lg md:text-xl font-black text-primary flex items-center justify-end gap-2">
+                   أحدث قطع الغيار المضافة <Package size={20} className="text-secondary" />
+                </h2>
+                <p className="text-[10px] text-muted-foreground font-bold">تصفح القطع المتوفرة حالياً في كافة الولايات.</p>
+             </div>
+             <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline">عرض كافة القطع</Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-1" dir="rtl">
+            {loadingExplore ? (
+               Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-80 bg-zinc-200 animate-pulse rounded-[24px]" />)
+            ) : exploreListings?.length > 0 ? (
+               exploreListings.map((product) => (
+                 <ProductCard 
+                    key={product.id} 
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
+                    category={product.category}
+                    seller={product.sellerName}
+                    condition={product.condition === 'new' ? 'New' : 'Used'}
+                    createdAt={product.createdAt}
+                 />
+               ))
+            ) : (
+               <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
+                  <Search size={32} className="opacity-10 mb-2" />
+                  <p className="font-black text-xs">لا توجد قطع معروضة حالياً.</p>
+               </div>
             )}
           </div>
         </section>
