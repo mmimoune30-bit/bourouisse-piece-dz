@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { 
   LayoutDashboard, Users, Store, Package, CreditCard, 
   Settings, ShieldAlert, LogOut, Menu, X, 
-  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle, Ticket, Star
+  Layout as LayoutIcon, History, ShoppingBag, Loader2, AlertTriangle, Ticket, Star, Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ const ADMIN_MENU = [
   { name: "المستخدمين", href: "/admin/users", icon: Users },
   { name: "المتاجر", href: "/admin/stores", icon: Store },
   { name: "المتاجر المميزة", href: "/admin/featured-stores", icon: Star },
+  { name: "المنتجات المميزة", href: "/admin/featured-products", icon: Zap },
   { name: "المنتجات", href: "/admin/products", icon: Package },
   { name: "طلبات الشراء", href: "/admin/purchase-requests", icon: ShoppingBag },
   { name: "المدفوعات", href: "/admin/payments", icon: CreditCard },
@@ -169,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <div className="p-4 md:p-8">
+        <div className="p-2 md:p-4">
           {children}
         </div>
       </main>

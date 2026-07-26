@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,7 +26,6 @@ const WhatsAppIcon = () => (
 
 export default function Navbar() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const [lang, setLang] = useState<"AR" | "EN">("AR");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -45,17 +45,11 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* Layer 1: Top Info Bar - Optimized for visibility */}
+      {/* Layer 1: Top Info Bar */}
       <div className="bg-white border-b border-zinc-100 py-1 overflow-hidden">
-        <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+        <div className="w-full px-2 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               <div className="flex items-center gap-8 text-black font-black uppercase text-[10px] md:text-[11px]">
-                  <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
-                  <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
-                  <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
-                  <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-primary" /> support@bourouisse-piecedz.com</span>
-               </div>
                <div className="flex items-center gap-8 text-black font-black uppercase text-[10px] md:text-[11px]">
                   <span className="text-primary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-primary" /> +213 778 42 89 77</span>
@@ -83,18 +77,22 @@ export default function Navbar() {
       </div>
 
       {/* Layer 2: Main Branding & Responsive Actions */}
-      <div className="bg-white py-3 border-b">
-        <div className="container mx-auto px-4 flex items-center justify-between gap-4 md:gap-6">
+      <div className="bg-white py-2 border-b">
+        <div className="w-full px-2 flex items-center justify-between gap-4 md:gap-6">
           
-          {/* Logo - Always visible and centered on small screens if needed, but left/right here */}
           <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
             <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
           </Link>
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3" dir="rtl">
+            <Link href="/">
+              <Button variant="ghost" className="text-primary font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-4">
+                <Home size={18} /> الرئيسية
+              </Button>
+            </Link>
             <Link href="/seller/register">
-              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-lg shadow-secondary/10 h-11 px-5 transition-all">
+              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-sm h-11 px-5 transition-all">
                 <Store size={18} /> كن بائعاً معنا
               </Button>
             </Link>
@@ -112,23 +110,26 @@ export default function Navbar() {
 
           {/* Mobile Menu Trigger */}
           <div className="lg:hidden flex items-center gap-2">
-            {!isHome && (
-              <Link href="/">
-                <Button variant="outline" size="icon" className="rounded-xl border-2">
-                  <Home size={18} className="text-primary" />
-                </Button>
-              </Link>
-            )}
-            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <Link href="/">
+              <Button variant="outline" size="icon" className="rounded-xl border-2 w-10 h-10">
+                <Home size={20} className="text-primary" />
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" className="rounded-xl w-10 h-10" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Sidebar/Menu Overlay */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4 animate-in slide-in-from-top duration-300" dir="rtl">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4" dir="rtl">
+          <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+             <Button variant="ghost" className="w-full text-primary font-black h-12 rounded-xl gap-3">
+                <Home size={18} /> الصفحة الرئيسية
+             </Button>
+          </Link>
           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}>
              <Button className="w-full bg-secondary text-primary font-black h-14 rounded-2xl gap-3 text-lg">
                 <Store size={20} /> كن بائعاً معنا
@@ -144,18 +145,13 @@ export default function Navbar() {
                 <LogIn size={20} /> دخول الحساب
              </Button>
           </Link>
-          <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full text-primary font-black h-12 rounded-xl gap-3">
-                <Home size={18} /> الصفحة الرئيسية
-             </Button>
-          </Link>
         </div>
       )}
 
       {/* Layer 3: Global Smart Search Bar */}
       {showSearch && (
-        <div className="bg-white py-2 border-b shadow-sm relative">
-          <div className="container mx-auto px-4 relative z-10">
+        <div className="bg-white py-1 border-b shadow-sm relative">
+          <div className="w-full px-2 relative z-10">
             <AISearchBox />
           </div>
         </div>

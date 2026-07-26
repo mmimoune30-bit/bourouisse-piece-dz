@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -19,7 +20,9 @@ import {
   Loader2, 
   Tags, 
   Camera,
-  Search
+  Search,
+  Zap,
+  ShoppingBag
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
@@ -32,36 +35,20 @@ import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { toast } from "@/hooks/use-toast";
 
-const BANNERS = [
+const HERO_SIDE_BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/warehouse-dz/1200/400",
+    image: "https://picsum.photos/seed/join-seller/400/300",
     link: "/seller/register",
-    ar: {
-      title: "اشترك معنا واعرض منتجاتك",
-      description: "اعرض قطع الغيار الجديدة والمستعملة ووصل إلى آلاف المشترين.",
-      button: "سجل كبائع"
-    },
-    en: {
-      title: "Join Us & List Your Products",
-      description: "List new and used spare parts and reach thousands of buyers.",
-      button: "Register as Seller"
-    }
+    title: "اشترك معنا واعرض منتجاتك",
+    button: "سجل كبائع"
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/engine-dz/1200/400",
+    image: "https://picsum.photos/seed/get-goods/400/300",
     link: "/catalog",
-    ar: {
-      title: "ابحث عن قطع الغيار بسهولة",
-      description: "محرك بحث متطور حسب الماركة والموديل وسنة الصنع بدقة متناهية.",
-      button: "ابدأ البحث"
-    },
-    en: {
-      title: "Find Auto Parts Easily",
-      description: "Advanced search by brand, model and manufacturing year.",
-      button: "Start Searching"
-    }
+    title: "اشترك معنا واحصل على سلعتك",
+    button: "ابدأ التسوق"
   }
 ];
 
@@ -76,62 +63,42 @@ export default function Home() {
 
   const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
 
-  const categoryMetaQuery = useMemo(() => {
-    if (!firestore) return null;
-    return collection(firestore, "categories_metadata");
-  }, [firestore]);
-
-  const { data: categoriesMeta } = useCollection(categoryMetaQuery);
-
+  // جلب ميتاداتا التصنيفات
+  const { data: categoriesMeta } = useCollection(firestore ? collection(firestore, "categories_metadata") : null);
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
-    categoriesMeta?.forEach(meta => {
-      map[meta.id] = meta.imageUrl;
-    });
+    categoriesMeta?.forEach(meta => { map[meta.id] = meta.imageUrl; });
     return map;
   }, [categoriesMeta]);
 
-  const allCampaignsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return collection(firestore, "featured_stores");
-  }, [firestore]);
-
-  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(allCampaignsQuery);
-
+  // جلب المتاجر المميزة والحصرية
+  const { data: allCampaigns, loading: loadingCampaigns } = useCollection(firestore ? collection(firestore, "featured_stores") : null);
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const exclusiveStores = useMemo(() => {
     return (allCampaigns || [])
-      .filter(c => 
-        c.tier === "Exclusive" && 
-        c.status === "Active" && 
-        c.startDate <= today && 
-        c.endDate >= today
-      )
+      .filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today)
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
   const featuredStores = useMemo(() => {
     return (allCampaigns || [])
-      .filter(c => 
-        c.tier === "Featured" && 
-        c.status === "Active" && 
-        c.startDate <= today && 
-        c.endDate >= today
-      )
+      .filter(c => c.tier === "Featured" && c.status === "Active" && c.startDate <= today && c.endDate >= today)
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  const allStoresQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(
-      collection(firestore, "users"),
-      where("role", "==", "Seller"),
-      where("status", "==", "Active")
-    );
-  }, [firestore]);
+  // جلب المنتجات المميزة المروجة
+  const { data: featuredProducts, loading: loadingFeaturedProducts } = useCollection(firestore ? collection(firestore, "featured_products") : null);
+  const activeFeaturedProducts = useMemo(() => {
+    return (featuredProducts || [])
+      .filter(p => p.startDate <= today && p.endDate >= today)
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }, [featuredProducts, today]);
 
-  const { data: allStores, loading: loadingStores } = useCollection(allStoresQuery);
+  // جلب كافة المتاجر
+  const { data: allStores, loading: loadingStores } = useCollection(
+    firestore ? query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active")) : null
+  );
 
   useEffect(() => {
     const checkLang = () => {
@@ -144,10 +111,7 @@ export default function Home() {
   }, []);
 
   const handleStoreClick = (campaignId: string) => {
-    if (!firestore) return;
-    updateDoc(doc(firestore, "featured_stores", campaignId), {
-      "stats.clicks": increment(1)
-    });
+    if (firestore) updateDoc(doc(firestore, "featured_stores", campaignId), { "stats.clicks": increment(1) });
   };
 
   const handleUploadImage = async (categoryEn: string) => {
@@ -166,14 +130,11 @@ export default function Home() {
       reader.readAsDataURL(file);
       reader.onload = async (event) => {
         const compressed = event.target?.result as string;
-        await setDoc(doc(firestore, "categories_metadata", catEn), {
-          imageUrl: compressed,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
+        await setDoc(doc(firestore, "categories_metadata", catEn), { imageUrl: compressed, updatedAt: new Date().toISOString() }, { merge: true });
         toast({ title: "تم التحديث", description: "تم تحديث صورة التصنيف بنجاح." });
       };
     } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر رفع الصورة." });
+      toast({ variant: "destructive", title: "خطأ", description: "فشل رفع الصورة." });
     } finally {
       setUploadingCat(null);
     }
@@ -186,34 +147,32 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        <section className="container mx-auto px-4 mt-2">
-          <div className="flex flex-col lg:flex-row-reverse gap-4" dir="rtl">
-            <div className="lg:w-3/4 min-h-[180px] md:h-[220px] bg-white rounded-[24px] border-2 border-primary/5 shadow-sm overflow-hidden flex flex-col relative">
-              <div className="bg-primary/5 px-4 md:px-6 py-2 border-b flex items-center justify-between shrink-0 z-20">
-                 <h2 className="font-black text-xs md:text-sm text-primary flex items-center gap-2">
-                   <Crown size={16} className="text-secondary fill-secondary" /> متاجر حصرية
+        <section className="w-full px-1 md:px-2 mt-1">
+          <div className="flex flex-col lg:flex-row-reverse gap-2" dir="rtl">
+            {/* Exclusive Stores Slider */}
+            <div className="lg:w-3/4 h-[200px] md:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
+              <div className="bg-primary/5 px-4 py-1 border-b flex items-center justify-between z-20">
+                 <h2 className="font-black text-xs text-primary flex items-center gap-2">
+                   <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">
-                   {lang === 'AR' ? 'تصفح كافة المتاجر' : 'Browse Stores'} <ArrowLeft size={12} />
-                 </Link>
+                 <Link href="/catalog" className="text-[9px] font-bold text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={10} /></Link>
               </div>
-              
-              <div className="flex-grow relative overflow-hidden">
+              <div className="flex-grow relative">
                 {loadingCampaigns ? (
-                  <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
+                  <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
                     <CarouselContent className="h-full">
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
-                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 md:gap-8 px-4 md:px-12 hover:bg-zinc-50/50 transition-colors group py-4">
-                            <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl overflow-hidden relative border-4 border-white shadow-lg shrink-0">
+                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-4">
+                            <div className="w-20 h-20 md:w-32 md:h-32 rounded-xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
                             <div className="flex flex-col gap-1 text-right">
-                               <Badge className="bg-secondary text-primary font-black text-[10px] md:text-xs w-fit mr-auto py-0 h-5 md:h-6"><Crown size={10} className="hidden sm:inline" /> متجر حصري</Badge>
-                               <h3 className="font-black text-lg md:text-3xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-xs md:text-sm text-muted-foreground font-bold flex items-center gap-1 md:gap-2 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <Badge className="bg-secondary text-primary font-black text-[9px] w-fit mr-auto">👑 متجر حصري</Badge>
+                               <h3 className="font-black text-lg md:text-3xl text-primary line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-xs text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={12} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -221,87 +180,55 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground font-bold italic px-10 text-center text-xs md:text-sm">
-                    لا توجد إعلانات حصرية نشطة حالياً.
-                  </div>
+                  <div className="h-full flex items-center justify-center text-muted-foreground font-bold italic text-xs">لا توجد إعلانات حصرية حالياً.</div>
                 )}
               </div>
             </div>
 
-            <div className="lg:w-1/4 h-[120px] lg:h-[220px] relative rounded-[24px] overflow-hidden group shadow-lg border-4 border-white">
+            {/* Alternating Side Ads */}
+            <div className="lg:w-1/4 h-[120px] lg:h-[220px] relative rounded-xl overflow-hidden shadow-sm">
               <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
                 <CarouselContent className="h-full">
-                  {BANNERS.map((banner) => {
-                    const content = lang === "AR" ? banner.ar : banner.en;
-                    return (
-                      <CarouselItem key={banner.id} className="h-full">
-                        <div className="relative h-full w-full flex items-center justify-center">
-                          <Image src={banner.image} alt={content.title} fill className="object-cover" priority />
-                          <div className="absolute inset-0 bg-black/70" />
-                          <div className="relative z-10 p-4 text-center text-white space-y-2">
-                             <h3 className="text-xs md:text-sm font-black leading-tight">{content.title}</h3>
-                             <Link href={banner.link} className="block">
-                               <Button size="sm" className="w-full h-8 md:h-10 text-[10px] md:text-xs bg-secondary text-primary font-black rounded-lg">{content.button}</Button>
-                             </Link>
-                          </div>
+                  {HERO_SIDE_BANNERS.map((banner) => (
+                    <CarouselItem key={banner.id} className="h-full">
+                      <div className="relative h-full w-full flex items-center justify-center">
+                        <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                        <div className="absolute inset-0 bg-black/60" />
+                        <div className="relative z-10 p-4 text-center text-white space-y-2">
+                           <h3 className="text-xs md:text-sm font-black leading-tight">{banner.title}</h3>
+                           <Link href={banner.link} className="block">
+                             <Button size="sm" className="w-full h-8 bg-secondary text-primary font-black rounded-lg text-[10px]">{banner.button}</Button>
+                           </Link>
                         </div>
-                      </CarouselItem>
-                    );
-                  })}
+                      </div>
+                    </CarouselItem>
+                  ))}
                 </CarouselContent>
               </Carousel>
             </div>
           </div>
         </section>
 
-        <section className="container mx-auto px-4 py-4 mt-2">
-          <div className="flex flex-row-reverse justify-between items-center mb-4 gap-3 border-b pb-2">
-             <div className="text-right">
-                <h2 className="text-base md:text-lg font-black text-primary flex items-center justify-end gap-2">
-                   تصنيفات قطع الغيار <Tags size={18} className="text-secondary" />
-                </h2>
-             </div>
-             <Link href="/catalog">
-               <Button variant="link" className="text-secondary font-black text-[10px] md:text-xs h-auto p-0">عرض الكل <ArrowLeft size={14} /></Button>
-             </Link>
+        {/* Categories Section */}
+        <section className="w-full px-1 md:px-2 py-2 mt-1">
+          <div className="flex flex-row-reverse justify-between items-center mb-2 px-2 border-b border-primary/5 pb-1">
+             <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
+             <Link href="/catalog"><Button variant="link" className="text-secondary font-black text-[9px] h-auto p-0">عرض الكل</Button></Link>
           </div>
-          
-          <div className="flex flex-row-reverse gap-4 md:gap-6 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 scroll-smooth" dir="rtl">
+          <div className="flex flex-row-reverse gap-3 md:gap-4 overflow-x-auto pb-2 no-scrollbar px-1" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
-                <div key={i} className="flex flex-col items-center gap-2 shrink-0 group">
-                  <Link 
-                    href={`/catalog?category=${encodeURIComponent(cat.en)}`}
-                    className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-primary/5 bg-white shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
-                  >
-                    <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                <div key={i} className="flex flex-col items-center gap-1 shrink-0">
+                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="relative w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-primary/5 bg-white shadow-sm hover:scale-105 transition-transform flex items-center justify-center">
+                    <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-90" />
                     <div className="absolute inset-0 bg-black/5" />
                   </Link>
                   <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                    <Button 
-                      variant="outline" 
-                      className="h-7 md:h-8 px-3 md:px-4 rounded-lg border-2 border-primary/5 bg-white hover:bg-primary hover:text-white hover:border-primary font-black text-[9px] md:text-[10px] transition-all"
-                    >
-                      {lang === 'AR' ? cat.ar : cat.en}
-                    </Button>
+                    <span className="font-black text-[9px] text-primary bg-white px-2 py-0.5 rounded border border-zinc-100">{lang === 'AR' ? cat.ar : cat.en}</span>
                   </Link>
-                  
                   {isAdmin && (
-                    <button 
-                      onClick={() => handleUploadImage(cat.en)}
-                      disabled={uploadingCat === cat.en}
-                      className="mt-1 flex items-center gap-1 text-primary hover:text-secondary transition-colors"
-                    >
-                      {uploadingCat === cat.en ? (
-                        <Loader2 className="animate-spin" size={10} />
-                      ) : (
-                        <>
-                          <Camera size={10} />
-                          <span className="text-[8px] font-bold">تغيير الصورة</span>
-                        </>
-                      )}
-                    </button>
+                    <button onClick={() => handleUploadImage(cat.en)} className="text-[7px] font-bold text-secondary flex items-center gap-0.5"><Camera size={8} /> تعديل</button>
                   )}
                 </div>
               );
@@ -309,26 +236,22 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Featured Stores Slider */}
         {featuredStores && featuredStores.length > 0 && (
-          <section className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between mb-4 flex-row-reverse">
-              <h2 className="text-base md:text-lg font-black text-primary flex items-center gap-2">
-                <Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة
-              </h2>
+          <section className="w-full px-1 md:px-2 py-2">
+            <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse">
+              <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2"><Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة</h2>
             </div>
             <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4" dir="rtl">
+              <CarouselContent className="-ml-2" dir="rtl">
                 {featuredStores.map((campaign, i) => (
-                  <CarouselItem key={i} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/5 xl:basis-1/6">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="bg-white p-4 rounded-[24px] border-2 border-transparent hover:border-blue-100 hover:shadow-md transition-all block text-center space-y-2 h-full">
-                       <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-xl overflow-hidden relative border-2 border-zinc-50 shadow-sm">
+                  <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border hover:shadow-md transition-all block text-center space-y-1">
+                       <div className="w-10 h-10 mx-auto rounded-lg overflow-hidden relative border shadow-sm">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
-                       <div>
-                         <h4 className="font-black text-primary text-[10px] md:text-xs truncate">{campaign.storeName}</h4>
-                         <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold">{campaign.storeLocation}</p>
-                       </div>
-                       <Badge variant="outline" className="text-[8px] h-4 border-blue-200 text-blue-600 bg-blue-50">مميز</Badge>
+                       <h4 className="font-black text-primary text-[9px] truncate">{campaign.storeName}</h4>
+                       <Badge variant="outline" className="text-[7px] h-4 border-blue-200 text-blue-600">مميز</Badge>
                     </Link>
                   </CarouselItem>
                 ))}
@@ -337,38 +260,73 @@ export default function Home() {
           </section>
         )}
 
-        <section className="container mx-auto px-4 py-8">
-          <div className={cn("flex items-center justify-between mb-6 border-b-2 border-secondary pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <h2 className="text-lg md:text-xl font-black text-primary">{lang === 'AR' ? 'استكشف كافة المتاجر المعتمدة' : 'Explore All Verified Stores'}</h2>
-             <Link href="/catalog" className="text-xs font-bold text-muted-foreground hover:text-secondary">{lang === 'AR' ? 'مشاهدة المزيد' : 'View More'}</Link>
+        {/* Verified Stores Grid */}
+        <section className="w-full px-1 md:px-2 py-4">
+          <div className={cn("flex items-center justify-between mb-4 border-b-2 border-secondary pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+             <h2 className="text-base md:text-lg font-black text-primary">استكشف كافة المتاجر المعتمدة</h2>
+             <Link href="/catalog" className="text-[10px] font-bold text-muted-foreground hover:text-secondary">مشاهدة المزيد</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" dir="rtl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 px-1" dir="rtl">
             {loadingStores ? (
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 bg-zinc-200 animate-pulse rounded-2xl" />)
+              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 bg-zinc-200 animate-pulse rounded-xl" />)
             ) : allStores?.length > 0 ? (
               allStores.slice(0, 12).map((store) => (
-                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border hover:shadow-lg transition-all flex items-center gap-4 md:gap-6 flex-row-reverse text-right group">
-                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl overflow-hidden relative border-2 border-zinc-100 shrink-0">
-                     <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform" />
+                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-3 rounded-xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 flex-row-reverse text-right group">
+                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden relative border shrink-0">
+                     <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover" />
                    </div>
                    <div className="flex-grow">
-                      <h3 className="font-black text-sm md:text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">{store.name}</h3>
-                      <p className="text-[10px] md:text-sm text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
-                      <div className="mt-1 flex items-center gap-1 justify-end">
-                        <ShieldCheck size={14} className="text-green-500" />
-                        <span className="text-[8px] md:text-[9px] font-black text-zinc-400 uppercase">متجر معتمد</span>
-                      </div>
+                      <h3 className="font-black text-xs md:text-sm text-primary group-hover:text-secondary truncate">{store.name}</h3>
+                      <p className="text-[9px] text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={10} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
+                      <div className="mt-0.5 flex items-center gap-1 justify-end"><ShieldCheck size={10} className="text-green-500" /><span className="text-[7px] font-black text-zinc-400">معتمد</span></div>
                    </div>
                 </Link>
               ))
             ) : (
-              <div className="col-span-full py-20 md:py-32 bg-white rounded-[32px] md:rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
-                  <Search className="opacity-10 mb-4 w-12 h-12 md:w-16 md:h-16" />
-                  <p className="font-black text-base md:text-lg text-primary/40 px-6 text-center">لا توجد متاجر نشطة حالياً في النظام.</p>
+              <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
+                  <Search size={32} className="opacity-10 mb-2" />
+                  <p className="font-black text-xs">لا توجد متاجر نشطة حالياً.</p>
               </div>
             )}
           </div>
         </section>
+
+        {/* NEW: Featured Products Section */}
+        {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
+          <section className="w-full px-1 md:px-2 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
+            <div className="container mx-auto px-2">
+              <div className="flex items-center justify-between mb-6 flex-row-reverse">
+                 <div className="text-right">
+                    <h2 className="text-xl md:text-2xl font-black flex items-center justify-end gap-3 text-secondary">
+                       منتجات ننصح بها <Zap className="fill-secondary animate-pulse" size={24} />
+                    </h2>
+                    <p className="text-[10px] text-zinc-400 font-bold">أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.</p>
+                 </div>
+                 <Link href="/catalog">
+                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2">
+                       تصفح الكتالوج <ShoppingBag size={16} />
+                    </Button>
+                 </Link>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" dir="rtl">
+                {activeFeaturedProducts.map((p) => (
+                  <ProductCard 
+                    key={p.id}
+                    id={p.productId}
+                    name={p.productName}
+                    price={p.productPrice}
+                    image={p.productImage}
+                    seller={p.sellerName}
+                    category="مميز"
+                    condition="New"
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
       </main>
       <Footer />
     </div>

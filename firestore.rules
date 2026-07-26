@@ -3,8 +3,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // --- وظائف مساعدة للتحقق (Security Helpers) ---
-    
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -13,123 +11,43 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(uid)).data;
     }
 
-    // التحقق من صلاحيات المدير العام (Super Admin فقط)
-    function isSuperAdmin() {
-      return isAuthenticated() && (
-        getUserData(request.auth.uid).role == "Super Admin" || 
-        request.auth.token.email == "mmimoune30@gmail.com"
-      );
-    }
-
-    // التحقق من صلاحيات الطاقم الإداري (Super Admin, Manager, etc.)
     function isAdmin() {
       return isAuthenticated() && 
         getUserData(request.auth.uid).role in ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
     }
 
-    function isManager() {
-      return isAuthenticated() && getUserData(request.auth.uid).role == "Manager";
-    }
-
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function isActive() {
-      return isAuthenticated() && getUserData(request.auth.uid).status == "Active";
-    }
-
-    function isOwnerUpdatingAllowedFields() {
-      let allowedFields = ["name", "phone", "wilaya", "commune", "avatarUrl", "location"];
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
-    }
-
-    // --- 1. مجموعة المستخدمين (Users) ---
     match /users/{userId} {
-      allow read: if isAdmin() || isOwner(userId);
-      
-      allow create: if isAuthenticated() 
-                   && request.auth.uid == userId 
-                   && (request.resource.data.role in ["Customer", "Seller"] || request.auth.token.email == "mmimoune30@gmail.com");
-      
-      allow update: if isSuperAdmin() 
-                   || (isAdmin() && userId != request.auth.uid)
-                   || (isOwner(userId) && isOwnerUpdatingAllowedFields());
-      
-      allow delete: if isSuperAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
     }
 
-    // --- 2. المنتجات والإعلانات (Products & Listings) ---
-    match /{collectionName}/{docId} {
-      allow read: if collectionName in ["listings", "products"];
-      
-      allow create: if collectionName in ["listings", "products"] 
-                   && isAuthenticated() 
-                   && isActive()
-                   && (request.resource.data.sellerId == request.auth.uid);
-                   
-      allow update: if collectionName in ["listings", "products"] 
-                           && (isAdmin() || (resource.data.sellerId == request.auth.uid));
-
-      allow delete: if isAdmin();
-    }
-
-    // --- 3. المتاجر المميزة والحصرية (Featured Stores) ---
-    match /featured_stores/{campaignId} {
+    match /featured_stores/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // --- 4. طلبات الاشتراك (Subscription Requests) ---
-    match /subscription_requests/{requestId} {
+    match /featured_products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /listings/{id} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /subscription_requests/{id} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.sellerId == request.auth.uid);
-      allow create: if isAuthenticated() && request.resource.data.sellerId == request.auth.uid;
-      allow update, delete: if isAdmin();
+      allow write: if isAuthenticated();
     }
 
-    // --- 5. طلبات الشراء (Purchase Requests) ---
-    match /purchase_requests/{reqId} {
-      allow read: if isAdmin() || (isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid));
-      allow create: if isAuthenticated() && isActive() && request.resource.data.buyerId == request.auth.uid;
-      allow update: if isAdmin() || (isAuthenticated() && resource.data.sellerId == request.auth.uid);
-      allow delete: if isSuperAdmin();
-    }
-
-    // --- 6. الإشعارات (Notifications) ---
-    match /notifications/{notificationId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAdmin();
-      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
-    }
-
-    // --- 7. ميتاداتا التصنيفات (Category Images) ---
-    match /categories_metadata/{catId} {
+    match /categories_metadata/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // --- بقية المجموعات ---
-    match /complaints/{complaintId} {
-      allow create: if isAuthenticated() && isActive();
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow update, delete: if isAdmin();
-    }
-
-    match /support_tickets/{ticketId} {
-      allow create: if isAuthenticated();
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow update, delete: if isAdmin();
-    }
-
-    match /banners/{bannerId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    match /settings/{settingId} {
-      allow read: if true;
-      allow write: if isSuperAdmin();
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
     }
   }
 }
