@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -181,15 +180,15 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
             {/* Exclusive Stores Slider */}
             <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
-              <div className="bg-primary/5 px-4 py-1.5 border-b flex items-center justify-between z-20">
+              <div className="bg-primary/5 px-4 py-1.5 border-b flex items-center justify-between z-20 shrink-0">
                  <h2 className="font-black text-xs text-primary flex items-center gap-2">
                    <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
                  <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
               </div>
-              <div className="flex-grow relative">
+              <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
-                  <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
+                  <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
                     <CarouselContent className="h-full">
@@ -210,7 +209,7 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground font-bold italic text-xs">لا توجد إعلانات حصرية حالياً.</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-bold italic text-xs">لا توجد إعلانات حصرية حالياً.</div>
                 )}
               </div>
             </div>
@@ -224,9 +223,9 @@ export default function Home() {
                       <div className="relative h-full w-full flex items-center justify-center">
                         <Image src={banner.image} alt={banner.title} fill className="object-cover" data-ai-hint={banner.imageHint} />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-6 text-center text-white space-y-6">
-                           <h3 className="text-xl md:text-2xl font-black leading-tight">{banner.title}</h3>
-                           <Link href={banner.link} className="block">
+                        <div className="relative z-10 p-6 text-center text-white space-y-6 flex flex-col items-center justify-center h-full">
+                           <h3 className="text-xl md:text-2xl font-black leading-tight mb-4">{banner.title}</h3>
+                           <Link href={banner.link} className="w-full">
                              <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">{banner.button}</Button>
                            </Link>
                         </div>
