@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -158,11 +157,11 @@ const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel()
 
   return (
-    <div ref={carouselRef} className="overflow-hidden h-full">
+    <div ref={carouselRef} className="overflow-hidden h-full w-full">
       <div
         ref={ref}
         className={cn(
-          "flex h-full",
+          "flex h-full w-full",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
@@ -185,7 +184,7 @@ const CarouselItem = React.forwardRef<
       role="group"
       aria-roledescription="slide"
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full h-full",
+        "min-w-0 shrink-0 grow-0 basis-full h-full w-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}

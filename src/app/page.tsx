@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -184,7 +183,7 @@ export default function Home() {
                 {loadingCampaigns ? (
                   <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                 ) : exclusiveStores?.length > 0 ? (
-                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="w-full h-full">
+                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
                     <CarouselContent className="h-full">
                       {exclusiveStores.map((campaign, i) => (
                         <CarouselItem key={i} className="h-full">
@@ -209,14 +208,14 @@ export default function Home() {
             </div>
 
             <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm">
-              <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]}>
+              <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}>
                 <CarouselContent className="h-full">
                   {HERO_SIDE_BANNERS.map((banner) => (
                     <CarouselItem key={banner.id} className="h-full">
                       <div className="relative h-full w-full flex items-center justify-center">
                         <Image src={banner.image} alt={banner.title} fill className="object-cover" data-ai-hint={banner.imageHint} />
                         <div className="absolute inset-0 bg-black/60" />
-                        <div className="relative z-10 p-6 text-center text-white space-y-6 flex flex-col items-center justify-center h-full">
+                        <div className="relative z-10 p-6 text-center text-white space-y-6 flex flex-col items-center justify-center h-full w-full">
                            <h3 className="text-xl md:text-2xl font-black leading-tight mb-4">{banner.title}</h3>
                            <Link href={banner.link} className="w-full">
                              <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">{banner.button}</Button>
