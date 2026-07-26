@@ -32,16 +32,19 @@ export default function FeaturedProductsAdmin() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // States for the controlled form
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [priority, setPriority] = useState<string>("10");
   const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState<string>("");
 
+  // جلب كافة المنتجات النشطة
   const listingsQuery = useMemo(() => {
     if (!firestore) return null;
     return query(collection(firestore, "listings"), where("status", "==", "Active"));
   }, [firestore]);
 
+  // جلب كافة الحملات الحالية
   const campaignsQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_products");
