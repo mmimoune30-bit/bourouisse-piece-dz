@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -9,13 +10,10 @@ import { Button } from "@/components/ui/button";
 import { 
   ArrowLeft, 
   MapPin, 
-  ChevronRight, 
   ShieldCheck, 
   Star, 
-  ArrowRight, 
   Store, 
   Crown, 
-  Sparkles, 
   Loader2, 
   Tags, 
   Camera,
@@ -27,7 +25,6 @@ import {
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useUser } from "@/firebase";
 import { collection, query, where, updateDoc, doc, increment, setDoc, orderBy, limit } from "firebase/firestore";
@@ -38,7 +35,7 @@ import { toast } from "@/hooks/use-toast";
 const HERO_SIDE_BANNERS = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/join-seller/400/400",
+    image: "https://picsum.photos/seed/join-seller-1/400/400",
     link: "/seller/register",
     title: "اشترك معنا واعرض منتجاتك",
     button: "سجل كبائع",
@@ -46,11 +43,11 @@ const HERO_SIDE_BANNERS = [
   },
   {
     id: 2,
-    image: "https://picsum.photos/seed/get-goods/400/400",
-    link: "/catalog",
-    title: "اشترك معنا واحصل على سلعتك",
-    button: "ابدأ التسوق",
-    imageHint: "happy customer"
+    image: "https://picsum.photos/seed/join-seller-2/400/400",
+    link: "/seller/register",
+    title: "اشترك معنا و احصل على علاقات تجارية مميزة",
+    button: "ابدأ الآن",
+    imageHint: "business relations"
   }
 ];
 
@@ -65,7 +62,6 @@ export default function Home() {
 
   const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
 
-  // Memoized Queries
   const categoriesMetaQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "categories_metadata");
@@ -175,10 +171,8 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        {/* Hero Section - Matched Heights */}
         <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
-            {/* Exclusive Stores Slider */}
             <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
               <div className="bg-primary/5 px-4 py-1.5 border-b flex items-center justify-between z-20 shrink-0">
                  <h2 className="font-black text-xs text-primary flex items-center gap-2">
@@ -214,9 +208,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Alternating Side Ads - Exactly Matching Height */}
             <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm">
-              <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 }), Fade()]}>
+              <Carousel className="w-full h-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]}>
                 <CarouselContent className="h-full">
                   {HERO_SIDE_BANNERS.map((banner) => (
                     <CarouselItem key={banner.id} className="h-full">
@@ -238,7 +231,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Centered with Minimal Margins */}
         <section className="w-full px-0.5 py-1">
           <div className="flex flex-row-reverse justify-center items-center mb-1 px-2 border-b border-primary/5 pb-0.5">
              <h2 className="text-xs md:text-sm font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={14} className="text-secondary" /></h2>
@@ -264,7 +256,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Slider */}
         {featuredStores && featuredStores.length > 0 && (
           <section className="w-full px-0.5 py-2">
             <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse">
@@ -288,7 +279,6 @@ export default function Home() {
           </section>
         )}
 
-        {/* Verified Stores Grid */}
         <section className="w-full px-0.5 py-4">
           <div className={cn("flex items-center justify-between mb-4 border-b-2 border-secondary pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
              <h2 className="text-base md:text-lg font-black text-primary">استكشف كافة المتاجر المعتمدة</h2>
@@ -319,7 +309,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Explore Car Parts Section */}
         <section className="w-full px-0.5 py-6">
           <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
@@ -356,7 +345,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products Section */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
           <section className="w-full px-0.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
             <div className="container mx-auto px-2">
