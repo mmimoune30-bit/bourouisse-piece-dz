@@ -243,7 +243,7 @@ export default function Home() {
              <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
              <Link href="/catalog"><Button variant="link" className="text-secondary font-black text-[9px] h-auto p-0">عرض الكل</Button></Link>
           </div>
-          <div className="flex flex-row-reverse gap-3 md:gap-4 overflow-x-auto pb-2 no-scrollbar px-1" dir="rtl">
+          <div className="flex flex-row-reverse justify-center gap-3 md:gap-4 overflow-x-auto pb-2 no-scrollbar px-1" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
