@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags, Home, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,7 @@ export default function Navbar() {
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
+  const isNotHome = pathname !== "/";
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
@@ -81,10 +82,19 @@ export default function Navbar() {
       <div className="bg-white py-2 border-b">
         <div className="w-full px-2 flex items-center justify-between gap-2 md:gap-4">
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
               <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
             </Link>
+
+            {/* Back to Home Button - Shown on internal pages only */}
+            {isNotHome && (
+              <Link href="/" className="hidden md:block">
+                <Button variant="outline" size="sm" className="border-2 border-primary text-primary font-black rounded-xl h-10 px-4 gap-2 hover:bg-primary hover:text-white transition-all shadow-sm">
+                   <Home size={16} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Desktop Actions */}
@@ -135,6 +145,14 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4" dir="rtl">
+          {isNotHome && (
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button variant="outline" className="w-full border-2 border-primary text-primary font-black h-14 rounded-xl gap-3 text-lg">
+                <Home size={22} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+              </Button>
+            </Link>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="w-full text-primary font-black h-14 rounded-xl gap-3 text-lg justify-start">
