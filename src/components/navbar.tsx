@@ -46,7 +46,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-md">
-      {/* Layer 1: Top Info Bar */}
+      {/* Layer 1: Top Info Bar - Minimized Padding */}
       <div className="bg-white border-b border-zinc-100 py-1 overflow-hidden">
         <div className="w-full px-2 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
@@ -59,10 +59,10 @@ export default function Navbar() {
                </div>
             </div>
           </div>
-          <div className="shrink-0 pl-4 border-l flex items-center gap-2">
+          <div className="shrink-0 pl-2 border-l flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-1 md:gap-2 font-bold h-7 md:h-8 px-2">
+                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-1 md:gap-2 font-bold h-7 md:h-8 px-1">
                   <Globe size={14} className="text-primary" />
                   <span className="text-[10px] md:text-sm">{lang === 'AR' ? 'العربية' : 'English'}</span>
                   <ChevronDown size={12} />
@@ -77,19 +77,27 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding & Responsive Actions */}
+      {/* Layer 2: Main Branding & Responsive Actions - Minimized Padding */}
       <div className="bg-white py-2 border-b">
-        <div className="w-full px-2 flex items-center justify-between gap-4 md:gap-6">
+        <div className="w-full px-2 flex items-center justify-between gap-2 md:gap-4">
           
-          <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
-            <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
+              <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
+            </Link>
+            {/* Desktop Home Button Re-added */}
+            <Link href="/" className="hidden lg:block">
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 text-primary">
+                <Home size={20} />
+              </Button>
+            </Link>
+          </div>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-3" dir="rtl">
+          <div className="hidden lg:flex items-center gap-2" dir="rtl">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-primary font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-4">
+                <Button variant="ghost" className="text-primary font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-3">
                   <Tags size={18} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'} <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
@@ -105,31 +113,31 @@ export default function Navbar() {
             </DropdownMenu>
 
             <Link href="/seller/register">
-              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-sm h-11 px-5 transition-all">
+              <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-sm h-11 px-4 transition-all">
                 <Store size={18} /> كن بائعاً معنا
               </Button>
             </Link>
             <Link href="/join">
-              <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-11 px-5 transition-all">
+              <Button variant="outline" className="border-2 border-primary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 h-11 px-4 transition-all">
                 <UserPlus size={18} /> إضافة حساب
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-4">
+              <Button variant="ghost" className="text-zinc-600 font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-3">
                 <LogIn size={18} /> دخول
               </Button>
             </Link>
           </div>
 
           {/* Mobile Menu Trigger */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-1">
             <Link href="/">
-              <Button variant="outline" size="icon" className="rounded-xl border-2 w-10 h-10">
-                <Home size={20} className="text-primary" />
+              <Button variant="outline" size="icon" className="rounded-xl border-2 w-9 h-9">
+                <Home size={18} className="text-primary" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="rounded-xl w-10 h-10" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <Button variant="ghost" size="icon" className="rounded-xl w-9 h-9" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
           </div>
         </div>
@@ -173,10 +181,10 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Layer 3: Global Smart Search Bar */}
+      {/* Layer 3: Global Smart Search Bar - Minimal Margins */}
       {showSearch && (
-        <div className="bg-white py-1 border-b shadow-sm relative">
-          <div className="w-full px-2 relative z-10">
+        <div className="bg-white py-0.5 border-b shadow-sm relative">
+          <div className="w-full px-1 relative z-10">
             <AISearchBox />
           </div>
         </div>

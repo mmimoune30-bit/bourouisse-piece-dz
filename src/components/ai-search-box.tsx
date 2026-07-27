@@ -40,32 +40,34 @@ export default function AISearchBox() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 py-2">
-      {/* Container with Moroccan Geometric Pattern */}
-      <div className="relative p-1 rounded-[28px] overflow-hidden shadow-xl group transition-all duration-500 hover:shadow-2xl">
+    <div className="w-full max-w-5xl mx-auto px-1 py-1">
+      {/* Moroccan Zellige Ornamented Container */}
+      <div className="relative p-1 rounded-[32px] overflow-hidden shadow-2xl group transition-all duration-700 hover:shadow-secondary/20">
         
-        {/* Moroccan Pattern Background (Zellige Inspired) */}
+        {/* Intricate Zellige Pattern Background */}
         <div 
-          className="absolute inset-0 opacity-20 pointer-events-none"
+          className="absolute inset-0 opacity-40 pointer-events-none"
           style={{
-            backgroundColor: "#ffffff",
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%231a2b4b' fill-opacity='1'%3E%3Cpath d='M0 0h80v80H0V0zm20 20h40v40H20V20zm20 0L20 40l20 20 20-20-20-20z'/%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '40px 40px'
+            backgroundColor: "#1a2b4b", // Royal Blue Base
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23d4a017' fill-opacity='0.4'%3E%3Cpath d='M50 0L61.2 38.8H100L68.8 61.2L80 100L50 77.5L20 100L31.2 61.2L0 38.8H38.8L50 0z'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '30px 30px'
           }}
         />
         
-        {/* Animated Gradient Border (Blue & Gold) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary animate-spin-slow opacity-30 group-hover:opacity-100 transition-opacity duration-1000" style={{ animationDuration: '8s' }} />
+        {/* Glowing Golden Border Animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary animate-spin-slow opacity-50 group-hover:opacity-100 transition-opacity duration-1000" style={{ animationDuration: '10s' }} />
 
-        {/* Form Body */}
+        {/* Search Bar Body */}
         <form 
           onSubmit={handleSubmit} 
-          className="relative bg-white rounded-[24px] overflow-hidden flex items-center h-14 border-4 border-double border-primary/10"
+          className="relative bg-white rounded-[28px] overflow-hidden flex items-center h-16 border-[6px] border-double border-primary/20"
         >
-          {/* Moroccan Left Accent */}
-          <div className="hidden md:flex items-center px-4 border-r border-zinc-100 bg-zinc-50/50">
-            <div className="w-6 h-6 text-secondary rotate-45 border-2 border-primary flex items-center justify-center">
-               <div className="w-2 h-2 bg-primary rotate-45" />
+          {/* Moroccan Left Motif */}
+          <div className="hidden md:flex items-center px-5 border-r-2 border-zinc-100 bg-zinc-50">
+            <div className="relative w-8 h-8 flex items-center justify-center">
+               <div className="absolute inset-0 border-2 border-secondary rotate-45" />
+               <div className="absolute inset-0 border-2 border-primary rotate-0" />
+               <div className="w-2 h-2 bg-secondary rounded-full" />
             </div>
           </div>
 
@@ -76,40 +78,44 @@ export default function AISearchBox() {
                 setValue(e.target.value);
                 handleSearch(e.target.value);
               }}
-              placeholder="ابحث بذكاء عن قطعة غيار (مثلاً: محرك كليو 4)..."
-              className="w-full h-full pr-12 pl-4 bg-transparent focus:outline-none text-right font-black text-primary placeholder:text-zinc-400 placeholder:font-bold"
+              placeholder="ابحث بذكاء (مثلاً: محرك كليو 4، إطارات ميشلان)..."
+              className="w-full h-full pr-14 pl-6 bg-transparent focus:outline-none text-right font-black text-primary placeholder:text-zinc-400 placeholder:font-bold text-lg"
               dir="rtl"
             />
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-primary w-5 h-5 transition-transform group-focus-within:scale-110" />
+            <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-primary w-6 h-6 transition-transform group-focus-within:scale-125" />
           </div>
 
-          {/* Search Button with Sparkle */}
+          {/* Luxury Search Button */}
           <button 
             type="submit"
-            className="h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-zinc-900 transition-colors border-l-4 border-double border-secondary/50"
+            className="h-full bg-primary text-secondary px-8 flex items-center gap-3 hover:bg-zinc-900 transition-all border-l-4 border-double border-secondary/50 active:scale-95"
           >
-            <span className="font-black hidden sm:inline">بحث ذكي</span>
-            <Sparkles size={18} className="animate-pulse" />
+            <span className="font-black text-lg hidden sm:inline">بحث ذكي</span>
+            <Sparkles size={22} className="animate-pulse text-secondary" />
           </button>
 
-          {/* Moroccan Right Accent */}
-          <div className="hidden md:flex items-center px-4 border-l border-zinc-100 bg-zinc-50/50">
-             <div className="w-6 h-6 text-secondary rotate-45 border-2 border-primary flex items-center justify-center">
-               <div className="w-2 h-2 bg-primary rotate-45" />
+          {/* Moroccan Right Motif */}
+          <div className="hidden md:flex items-center px-5 border-l-2 border-zinc-100 bg-zinc-50">
+             <div className="relative w-8 h-8 flex items-center justify-center">
+               <div className="absolute inset-0 border-2 border-secondary rotate-45" />
+               <div className="absolute inset-0 border-2 border-primary rotate-0" />
+               <div className="w-2 h-2 bg-secondary rounded-full" />
             </div>
           </div>
         </form>
       </div>
 
-      {/* Moroccan Sub-Decoration (Optional visual line) */}
-      <div className="flex items-center justify-center gap-4 mt-1 opacity-40">
-         <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-primary" />
-         <div className="w-2 h-2 bg-secondary rotate-45" />
-         <div className="w-3 h-3 border border-primary rotate-45 flex items-center justify-center">
-            <div className="w-1 h-1 bg-secondary rotate-45" />
+      {/* Elegant Moroccan Sub-Line Decoration */}
+      <div className="flex items-center justify-center gap-6 mt-2 opacity-60">
+         <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-primary to-secondary" />
+         <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-secondary rotate-45" />
+            <div className="w-4 h-4 border-2 border-primary rotate-45 flex items-center justify-center">
+               <div className="w-1.5 h-1.5 bg-secondary rotate-45" />
+            </div>
+            <div className="w-2 h-2 bg-secondary rotate-45" />
          </div>
-         <div className="w-2 h-2 bg-secondary rotate-45" />
-         <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent to-primary" />
+         <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-primary to-secondary" />
       </div>
     </div>
   );
