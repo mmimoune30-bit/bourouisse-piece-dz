@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home, Menu, X
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home, Menu, X, Tags
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
+import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 const WhatsAppIcon = () => (
@@ -86,11 +87,23 @@ export default function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3" dir="rtl">
-            <Link href="/">
-              <Button variant="ghost" className="text-primary font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-4">
-                <Home size={18} /> الرئيسية
-              </Button>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-primary font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-4">
+                  <Tags size={18} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'} <ChevronDown size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[70vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+                {PART_CATEGORIES.map((cat) => (
+                  <DropdownMenuItem key={cat.en} asChild>
+                    <Link href={`/catalog?category=${cat.en}`} className="justify-end font-bold py-2 cursor-pointer rounded-xl text-right w-full">
+                      {lang === 'AR' ? cat.ar : cat.en}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link href="/seller/register">
               <Button className="bg-secondary text-primary font-black hover:bg-primary hover:text-white rounded-xl gap-2 shadow-sm h-11 px-5 transition-all">
                 <Store size={18} /> كن بائعاً معنا
@@ -125,11 +138,23 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4" dir="rtl">
-          <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full text-primary font-black h-12 rounded-xl gap-3">
-                <Home size={18} /> الصفحة الرئيسية
-             </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full text-primary font-black h-14 rounded-xl gap-3 text-lg justify-start">
+                <Tags size={22} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-[calc(100vw-32px)] p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[50vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+              {PART_CATEGORIES.map((cat) => (
+                <DropdownMenuItem key={cat.en} asChild onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href={`/catalog?category=${cat.en}`} className="justify-end font-bold py-3 cursor-pointer rounded-xl text-right w-full">
+                    {lang === 'AR' ? cat.ar : cat.en}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}>
              <Button className="w-full bg-secondary text-primary font-black h-14 rounded-2xl gap-3 text-lg">
                 <Store size={20} /> كن بائعاً معنا
