@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Home, Menu, X, Tags
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,12 +85,6 @@ export default function Navbar() {
             <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
               <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
             </Link>
-            {/* Desktop Home Button Re-added */}
-            <Link href="/" className="hidden lg:block">
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 text-primary">
-                <Home size={20} />
-              </Button>
-            </Link>
           </div>
 
           {/* Desktop Actions */}
@@ -131,11 +125,6 @@ export default function Navbar() {
 
           {/* Mobile Menu Trigger */}
           <div className="lg:hidden flex items-center gap-1">
-            <Link href="/">
-              <Button variant="outline" size="icon" className="rounded-xl border-2 w-9 h-9">
-                <Home size={18} className="text-primary" />
-              </Button>
-            </Link>
             <Button variant="ghost" size="icon" className="rounded-xl w-9 h-9" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
