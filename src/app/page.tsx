@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -153,7 +152,7 @@ export default function Home() {
       <main className="flex-grow pt-[170px] md:pt-[190px]">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
 
-        {/* Hero Section with Unified Height and Minimum Margins */}
+        {/* Hero Section - Unified Height 400px */}
         <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
             {/* Exclusive Stores Slider */}
@@ -192,16 +191,15 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Alternating Side Ads - Fixed Background Image */}
+            {/* Alternating Side Ads - Content Swapping Only */}
             <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-primary/5">
-              {/* Static Background Image for all slides */}
+              {/* Static Background Image & Overlay for all slides */}
               <Image 
                 src="https://picsum.photos/seed/auto-hero-real/1200/800" 
                 alt="Ad Background" 
                 fill 
                 className="object-cover" 
               />
-              {/* Static Dark Overlay */}
               <div className="absolute inset-0 bg-black/65 z-0" />
               
               <Carousel 
@@ -210,8 +208,8 @@ export default function Home() {
                 className="w-full h-full relative z-10"
               >
                 <CarouselContent className="h-full -ml-0">
-                  {/* Slide 1: Seller Join Text */}
-                  <CarouselItem className="h-full pl-0">
+                  {/* Slide 1: Seller Join */}
+                  <CarouselItem key="side-ad-1" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
                       <Link href="/seller/register" className="w-full">
@@ -220,8 +218,8 @@ export default function Home() {
                     </div>
                   </CarouselItem>
 
-                  {/* Slide 2: Buyer Join Text */}
-                  <CarouselItem className="h-full pl-0">
+                  {/* Slide 2: Buyer Join */}
+                  <CarouselItem key="side-ad-2" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
                       <Link href="/buyer/register" className="w-full">
@@ -230,8 +228,8 @@ export default function Home() {
                     </div>
                   </CarouselItem>
 
-                  {/* Slide 3: Logo Display */}
-                  <CarouselItem className="h-full pl-0">
+                  {/* Slide 3: Logo Brand */}
+                  <CarouselItem key="side-ad-3" className="h-full pl-0">
                     <div className="flex flex-col items-center justify-center h-full w-full p-8">
                         <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
                     </div>
@@ -242,7 +240,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Centered with Matching Font Sizes */}
+        {/* Categories Section */}
         <section className="w-full px-0.5 py-1">
           <div className="flex flex-row-reverse justify-center items-center mb-1 px-2 border-b border-primary/5 pb-0.5">
              <h2 className="text-xs md:text-sm font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={14} className="text-secondary" /></h2>
@@ -292,38 +290,7 @@ export default function Home() {
           </section>
         )}
 
-        {/* Explore All Registered Stores */}
-        <section className="w-full px-0.5 py-4">
-          <div className={cn("flex items-center justify-between mb-4 border-b-2 border-secondary pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <h2 className="text-base md:text-lg font-black text-primary">استكشف كافة المتاجر المعتمدة</h2>
-             <Link href="/catalog" className="text-[10px] font-bold text-muted-foreground hover:text-secondary">مشاهدة المزيد</Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 px-1" dir="rtl">
-            {loadingStores ? (
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 bg-zinc-200 animate-pulse rounded-xl" />)
-            ) : allStores?.length > 0 ? (
-              allStores.slice(0, 12).map((store) => (
-                <Link key={store.id} href={`/catalog?query=${encodeURIComponent(store.name)}`} className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 flex-row-reverse text-right group">
-                   <div className="w-16 h-16 rounded-xl overflow-hidden relative border shrink-0">
-                     <Image src={store.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${store.name}`} alt={store.name} fill className="object-cover" />
-                   </div>
-                   <div className="flex-grow">
-                      <h3 className="font-black text-sm md:text-base text-primary group-hover:text-secondary truncate">{store.name}</h3>
-                      <p className="text-[10px] text-muted-foreground flex items-center gap-1 justify-end"><MapPin size={10} className="text-secondary" /> {store.wilaya || 'الجزائر'}</p>
-                      <div className="mt-1 flex items-center gap-1 justify-end"><ShieldCheck size={12} className="text-green-500" /><span className="text-[8px] font-black text-zinc-400">معتمد</span></div>
-                   </div>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
-                  <Search size={32} className="opacity-10 mb-2" />
-                  <p className="font-black text-xs">لا توجد متاجر نشطة حالياً.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Explore Latest Parts - New Section */}
+        {/* Explore Latest Parts */}
         <section className="w-full px-0.5 py-6">
           <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
@@ -360,7 +327,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products Section - Managed by Admin */}
+        {/* Featured Products Section */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
           <section className="w-full px-0.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
             <div className="container mx-auto px-2">
