@@ -31,15 +31,7 @@ import { collection, query, where, updateDoc, doc, increment, setDoc, orderBy, l
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { toast } from "@/hooks/use-toast";
-
-const HERO_SIDE_BANNER = {
-  id: 1,
-  image: "https://picsum.photos/seed/join-seller-1/1200/800",
-  link: "/seller/register",
-  title: "اشترك معنا واعرض منتجاتك",
-  button: "سجل كبائع",
-  imageHint: "car seller"
-};
+import SiteLogo from "@/components/site-logo";
 
 export default function Home() {
   const { firestore } = useFirestore();
@@ -200,18 +192,58 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Static Side Ad - FIXED "Join Us" Banner */}
+            {/* Alternating Side Ads */}
             <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-white border border-primary/5">
-              <div className="relative h-full w-full">
-                <Image src={HERO_SIDE_BANNER.image} alt={HERO_SIDE_BANNER.title} fill className="object-cover" data-ai-hint={HERO_SIDE_BANNER.imageHint} />
-                <div className="absolute inset-0 bg-black/60" />
-                <div className="relative z-10 p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
-                   <h3 className="text-xl md:text-2xl font-black leading-tight">{HERO_SIDE_BANNER.title}</h3>
-                   <Link href={HERO_SIDE_BANNER.link} className="w-full">
-                     <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">{HERO_SIDE_BANNER.button}</Button>
-                   </Link>
-                </div>
-              </div>
+              <Carousel 
+                opts={{ loop: true }} 
+                plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
+                className="w-full h-full"
+              >
+                <CarouselContent className="h-full -ml-0">
+                  {/* Slide 1: Seller Join */}
+                  <CarouselItem className="h-full pl-0">
+                    <div className="relative h-full w-full">
+                      <Image src="https://picsum.photos/seed/join-seller-1/1200/800" alt="Seller Ad" fill className="object-cover" />
+                      <div className="absolute inset-0 bg-black/60" />
+                      <div className="relative z-10 p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
+                        <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
+                        <Link href="/seller/register" className="w-full">
+                          <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">سجل كبائع</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CarouselItem>
+
+                  {/* Slide 2: Buyer Join */}
+                  <CarouselItem className="h-full pl-0">
+                    <div className="relative h-full w-full">
+                      <Image src="https://picsum.photos/seed/join-buyer-1/1200/800" alt="Buyer Ad" fill className="object-cover" />
+                      <div className="absolute inset-0 bg-black/60" />
+                      <div className="relative z-10 p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
+                        <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
+                        <Link href="/buyer/register" className="w-full">
+                          <Button className="w-full h-14 border-2 border-white text-white hover:bg-white hover:text-primary font-black rounded-xl text-lg shadow-lg transition-all">سجل كمشتري</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CarouselItem>
+
+                  {/* Slide 3: Full Logo */}
+                  <CarouselItem className="h-full pl-0">
+                    <div className="relative h-full w-full bg-zinc-950 flex flex-col items-center justify-center p-8">
+                        {/* Decorative Pattern Background for Logo Slide */}
+                        <div 
+                          className="absolute inset-0 opacity-10"
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23d4a017' fill-opacity='0.4'%3E%3Cpath d='M50 0L61.2 38.8H100L68.8 61.2L80 100L50 77.5L20 100L31.2 61.2L0 38.8H38.8L50 0z'/%3E%3C/g%3E%3C/svg%3E")`,
+                            backgroundSize: '40px 40px'
+                          }}
+                        />
+                        <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
+                    </div>
+                  </CarouselItem>
+                </CarouselContent>
+              </Carousel>
             </div>
           </div>
         </section>
