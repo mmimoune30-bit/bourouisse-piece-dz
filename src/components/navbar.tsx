@@ -84,7 +84,7 @@ export default function Navbar() {
           
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
-              <SiteLogo className="min-w-[140px] md:min-w-[180px]" />
+              <SiteLogo className="min-w-[180px] md:min-w-[240px]" />
             </Link>
 
             {/* Back to Home Button - Shown on internal pages only */}
