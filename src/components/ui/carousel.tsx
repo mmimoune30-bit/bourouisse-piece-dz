@@ -87,7 +87,7 @@ const Carousel = React.forwardRef<
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
-        igit commit - (event.key === "ArrowLeft") {
+        if (event.key === "ArrowLeft") {
           event.preventDefault()
           scrollPrev()
         } else if (event.key === "ArrowRight") {
@@ -137,7 +137,7 @@ const Carousel = React.forwardRef<
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
-          className={cn("relative", className)}
+          className={cn("relative h-full", className)}
           role="region"
           aria-roledescription="carousel"
           {...props}
