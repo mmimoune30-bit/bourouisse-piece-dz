@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "update-images": "python update_categories_images.py"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
