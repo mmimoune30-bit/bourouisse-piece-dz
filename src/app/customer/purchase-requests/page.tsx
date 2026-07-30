@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,12 +24,16 @@ export default function MyPurchaseRequests() {
   const { firestore } = useFirestore();
   const { user } = useUser();
 
-  const requestsQuery = query(
-    collection(firestore!, "purchase_requests"),
-    where("buyerId", "==", user?.uid || "guest"),
-    orderBy("createdAt", "desc")
-  );
-
+  const requestsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+  
+    return query(
+      collection(firestore, "purchase_requests"),
+      where("buyerId", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
+  }, [firestore, user]);
+  
   const { data: requests, loading } = useCollection(requestsQuery);
 
   return (
