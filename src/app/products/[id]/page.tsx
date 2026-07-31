@@ -54,7 +54,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   const { data: product, loading } = useDoc(productRef);
 
-  // استعلام جلب الإعلانات الأخرى لنفس البائع
   const sellerListingsQuery = useMemo(() => {
     if (!firestore || !product?.sellerId) return null;
     return query(
@@ -67,7 +66,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   const { data: otherListings, loading: loadingOthers } = useCollection(sellerListingsQuery);
 
-  // تصفية المنتج الحالي يدوياً من النتائج
   const filteredOthers = useMemo(() => {
     return otherListings?.filter(l => l.id !== resolvedParams.id) || [];
   }, [otherListings, resolvedParams.id]);
@@ -161,10 +159,12 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-[230px] md:pt-[270px] pb-24 lg:pb-12">
+      {/* Reduced padding-top from 230px/270px to 160px/180px */}
+      <main className="flex-grow pt-[160px] md:pt-[180px] pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           
-          <div className="mb-6 text-center space-y-2">
+          {/* Reduced margin-bottom from mb-6 to mb-3 */}
+          <div className="mb-3 text-center space-y-1">
             <h1 className={cn("text-xl md:text-3xl text-zinc-800 tracking-tight leading-relaxed uppercase px-4", titleFont)}>
               {product.name}
             </h1>
@@ -173,36 +173,37 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          <div className={cn("grid grid-cols-1 lg:grid-cols-4 gap-8", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          {/* Reduced gap from gap-8 to gap-4 */}
+          <div className={cn("grid grid-cols-1 lg:grid-cols-4 gap-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
-            <div className="lg:col-span-1 space-y-6">
-              <Card className="border-orange-500 border-2 shadow-xl rounded-2xl md:rounded-[24px] overflow-hidden bg-white">
-                <CardContent className="p-6 md:p-8 flex flex-col items-center text-center gap-4">
+            <div className="lg:col-span-1 space-y-4">
+              <Card className="border-orange-500 border-2 shadow-xl rounded-2xl overflow-hidden bg-white">
+                <CardContent className="p-4 md:p-6 flex flex-col items-center text-center gap-3">
                    <div className={cn("text-3xl md:text-4xl text-orange-600", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} <span className="text-sm">دج</span></div>
-                   <div className={cn("text-zinc-600 text-sm md:text-base flex items-center gap-2", normalFont)}>
+                   <div className={cn("text-zinc-600 text-sm flex items-center gap-2", normalFont)}>
                      <Truck size={18} className="text-orange-500" /> {t.delivery[lang]}
                    </div>
-                   <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full mt-2">
+                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full mt-1">
                      <Button 
-                      className={cn("flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full gap-2 text-base shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
+                      className={cn("flex-1 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full gap-2 text-sm shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
                       onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
                      >
-                        <ShoppingCart size={20} /> {t.cart[lang]}
+                        <ShoppingCart size={18} /> {t.cart[lang]}
                      </Button>
                      <Link href={`/products/${product.id}/purchase`} className="flex-1">
                         <Button 
-                          className={cn("w-full bg-zinc-900 hover:bg-black text-white h-14 px-8 rounded-full text-base shadow-lg gap-2 uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
+                          className={cn("w-full bg-zinc-900 hover:bg-black text-white h-12 px-8 rounded-full text-sm shadow-lg gap-2 uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
                         >
-                          <Zap size={20} className="text-secondary" /> {t.buyNow[lang]}
+                          <Zap size={18} className="text-secondary" /> {t.buyNow[lang]}
                         </Button>
                      </Link>
                    </div>
                 </CardContent>
               </Card>
 
-              <Card className="border-none shadow-sm rounded-2xl md:rounded-[24px] bg-white">
-                <CardContent className="p-6 space-y-6">
-                   <div className={cn("flex items-center gap-4 text-zinc-700 border-b pb-4", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+              <Card className="border-none shadow-sm rounded-2xl bg-white">
+                <CardContent className="p-4 space-y-4">
+                   <div className={cn("flex items-center gap-4 text-zinc-700 border-b pb-3", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                       <div className={lang === 'AR' ? "text-right" : "text-left"}>
                          <span className={cn("text-base block uppercase", titleFont)}>{product.sellerName}</span>
                          <span className={cn("text-xs text-muted-foreground", normalFont)}>{product.wilaya || t.trusted[lang]}</span>
@@ -211,24 +212,24 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                    </div>
 
                    <div className="grid grid-cols-3 gap-2">
-                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('viber')}>
+                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('viber')}>
                          <ViberIcon /> {t.viber[lang]}
                       </Button>
-                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('whatsapp')}>
+                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('whatsapp')}>
                          <MessageCircle size={16} /> {t.whatsapp[lang]}
                       </Button>
-                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('telegram')}>
+                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('telegram')}>
                          <TelegramIcon /> {t.telegram[lang]}
                       </Button>
                    </div>
 
-                   <Button className={cn("w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-xl gap-3 text-xl shadow-xl transition-all", lang === 'AR' ? 'font-black' : 'font-semibold')} onClick={() => handleContact('phone')}>
-                      <Phone size={24} /> {product.phone || t.callNow[lang]}
+                   <Button className={cn("w-full h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl gap-3 text-lg shadow-xl", lang === 'AR' ? 'font-black' : 'font-semibold')} onClick={() => handleContact('phone')}>
+                      <Phone size={20} /> {product.phone || t.callNow[lang]}
                    </Button>
 
-                   <div className={cn("flex gap-2 items-start p-4 bg-zinc-50 rounded-2xl", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
-                      <AlertCircle className="text-zinc-400 shrink-0 mt-0.5" size={16} />
-                      <p className={cn("text-[10px] md:text-[11px] text-zinc-500 leading-relaxed", normalFont, lang === 'AR' ? "text-right" : "text-left")}>
+                   <div className={cn("flex gap-2 items-start p-3 bg-zinc-50 rounded-2xl", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+                      <AlertCircle className="text-zinc-400 shrink-0 mt-0.5" size={14} />
+                      <p className={cn("text-[10px] text-zinc-500 leading-relaxed", normalFont, lang === 'AR' ? "text-right" : "text-left")}>
                          {t.disclaimer[lang]}
                       </p>
                    </div>
@@ -236,61 +237,62 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </Card>
             </div>
 
-            <div className="lg:col-span-3 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="lg:col-span-3 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                  {product.images?.map((img: string, i: number) => (
-                   <div key={i} className="relative aspect-[4/3] rounded-[24px] overflow-hidden bg-white shadow-md border-4 border-white group">
+                   <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white group">
                       <Image src={img} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority={i === 0} />
                    </div>
                  ))}
               </div>
 
-              <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden">
-                <CardContent className="p-6 md:p-10 space-y-8">
-                   <h2 className={cn("text-2xl md:text-3xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
+              <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
+                <CardContent className="p-6 md:p-8 space-y-4">
+                   <h2 className={cn("text-xl md:text-2xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
                       {t.specs[lang]}
                    </h2>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-12 text-sm md:text-base">
-                      <div className="space-y-4">
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                   {/* Reduced space-y from 8 to 4 and gap from 12 to 6 */}
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 text-sm">
+                      <div className="space-y-2">
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.condition[lang]}</span>
                             <Badge className={cn("h-7 px-4 uppercase", titleFont)}>{product.condition === 'new' ? t.new[lang] : t.used[lang]}</Badge>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.quantity[lang]}</span>
                             <span className={cn("text-orange-600", titleFont)}>{product.quantity || 1} {t.piece[lang]}</span>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.store[lang]}</span>
                             <span className={cn("text-primary uppercase", titleFont)}>{product.sellerName}</span>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.fuel[lang]}</span>
                             <span className={cn("text-primary uppercase", titleFont)}>{product.fuelType || "-"}</span>
                          </div>
                       </div>
-                      <div className="space-y-4">
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                      <div className="space-y-2">
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.brand[lang]}</span>
                             <span className={cn("text-primary uppercase", titleFont)}>{product.brand}</span>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.model[lang]}</span>
                             <span className={cn("text-primary uppercase", titleFont)}>{product.model}</span>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.year[lang]}</span>
                             <span className={cn("text-primary uppercase", titleFont)}>{product.year}</span>
                          </div>
-                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                         <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                             <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.posted[lang]}</span>
                             <span className={cn("text-zinc-400 text-xs md:text-sm", titleFont)}>{formattedDate}</span>
                          </div>
                       </div>
                    </div>
-                   <div className="pt-6 border-t">
-                      <h4 className={cn("text-primary mb-4 text-lg uppercase", titleFont)}>{t.description[lang]}</h4>
-                      <p className={cn("text-zinc-600 leading-loose whitespace-pre-line text-sm md:text-base", normalFont)}>
+                   <div className="pt-4 border-t">
+                      <h4 className={cn("text-primary mb-2 text-base uppercase", titleFont)}>{t.description[lang]}</h4>
+                      <p className={cn("text-zinc-600 leading-relaxed whitespace-pre-line text-sm", normalFont)}>
                         {product.description || t.noDescription[lang]}
                       </p>
                    </div>
@@ -299,17 +301,17 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          {/* قسم إعلانات أخرى لنفس البائع */}
+          {/* More Ads Section */}
           {filteredOthers.length > 0 && (
-            <div className="mt-16 space-y-6">
+            <div className="mt-12 space-y-4">
               <div 
                 dir={lang === 'AR' ? "rtl" : "ltr"}
                 className={cn("bg-zinc-100 px-6 py-3 flex items-center justify-between border-b-2 border-black/10 rounded-lg shadow-sm", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
               >
-                <h2 className={cn("text-lg md:text-2xl text-black flex items-center gap-3 uppercase", titleFont)}>
+                <h2 className={cn("text-lg md:text-xl text-black flex items-center gap-3 uppercase", titleFont)}>
                   {t.moreFromSeller[lang]} <PackageSearch size={24} className="text-secondary" />
                 </h2>
-                <Link href={`/catalog?query=${encodeURIComponent(product.sellerName)}`} className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>
+                <Link href={`/catalog?query=${encodeURIComponent(product.sellerName)}`} className={cn("text-sm text-black hover:underline uppercase", titleFont)}>
                   عرض الكل
                 </Link>
               </div>
@@ -338,4 +340,3 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     </div>
   );
 }
-
