@@ -122,9 +122,9 @@ function CatalogContent() {
       )}
 
       <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-muted-foreground uppercase">{t.brand[lang]}</Label>
+        <Label className="font-black text-sm text-black uppercase">{t.brand[lang]}</Label>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="h-11 border-2"><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
+          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Any">{t.allBrands[lang]}</SelectItem>
             {availableBrands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
@@ -133,9 +133,9 @@ function CatalogContent() {
       </div>
 
       <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-muted-foreground uppercase">{t.model[lang]}</Label>
+        <Label className="font-black text-sm text-black uppercase">{t.model[lang]}</Label>
         <Select value={model} onValueChange={setModel} disabled={!brand || brand === "Any"}>
-          <SelectTrigger className="h-11 border-2"><SelectValue placeholder={t.allModels[lang]} /></SelectTrigger>
+          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allModels[lang]} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Any">{t.allModels[lang]}</SelectItem>
             {availableModels.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -144,9 +144,9 @@ function CatalogContent() {
       </div>
 
       <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-muted-foreground uppercase">{t.year[lang]}</Label>
+        <Label className="font-black text-sm text-black uppercase">{t.year[lang]}</Label>
         <Select value={year} onValueChange={setYear}>
-          <SelectTrigger className="h-11 border-2"><SelectValue placeholder={t.allYears[lang]} /></SelectTrigger>
+          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allYears[lang]} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Any">{t.allYears[lang]}</SelectItem>
             {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
@@ -155,9 +155,9 @@ function CatalogContent() {
       </div>
 
       <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-muted-foreground uppercase">{t.fuel[lang]}</Label>
+        <Label className="font-black text-sm text-black uppercase">{t.fuel[lang]}</Label>
         <Select value={fuelType} onValueChange={setFuelType}>
-          <SelectTrigger className="h-11 border-2"><SelectValue placeholder={t.allTypes[lang]} /></SelectTrigger>
+          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allTypes[lang]} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Any">{t.allTypes[lang]}</SelectItem>
             {FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en}>{f[lang.toLowerCase() as keyof Translation]}</SelectItem>)}
@@ -166,9 +166,9 @@ function CatalogContent() {
       </div>
 
       <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-muted-foreground uppercase">{t.category[lang]}</Label>
+        <Label className="font-black text-sm text-black uppercase">{t.category[lang]}</Label>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="h-11 border-2"><SelectValue placeholder={t.allCats[lang]} /></SelectTrigger>
+          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allCats[lang]} /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Any">{t.allCats[lang]}</SelectItem>
             {PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en}>{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}
@@ -176,7 +176,7 @@ function CatalogContent() {
         </Select>
       </div>
 
-      <Button variant="outline" className="w-full h-11 font-black gap-2 mt-4 uppercase" onClick={handleReset}>
+      <Button variant="outline" className="w-full h-11 font-black gap-2 mt-4 uppercase border-2 text-black" onClick={handleReset}>
         <RotateCcw size={16} /> {t.reset[lang]}
       </Button>
     </div>
