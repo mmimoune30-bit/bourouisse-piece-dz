@@ -134,8 +134,8 @@ function CatalogContent() {
           <SelectContent>{PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en} className="text-xs">{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-      <Button variant="outline" className={cn("w-full h-10 gap-1.5 border-2 text-[10px] uppercase mt-2", buttonFont)} onClick={handleReset}>
-        <RotateCcw size={14} /> {t.reset[lang]}
+      <Button className={cn("w-full h-12 gap-1.5 border-none text-sm uppercase mt-2 bg-[#9B2C2C] text-white hover:bg-red-900 shadow-md", buttonFont)} onClick={handleReset}>
+        <RotateCcw size={16} /> {t.reset[lang]}
       </Button>
     </div>
   );

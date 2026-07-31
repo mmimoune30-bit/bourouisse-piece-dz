@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -8,7 +9,8 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Lock
+  Lock,
+  ArrowRight
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -25,57 +27,72 @@ export default function Footer() {
     };
     checkLang();
     window.addEventListener("languageChange", checkLang);
-    const userRole = localStorage.getItem("user_role");
+    const userRole = typeof window !== 'undefined' ? localStorage.getItem("user_role") : null;
     setIsAdmin(["Super Admin", "Manager", "Financial Officer"].includes(userRole || ""));
     return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
   const t = {
     shop: { AR: "تسوق", EN: "Shop", FR: "Boutique" },
-    catalog: { AR: "الكتالوج", EN: "Catalog", FR: "Catalogue" },
-    links: { AR: "روابط", EN: "Links", FR: "Liens" },
-    regSeller: { AR: "سجل كبائع", EN: "Register", FR: "Vendre" },
-    contact: { AR: "تواصل", EN: "Contact", FR: "Contact" },
-    rights: { AR: "BOUROUISSE PIECE DT-DZ. © 2024", EN: "BOUROUISSE PIECE DT-DZ. © 2024", FR: "BOUROUISSE PIECE DT-DZ. © 2024" }
+    catalog: { AR: "الكتالوج الشامل", EN: "Full Catalog", FR: "Catalogue" },
+    categories: { AR: "تصنيفات القطع", EN: "Categories", FR: "Catégories" },
+    links: { AR: "روابط سريعة", EN: "Quick Links", FR: "Liens Rapides" },
+    regSeller: { AR: "سجل كبائع معنا", EN: "Join as Seller", FR: "Vendre" },
+    regBuyer: { AR: "سجل كمشتري جديد", EN: "Join as Buyer", FR: "S'inscrire" },
+    home: { AR: "الرئيسية", EN: "Home", FR: "Accueil" },
+    contact: { AR: "تواصل معنا", EN: "Contact Us", FR: "Contact" },
+    rights: { AR: "BOUROUISSE PIECE DT-DZ. © 2024 جميع الحقوق محفوظة", EN: "BOUROUISSE PIECE DT-DZ. © 2024 ALL RIGHTS RESERVED", FR: "BOUROUISSE PIECE DT-DZ. © 2024 TOUS DROITS RÉSERVÉS" }
   };
 
+  const textFont = lang === 'AR' ? 'font-bold' : 'font-medium';
+  const headFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+
   return (
-    <footer className="bg-primary text-white pt-8 pb-4 border-t-4 border-secondary">
+    <footer className="bg-primary text-white pt-10 pb-6 border-t-4 border-secondary">
       <div className="container mx-auto px-4">
-        <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-6 mb-8", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <SiteLogo brandClassName="text-white text-lg" subtextClassName="text-blue-100 text-[8px]" />
-            <div className="flex gap-4 justify-center md:justify-start">
-              <Facebook size={18} className="hover:text-secondary cursor-pointer" />
-              <Instagram size={18} className="hover:text-secondary cursor-pointer" />
+        <div className={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="col-span-1 md:col-span-1 space-y-6">
+            <SiteLogo brandClassName="text-white text-xl" subtextClassName="text-blue-100 text-[9px]" />
+            <div className="flex gap-5 justify-center md:justify-start">
+              <Facebook size={22} className="hover:text-secondary cursor-pointer transition-colors" />
+              <Instagram size={22} className="hover:text-secondary cursor-pointer transition-colors" />
+              <Twitter size={22} className="hover:text-secondary cursor-pointer transition-colors" />
             </div>
           </div>
-          <div className="space-y-2">
-            <h4 className="font-black text-xs uppercase border-secondary border-r-2 pr-2">{t.shop[lang]}</h4>
-            <ul className="space-y-1 text-[10px] text-blue-100/60 font-bold">
-              <li><Link href="/catalog" className="hover:text-white">{t.catalog[lang]}</Link></li>
+          
+          <div className="space-y-4">
+            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.shop[lang]}</h4>
+            <ul className={cn("space-y-2 text-xs md:text-sm text-blue-100/70", textFont)}>
+              <li><Link href="/catalog" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.catalog[lang]}</Link></li>
+              <li><Link href="/catalog" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.categories[lang]}</Link></li>
             </ul>
           </div>
-          <div className="space-y-2">
-            <h4 className="font-black text-xs uppercase border-secondary border-r-2 pr-2">{t.links[lang]}</h4>
-            <ul className="space-y-1 text-[10px] text-blue-100/60 font-bold">
-              <li><Link href="/seller/register" className="hover:text-white">{t.regSeller[lang]}</Link></li>
-              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary flex items-center gap-1"><Lock size={10} /> Admin</Link></li>}
+
+          <div className="space-y-4">
+            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.links[lang]}</h4>
+            <ul className={cn("space-y-2 text-xs md:text-sm text-blue-100/70", textFont)}>
+              <li><Link href="/" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.home[lang]}</Link></li>
+              <li><Link href="/seller/register" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.regSeller[lang]}</Link></li>
+              <li><Link href="/buyer/register" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.regBuyer[lang]}</Link></li>
+              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary flex items-center gap-2 font-black border-2 border-secondary/20 p-1.5 rounded-lg mt-2"><Lock size={14} /> ADMINISTRATION</Link></li>}
             </ul>
           </div>
-          <div className="space-y-2">
-            <h4 className="font-black text-xs uppercase border-secondary border-r-2 pr-2">{t.contact[lang]}</h4>
-            <ul className="space-y-1 text-[10px] text-blue-100/60 font-bold">
-              <li className="flex items-center gap-2"><Phone size={12} className="text-secondary" /> +213 778 42 89 77</li>
-              <li className="flex items-center gap-2"><MapPin size={12} className="text-secondary" /> Chlef, DZ</li>
+
+          <div className="space-y-4">
+            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.contact[lang]}</h4>
+            <ul className={cn("space-y-3 text-xs md:text-sm text-blue-100/70", textFont)}>
+              <li className="flex items-center gap-3"><Phone size={16} className="text-secondary shrink-0" /> +213 778 42 89 77</li>
+              <li className="flex items-center gap-3"><Mail size={16} className="text-secondary shrink-0" /> support@bourouisse.com</li>
+              <li className="flex items-center gap-3"><MapPin size={16} className="text-secondary shrink-0" /> Chlef, Algeria</li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/5 pt-4 flex justify-between items-center text-[8px] text-blue-100/30 font-bold uppercase tracking-widest">
-          <p>{t.rights[lang]}</p>
-          <div className="flex gap-4">
-            <Link href="/terms-of-service" className="hover:text-white">TOS</Link>
-            <Link href="/privacy-policy" className="hover:text-white">Privacy</Link>
+        
+        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] md:text-xs text-blue-100/40 font-bold uppercase tracking-wider">
+          <p className="text-center md:text-right">{t.rights[lang]}</p>
+          <div className="flex gap-6">
+            <Link href="/terms-of-service" className="hover:text-white transition-colors border-b border-transparent hover:border-white">TOS - الشروط</Link>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors border-b border-transparent hover:border-white">PRIVACY - الخصوصية</Link>
           </div>
         </div>
       </div>
