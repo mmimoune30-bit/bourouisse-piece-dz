@@ -112,7 +112,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[160px] md:pt-[180px] pb-12 flex items-center justify-center">
+      <main className="flex-grow pt-[180px] md:pt-[180px] pb-12 flex items-center justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
             <CardHeader className="bg-primary text-white p-8 text-center">
