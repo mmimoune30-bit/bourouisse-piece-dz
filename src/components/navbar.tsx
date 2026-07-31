@@ -140,9 +140,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 3: Search Bar */}
+      {/* Layer 3: Search Bar - Compact padding to remove gap */}
       {showSearch && (
-        <div className="bg-white py-3 border-b relative">
+        <div className="bg-white py-1 border-b relative">
           <div className="w-full px-4">
             <AISearchBox />
           </div>
