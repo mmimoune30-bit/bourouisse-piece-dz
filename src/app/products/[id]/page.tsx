@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   Phone, 
   MapPin, 
@@ -132,6 +133,9 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       : new Date(product.createdAt).toLocaleDateString(getLocale())
   ) : "-";
 
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const normalFont = lang === 'AR' ? 'font-bold' : 'font-medium';
+
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
@@ -140,11 +144,11 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
         <div className="container mx-auto px-4 max-w-7xl">
           
           <div className="mb-6 text-center space-y-2">
-            <h1 className="text-xl md:text-3xl font-black text-zinc-800 tracking-tight leading-relaxed uppercase px-4">
+            <h1 className={cn("text-xl md:text-3xl text-zinc-800 tracking-tight leading-relaxed uppercase px-4", titleFont)}>
               {product.name}
             </h1>
             <div className={cn("flex items-center justify-center gap-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-               <span className="text-orange-500 font-black text-2xl md:text-3xl">{formattedPrice} {lang === 'AR' ? 'دج' : 'DZD'}</span>
+               <span className={cn("text-orange-500 text-2xl md:text-3xl", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} {lang === 'AR' ? 'دج' : 'DZD'}</span>
             </div>
           </div>
 
@@ -153,20 +157,20 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             <div className="lg:col-span-1 space-y-6">
               <Card className="border-orange-500 border-2 shadow-xl rounded-2xl md:rounded-[24px] overflow-hidden bg-white">
                 <CardContent className="p-6 md:p-8 flex flex-col items-center text-center gap-4">
-                   <div className="text-3xl md:text-4xl font-black text-orange-600">{formattedPrice} <span className="text-sm">دج</span></div>
-                   <div className="text-zinc-600 font-bold text-sm md:text-base flex items-center gap-2">
+                   <div className={cn("text-3xl md:text-4xl text-orange-600", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} <span className="text-sm">دج</span></div>
+                   <div className={cn("text-zinc-600 text-sm md:text-base flex items-center gap-2", normalFont)}>
                      <Truck size={18} className="text-orange-500" /> {t.delivery[lang]}
                    </div>
                    <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full mt-2">
                      <Button 
-                      className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full gap-2 text-base shadow-lg uppercase"
+                      className={cn("flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full gap-2 text-base shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
                       onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
                      >
                         <ShoppingCart size={20} /> {t.cart[lang]}
                      </Button>
                      <Link href={`/products/${product.id}/purchase`} className="flex-1">
                         <Button 
-                          className="w-full bg-zinc-900 hover:bg-black text-white font-black h-14 px-8 rounded-full text-base shadow-lg gap-2 uppercase"
+                          className={cn("w-full bg-zinc-900 hover:bg-black text-white h-14 px-8 rounded-full text-base shadow-lg gap-2 uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
                         >
                           <Zap size={20} className="text-secondary" /> {t.buyNow[lang]}
                         </Button>
@@ -179,31 +183,31 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 <CardContent className="p-6 space-y-6">
                    <div className={cn("flex items-center gap-4 text-zinc-700 border-b pb-4", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                       <div className={lang === 'AR' ? "text-right" : "text-left"}>
-                         <span className="font-black text-base block uppercase">{product.sellerName}</span>
-                         <span className="text-xs text-muted-foreground font-bold">{product.wilaya || t.trusted[lang]}</span>
+                         <span className={cn("text-base block uppercase", titleFont)}>{product.sellerName}</span>
+                         <span className={cn("text-xs text-muted-foreground", normalFont)}>{product.wilaya || t.trusted[lang]}</span>
                       </div>
                       <MapPin size={22} className="text-orange-500 shrink-0" />
                    </div>
 
                    <div className="grid grid-cols-3 gap-2">
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('viber')}>
+                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('viber')}>
                          <ViberIcon /> {t.viber[lang]}
                       </Button>
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('whatsapp')}>
+                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('whatsapp')}>
                          <MessageCircle size={16} /> {t.whatsapp[lang]}
                       </Button>
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('telegram')}>
+                      <Button variant="outline" className={cn("h-11 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] md:text-[11px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('telegram')}>
                          <TelegramIcon /> {t.telegram[lang]}
                       </Button>
                    </div>
 
-                   <Button className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl gap-3 text-xl shadow-xl transition-all" onClick={() => handleContact('phone')}>
+                   <Button className={cn("w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-xl gap-3 text-xl shadow-xl transition-all", lang === 'AR' ? 'font-black' : 'font-semibold')} onClick={() => handleContact('phone')}>
                       <Phone size={24} /> {product.phone || t.callNow[lang]}
                    </Button>
 
                    <div className={cn("flex gap-2 items-start p-4 bg-zinc-50 rounded-2xl", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                       <AlertCircle className="text-zinc-400 shrink-0 mt-0.5" size={16} />
-                      <p className={cn("text-[10px] md:text-[11px] text-zinc-500 leading-relaxed font-bold", lang === 'AR' ? "text-right" : "text-left")}>
+                      <p className={cn("text-[10px] md:text-[11px] text-zinc-500 leading-relaxed", normalFont, lang === 'AR' ? "text-right" : "text-left")}>
                          {t.disclaimer[lang]}
                       </p>
                    </div>
@@ -222,50 +226,50 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
               <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden">
                 <CardContent className="p-6 md:p-10 space-y-8">
-                   <h2 className={cn("text-2xl md:text-3xl font-black text-primary border-orange-500 uppercase", lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
+                   <h2 className={cn("text-2xl md:text-3xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
                       {t.specs[lang]}
                    </h2>
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-12 text-sm md:text-base">
                       <div className="space-y-4">
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.condition[lang]}</span>
-                            <Badge className="font-black h-7 px-4 uppercase">{product.condition === 'new' ? t.new[lang] : t.used[lang]}</Badge>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.condition[lang]}</span>
+                            <Badge className={cn("h-7 px-4 uppercase", titleFont)}>{product.condition === 'new' ? t.new[lang] : t.used[lang]}</Badge>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.quantity[lang]}</span>
-                            <span className="font-black text-orange-600">{product.quantity || 1} {t.piece[lang]}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.quantity[lang]}</span>
+                            <span className={cn("text-orange-600", titleFont)}>{product.quantity || 1} {t.piece[lang]}</span>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.store[lang]}</span>
-                            <span className="font-black text-primary uppercase">{product.sellerName}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.store[lang]}</span>
+                            <span className={cn("text-primary uppercase", titleFont)}>{product.sellerName}</span>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.fuel[lang]}</span>
-                            <span className="font-black text-primary uppercase">{product.fuelType || "-"}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.fuel[lang]}</span>
+                            <span className={cn("text-primary uppercase", titleFont)}>{product.fuelType || "-"}</span>
                          </div>
                       </div>
                       <div className="space-y-4">
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.brand[lang]}</span>
-                            <span className="font-black text-primary uppercase">{product.brand}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.brand[lang]}</span>
+                            <span className={cn("text-primary uppercase", titleFont)}>{product.brand}</span>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.model[lang]}</span>
-                            <span className="font-black text-primary uppercase">{product.model}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.model[lang]}</span>
+                            <span className={cn("text-primary uppercase", titleFont)}>{product.model}</span>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.year[lang]}</span>
-                            <span className="font-black text-primary uppercase">{product.year}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.year[lang]}</span>
+                            <span className={cn("text-primary uppercase", titleFont)}>{product.year}</span>
                          </div>
                          <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                            <span className="text-zinc-500 font-bold uppercase">{t.posted[lang]}</span>
-                            <span className="font-black text-zinc-400 text-xs md:text-sm">{formattedDate}</span>
+                            <span className={cn("text-zinc-500 uppercase", normalFont)}>{t.posted[lang]}</span>
+                            <span className={cn("text-zinc-400 text-xs md:text-sm", titleFont)}>{formattedDate}</span>
                          </div>
                       </div>
                    </div>
                    <div className="pt-6 border-t">
-                      <h4 className="font-black text-primary mb-4 text-lg uppercase">{t.description[lang]}</h4>
-                      <p className="text-zinc-600 leading-loose font-bold whitespace-pre-line text-sm md:text-base">
+                      <h4 className={cn("text-primary mb-4 text-lg uppercase", titleFont)}>{t.description[lang]}</h4>
+                      <p className={cn("text-zinc-600 leading-loose whitespace-pre-line text-sm md:text-base", normalFont)}>
                         {product.description || t.noDescription[lang]}
                       </p>
                    </div>
