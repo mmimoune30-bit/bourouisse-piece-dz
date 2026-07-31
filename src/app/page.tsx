@@ -98,11 +98,11 @@ export default function Home() {
   const t = {
     exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
     featured: { AR: "متاجر مميزة", EN: "Featured Stores", FR: "Boutiques Vedettes" },
-    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Added Parts", FR: "Pièces Récemment Ajoutées" },
+    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Added Parts", FR: "Pièces Récentes" },
     recommended: { AR: "منتجات ننصح بها", EN: "Recommended Products", FR: "Produits Recommandés" },
     viewAll: { AR: "تصفح الكل", EN: "View All", FR: "Voir Tout" },
-    viewAllParts: { AR: "عرض كافة القطع", EN: "View All Parts", FR: "Voir Toutes les Pièces" },
-    browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir le Catalogue" },
+    viewAllParts: { AR: "عرض كافة القطع", EN: "View All Parts", FR: "Voir Toutes" },
+    browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir" },
     noAds: { AR: "لا توجد إعلانات حصرية حالياً.", EN: "No exclusive ads at the moment.", FR: "Pas de publicités exclusives." },
     noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured stores at the moment.", FR: "Pas de boutiques vedettes." },
     noParts: { AR: "لا توجد قطع معروضة حالياً.", EN: "No parts available at the moment.", FR: "Aucune pièce disponible." },
@@ -119,7 +119,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[185px] md:pt-[210px]">
+      <main className="flex-grow pt-[230px] md:pt-[280px]">
         {/* Hero Section */}
         <section className="w-full px-0.5 mt-1">
           <div className={cn("flex flex-col lg:flex-row-reverse gap-1.5", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>

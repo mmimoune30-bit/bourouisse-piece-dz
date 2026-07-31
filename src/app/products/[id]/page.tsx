@@ -136,7 +136,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-[170px] md:pt-[190px] pb-24 lg:pb-12">
+      <main className="flex-grow pt-[230px] md:pt-[270px] pb-24 lg:pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           
           <div className="mb-6 text-center space-y-2">

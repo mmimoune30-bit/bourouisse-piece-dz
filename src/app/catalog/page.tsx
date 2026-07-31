@@ -113,7 +113,7 @@ function CatalogContent() {
   };
 
   const FilterPanel = ({ isMobile = false }) => (
-    <div className={cn("space-y-6 text-right", !isMobile && "sticky top-[180px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+    <div className={cn("space-y-6 text-right", !isMobile && "sticky top-[240px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
       {!isMobile && (
         <div className={cn("flex items-center justify-between border-b pb-4", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
           <h3 className="font-black text-xl text-primary">{t.filters[lang]}</h3>
@@ -185,7 +185,7 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[185px] md:pt-[210px] pb-12">
+      <main className="flex-grow pt-[245px] md:pt-[285px] pb-12">
         <div className="container mx-auto px-4">
           
           <div className={cn("mb-6 flex flex-col md:flex-row justify-between items-center gap-4", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
