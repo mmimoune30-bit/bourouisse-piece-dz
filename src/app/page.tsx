@@ -81,12 +81,6 @@ export default function Home() {
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const categoryImagesMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    categoriesMeta?.forEach(meta => { map[meta.id] = meta.imageUrl; });
-    return map;
-  }, [categoriesMeta]);
-
   const exclusiveStores = useMemo(() => {
     return (allCampaigns || [])
       .filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today)
@@ -119,39 +113,11 @@ export default function Home() {
     if (firestore) updateDoc(doc(firestore, "featured_stores", campaignId), { "stats.clicks": increment(1) });
   };
 
-  const handleUploadImage = async (categoryEn: string) => {
-    currentCatRef.current = categoryEn;
-    fileInputRef.current?.click();
-  };
-
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    const catEn = currentCatRef.current;
-    if (!file || !firestore || !catEn) return;
-
-    setUploadingCat(catEn);
-    try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async (event) => {
-        const compressed = event.target?.result as string;
-        await setDoc(doc(firestore, "categories_metadata", catEn), { imageUrl: compressed, updatedAt: new Date().toISOString() }, { merge: true });
-        toast({ title: "تم التحديث", description: "تم تحديث صورة التصنيف بنجاح." });
-      };
-    } catch (err) {
-      toast({ variant: "destructive", title: "خطأ", description: "فشل رفع الصورة." });
-    } finally {
-      setUploadingCat(null);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
       <main className="flex-grow pt-[170px] md:pt-[190px]">
-        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={onFileChange} />
-
         {/* Hero Section - Unified Height 400px */}
         <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
@@ -240,29 +206,21 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="w-full px-0.5 py-1">
-          <div className="flex flex-row-reverse justify-center items-center mb-1 px-2 border-b border-primary/5 pb-0.5">
-             <h2 className="text-xs md:text-sm font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={14} className="text-secondary" /></h2>
+        {/* Categories Section - Clean Text Buttons Only */}
+        <section className="w-full px-0.5 py-4">
+          <div className="flex flex-row-reverse justify-center items-center mb-4 px-2 border-b border-primary/5 pb-2">
+             <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
           </div>
-          <div className="flex flex-row-reverse justify-center gap-3 md:gap-8 overflow-x-auto pb-1 no-scrollbar px-1" dir="rtl">
-            {PART_CATEGORIES.map((cat, i) => {
-              const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
-              return (
-                <div key={i} className="flex flex-col items-center gap-1 shrink-0">
-                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="relative w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border border-primary/5 bg-white shadow-sm hover:scale-105 transition-transform flex items-center justify-center">
-                    <Image src={categoryImage} alt={cat.en} fill className="object-cover opacity-90" />
-                    <div className="absolute inset-0 bg-black/5" />
-                  </Link>
-                  <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                    <span className="font-black text-xs md:text-sm text-primary bg-white px-2 py-0.5 rounded border border-zinc-100">{lang === 'AR' ? cat.ar : cat.en}</span>
-                  </Link>
-                  {isAdmin && (
-                    <button onClick={() => handleUploadImage(cat.en)} className="text-[7px] font-bold text-secondary flex items-center gap-0.5"><Camera size={8} /> تعديل</button>
-                  )}
-                </div>
-              );
-            })}
+          <div className="flex flex-row-reverse justify-center gap-3 overflow-x-auto pb-4 no-scrollbar px-2" dir="rtl">
+            {PART_CATEGORIES.map((cat, i) => (
+              <div key={i} className="shrink-0">
+                <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
+                  <span className="font-black text-xs md:text-sm text-primary bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap">
+                    {lang === 'AR' ? cat.ar : cat.en}
+                  </span>
+                </Link>
+              </div>
+            ))}
           </div>
         </section>
 
