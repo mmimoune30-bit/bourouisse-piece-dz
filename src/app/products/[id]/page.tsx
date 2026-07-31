@@ -28,6 +28,7 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useFirestore, useDoc } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { cn } from "@/lib/utils";
 
 const ViberIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.514 10.603a1.5 1.5 0 1 1-2.923-.66 5.864 5.864 0 0 0-4.534-4.534 1.5 1.5 0 1 1-.66-2.923 8.864 8.864 0 0 1 8.117 8.117zm-4.321 0a1.5 1.5 0 1 1-2.923-.66c.21-.926.862-1.683 1.734-2.1l1.189 2.76zm8.807 1.397c0 8.837-7.163 16-16 16S0 20.837 0 12 7.163-4 16-4s16 7.163 16 16zm-7.608 2.015s-.764-1.254-1.04-1.854l-1.012.357s-.348.125-.563-.122l-1.554-1.802s-.216-.247-.091-.462l.357-1.012c-.6-.276-1.854-1.04-1.854-1.04-.333-.146-.68.126-.68.126l-1.002 1.488s-.361.542-.11 1.25c.346.974 1.63 2.94 2.808 4.043 1.178 1.103 3.327 2.128 4.293 2.3 1.05.187 1.517-.23 1.517-.23l1.411-1.127s.245-.333.02-.562l-2.5-2.247s-.233-.208-.51 0z"/></svg>
@@ -41,8 +42,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const resolvedParams = use(params);
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
+  const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
 
-  // Memoize document reference to prevent crash
   const productRef = useMemo(() => {
     if (!firestore || !resolvedParams.id) return null;
     return doc(firestore, "listings", resolvedParams.id);
@@ -52,11 +53,48 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   useEffect(() => {
     setMounted(true);
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (savedLang) setLang(savedLang);
+    };
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
+    return () => window.removeEventListener("languageChange", checkLang);
   }, []);
+
+  const t = {
+    delivery: { AR: "التوصيل متوفر لـ 58 ولاية", EN: "Delivery available to 58 wilayas", FR: "Livraison disponible dans 58 wilayas" },
+    cart: { AR: "سلة المشتريات", EN: "Shopping Cart", FR: "Panier" },
+    buyNow: { AR: "شراء الآن", EN: "Buy Now", FR: "Acheter" },
+    trusted: { AR: "بائع موثوق", EN: "Verified Seller", FR: "Vendeur Vérifié" },
+    viber: { AR: "فايبر", EN: "Viber", FR: "Viber" },
+    whatsapp: { AR: "واتساب", EN: "WhatsApp", FR: "WhatsApp" },
+    telegram: { AR: "تليجرام", EN: "Telegram", FR: "Telegram" },
+    callNow: { AR: "اتصل الآن", EN: "Call Now", FR: "Appeler" },
+    disclaimer: { AR: "هذا الإعلان مقدم عبر منصة بورويس. أي خدمة هي مسؤولية صاحب الإعلان.", EN: "This ad is provided via Bourouisse. Services are the responsibility of the advertiser.", FR: "Cette annonce est fournie via Bourouisse. Les services incombent à l'annonceur." },
+    specs: { AR: "المواصفات التقنية", EN: "Technical Specifications", FR: "Spécifications Techniques" },
+    condition: { AR: "الحالة", EN: "Condition", FR: "État" },
+    new: { AR: "جديد", EN: "New", FR: "Neuf" },
+    used: { AR: "مستعمل", EN: "Used", FR: "Occasion" },
+    quantity: { AR: "الكمية", EN: "Quantity", FR: "Quantité" },
+    piece: { AR: "قطعة", EN: "piece", FR: "pièce" },
+    store: { AR: "المتجر", EN: "Store", FR: "Boutique" },
+    fuel: { AR: "نوع الطاقة", EN: "Fuel Type", FR: "Énergie" },
+    brand: { AR: "الماركة", EN: "Brand", FR: "Marque" },
+    model: { AR: "الموديل", EN: "Model", FR: "Modèle" },
+    year: { AR: "السنة", EN: "Year", FR: "Année" },
+    posted: { AR: "تاريخ النشر", EN: "Posted Date", FR: "Publié le" },
+    description: { AR: "وصف المنتج", EN: "Product Description", FR: "Description" },
+    noDescription: { AR: "لا يوجد وصف إضافي لهذه القطعة.", EN: "No additional description for this part.", FR: "Aucune description supplémentaire." },
+    notFound: { AR: "عذراً، الإعلان غير موجود.", EN: "Sorry, the ad was not found.", FR: "Désolé, l'annonce est introuvable." },
+    loading: { AR: "جاري التحميل...", EN: "Loading...", FR: "Chargement..." },
+    addedToCart: { AR: "تم إضافة القطعة إلى سلتك بنجاح.", EN: "Item added to your cart successfully.", FR: "Article ajouté au panier avec succès." },
+    noPhone: { AR: "رقم الهاتف غير متوفر لهذا الإعلان.", EN: "Phone number not available for this ad.", FR: "Numéro non disponible pour cette annonce." }
+  };
 
   const handleContact = (platform: 'whatsapp' | 'viber' | 'telegram' | 'phone') => {
     if (!product?.phone && !product?.sellerPhone) {
-      toast({ variant: "destructive", title: "تنبيه", description: "رقم الهاتف غير متوفر لهذا الإعلان." });
+      toast({ variant: "destructive", title: lang === 'AR' ? "تنبيه" : "Alert", description: t.noPhone[lang] });
       return;
     }
     const phone = (product.phone || product.sellerPhone).replace(/\s/g, '');
@@ -79,19 +117,20 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse"><Loader2 className="animate-spin mr-2" /> جاري التحميل...</div>;
+    return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse"><Loader2 className="animate-spin mr-2" /> {t.loading[lang]}</div>;
   }
 
   if (!product) {
-    return <div className="min-h-screen flex items-center justify-center font-black text-2xl">عذراً، الإعلان غير موجود.</div>;
+    return <div className="min-h-screen flex items-center justify-center font-black text-2xl">{t.notFound[lang]}</div>;
   }
 
   const formattedPrice = mounted ? Number(product.price).toLocaleString() : product.price;
+  const getLocale = () => lang === 'AR' ? 'ar-DZ' : lang === 'EN' ? 'en-US' : 'fr-FR';
   const formattedDate = product.createdAt ? (
     typeof product.createdAt.toDate === 'function' 
-      ? product.createdAt.toDate().toLocaleDateString('ar-DZ') 
-      : new Date(product.createdAt).toLocaleDateString('ar-DZ')
-  ) : "غير متاح";
+      ? product.createdAt.toDate().toLocaleDateString(getLocale()) 
+      : new Date(product.createdAt).toLocaleDateString(getLocale())
+  ) : "-";
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
@@ -104,76 +143,74 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             <h1 className="text-xl md:text-3xl font-black text-zinc-800 tracking-tight leading-relaxed uppercase px-4">
               {product.name}
             </h1>
-            <div className="flex items-center justify-center gap-2" dir="rtl">
-               <span className="text-orange-500 font-black text-2xl md:text-3xl">{formattedPrice} دج</span>
+            <div className={cn("flex items-center justify-center gap-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+               <span className="text-orange-500 font-black text-2xl md:text-3xl">{formattedPrice} {lang === 'AR' ? 'دج' : 'DZD'}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" dir="rtl">
+          <div className={cn("grid grid-cols-1 lg:grid-cols-4 gap-8", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
-            {/* Left Column (Actions & Info) */}
             <div className="lg:col-span-1 space-y-6">
-              <Card className="border-orange-500 border-2 shadow-xl rounded-2xl md:rounded-[24px] overflow-hidden">
+              <Card className="border-orange-500 border-2 shadow-xl rounded-2xl md:rounded-[24px] overflow-hidden bg-white">
                 <CardContent className="p-6 md:p-8 flex flex-col items-center text-center gap-4">
-                   <div className="text-3xl md:text-4xl font-black text-orange-600">{formattedPrice} دج</div>
+                   <div className="text-3xl md:text-4xl font-black text-orange-600">{formattedPrice} <span className="text-sm">دج</span></div>
                    <div className="text-zinc-600 font-bold text-sm md:text-base flex items-center gap-2">
-                     <Truck size={18} className="text-orange-500" /> التوصيل متوفر لـ 58 ولاية
+                     <Truck size={18} className="text-orange-500" /> {t.delivery[lang]}
                    </div>
                    <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full mt-2">
                      <Button 
-                      className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full gap-2 text-base shadow-lg"
-                      onClick={() => toast({ title: "سلة المشتريات", description: "تم إضافة القطعة إلى سلتك بنجاح." })}
+                      className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-full gap-2 text-base shadow-lg uppercase"
+                      onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
                      >
-                        <ShoppingCart size={20} /> سلة المشتريات
+                        <ShoppingCart size={20} /> {t.cart[lang]}
                      </Button>
                      <Link href={`/products/${product.id}/purchase`} className="flex-1">
                         <Button 
-                          className="w-full bg-zinc-900 hover:bg-black text-white font-black h-14 px-8 rounded-full text-base shadow-lg gap-2"
+                          className="w-full bg-zinc-900 hover:bg-black text-white font-black h-14 px-8 rounded-full text-base shadow-lg gap-2 uppercase"
                         >
-                          <Zap size={20} className="text-secondary" /> شراء الآن
+                          <Zap size={20} className="text-secondary" /> {t.buyNow[lang]}
                         </Button>
                      </Link>
                    </div>
                 </CardContent>
               </Card>
 
-              <Card className="border-none shadow-sm rounded-2xl md:rounded-[24px]">
+              <Card className="border-none shadow-sm rounded-2xl md:rounded-[24px] bg-white">
                 <CardContent className="p-6 space-y-6">
-                   <div className="flex items-center gap-4 text-zinc-700 border-b pb-4">
-                      <MapPin size={22} className="text-orange-500" />
-                      <div className="text-right">
-                         <span className="font-black text-base block">{product.sellerName}</span>
-                         <span className="text-xs text-muted-foreground font-bold">{product.wilaya || "بائع موثوق"}</span>
+                   <div className={cn("flex items-center gap-4 text-zinc-700 border-b pb-4", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+                      <div className={lang === 'AR' ? "text-right" : "text-left"}>
+                         <span className="font-black text-base block uppercase">{product.sellerName}</span>
+                         <span className="text-xs text-muted-foreground font-bold">{product.wilaya || t.trusted[lang]}</span>
                       </div>
+                      <MapPin size={22} className="text-orange-500 shrink-0" />
                    </div>
 
                    <div className="grid grid-cols-3 gap-2">
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] md:text-[11px] font-black shadow-sm" onClick={() => handleContact('viber')}>
-                         <ViberIcon /> فايبر
+                      <Button variant="outline" className="h-11 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('viber')}>
+                         <ViberIcon /> {t.viber[lang]}
                       </Button>
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] md:text-[11px] font-black shadow-sm" onClick={() => handleContact('whatsapp')}>
-                         <MessageCircle size={16} /> واتساب
+                      <Button variant="outline" className="h-11 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('whatsapp')}>
+                         <MessageCircle size={16} /> {t.whatsapp[lang]}
                       </Button>
-                      <Button variant="outline" className="h-11 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] md:text-[11px] font-black shadow-sm" onClick={() => handleContact('telegram')}>
-                         <TelegramIcon /> تليجرام
+                      <Button variant="outline" className="h-11 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] md:text-[11px] font-black shadow-sm uppercase" onClick={() => handleContact('telegram')}>
+                         <TelegramIcon /> {t.telegram[lang]}
                       </Button>
                    </div>
 
                    <Button className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-xl gap-3 text-xl shadow-xl transition-all" onClick={() => handleContact('phone')}>
-                      <Phone size={24} /> {product.phone || "اتصل الآن"}
+                      <Phone size={24} /> {product.phone || t.callNow[lang]}
                    </Button>
 
-                   <div className="flex gap-2 items-start p-4 bg-zinc-50 rounded-2xl">
+                   <div className={cn("flex gap-2 items-start p-4 bg-zinc-50 rounded-2xl", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                       <AlertCircle className="text-zinc-400 shrink-0 mt-0.5" size={16} />
-                      <p className="text-[10px] md:text-[11px] text-zinc-500 leading-relaxed font-bold">
-                         هذا الإعلان مقدم عبر منصة بورويس. أي خدمة هي مسؤولية صاحب الإعلان.
+                      <p className={cn("text-[10px] md:text-[11px] text-zinc-500 leading-relaxed font-bold", lang === 'AR' ? "text-right" : "text-left")}>
+                         {t.disclaimer[lang]}
                       </p>
                    </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Right Column (Gallery & Specs) */}
             <div className="lg:col-span-3 space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {product.images?.map((img: string, i: number) => (
@@ -184,50 +221,52 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </div>
 
               <Card className="border-none shadow-sm rounded-[32px] bg-white overflow-hidden">
-                <CardContent className="p-6 md:p-10 text-right space-y-8">
-                   <h2 className="text-2xl md:text-3xl font-black text-primary border-r-8 border-orange-500 pr-4">المواصفات التقنية</h2>
+                <CardContent className="p-6 md:p-10 space-y-8">
+                   <h2 className={cn("text-2xl md:text-3xl font-black text-primary border-orange-500 uppercase", lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
+                      {t.specs[lang]}
+                   </h2>
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-12 text-sm md:text-base">
                       <div className="space-y-4">
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">الحالة</span>
-                            <Badge className="font-black h-7 px-4">{product.condition === 'new' ? 'جديد' : 'مستعمل'}</Badge>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.condition[lang]}</span>
+                            <Badge className="font-black h-7 px-4 uppercase">{product.condition === 'new' ? t.new[lang] : t.used[lang]}</Badge>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">الكمية</span>
-                            <span className="font-black text-orange-600">{product.quantity || 1} قطعة</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.quantity[lang]}</span>
+                            <span className="font-black text-orange-600">{product.quantity || 1} {t.piece[lang]}</span>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">المتجر</span>
-                            <span className="font-black text-primary">{product.sellerName}</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.store[lang]}</span>
+                            <span className="font-black text-primary uppercase">{product.sellerName}</span>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">نوع الطاقة</span>
-                            <span className="font-black text-primary">{product.fuelType || "بنزين"}</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.fuel[lang]}</span>
+                            <span className="font-black text-primary uppercase">{product.fuelType || "-"}</span>
                          </div>
                       </div>
                       <div className="space-y-4">
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">الماركة</span>
-                            <span className="font-black text-primary">{product.brand}</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.brand[lang]}</span>
+                            <span className="font-black text-primary uppercase">{product.brand}</span>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">الموديل</span>
-                            <span className="font-black text-primary">{product.model}</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.model[lang]}</span>
+                            <span className="font-black text-primary uppercase">{product.model}</span>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">السنة</span>
-                            <span className="font-black text-primary">{product.year}</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.year[lang]}</span>
+                            <span className="font-black text-primary uppercase">{product.year}</span>
                          </div>
-                         <div className="flex justify-between border-b pb-3 items-center">
-                            <span className="text-zinc-500 font-bold">تاريخ النشر</span>
+                         <div className={cn("flex justify-between border-b pb-3 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                            <span className="text-zinc-500 font-bold uppercase">{t.posted[lang]}</span>
                             <span className="font-black text-zinc-400 text-xs md:text-sm">{formattedDate}</span>
                          </div>
                       </div>
                    </div>
                    <div className="pt-6 border-t">
-                      <h4 className="font-black text-primary mb-4 text-lg">وصف المنتج</h4>
+                      <h4 className="font-black text-primary mb-4 text-lg uppercase">{t.description[lang]}</h4>
                       <p className="text-zinc-600 leading-loose font-bold whitespace-pre-line text-sm md:text-base">
-                        {product.description || "لا يوجد وصف إضافي لهذه القطعة."}
+                        {product.description || t.noDescription[lang]}
                       </p>
                    </div>
                 </CardContent>
