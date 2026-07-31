@@ -96,47 +96,50 @@ export default function Navbar() {
 
       {/* Layer 2: Main Branding */}
       <div className="bg-white py-2 border-b">
-        <div className="w-full px-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {/* زر الرجوع للرئيسية في أقصى اليمين (في ترتيب الـ Flex) */}
-            {isNotHome && (
-              <Link href="/">
-                <Button variant="outline" size="sm" className={cn("border-2 border-black text-black rounded-lg h-9 px-3 gap-1.5 hover:bg-black hover:text-white text-sm md:text-base uppercase", boldNavFont)}>
-                   <Home size={16} /> {getBackHomeText()}
-                </Button>
-              </Link>
-            )}
+        <div className="w-full px-2 flex items-center justify-between gap-2" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+          <div className="flex items-center gap-4">
             <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
               <SiteLogo className="min-w-[160px] md:min-w-[200px]" showTagline={true} />
             </Link>
           </div>
 
-          <div className="hidden lg:flex items-center gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn("text-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-3 text-sm md:text-base uppercase", boldNavFont)}>
-                  <Tags size={18} /> {getCategoriesText()} <ChevronDown size={14} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 p-1.5 rounded-xl shadow-xl overflow-y-auto max-h-[60vh]">
-                {PART_CATEGORIES.map((cat) => (
-                  <DropdownMenuItem key={cat.en} asChild>
-                    <Link href={`/catalog?category=${cat.en}`} className={cn("justify-end py-1.5 text-xs text-black uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}>
-                      {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link href="/seller/register"><Button className={cn("bg-secondary text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getBecomeSellerText()}</Button></Link>
-            <Link href="/join"><Button variant="outline" className={cn("border-2 border-black text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
-            <Link href="/login"><Button variant="ghost" className={cn("text-black h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getLoginText()}</Button></Link>
-          </div>
+          <div className="flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className={cn("text-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-3 text-sm md:text-base uppercase", boldNavFont)}>
+                    <Tags size={18} /> {getCategoriesText()} <ChevronDown size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 p-1.5 rounded-xl shadow-xl overflow-y-auto max-h-[60vh]">
+                  {PART_CATEGORIES.map((cat) => (
+                    <DropdownMenuItem key={cat.en} asChild>
+                      <Link href={`/catalog?category=${cat.en}`} className={cn("justify-end py-1.5 text-xs text-black uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}>
+                        {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Link href="/seller/register"><Button className={cn("bg-secondary text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getBecomeSellerText()}</Button></Link>
+              <Link href="/join"><Button variant="outline" className={cn("border-2 border-black text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
+              <Link href="/login"><Button variant="ghost" className={cn("text-black h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getLoginText()}</Button></Link>
+            </div>
 
-          <div className="lg:hidden">
-            <Button variant="ghost" size="icon" className="rounded-lg w-8 h-8" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-            </Button>
+            {/* زر الرجوع للرئيسية - أقصى اليسار في النسخة العربية وبدون إطار */}
+            {isNotHome && (
+              <Link href="/">
+                <Button variant="ghost" size="sm" className={cn("text-black rounded-lg h-9 px-3 gap-1.5 hover:bg-zinc-100 text-sm md:text-base uppercase border-none shadow-none", boldNavFont)}>
+                   <Home size={16} /> {getBackHomeText()}
+                </Button>
+              </Link>
+            )}
+
+            <div className="lg:hidden">
+              <Button variant="ghost" size="icon" className="rounded-lg w-8 h-8" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -153,10 +156,10 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-xl py-4 px-4 space-y-2 flex flex-col" dir={lang === 'AR' ? "rtl" : "ltr"}>
-           {isNotHome && <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="w-full"><Button variant="outline" className={cn("w-full border-2 border-black h-12 rounded-lg text-sm uppercase", boldNavFont)}><Home size={18} className="ml-2" /> {getBackHomeText()}</Button></Link>}
            <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}><Button className={cn("w-full bg-secondary text-black h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getBecomeSellerText()}</Button></Link>
            <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}><Button variant="outline" className={cn("w-full border-2 border-black h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}><Button variant="ghost" className={cn("w-full h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getLoginText()}</Button></Link>
+           {isNotHome && <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="w-full"><Button variant="ghost" className={cn("w-full h-12 rounded-lg text-sm uppercase border-none", boldNavFont)}><Home size={18} className="ml-2" /> {getBackHomeText()}</Button></Link>}
         </div>
       )}
     </nav>
