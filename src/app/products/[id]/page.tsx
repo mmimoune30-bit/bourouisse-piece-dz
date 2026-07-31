@@ -4,6 +4,7 @@
 import { use, useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import ProductCard from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,13 +23,14 @@ import {
   Cpu,
   Calendar,
   Hash,
-  ChevronLeft
+  ChevronLeft,
+  PackageSearch
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { useFirestore, useDoc } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { useFirestore, useDoc, useCollection } from "@/firebase";
+import { doc, collection, query, where, limit, orderBy } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 const ViberIcon = () => (
@@ -51,6 +53,24 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   }, [firestore, resolvedParams.id]);
 
   const { data: product, loading } = useDoc(productRef);
+
+  // استعلام جلب الإعلانات الأخرى لنفس البائع
+  const sellerListingsQuery = useMemo(() => {
+    if (!firestore || !product?.sellerId) return null;
+    return query(
+      collection(firestore, "listings"),
+      where("sellerId", "==", product.sellerId),
+      where("status", "==", "Active"),
+      limit(6)
+    );
+  }, [firestore, product?.sellerId]);
+
+  const { data: otherListings, loading: loadingOthers } = useCollection(sellerListingsQuery);
+
+  // تصفية المنتج الحالي يدوياً من النتائج
+  const filteredOthers = useMemo(() => {
+    return otherListings?.filter(l => l.id !== resolvedParams.id) || [];
+  }, [otherListings, resolvedParams.id]);
 
   useEffect(() => {
     setMounted(true);
@@ -90,7 +110,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     notFound: { AR: "عذراً، الإعلان غير موجود.", EN: "Sorry, the ad was not found.", FR: "Désolé, l'annonce est introuvable." },
     loading: { AR: "جاري التحميل...", EN: "Loading...", FR: "Chargement..." },
     addedToCart: { AR: "تم إضافة القطعة إلى سلتك بنجاح.", EN: "Item added to your cart successfully.", FR: "Article ajouté au panier avec succès." },
-    noPhone: { AR: "رقم الهاتف غير متوفر لهذا الإعلان.", EN: "Phone number not available for this ad.", FR: "Numéro non disponible pour cette annonce." }
+    noPhone: { AR: "رقم الهاتف غير متوفر لهذا الإعلان.", EN: "Phone number not available for this ad.", FR: "Numéro non disponible pour cette annonce." },
+    moreFromSeller: { AR: "إعلانات أخرى من نفس البائع", EN: "More ads from this seller", FR: "Autres annonces du vendeur" }
   };
 
   const handleContact = (platform: 'whatsapp' | 'viber' | 'telegram' | 'phone') => {
@@ -276,8 +297,40 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 </CardContent>
               </Card>
             </div>
-
           </div>
+
+          {/* قسم إعلانات أخرى لنفس البائع */}
+          {filteredOthers.length > 0 && (
+            <div className="mt-16 space-y-6">
+              <div 
+                dir={lang === 'AR' ? "rtl" : "ltr"}
+                className={cn("bg-zinc-100 px-6 py-3 flex items-center justify-between border-b-2 border-black/10 rounded-lg shadow-sm", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
+              >
+                <h2 className={cn("text-lg md:text-2xl text-black flex items-center gap-3 uppercase", titleFont)}>
+                  {t.moreFromSeller[lang]} <PackageSearch size={24} className="text-secondary" />
+                </h2>
+                <Link href={`/catalog?query=${encodeURIComponent(product.sellerName)}`} className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>
+                  عرض الكل
+                </Link>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3" dir={lang === 'AR' ? "rtl" : "ltr"}>
+                 {filteredOthers.map((item) => (
+                   <ProductCard 
+                      key={item.id} 
+                      id={item.id}
+                      name={item.name}
+                      price={item.price}
+                      image={item.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
+                      category={item.category}
+                      seller={item.sellerName}
+                      condition={item.condition === 'new' ? 'New' : 'Used'}
+                      createdAt={item.createdAt}
+                   />
+                 ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
@@ -285,3 +338,4 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     </div>
   );
 }
+
