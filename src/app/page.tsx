@@ -107,7 +107,7 @@ export default function Home() {
     noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured stores at the moment.", FR: "Pas de boutiques vedettes." },
     noParts: { AR: "لا توجد قطع معروضة حالياً.", EN: "No parts available at the moment.", FR: "Aucune pièce disponible." },
     sellerAd: { AR: "اشترك معنا واعرض منتجاتك", EN: "Join Us & Showcase Your Products", FR: "Rejoignez-nous & Affichez vos Produits" },
-    buyerAd: { AR: "سجل معنا و اشتري بطريقة احترافية", EN: "Join Us & Buy Professionally", FR: "Inscrivez-vous & Achetez Professionnellement" },
+    buyerAd: { AR: "سجل معنا و اشتري سلعتك بطريقة احترافية", EN: "Join Us & Buy Professionally", FR: "Inscrivez-vous & Achetez Professionnellement" },
     regSeller: { AR: "سجل كبائع", EN: "Register as Seller", FR: "S'inscrire comme Vendeur" },
     regBuyer: { AR: "سجل كمشتري", EN: "Register as Buyer", FR: "S'inscrire comme Acheteur" },
     categories: { AR: "تصنيفات قطع الغيار", EN: "Part Categories", FR: "Catégories de Pièces" },
@@ -175,7 +175,7 @@ export default function Home() {
                 <CarouselContent className="h-full -ml-0">
                   <CarouselItem key="side-ad-seller" className="h-full pl-0">
                     <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">{t.sellerAd[lang]}</h3>
+                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase px-2">{t.sellerAd[lang]}</h3>
                       <Link href="/seller/register" className="w-full px-4">
                         <Button className="w-full h-9 bg-secondary text-black font-black rounded-lg text-[10px] shadow-lg hover:bg-white transition-all uppercase">{t.regSeller[lang]}</Button>
                       </Link>
@@ -183,7 +183,7 @@ export default function Home() {
                   </CarouselItem>
                   <CarouselItem key="side-ad-buyer" className="h-full pl-0">
                     <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">{t.buyerAd[lang]}</h3>
+                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase px-2">{t.buyerAd[lang]}</h3>
                       <Link href="/buyer/register" className="w-full px-4">
                         <Button variant="outline" className="w-full h-9 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-lg text-[10px] shadow-lg transition-all uppercase">{t.regBuyer[lang]}</Button>
                       </Link>
