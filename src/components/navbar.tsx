@@ -27,7 +27,7 @@ const WhatsAppIcon = () => (
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [lang, setLang] = useState<"AR" | "EN">("AR");
+  const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
@@ -35,14 +35,50 @@ export default function Navbar() {
   const isNotHome = pathname !== "/";
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
     if (savedLang) setLang(savedLang);
   }, []);
 
-  const toggleLang = (newLang: "AR" | "EN") => {
+  const toggleLang = (newLang: "AR" | "EN" | "FR") => {
     setLang(newLang);
     localStorage.setItem("app_lang", newLang);
     window.dispatchEvent(new Event("languageChange"));
+  };
+
+  const getInquiryText = () => {
+    if (lang === 'AR') return 'للاستفسار:';
+    if (lang === 'EN') return 'Inquiry:';
+    return 'Demande:';
+  };
+
+  const getBackHomeText = () => {
+    if (lang === 'AR') return 'الرجوع للرئيسية';
+    if (lang === 'EN') return 'Back to Home';
+    return 'Retour à l\'accueil';
+  };
+
+  const getCategoriesText = () => {
+    if (lang === 'AR') return 'تصنيفات قطع الغيار';
+    if (lang === 'EN') return 'Categories';
+    return 'Catégories';
+  };
+
+  const getBecomeSellerText = () => {
+    if (lang === 'AR') return 'كن بائعاً معنا';
+    if (lang === 'EN') return 'Become a Seller';
+    return 'Devenir Vendeur';
+  };
+
+  const getJoinNowText = () => {
+    if (lang === 'AR') return 'إضافة حساب';
+    if (lang === 'EN') return 'Join Now';
+    return 'S\'inscrire';
+  };
+
+  const getLoginText = () => {
+    if (lang === 'AR') return 'دخول';
+    if (lang === 'EN') return 'Login';
+    return 'Connexion';
   };
 
   return (
@@ -53,7 +89,7 @@ export default function Navbar() {
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-12 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className="flex items-center gap-8 text-black font-black uppercase text-[10px] md:text-[11px]">
-                  <span className="text-black tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
+                  <span className="text-black tracking-widest">{getInquiryText()}</span>
                   <span className="flex items-center gap-2 font-bold"><Phone size={14} className="text-black" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-2 font-bold"><Mail size={14} className="text-black" /> support@bourouisse-piecedz.com</span>
@@ -65,13 +101,14 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-1 md:gap-2 font-black h-7 md:h-8 px-1">
                   <Globe size={14} className="text-black" />
-                  <span className="text-[10px] md:text-sm">{lang === 'AR' ? 'العربية' : 'English'}</span>
+                  <span className="text-[10px] md:text-sm">{lang === 'AR' ? 'العربية' : lang === 'EN' ? 'English' : 'Français'}</span>
                   <ChevronDown size={12} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align={lang === 'AR' ? "end" : "start"} className="w-32">
                 <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black cursor-pointer">العربية</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-black cursor-pointer">English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-black cursor-pointer">Français</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -90,7 +127,7 @@ export default function Navbar() {
             {isNotHome && (
               <Link href="/">
                 <Button variant="outline" size="sm" className="border-2 border-black text-black font-black rounded-xl h-10 px-4 gap-2 hover:bg-black hover:text-white transition-all shadow-sm uppercase">
-                   <Home size={16} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+                   <Home size={16} /> {getBackHomeText()}
                 </Button>
               </Link>
             )}
@@ -101,14 +138,14 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-3 uppercase">
-                  <Tags size={18} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'} <ChevronDown size={14} />
+                  <Tags size={18} /> {getCategoriesText()} <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[70vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
                 {PART_CATEGORIES.map((cat) => (
                   <DropdownMenuItem key={cat.en} asChild>
                     <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-2 cursor-pointer rounded-xl text-right w-full text-black uppercase">
-                      {lang === 'AR' ? cat.ar : cat.en}
+                      {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                     </Link>
                   </DropdownMenuItem>
                 ))}
@@ -117,17 +154,17 @@ export default function Navbar() {
 
             <Link href="/seller/register">
               <Button className="bg-secondary text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 shadow-sm h-11 px-4 transition-all uppercase">
-                <Store size={18} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}
+                <Store size={18} /> {getBecomeSellerText()}
               </Button>
             </Link>
             <Link href="/join">
               <Button variant="outline" className="border-2 border-black text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 h-11 px-4 transition-all uppercase">
-                <UserPlus size={18} /> {lang === 'AR' ? 'إضافة حساب' : 'Join Now'}
+                <UserPlus size={18} /> {getJoinNowText()}
               </Button>
             </Link>
             <Link href="/login">
               <Button variant="ghost" className="text-black font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-3 uppercase">
-                <LogIn size={18} /> {lang === 'AR' ? 'دخول' : 'Login'}
+                <LogIn size={18} /> {getLoginText()}
               </Button>
             </Link>
           </div>
@@ -147,7 +184,7 @@ export default function Navbar() {
           {isNotHome && (
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
               <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-xl gap-3 text-lg uppercase">
-                <Home size={22} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
+                <Home size={22} /> {getBackHomeText()}
               </Button>
             </Link>
           )}
@@ -155,14 +192,14 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="w-full text-black font-black h-14 rounded-xl gap-3 text-lg justify-start uppercase">
-                <Tags size={22} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'}
+                <Tags size={22} /> {getCategoriesText()}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-[calc(100vw-32px)] p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[50vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
               {PART_CATEGORIES.map((cat) => (
                 <DropdownMenuItem key={cat.en} asChild onClick={() => setIsMobileMenuOpen(false)}>
                   <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-3 cursor-pointer rounded-xl text-right w-full text-black uppercase">
-                    {lang === 'AR' ? cat.ar : cat.en}
+                    {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                   </Link>
                 </DropdownMenuItem>
               ))}
@@ -171,17 +208,17 @@ export default function Navbar() {
 
           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}>
              <Button className="w-full bg-secondary text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
-                <Store size={20} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}
+                <Store size={20} /> {getBecomeSellerText()}
              </Button>
           </Link>
           <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}>
              <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
-                <UserPlus size={20} /> {lang === 'AR' ? 'إضافة حساب' : 'Join Now'}
+                <UserPlus size={20} /> {getJoinNowText()}
              </Button>
           </Link>
           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
              <Button variant="ghost" className="w-full text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
-                <LogIn size={20} /> {lang === 'AR' ? 'دخول الحساب' : 'Login'}
+                <LogIn size={20} /> {getLoginText()}
              </Button>
           </Link>
         </div>

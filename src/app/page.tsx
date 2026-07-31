@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 export default function Home() {
   const { firestore } = useFirestore();
   const { profile } = useUser();
-  const [lang, setLang] = useState<"AR" | "EN">("AR");
+  const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [api, setApi] = useState<CarouselApi>();
   
   const featuredStoresQuery = useMemo(() => {
@@ -83,7 +83,7 @@ export default function Home() {
 
   useEffect(() => {
     const checkLang = () => {
-      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
       if (savedLang) setLang(savedLang);
     };
     checkLang();
@@ -95,23 +95,43 @@ export default function Home() {
     if (firestore) updateDoc(doc(firestore, "featured_stores", campaignId), { "stats.clicks": increment(1) });
   };
 
+  const t = {
+    exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
+    featured: { AR: "متاجر مميزة", EN: "Featured Stores", FR: "Boutiques Vedettes" },
+    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Added Parts", FR: "Pièces Récemment Ajoutées" },
+    recommended: { AR: "منتجات ننصح بها", EN: "Recommended Products", FR: "Produits Recommandés" },
+    viewAll: { AR: "تصفح الكل", EN: "View All", FR: "Voir Tout" },
+    viewAllParts: { AR: "عرض كافة القطع", EN: "View All Parts", FR: "Voir Toutes les Pièces" },
+    browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir le Catalogue" },
+    noAds: { AR: "لا توجد إعلانات حصرية حالياً.", EN: "No exclusive ads at the moment.", FR: "Pas de publicités exclusives." },
+    noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured stores at the moment.", FR: "Pas de boutiques vedettes." },
+    noParts: { AR: "لا توجد قطع معروضة حالياً.", EN: "No parts available at the moment.", FR: "Aucune pièce disponible." },
+    sellerAd: { AR: "اشترك معنا واعرض منتجاتك", EN: "Join Us & Showcase Your Products", FR: "Rejoignez-nous & Affichez vos Produits" },
+    buyerAd: { AR: "سجل معنا و اشتري بطريقة احترافية", EN: "Join Us & Buy Professionally", FR: "Inscrivez-vous & Achetez Professionnellement" },
+    regSeller: { AR: "سجل كبائع", EN: "Register as Seller", FR: "S'inscrire comme Vendeur" },
+    regBuyer: { AR: "سجل كمشتري", EN: "Register as Buyer", FR: "S'inscrire comme Acheteur" },
+    categories: { AR: "تصنيفات قطع الغيار", EN: "Part Categories", FR: "Catégories de Pièces" },
+    latestSubtitle: { AR: "تصفح القطع المتوفرة حالياً في كافة الولايات.", EN: "Browse parts currently available across all wilayas.", FR: "Parcourez les pièces disponibles dans toutes les wilayas." },
+    recommendedSubtitle: { AR: "أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.", EN: "Top quality parts handpicked by our team.", FR: "Pièces de qualité sélectionnées par notre équipe." }
+  };
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
       <main className="flex-grow pt-[170px] md:pt-[190px]">
-        {/* Hero Section - Reduced Height to 220px */}
+        {/* Hero Section */}
         <section className="w-full px-0.5 mt-1">
           <div className={cn("flex flex-col lg:flex-row-reverse gap-1.5", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
             {/* Exclusive Stores Slider */}
             <div className="lg:w-3/4 h-[180px] lg:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-black/5">
-              <div className="bg-zinc-50 px-4 py-1 border-b flex items-center justify-between z-20 shrink-0">
+              <div className={cn("bg-zinc-50 px-4 py-1 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
                  <h2 className="font-black text-[10px] md:text-xs text-black flex items-center gap-2 uppercase">
-                   <Crown size={12} className="text-secondary fill-secondary" /> {lang === 'AR' ? 'متاجر حصرية' : 'Exclusive Stores'}
+                   <Crown size={12} className="text-secondary fill-secondary" /> {t.exclusive[lang]}
                  </h2>
                  <Link href="/catalog" className="text-[9px] md:text-[10px] font-black text-black hover:underline flex items-center gap-1 uppercase">
-                    {lang === 'AR' ? 'تصفح الكل' : 'View All'} <ArrowLeft size={10} className={lang === 'EN' ? 'rotate-180' : ''} />
+                    {t.viewAll[lang]} <ArrowLeft size={10} className={lang !== 'AR' ? 'rotate-180' : ''} />
                  </Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
@@ -140,59 +160,35 @@ export default function Home() {
                   </Carousel>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black italic text-xs">
-                    {lang === 'AR' ? 'لا توجد إعلانات حصرية حالياً.' : 'No exclusive ads at the moment.'}
+                    {t.noAds[lang]}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Side Ads Carousel - Fixed Background, Rotating Text */}
+            {/* Side Ads Carousel */}
             <div className="lg:w-1/4 h-[180px] lg:h-[220px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
-              {/* Static Background */}
-              <Image 
-                src="https://picsum.photos/seed/auto-hero-real/1200/800" 
-                alt="Ad Background" 
-                fill 
-                className="object-cover" 
-              />
+              <Image src="https://picsum.photos/seed/auto-hero-real/1200/800" alt="Ad Background" fill className="object-cover" />
               <div className="absolute inset-0 bg-black/65 z-0" />
               
-              {/* Rotating Content Only */}
-              <Carousel 
-                opts={{ loop: true }} 
-                plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
-                className="w-full h-full relative z-10"
-              >
+              <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full relative z-10">
                 <CarouselContent className="h-full -ml-0">
-                  {/* Slide 1: Seller Join */}
                   <CarouselItem key="side-ad-seller" className="h-full pl-0">
                     <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">
-                        {lang === 'AR' ? 'اشترك معنا واعرض منتجاتك' : 'Join Us & Showcase Your Products'}
-                      </h3>
+                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">{t.sellerAd[lang]}</h3>
                       <Link href="/seller/register" className="w-full px-4">
-                        <Button className="w-full h-9 bg-secondary text-black font-black rounded-lg text-[10px] shadow-lg hover:bg-white transition-all uppercase">
-                           {lang === 'AR' ? 'سجل كبائع' : 'Register as Seller'}
-                        </Button>
+                        <Button className="w-full h-9 bg-secondary text-black font-black rounded-lg text-[10px] shadow-lg hover:bg-white transition-all uppercase">{t.regSeller[lang]}</Button>
                       </Link>
                     </div>
                   </CarouselItem>
-
-                  {/* Slide 2: Buyer Join */}
                   <CarouselItem key="side-ad-buyer" className="h-full pl-0">
                     <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">
-                        {lang === 'AR' ? 'سجل معنا و اشتري بطريقة احترافية' : 'Join Us & Buy Professionally'}
-                      </h3>
+                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase">{t.buyerAd[lang]}</h3>
                       <Link href="/buyer/register" className="w-full px-4">
-                        <Button variant="outline" className="w-full h-9 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-lg text-[10px] shadow-lg transition-all uppercase">
-                           {lang === 'AR' ? 'سجل كمشتري' : 'Register as Buyer'}
-                        </Button>
+                        <Button variant="outline" className="w-full h-9 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-lg text-[10px] shadow-lg transition-all uppercase">{t.regBuyer[lang]}</Button>
                       </Link>
                     </div>
                   </CarouselItem>
-
-                  {/* Slide 3: Full Site Logo */}
                   <CarouselItem key="side-ad-logo" className="h-full pl-0">
                     <div className="flex flex-col items-center justify-center h-full w-full p-4">
                         <SiteLogo brandClassName="text-white text-xs md:text-sm" subtextClassName="text-blue-100 text-[8px]" showTagline={false} />
@@ -206,9 +202,9 @@ export default function Home() {
 
         {/* Categories Section */}
         <section className="w-full px-0.5 py-4">
-          <div className="flex flex-row-reverse justify-center items-center mb-4 px-2 border-b border-black/5 pb-2">
+          <div className={cn("flex items-center justify-center mb-4 px-2 border-b border-black/5 pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2 uppercase">
-                {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Part Categories'} <Tags size={16} className="text-secondary" />
+                {t.categories[lang]} <Tags size={16} className="text-secondary" />
              </h2>
           </div>
           <div className="flex flex-row-reverse justify-center gap-3 overflow-x-auto pb-4 no-scrollbar px-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -216,7 +212,7 @@ export default function Home() {
               <div key={i} className="shrink-0">
                 <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
                   <span className="font-black text-xs md:text-sm text-black bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap uppercase">
-                    {lang === 'AR' ? cat.ar : cat.en}
+                    {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                   </span>
                 </Link>
               </div>
@@ -224,12 +220,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Section - Repositioned Above Latest Parts */}
+        {/* Featured Stores Section */}
         <section className="w-full px-0.5 py-2">
           <div className={cn("flex items-center justify-between mb-2 px-2 border-b border-black/10 pb-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
             <div className={cn("text-right w-full flex items-center gap-2", lang === 'AR' ? "justify-end" : "justify-start")}>
               <h2 className="text-xs md:text-sm font-black text-black flex items-center gap-2 uppercase">
-                {lang === 'AR' ? 'متاجر مميزة' : 'Featured Stores'} <Star size={14} className="text-black fill-black" />
+                {t.featured[lang]} <Star size={14} className="text-black fill-black" />
               </h2>
             </div>
           </div>
@@ -255,7 +251,7 @@ export default function Home() {
                 ))
               ) : (
                 <div className="col-span-full py-4 text-center text-zinc-400 font-black italic text-[10px] w-full">
-                   {lang === 'AR' ? 'لا توجد متاجر مميزة حالياً.' : 'No featured stores at the moment.'}
+                   {t.noFeatured[lang]}
                 </div>
               )}
             </CarouselContent>
@@ -265,16 +261,14 @@ export default function Home() {
         {/* Explore Latest Parts Section */}
         <section className="w-full px-0.5 py-6">
           <div className={cn("flex items-center justify-between mb-4 border-b-2 border-black/10 pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <div className={cn("text-right", lang === 'EN' && "text-left")}>
+             <div className={cn("text-right", lang !== 'AR' && "text-left")}>
                 <h2 className="text-lg md:text-xl font-black text-black flex items-center gap-2 uppercase">
-                   {lang === 'AR' ? 'أحدث قطع الغيار المضافة' : 'Latest Added Parts'} <Package size={20} className="text-black" />
+                   {t.latest[lang]} <Package size={20} className="text-black" />
                 </h2>
-                <p className="text-[10px] text-zinc-500 font-black uppercase">
-                   {lang === 'AR' ? 'تصفح القطع المتوفرة حالياً في كافة الولايات.' : 'Browse parts currently available across all wilayas.'}
-                </p>
+                <p className="text-[10px] text-zinc-500 font-black uppercase">{t.latestSubtitle[lang]}</p>
              </div>
              <Link href="/catalog" className="text-[10px] font-black text-black hover:underline uppercase">
-                {lang === 'AR' ? 'عرض كافة القطع' : 'View All Parts'}
+                {t.viewAllParts[lang]}
              </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -297,9 +291,7 @@ export default function Home() {
             ) : (
                <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
                   <Search size={32} className="opacity-10 mb-2" />
-                  <p className="font-black text-xs text-black">
-                     {lang === 'AR' ? 'لا توجد قطع معروضة حالياً.' : 'No parts available at the moment.'}
-                  </p>
+                  <p className="font-black text-xs text-black">{t.noParts[lang]}</p>
                </div>
             )}
           </div>
@@ -310,17 +302,15 @@ export default function Home() {
           <section className="w-full px-0.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
             <div className="container mx-auto px-2">
               <div className={cn("flex items-center justify-between mb-6", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                 <div className={cn("text-right", lang === 'EN' && "text-left")}>
+                 <div className={cn("text-right", lang !== 'AR' && "text-left")}>
                     <h2 className="text-xl md:text-2xl font-black flex items-center gap-3 text-secondary uppercase">
-                       {lang === 'AR' ? 'منتجات ننصح بها' : 'Recommended Products'} <Zap className="fill-secondary animate-pulse" size={24} />
+                       {t.recommended[lang]} <Zap className="fill-secondary animate-pulse" size={24} />
                     </h2>
-                    <p className="text-[10px] text-zinc-400 font-black uppercase">
-                       {lang === 'AR' ? 'أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.' : 'Top quality parts handpicked by our team.'}
-                    </p>
+                    <p className="text-[10px] text-zinc-400 font-black uppercase">{t.recommendedSubtitle[lang]}</p>
                  </div>
                  <Link href="/catalog">
                     <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2 uppercase">
-                       {lang === 'AR' ? 'تصفح الكتالوج' : 'Browse Catalog'} <ShoppingBag size={16} />
+                       {t.browseCatalog[lang]} <ShoppingBag size={16} />
                     </Button>
                  </Link>
               </div>
@@ -334,7 +324,7 @@ export default function Home() {
                     price={p.productPrice}
                     image={p.productImage}
                     seller={p.sellerName}
-                    category={lang === 'AR' ? 'مميز' : 'Featured'}
+                    category={lang === 'AR' ? 'مميز' : lang === 'EN' ? 'Featured' : 'Vedette'}
                     condition="New"
                   />
                 ))}
@@ -347,4 +337,3 @@ export default function Home() {
     </div>
   );
 }
-

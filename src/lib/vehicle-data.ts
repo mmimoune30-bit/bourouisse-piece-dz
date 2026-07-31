@@ -2,6 +2,7 @@
 export type Translation = {
   ar: string;
   en: string;
+  fr: string;
 };
 
 export type VehicleType = {
@@ -13,7 +14,7 @@ export type VehicleType = {
 export const VEHICLE_TYPES: VehicleType[] = [
   {
     id: "passenger",
-    label: { ar: "سيارة سياحية", en: "Passenger Car" },
+    label: { ar: "سيارة سياحية", en: "Passenger Car", fr: "Véhicule de Tourisme" },
     brands: [
       "Fiat", "Renault", "Dacia", "Peugeot", "Volkswagen", "SEAT", "Skoda", "Opel", "Citroën", 
       "Audi", "BMW", "Mercedes-Benz", "Cupra", "Volvo", "Porsche", "Alfa Romeo", "Mini", 
@@ -26,7 +27,7 @@ export const VEHICLE_TYPES: VehicleType[] = [
   },
   {
     id: "commercial",
-    label: { ar: "سيارة نفعية", en: "Light Commercial Vehicle" },
+    label: { ar: "سيارة نفعية", en: "Light Commercial Vehicle", fr: "Véhicule Utilitaire" },
     brands: [
       "Fiat Professional", "Renault", "Peugeot", "Citroën", "Volkswagen", "Toyota", 
       "Nissan", "Hyundai", "IVECO", "Mercedes-Benz", "SAFAV-MB", "JMC", "Foton", 
@@ -35,12 +36,12 @@ export const VEHICLE_TYPES: VehicleType[] = [
   },
   {
     id: "small_truck",
-    label: { ar: "شاحنة صغيرة", en: "Small Truck" },
+    label: { ar: "شاحنة صغيرة", en: "Small Truck", fr: "Petit Camion" },
     brands: ["JAC", "JMC", "Foton", "Dongfeng", "Changan", "Hyundai", "Kia", "Toyota", "DFSK", "Victory Auto"]
   },
   {
     id: "heavy_truck",
-    label: { ar: "شاحنة كبيرة", en: "Heavy Truck" },
+    label: { ar: "شاحنة كبيرة", en: "Heavy Truck", fr: "Poids Lourd" },
     brands: [
       "Renault Trucks", "Volvo", "Scania", "MAN", "Mercedes-Benz", "IVECO", 
       "Shacman", "FAW", "Howo", "SAPPL-MB", "SNVI", "XCMG", "SANY", "Liugong"
@@ -48,22 +49,22 @@ export const VEHICLE_TYPES: VehicleType[] = [
   },
   {
     id: "bus",
-    label: { ar: "حافلة", en: "Bus" },
+    label: { ar: "حافلة", en: "Bus", fr: "Bus & Autocar" },
     brands: ["Higer", "Yutong", "King Long", "Ankai", "Zhongtong", "Toyota", "Hyundai", "IVECO", "Mercedes-Benz", "SNVI"]
   },
   {
     id: "tractor",
-    label: { ar: "جرار فلاحي", en: "Agricultural Tractor" },
+    label: { ar: "جرار فلاحي", en: "Agricultural Tractor", fr: "Tracteur Agricole" },
     brands: ["Etrag", "PMA / Sonalika", "Massey Ferguson", "John Deere", "New Holland", "Case IH", "Kubota", "Cirta", "Deutz-Fahr"]
   },
   {
     id: "machine",
-    label: { ar: "آلة أشغال", en: "Construction Machine" },
+    label: { ar: "آلة أشغال", en: "Construction Machine", fr: "Engin de Chantier" },
     brands: ["Caterpillar", "Komatsu", "JCB", "Liebherr", "Case", "Volvo", "Hyundai", "Doosan", "Hidromek", "XCMG", "SANY", "Liugong"]
   },
   {
     id: "motorcycle",
-    label: { ar: "دراجة نارية", en: "Motorcycle" },
+    label: { ar: "دراجة نارية", en: "Motorcycle", fr: "Moto" },
     brands: ["Yamaha", "Honda", "Kawasaki", "Suzuki", "BMW", "KTM", "SYM", "VMS Industrie", "AS Motors / SYM Algeria", "Zontes"]
   }
 ];
@@ -183,27 +184,27 @@ export const BRAND_MODELS: Record<string, string[]> = {
 };
 
 export const PART_CATEGORIES: Translation[] = [
-  { ar: "المحرك", en: "Engine" },
-  { ar: "علبة السرعة", en: "Gearbox" },
-  { ar: "الهيكل", en: "Body" },
-  { ar: "الكهرباء", en: "Electrical" },
-  { ar: "التعليق", en: "Suspension" },
-  { ar: "المكابح", en: "Brakes" },
-  { ar: "التبريد", en: "Cooling" },
-  { ar: "نظام الوقود", en: "Fuel System" },
-  { ar: "العادم", en: "Exhaust" },
-  { ar: "العجلات والإطارات", en: "Wheels & Tires" },
-  { ar: "الداخلية", en: "Interior" },
-  { ar: "الأكسيسوارات", en: "Accessories" },
-  { ar: "الإضاءة", en: "Lighting" }
+  { ar: "المحرك", en: "Engine", fr: "Moteur" },
+  { ar: "علبة السرعة", en: "Gearbox", fr: "Boîte de Vitesse" },
+  { ar: "الهيكل", en: "Body", fr: "Carrosserie" },
+  { ar: "الكهرباء", en: "Electrical", fr: "Électricité" },
+  { ar: "التعليق", en: "Suspension", fr: "Suspension" },
+  { ar: "المكابح", en: "Brakes", fr: "Freinage" },
+  { ar: "التبريد", en: "Cooling", fr: "Refroidissement" },
+  { ar: "نظام الوقود", en: "Fuel System", fr: "Système de Carburant" },
+  { ar: "العادم", en: "Exhaust", fr: "Échappement" },
+  { ar: "العجلات والإطارات", en: "Wheels & Tires", fr: "Roues & Pneus" },
+  { ar: "الداخلية", en: "Interior", fr: "Intérieur" },
+  { ar: "الأكسيسوارات", en: "Accessories", fr: "Accessoires" },
+  { ar: "الإضاءة", en: "Lighting", fr: "Éclairage" }
 ];
 
 export const FUEL_TYPES: Translation[] = [
-  { ar: "بنزين", en: "Gasoline" },
-  { ar: "ديزل / مازوت", en: "Diesel" },
-  { ar: "غاز (GPL/GNC)", en: "LPG/CNG" },
-  { ar: "كهرباء", en: "Electric" },
-  { ar: "هجين (Hybrid)", en: "Hybrid" }
+  { ar: "بنزين", en: "Gasoline", fr: "Essence" },
+  { ar: "ديزل / مازوت", en: "Diesel", fr: "Diesel / Gazole" },
+  { ar: "غاز (GPL/GNC)", en: "LPG/CNG", fr: "GPL/GNC" },
+  { ar: "كهرباء", en: "Electric", fr: "Électrique" },
+  { ar: "هجين (Hybrid)", en: "Hybrid", fr: "Hybride" }
 ];
 
 export const YEARS = Array.from({ length: 2027 - 1980 }, (_, i) => (2026 - i).toString());
