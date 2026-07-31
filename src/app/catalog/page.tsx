@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -10,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES, type Translation } from "@/lib/vehicle-data";
-import { Filter, Search, RotateCcw, SlidersHorizontal, Loader2 } from "lucide-react";
+import { Filter, Search, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
@@ -46,20 +45,11 @@ function CatalogContent() {
     return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
-  useEffect(() => {
-    setTextSearch(searchParams.get("query") || "");
-    setCategory(searchParams.get("category") || "");
-  }, [searchParams]);
-
   const filteredProducts = useMemo(() => {
     if (!dbProducts) return [];
     return dbProducts.filter(p => {
       const q = textSearch.toLowerCase();
-      const matchesText = !textSearch || 
-                          p.name?.toLowerCase().includes(q) || 
-                          p.brand?.toLowerCase().includes(q) ||
-                          p.model?.toLowerCase().includes(q) ||
-                          p.description?.toLowerCase().includes(q);
+      const matchesText = !textSearch || p.name?.toLowerCase().includes(q) || p.brand?.toLowerCase().includes(q) || p.model?.toLowerCase().includes(q);
       const matchesBrand = !brand || brand === "Any" || p.brand === brand;
       const matchesModel = !model || model === "Any" || p.model === model;
       const matchesYear = !year || year === "Any" || p.year === year;
@@ -75,184 +65,103 @@ function CatalogContent() {
     return Array.from(allBrands).sort();
   }, []);
 
-  const availableModels = useMemo(() => {
-    return brand && brand !== "Any" ? BRAND_MODELS[brand] || [] : [];
-  }, [brand]);
+  const availableModels = useMemo(() => brand && brand !== "Any" ? BRAND_MODELS[brand] || [] : [], [brand]);
 
   const handleReset = () => {
-    setBrand("");
-    setModel("");
-    setYear("");
-    setCategory("");
-    setFuelType("");
-    setTextSearch("");
+    setBrand(""); setModel(""); setYear(""); setCategory(""); setFuelType(""); setTextSearch("");
     window.history.pushState({}, "", "/catalog");
   };
 
   const t = {
-    filters: { AR: "فلاتر متقدمة", EN: "Advanced Filters", FR: "Filtres Avancés" },
+    filters: { AR: "فلاتر متقدمة", EN: "Filters", FR: "Filtres" },
     brand: { AR: "الماركة", EN: "Brand", FR: "Marque" },
     model: { AR: "الموديل", EN: "Model", FR: "Modèle" },
     year: { AR: "سنة الصنع", EN: "Year", FR: "Année" },
     fuel: { AR: "نوع الطاقة", EN: "Fuel Type", FR: "Énergie" },
-    category: { AR: "تصنيف القطعة", EN: "Part Category", FR: "Catégorie" },
-    reset: { AR: "إعادة ضبط الفلاتر", EN: "Reset Filters", FR: "Réinitialiser" },
-    allBrands: { AR: "كل الماركات", EN: "All Brands", FR: "Toutes les marques" },
-    allModels: { AR: "كل الموديلات", EN: "All Models", FR: "Tous les modèles" },
-    allYears: { AR: "كل السنوات", EN: "All Years", FR: "Toutes les années" },
-    allTypes: { AR: "كل الأنواع", EN: "All Types", FR: "Tous les types" },
-    allCats: { AR: "كل الفئات", EN: "All Categories", FR: "Toutes les catégories" },
-    title: { AR: "الكتالوج الشامل", EN: "Comprehensive Catalog", FR: "Catalogue Complet" },
-    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts available now.", FR: "Parcourez et filtrez des milliers de pièces disponibles." },
+    category: { AR: "تصنيف القطعة", EN: "Category", FR: "Catégorie" },
+    reset: { AR: "مسح الفلاتر", EN: "Reset", FR: "Effacer" },
+    title: { AR: "الكتالوج", EN: "Catalog", FR: "Catalogue" },
     results: { AR: "النتائج:", EN: "Results:", FR: "Résultats:" },
-    parts: { AR: "قطعة", EN: "parts", FR: "pièces" },
-    noResults: { AR: "لا توجد نتائج مطابقة لبحثك حالياً", EN: "No results matching your search found.", FR: "Aucun résultat correspondant à votre recherche." },
-    showAll: { AR: "إظهار كافة القطع", EN: "Show all parts", FR: "Afficher toutes les pièces" },
-    filter: { AR: "تصفية", EN: "Filter", FR: "Filtrer" },
-    loading: { AR: "جاري التحميل...", EN: "Loading...", FR: "Chargement..." }
+    allBrands: { AR: "الماركات", EN: "All Brands", FR: "Marques" },
   };
 
   const FilterPanel = ({ isMobile = false }) => (
-    <div className={cn("space-y-6 text-right", !isMobile && "sticky top-[240px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+    <div className={cn("space-y-4 text-right", !isMobile && "sticky top-[220px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
       {!isMobile && (
-        <div className={cn("flex items-center justify-between border-b pb-4", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-          <h3 className="font-black text-xl text-primary">{t.filters[lang]}</h3>
-          <Filter size={20} className="text-secondary" />
+        <div className={cn("flex items-center justify-between border-b pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+          <h3 className="font-black text-lg text-black">{t.filters[lang]}</h3>
+          <Filter size={18} className="text-secondary" />
         </div>
       )}
-
-      <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-sm text-black uppercase">{t.brand[lang]}</Label>
+      <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
+        <Label className="font-black text-xs text-black uppercase">{t.brand[lang]}</Label>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Any">{t.allBrands[lang]}</SelectItem>
-            {availableBrands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-          </SelectContent>
+          <SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
+          <SelectContent>{availableBrands.map(b => <SelectItem key={b} value={b} className="text-xs">{b}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-
-      <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-sm text-black uppercase">{t.model[lang]}</Label>
-        <Select value={model} onValueChange={setModel} disabled={!brand || brand === "Any"}>
-          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allModels[lang]} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Any">{t.allModels[lang]}</SelectItem>
-            {availableModels.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-          </SelectContent>
+      <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
+        <Label className="font-black text-xs text-black uppercase">{t.model[lang]}</Label>
+        <Select value={model} onValueChange={setModel} disabled={!brand}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+          <SelectContent>{availableModels.map(m => <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-
-      <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-sm text-black uppercase">{t.year[lang]}</Label>
-        <Select value={year} onValueChange={setYear}>
-          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allYears[lang]} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Any">{t.allYears[lang]}</SelectItem>
-            {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-          </SelectContent>
+      <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
+        <Label className="font-black text-xs text-black uppercase">{t.year[lang]}</Label>
+        <Select value={year} onValueChange={setYear}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+          <SelectContent>{YEARS.map(y => <SelectItem key={y} value={y} className="text-xs">{y}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-
-      <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-sm text-black uppercase">{t.fuel[lang]}</Label>
-        <Select value={fuelType} onValueChange={setFuelType}>
-          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allTypes[lang]} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Any">{t.allTypes[lang]}</SelectItem>
-            {FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en}>{f[lang.toLowerCase() as keyof Translation]}</SelectItem>)}
-          </SelectContent>
+      <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
+        <Label className="font-black text-xs text-black uppercase">{t.fuel[lang]}</Label>
+        <Select value={fuelType} onValueChange={setFuelType}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+          <SelectContent>{FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en} className="text-xs">{f[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-
-      <div className={cn("space-y-2", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-sm text-black uppercase">{t.category[lang]}</Label>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="h-11 border-2 text-black font-bold text-sm"><SelectValue placeholder={t.allCats[lang]} /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Any">{t.allCats[lang]}</SelectItem>
-            {PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en}>{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}
-          </SelectContent>
+      <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
+        <Label className="font-black text-xs text-black uppercase">{t.category[lang]}</Label>
+        <Select value={category} onValueChange={setCategory}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+          <SelectContent>{PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en} className="text-xs">{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-
-      <Button variant="outline" className="w-full h-11 font-black gap-2 mt-4 uppercase border-2 text-black" onClick={handleReset}>
-        <RotateCcw size={16} /> {t.reset[lang]}
-      </Button>
+      <Button variant="outline" className="w-full h-9 font-black gap-1.5 border-2 text-[10px] uppercase mt-2" onClick={handleReset}><RotateCcw size={14} /> {t.reset[lang]}</Button>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[245px] md:pt-[285px] pb-12">
-        <div className="container mx-auto px-4">
-          
-          <div className={cn("mb-6 flex flex-col md:flex-row justify-between items-center gap-4", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
+      <main className="flex-grow pt-[165px] md:pt-[195px] pb-6">
+        <div className="container mx-auto px-2">
+          <div className={cn("mb-3 flex flex-col md:flex-row justify-between items-center gap-2", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
             <div className={cn("w-full md:w-auto", lang === 'AR' ? "text-right" : "text-left")}>
-              <h1 className="text-2xl md:text-3xl font-black text-primary leading-tight uppercase">{t.title[lang]}</h1>
-              <p className="text-xs md:text-sm text-muted-foreground font-bold">{t.subtitle[lang]}</p>
+              <h1 className="text-xl md:text-2xl font-black text-black uppercase">{t.title[lang]}</h1>
             </div>
-            <div className={cn("w-full md:w-auto flex items-center justify-between gap-3", lang === 'AR' ? "flex-row-reverse" : "flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-              <div className="bg-white px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl border shadow-sm flex items-center gap-2 md:gap-3 text-xs md:text-sm font-bold text-primary">
+            <div className={cn("w-full md:w-auto flex items-center justify-between gap-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+              <div className="bg-white px-3 py-1.5 rounded-lg border shadow-xs flex items-center gap-2 text-xs font-bold text-black">
                 <span className="text-secondary">{t.results[lang]}</span>
-                <span className="opacity-70">{loading ? "..." : filteredProducts.length} {t.parts[lang]}</span>
+                <span className="opacity-70">{loading ? "..." : filteredProducts.length}</span>
               </div>
-              
               <div className="lg:hidden">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="secondary" className="font-bold gap-2 h-10 md:h-12 rounded-xl uppercase">
-                      <SlidersHorizontal size={18} /> {t.filter[lang]}
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[300px] sm:w-[400px]">
-                    <SheetHeader>
-                      <SheetTitle className={cn("font-black uppercase", lang === 'AR' ? "text-right" : "text-left")}>{t.filters[lang]}</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-8">
-                      <FilterPanel isMobile={true} />
-                    </div>
+                <Sheet><SheetTrigger asChild><Button variant="secondary" className="font-bold gap-1.5 h-8 rounded-lg text-[10px] uppercase"><SlidersHorizontal size={14} /> {t.filters[lang]}</Button></SheetTrigger>
+                  <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[280px] p-4"><SheetHeader><SheetTitle className={cn("font-black uppercase text-sm", lang === 'AR' ? "text-right" : "text-left")}>{t.filters[lang]}</SheetTitle></SheetHeader>
+                    <div className="mt-4"><FilterPanel isMobile={true} /></div>
                   </SheetContent>
                 </Sheet>
               </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <aside className="hidden lg:block lg:col-span-1">
-              <Card className="border-none shadow-xl">
-                <CardContent className="p-6">
-                   <FilterPanel />
-                </CardContent>
-              </Card>
-            </aside>
-
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <aside className="hidden lg:block lg:col-span-1"><Card className="border shadow-sm"><CardContent className="p-3"><FilterPanel /></CardContent></Card></aside>
             <div className="lg:col-span-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                 {loading ? (
-                   Array.from({ length: 6 }).map((_, i) => (
-                     <div key={i} className="h-80 bg-zinc-200 animate-pulse rounded-[24px] md:rounded-[32px]" />
-                   ))
-                 ) : filteredProducts.length > 0 ? (
-                   filteredProducts.map((product) => (
-                     <ProductCard 
-                        key={product.id} 
-                        id={product.id}
-                        name={product.name}
-                        price={product.price}
-                        image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
-                        category={product.category}
-                        seller={product.sellerName}
-                        condition={product.condition === 'new' ? 'New' : 'Used'}
-                        createdAt={product.createdAt}
-                     />
-                   ))
-                 ) : (
-                   <div className="col-span-full py-20 md:py-32 bg-white rounded-[32px] md:rounded-[40px] border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
-                      <Search className="opacity-10 mb-4 w-12 h-12 md:w-16 md:h-16" />
-                      <p className="font-black text-base md:text-lg text-primary/40 px-6 text-center uppercase">{t.noResults[lang]}</p>
-                      <Button variant="link" onClick={handleReset} className="mt-2 font-bold text-secondary uppercase">{t.showAll[lang]}</Button>
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+                 {loading ? Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-60 bg-zinc-100 animate-pulse rounded-lg" />)
+                 : filteredProducts.length > 0 ? filteredProducts.map((product) => (
+                     <ProductCard key={product.id} id={product.id} name={product.name} price={product.price} image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"} category={product.category} seller={product.sellerName} condition={product.condition === 'new' ? 'New' : 'Used'} createdAt={product.createdAt} />
+                   )) : (
+                   <div className="col-span-full py-16 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
+                      <Search size={32} className="opacity-10 mb-2" />
+                      <p className="font-black text-xs text-black uppercase">No results</p>
                    </div>
                  )}
               </div>
@@ -266,9 +175,5 @@ function CatalogContent() {
 }
 
 export default function CatalogPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse">Loading...</div>}>
-      <CatalogContent />
-    </Suspense>
-  );
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black text-xl animate-pulse">Loading...</div>}><CatalogContent /></Suspense>;
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -10,9 +9,7 @@ import { Button } from "@/components/ui/button";
 import { 
   ArrowLeft, 
   MapPin, 
-  ShieldCheck, 
   Star, 
-  Store, 
   Crown, 
   Loader2, 
   Tags, 
@@ -24,7 +21,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { useFirestore, useCollection, useUser } from "@/firebase";
+import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where, updateDoc, doc, increment, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
@@ -33,7 +30,6 @@ import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { firestore } = useFirestore();
-  const { profile } = useUser();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [api, setApi] = useState<CarouselApi>();
   
@@ -98,60 +94,51 @@ export default function Home() {
   const t = {
     exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
     featured: { AR: "متاجر مميزة", EN: "Featured Stores", FR: "Boutiques Vedettes" },
-    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Added Parts", FR: "Pièces Récentes" },
-    recommended: { AR: "منتجات ننصح بها", EN: "Recommended Products", FR: "Produits Recommandés" },
-    viewAll: { AR: "تصفح الكل", EN: "View All", FR: "Voir Tout" },
-    viewAllParts: { AR: "عرض كافة القطع", EN: "View All Parts", FR: "Voir Toutes" },
-    browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir" },
-    noAds: { AR: "لا توجد إعلانات حصرية حالياً.", EN: "No exclusive ads at the moment.", FR: "Pas de publicités exclusives." },
-    noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured stores at the moment.", FR: "Pas de boutiques vedettes." },
-    noParts: { AR: "لا توجد قطع معروضة حالياً.", EN: "No parts available at the moment.", FR: "Aucune pièce disponible." },
-    sellerAd: { AR: "اشترك معنا واعرض منتجاتك", EN: "Join Us & Showcase Your Products", FR: "Rejoignez-nous & Affichez vos Produits" },
-    buyerAd: { AR: "سجل معنا و اشتري سلعتك بطريقة احترافية", EN: "Join Us & Buy Professionally", FR: "Inscrivez-vous & Achetez Professionnellement" },
-    regSeller: { AR: "سجل كبائع", EN: "Register as Seller", FR: "S'inscrire comme Vendeur" },
-    regBuyer: { AR: "سجل كمشتري", EN: "Register as Buyer", FR: "S'inscrire comme Acheteur" },
-    categories: { AR: "تصنيفات قطع الغيار", EN: "Part Categories", FR: "Catégories de Pièces" },
-    latestSubtitle: { AR: "تصفح القطع المتوفرة حالياً في كافة الولايات.", EN: "Browse parts currently available across all wilayas.", FR: "Parcourez les pièces disponibles dans toutes les wilayas." },
-    recommendedSubtitle: { AR: "أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.", EN: "Top quality parts handpicked by our team.", FR: "Pièces de qualité sélectionnées par notre équipe." }
+    latest: { AR: "أحدث قطع الغيار", EN: "Latest Parts", FR: "Pièces Récentes" },
+    recommended: { AR: "منتجات موصى بها", EN: "Recommended", FR: "Recommandés" },
+    viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" },
+    browseCatalog: { AR: "تصفح", EN: "Browse", FR: "Parcourir" },
+    noAds: { AR: "لا توجد إعلانات حصرية حالياً.", EN: "No ads.", FR: "Aucune pub." },
+    noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured.", FR: "Aucune boutique." },
+    sellerAd: { AR: "اشترك واعرض منتجاتك", EN: "Sell with us", FR: "Vendez ici" },
+    buyerAd: { AR: "سجل و اشتري باحترافية", EN: "Buy professionally", FR: "Achetez pro" },
+    regSeller: { AR: "سجل كبائع", EN: "Seller Register", FR: "Vendeur" },
+    regBuyer: { AR: "سجل كمشتري", EN: "Buyer Register", FR: "Acheteur" },
+    categories: { AR: "تصنيفات", EN: "Categories", FR: "Catégories" }
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
+    <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[230px] md:pt-[280px]">
-        {/* Hero Section */}
-        <section className="w-full px-0.5 mt-1">
-          <div className={cn("flex flex-col lg:flex-row-reverse gap-1.5", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+      <main className="flex-grow pt-[160px] md:pt-[190px]">
+        {/* Compact Hero Section */}
+        <section className="w-full px-1 mt-1">
+          <div className={cn("flex flex-col lg:flex-row-reverse gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
-            {/* Exclusive Stores Slider */}
-            <div className="lg:w-3/4 h-[180px] lg:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-black/5">
-              <div className={cn("bg-zinc-50 px-4 py-1 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                 <h2 className="font-black text-[10px] md:text-xs text-black flex items-center gap-2 uppercase">
+            <div className="lg:w-3/4 h-[160px] md:h-[180px] bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative border">
+              <div className={cn("bg-zinc-50 px-3 py-0.5 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                 <h2 className="font-black text-[9px] md:text-xs text-black flex items-center gap-1.5 uppercase">
                    <Crown size={12} className="text-secondary fill-secondary" /> {t.exclusive[lang]}
                  </h2>
-                 <Link href="/catalog" className="text-[9px] md:text-[10px] font-black text-black hover:underline flex items-center gap-1 uppercase">
-                    {t.viewAll[lang]} <ArrowLeft size={10} className={lang !== 'AR' ? 'rotate-180' : ''} />
-                 </Link>
+                 <Link href="/catalog" className="text-[9px] font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
-                  <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-black" /></div>
+                  <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
                 ) : exclusiveStores?.length > 0 ? (
-                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
-                    <CarouselContent className="h-full -ml-0">
+                  <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
+                    <CarouselContent className="h-full">
                       {exclusiveStores.map((campaign, i) => (
-                        <CarouselItem key={`exclusive-${campaign.id}-${i}`} className="h-full pl-0">
-                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-2">
-                            <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
-                               <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
+                        <CarouselItem key={i} className="h-full">
+                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-4 md:px-8 hover:bg-zinc-50/50 transition-colors">
+                            <div className="w-16 h-16 md:w-24 md:h-24 rounded-xl overflow-hidden relative border shadow-sm shrink-0">
+                               <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover" />
                             </div>
-                            <div className={cn("flex flex-col gap-1", lang === 'AR' ? "text-right" : "text-left")}>
-                               <Badge className="bg-secondary text-black font-black text-[8px] md:text-[10px] w-fit">👑 {lang === 'AR' ? 'حصري' : 'EXCLUSIVE'}</Badge>
-                               <h3 className="font-black text-xl md:text-3xl text-black line-clamp-1 uppercase">{campaign.storeName}</h3>
-                               <p className={cn("text-xs md:text-sm text-black font-bold flex items-center gap-1", lang === 'AR' ? "justify-end" : "justify-start")}>
-                                  <MapPin size={14} className="text-secondary" /> {campaign.storeLocation}
-                                </p>
+                            <div className={cn("flex flex-col gap-0.5", lang === 'AR' ? "text-right" : "text-left")}>
+                               <Badge className="bg-secondary text-black font-black text-[8px] w-fit">👑 {lang === 'AR' ? 'حصري' : 'EXCL'}</Badge>
+                               <h3 className="font-black text-lg md:text-2xl text-black line-clamp-1 uppercase">{campaign.storeName}</h3>
+                               <p className="text-[10px] md:text-xs text-black font-bold flex items-center gap-1"><MapPin size={10} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -159,40 +146,22 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black italic text-xs">
-                    {t.noAds[lang]}
-                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-400 text-[10px] font-black">{t.noAds[lang]}</div>
                 )}
               </div>
             </div>
 
-            {/* Side Ads Carousel */}
-            <div className="lg:w-1/4 h-[180px] lg:h-[220px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
-              <Image src="https://picsum.photos/seed/auto-hero-real/1200/800" alt="Ad Background" fill className="object-cover" />
-              <div className="absolute inset-0 bg-black/65 z-0" />
-              
-              <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full relative z-10">
-                <CarouselContent className="h-full -ml-0">
-                  <CarouselItem key="side-ad-seller" className="h-full pl-0">
-                    <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase px-2">{t.sellerAd[lang]}</h3>
-                      <Link href="/seller/register" className="w-full px-4">
-                        <Button className="w-full h-9 bg-secondary text-black font-black rounded-lg text-[10px] shadow-lg hover:bg-white transition-all uppercase">{t.regSeller[lang]}</Button>
-                      </Link>
-                    </div>
+            <div className="lg:w-1/4 h-[160px] md:h-[180px] relative rounded-lg overflow-hidden bg-zinc-900 border">
+              <Image src="https://picsum.photos/seed/auto-hero-compact/1200/800" alt="" fill className="object-cover opacity-40" />
+              <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full relative z-10">
+                <CarouselContent className="h-full">
+                  <CarouselItem className="h-full flex flex-col items-center justify-center p-3 space-y-1.5 text-center">
+                      <h3 className="text-[10px] md:text-xs font-black text-white uppercase">{t.sellerAd[lang]}</h3>
+                      <Link href="/seller/register" className="w-full"><Button className="w-full h-8 bg-secondary text-black font-black text-[9px] rounded-md uppercase">{t.regSeller[lang]}</Button></Link>
                   </CarouselItem>
-                  <CarouselItem key="side-ad-buyer" className="h-full pl-0">
-                    <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-2">
-                      <h3 className="text-xs md:text-sm font-black leading-tight uppercase px-2">{t.buyerAd[lang]}</h3>
-                      <Link href="/buyer/register" className="w-full px-4">
-                        <Button variant="outline" className="w-full h-9 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-lg text-[10px] shadow-lg transition-all uppercase">{t.regBuyer[lang]}</Button>
-                      </Link>
-                    </div>
-                  </CarouselItem>
-                  <CarouselItem key="side-ad-logo" className="h-full pl-0">
-                    <div className="flex flex-col items-center justify-center h-full w-full p-4">
-                        <SiteLogo brandClassName="text-white text-xs md:text-sm" subtextClassName="text-blue-100 text-[8px]" showTagline={false} />
-                    </div>
+                  <CarouselItem className="h-full flex flex-col items-center justify-center p-3 space-y-1.5 text-center">
+                      <h3 className="text-[10px] md:text-xs font-black text-white uppercase">{t.buyerAd[lang]}</h3>
+                      <Link href="/buyer/register" className="w-full"><Button variant="outline" className="w-full h-8 border-white text-white font-black text-[9px] rounded-md uppercase">{t.regBuyer[lang]}</Button></Link>
                   </CarouselItem>
                 </CarouselContent>
               </Carousel>
@@ -200,80 +169,64 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="w-full px-0.5 py-4">
-          <div className={cn("flex items-center justify-center mb-4 px-2 border-b border-black/5 pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2 uppercase">
-                {t.categories[lang]} <Tags size={16} className="text-secondary" />
+        {/* Compact Categories */}
+        <section className="px-1 py-2">
+          <div className="flex items-center justify-center mb-2 border-b border-black/5 pb-1">
+             <h2 className="text-xs font-black text-black flex items-center gap-1.5 uppercase">
+                {t.categories[lang]} <Tags size={14} className="text-secondary" />
              </h2>
           </div>
-          <div className="flex flex-row-reverse justify-center gap-3 overflow-x-auto pb-4 no-scrollbar px-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="flex flex-row-reverse justify-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {PART_CATEGORIES.map((cat, i) => (
-              <div key={i} className="shrink-0">
-                <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                  <span className="font-black text-xs md:text-sm text-black bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap uppercase">
-                    {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
-                  </span>
-                </Link>
-              </div>
+              <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0">
+                <span className="font-black text-[10px] text-black bg-white px-3 py-1.5 rounded-lg border hover:border-secondary transition-all block shadow-sm uppercase whitespace-nowrap">
+                  {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
+                </span>
+              </Link>
             ))}
           </div>
         </section>
 
-        {/* Featured Stores Section */}
-        <section className="w-full px-0.5 py-2">
-          <div className={cn("flex items-center justify-between mb-2 px-2 border-b border-black/10 pb-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-            <div className={cn("text-right w-full flex items-center gap-2", lang === 'AR' ? "justify-end" : "justify-start")}>
-              <h2 className="text-xs md:text-sm font-black text-black flex items-center gap-2 uppercase">
-                {t.featured[lang]} <Star size={14} className="text-black fill-black" />
+        {/* Compact Featured Stores */}
+        <section className="px-1 py-1">
+          <div className="flex items-center justify-between mb-1 border-b border-black/5 pb-0.5 px-1">
+              <h2 className="text-[10px] font-black text-black flex items-center gap-1 uppercase">
+                {t.featured[lang]} <Star size={12} className="fill-black" />
               </h2>
-            </div>
           </div>
-          
           <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
-            <CarouselContent className="-ml-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <CarouselContent className="-ml-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
               {loadingCampaigns ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <CarouselItem key={i} className="pl-2 basis-1/3 sm:basis-1/4 lg:basis-1/8">
-                    <div className="h-14 bg-zinc-200 animate-pulse rounded-lg" />
-                  </CarouselItem>
-                ))
+                Array.from({ length: 6 }).map((_, i) => <CarouselItem key={i} className="pl-1 basis-1/4 sm:basis-1/6 lg:basis-1/10"><div className="h-10 bg-zinc-100 rounded-lg animate-pulse" /></CarouselItem>)
               ) : featuredStoresList?.length > 0 ? (
                 featuredStoresList.map((campaign, i) => (
-                  <CarouselItem key={`featured-${campaign.id}-${i}`} className="pl-2 basis-1/3 sm:basis-1/4 lg:basis-1/8">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-2 rounded-lg border border-zinc-100 hover:border-black hover:shadow-sm transition-all block text-center space-y-1 group">
-                       <div className="w-8 h-8 md:w-10 md:h-10 mx-auto rounded-md overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
-                         <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
+                  <CarouselItem key={i} className="pl-1 basis-1/4 sm:basis-1/6 lg:basis-1/10">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-1 rounded-md border hover:border-black transition-all block text-center space-y-0.5">
+                       <div className="w-7 h-7 mx-auto rounded-sm overflow-hidden relative border shadow-xs">
+                         <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover" />
                        </div>
-                       <h4 className="font-black text-black text-[8px] md:text-[9px] truncate uppercase">{campaign.storeName}</h4>
+                       <h4 className="font-black text-black text-[7px] truncate uppercase">{campaign.storeName}</h4>
                     </Link>
                   </CarouselItem>
                 ))
               ) : (
-                <div className="col-span-full py-4 text-center text-zinc-400 font-black italic text-[10px] w-full">
-                   {t.noFeatured[lang]}
-                </div>
+                <div className="py-2 text-center text-zinc-400 text-[8px] font-black italic w-full">{t.noFeatured[lang]}</div>
               )}
             </CarouselContent>
           </Carousel>
         </section>
 
-        {/* Explore Latest Parts Section */}
-        <section className="w-full px-0.5 py-6">
-          <div className={cn("flex items-center justify-between mb-4 border-b-2 border-black/10 pb-1 px-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-             <div className={cn("text-right", lang !== 'AR' && "text-left")}>
-                <h2 className="text-lg md:text-xl font-black text-black flex items-center gap-2 uppercase">
-                   {t.latest[lang]} <Package size={20} className="text-black" />
-                </h2>
-                <p className="text-[10px] text-zinc-500 font-black uppercase">{t.latestSubtitle[lang]}</p>
-             </div>
-             <Link href="/catalog" className="text-[10px] font-black text-black hover:underline uppercase">
-                {t.viewAllParts[lang]}
-             </Link>
+        {/* Latest Parts Grid - Tighter gaps */}
+        <section className="px-1 py-3">
+          <div className={cn("flex items-center justify-between mb-2 border-b-2 border-black/10 pb-0.5 px-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+             <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
+                {t.latest[lang]} <Package size={16} />
+             </h2>
+             <Link href="/catalog" className="text-[9px] font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {loadingExplore ? (
-               Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-80 bg-zinc-200 animate-pulse rounded-[24px]" />)
+               Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-60 bg-zinc-100 rounded-xl animate-pulse" />)
             ) : exploreListings?.length > 0 ? (
                exploreListings.map((product) => (
                  <ProductCard 
@@ -289,46 +242,24 @@ export default function Home() {
                  />
                ))
             ) : (
-               <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
-                  <Search size={32} className="opacity-10 mb-2" />
-                  <p className="font-black text-xs text-black">{t.noParts[lang]}</p>
-               </div>
+               <div className="col-span-full py-8 text-center text-zinc-400 text-[10px] font-black italic uppercase">Aucune pièce disponible</div>
             )}
           </div>
         </section>
 
-        {/* Featured Products Section */}
+        {/* Featured Products Section - Dark */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
-          <section className="w-full px-0.5 py-6 bg-zinc-900 text-white rounded-t-[32px] mt-6">
-            <div className="container mx-auto px-2">
-              <div className={cn("flex items-center justify-between mb-6", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-                 <div className={cn("text-right", lang !== 'AR' && "text-left")}>
-                    <h2 className="text-xl md:text-2xl font-black flex items-center gap-3 text-secondary uppercase">
-                       {t.recommended[lang]} <Zap className="fill-secondary animate-pulse" size={24} />
-                    </h2>
-                    <p className="text-[10px] text-zinc-400 font-black uppercase">{t.recommendedSubtitle[lang]}</p>
-                 </div>
-                 <Link href="/catalog">
-                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2 uppercase">
-                       {t.browseCatalog[lang]} <ShoppingBag size={16} />
-                    </Button>
-                 </Link>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-                {activeFeaturedProducts.map((p) => (
-                  <ProductCard 
-                    key={p.id}
-                    id={p.productId}
-                    name={p.productName}
-                    price={p.productPrice}
-                    image={p.productImage}
-                    seller={p.sellerName}
-                    category={lang === 'AR' ? 'مميز' : lang === 'EN' ? 'Featured' : 'Vedette'}
-                    condition="New"
-                  />
-                ))}
-              </div>
+          <section className="w-full px-1 py-4 bg-zinc-900 text-white rounded-t-2xl mt-4">
+            <div className={cn("flex items-center justify-between mb-4 border-b border-white/10 pb-1 px-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+                <h2 className="text-sm md:text-lg font-black flex items-center gap-2 text-secondary uppercase">
+                   {t.recommended[lang]} <Zap size={18} fill="currentColor" />
+                </h2>
+                <Link href="/catalog"><Button variant="outline" size="sm" className="h-7 border-white/20 text-white text-[9px] font-black rounded-md uppercase">{t.browseCatalog[lang]}</Button></Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
+              {activeFeaturedProducts.map((p) => (
+                <ProductCard key={p.id} id={p.productId} name={p.productName} price={p.productPrice} image={p.productImage} seller={p.sellerName} category={lang === 'AR' ? 'مميز' : 'Featured'} condition="New" />
+              ))}
             </div>
           </section>
         )}
