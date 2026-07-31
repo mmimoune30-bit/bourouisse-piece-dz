@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -51,8 +52,8 @@ export default function Navbar() {
 
   const getInquiryText = () => lang === 'AR' ? 'للاستفسار:' : lang === 'EN' ? 'Inquiry:' : 'Demande:';
   const getBackHomeText = () => lang === 'AR' ? 'الرئيسية' : lang === 'EN' ? 'Home' : 'Accueil';
-  const getCategoriesText = () => lang === 'AR' ? 'تصنيفات' : lang === 'EN' ? 'Categories' : 'Catégories';
-  const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً' : lang === 'EN' ? 'Sell' : 'Vendre';
+  const getCategoriesText = () => lang === 'AR' ? 'تصنيفات قطع الغيار' : lang === 'EN' ? 'Categories' : 'Catégories';
+  const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Sell with us' : 'Vendre';
   const getJoinNowText = () => lang === 'AR' ? 'إضافة حساب' : lang === 'EN' ? 'Join' : 'S\'inscrire';
   const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
 
@@ -90,7 +91,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding - More compact */}
+      {/* Layer 2: Main Branding */}
       <div className="bg-white py-1.5 border-b">
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -106,11 +107,11 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="hidden lg:flex items-center gap-1.5" dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="hidden lg:flex items-center gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-2 text-[11px] uppercase">
-                  <Tags size={16} /> {getCategoriesText()} <ChevronDown size={12} />
+                <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-3 text-sm md:text-base uppercase">
+                  <Tags size={18} /> {getCategoriesText()} <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 p-1.5 rounded-xl shadow-xl overflow-y-auto max-h-[60vh]">
@@ -123,9 +124,9 @@ export default function Navbar() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link href="/seller/register"><Button className="bg-secondary text-black font-black rounded-lg h-9 px-3 text-[11px] uppercase">{getBecomeSellerText()}</Button></Link>
-            <Link href="/join"><Button variant="outline" className="border-2 border-black text-black font-black rounded-lg h-9 px-3 text-[11px] uppercase">{getJoinNowText()}</Button></Link>
-            <Link href="/login"><Button variant="ghost" className="text-black font-black h-9 px-3 text-[11px] uppercase">{getLoginText()}</Button></Link>
+            <Link href="/seller/register"><Button className="bg-secondary text-black font-black rounded-lg h-9 px-4 text-sm md:text-base uppercase">{getBecomeSellerText()}</Button></Link>
+            <Link href="/join"><Button variant="outline" className="border-2 border-black text-black font-black rounded-lg h-9 px-4 text-sm md:text-base uppercase">{getJoinNowText()}</Button></Link>
+            <Link href="/login"><Button variant="ghost" className="text-black font-black h-9 px-4 text-sm md:text-base uppercase">{getLoginText()}</Button></Link>
           </div>
 
           <div className="lg:hidden">
@@ -136,9 +137,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 3: Search Bar - Compact */}
+      {/* Layer 3: Search Bar */}
       {showSearch && (
-        <div className="bg-white py-1.5 border-b relative">
+        <div className="bg-white py-2 border-b relative">
           <div className="w-full px-4">
             <AISearchBox />
           </div>

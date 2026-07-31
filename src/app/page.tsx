@@ -26,7 +26,6 @@ import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where, updateDoc, doc, increment, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
-import SiteLogo from "@/components/site-logo";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -105,24 +104,24 @@ export default function Home() {
     buyerAd: { AR: "سجل معنا و اشتري سلعتك بطريقة احترافية", EN: "Buy professionally with us", FR: "Achetez avec professionnalisme" },
     regSeller: { AR: "سجل كبائع", EN: "Seller Register", FR: "Vendeur" },
     regBuyer: { AR: "سجل كمشتري", EN: "Buyer Register", FR: "Acheteur" },
-    categories: { AR: "تصنيفات", EN: "Categories", FR: "Catégories" }
+    categories: { AR: "تصنيفات قطع الغيار", EN: "Categories", FR: "Catégories" }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[175px] md:pt-[210px]">
-        {/* Compact Hero Section - Reduced Height */}
+      <main className="flex-grow pt-[165px] md:pt-[200px]">
+        {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
-          <div className={cn("flex flex-col lg:flex-row-reverse gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
             <div className="lg:w-3/4 h-[180px] md:h-[220px] bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative border">
-              <div className={cn("bg-zinc-50 px-3 py-1 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+              <div className={cn("bg-zinc-50 px-3 py-1 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                  <h2 className="font-black text-sm md:text-base text-black flex items-center gap-1.5 uppercase">
                    <Crown size={14} className="text-secondary fill-secondary" /> {t.exclusive[lang]}
                  </h2>
-                 <Link href="/catalog" className="text-[10px] font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
+                 <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
@@ -170,14 +169,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Compact Categories - Increased Font */}
+        {/* Categories Section */}
         <section className="px-1 py-1">
-          <div className="flex items-center justify-center mb-1.5 border-b border-black/5 pb-1">
+          <div className={cn("flex items-center mb-1.5 border-b border-black/5 pb-1", lang === 'AR' ? "justify-end" : "justify-start")}>
              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
                 {t.categories[lang]} <Tags size={16} className="text-secondary" />
              </h2>
           </div>
-          <div className="flex flex-row-reverse justify-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="flex flex-row justify-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {PART_CATEGORIES.map((cat, i) => (
               <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0">
                 <span className="font-black text-xs md:text-sm text-black bg-white px-3 py-1.5 rounded-lg border hover:border-secondary transition-all block shadow-sm uppercase whitespace-nowrap">
@@ -188,12 +187,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Compact Featured Stores Bar - Reduced Height */}
+        {/* Featured Stores Bar */}
         <section className="px-1 py-0.5">
-          <div className="flex items-center justify-between mb-1 border-b border-black/5 pb-0.5 px-1">
+          <div className={cn("flex items-center justify-between mb-1 border-b border-black/5 pb-0.5 px-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
               <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1 uppercase">
                 {t.featured[lang]} <Star size={14} className="fill-black" />
               </h2>
+              <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
           </div>
           <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
             <CarouselContent className="-ml-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -219,11 +219,11 @@ export default function Home() {
 
         {/* Latest Parts Grid */}
         <section className="px-1 py-1">
-          <div className={cn("flex items-center justify-between mb-2 border-b-2 border-black/10 pb-1 px-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+          <div className={cn("flex items-center justify-between mb-2 border-b-2 border-black/10 pb-1 px-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
                 {t.latest[lang]} <Package size={18} />
              </h2>
-             <Link href="/catalog" className="text-[10px] font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
+             <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {loadingExplore ? (
@@ -251,11 +251,11 @@ export default function Home() {
         {/* Featured Products Section - Dark */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
           <section className="w-full px-1 py-3 bg-zinc-900 text-white rounded-t-2xl mt-4">
-            <div className={cn("flex items-center justify-between mb-3 border-b border-white/10 pb-1 px-1", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
+            <div className={cn("flex items-center justify-between mb-3 border-b border-white/10 pb-1 px-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
                 <h2 className="text-sm md:text-lg font-black flex items-center gap-2 text-secondary uppercase">
                    {t.recommended[lang]} <Zap size={18} fill="currentColor" />
                 </h2>
-                <Link href="/catalog"><Button variant="outline" size="sm" className="h-7 border-white/20 text-white text-[10px] font-black rounded-md uppercase">{t.browseCatalog[lang]}</Button></Link>
+                <Link href="/catalog"><Button variant="outline" size="sm" className="h-8 border-white/20 text-white text-xs font-black rounded-md uppercase">{t.browseCatalog[lang]}</Button></Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
               {activeFeaturedProducts.map((p) => (
@@ -269,4 +269,3 @@ export default function Home() {
     </div>
   );
 }
-
