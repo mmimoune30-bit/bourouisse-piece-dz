@@ -94,7 +94,7 @@ export default function Home() {
   const t = {
     exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
     featured: { AR: "متاجر مميزة", EN: "Featured Stores", FR: "Boutiques Vedettes" },
-    latest: { AR: "أحدث قطع الغيار", EN: "Latest Parts", FR: "Pièces Récentes" },
+    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Parts", FR: "Pièces Récentes" },
     recommended: { AR: "منتجات موصى بها", EN: "Recommended", FR: "Recommandés" },
     viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" },
     browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir" },
@@ -111,7 +111,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[235px] md:pt-[275px]">
+      <main className="flex-grow pt-[175px] md:pt-[205px]">
         {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
           <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -119,7 +119,7 @@ export default function Home() {
             <div className="lg:w-3/4 h-[180px] md:h-[220px] bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative border">
               <div 
                 dir={lang === 'AR' ? "rtl" : "ltr"}
-                className="bg-zinc-50 px-3 py-1 border-b flex items-center justify-between z-20 shrink-0"
+                className="bg-zinc-100 px-3 py-1 border-b flex items-center justify-between z-20 shrink-0"
               >
                  <h2 className="font-black text-sm md:text-base text-black flex items-center gap-1.5 uppercase">
                    <Crown size={16} className="text-secondary fill-secondary" /> {t.exclusive[lang]}
@@ -176,7 +176,7 @@ export default function Home() {
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
-            className="flex items-center mb-1.5 border-b border-black/5 pb-1"
+            className="bg-zinc-100 px-3 py-1.5 flex items-center mb-1.5 border-b border-black/5"
           >
              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
                 {t.categories[lang]} <Tags size={18} className="text-secondary" />
@@ -197,7 +197,7 @@ export default function Home() {
         <section className="px-1 py-0.5">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
-            className="flex items-center justify-between mb-1 border-b border-black/5 pb-0.5 px-1"
+            className="bg-zinc-100 flex items-center justify-between mb-1 border-b border-black/5 py-1.5 px-3"
           >
               <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1 uppercase">
                 {t.featured[lang]} <Star size={16} className="fill-black" />
@@ -230,7 +230,7 @@ export default function Home() {
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
-            className="flex items-center justify-between mb-2 border-b-2 border-black/10 pb-1 px-1"
+            className="bg-zinc-100 px-3 py-1.5 flex items-center justify-between mb-2 border-b-2 border-black/10"
           >
              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
                 {t.latest[lang]} <Package size={20} />
