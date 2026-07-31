@@ -138,8 +138,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Side Ads Carousel */}
+            {/* Side Ads Carousel - Fixed Image, Rotating Text */}
             <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
+              {/* Fixed Background Image */}
               <Image 
                 src="https://picsum.photos/seed/auto-hero-real/1200/800" 
                 alt="Ad Background" 
@@ -148,12 +149,14 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-black/65 z-0" />
               
+              {/* Rotating Content */}
               <Carousel 
                 opts={{ loop: true }} 
                 plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
                 className="w-full h-full relative z-10"
               >
                 <CarouselContent className="h-full -ml-0">
+                  {/* Slide 1 */}
                   <CarouselItem key="side-ad-1" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
@@ -162,6 +165,7 @@ export default function Home() {
                       </Link>
                     </div>
                   </CarouselItem>
+                  {/* Slide 2 */}
                   <CarouselItem key="side-ad-2" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
@@ -170,6 +174,7 @@ export default function Home() {
                       </Link>
                     </div>
                   </CarouselItem>
+                  {/* Slide 3 */}
                   <CarouselItem key="side-ad-3" className="h-full pl-0">
                     <div className="flex flex-col items-center justify-center h-full w-full p-8">
                         <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
@@ -258,7 +263,7 @@ export default function Home() {
             ) : (
                <div className="col-span-full py-10 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
                   <Search size={32} className="opacity-10 mb-2" />
-                  <p className="font-black text-xs">لا توجد قطع معروضة حالياً.</p>
+                  <p className="font-black text-xs text-black">لا توجد قطع معروضة حالياً.</p>
                </div>
             )}
           </div>
