@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -15,21 +16,18 @@ import {
   Crown, 
   Loader2, 
   Tags, 
-  Camera,
   Search,
   Zap,
   ShoppingBag,
   Package
 } from "lucide-react";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useUser } from "@/firebase";
-import { collection, query, where, updateDoc, doc, increment, setDoc, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, updateDoc, doc, increment, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
-import { toast } from "@/hooks/use-toast";
 import SiteLogo from "@/components/site-logo";
 
 export default function Home() {
@@ -38,11 +36,6 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
   const [api, setApi] = useState<CarouselApi>();
   
-  const categoriesMetaQuery = useMemo(() => {
-    if (!firestore) return null;
-    return collection(firestore, "categories_metadata");
-  }, [firestore]);
-
   const featuredStoresQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_stores");
@@ -115,7 +108,7 @@ export default function Home() {
                  <h2 className="font-black text-xs text-black flex items-center gap-2">
                    <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-[10px] font-black text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
+                 <Link href="/catalog" className="text-[10px] font-black text-black hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
@@ -206,22 +199,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Slider */}
+        {/* Featured Stores Slider - Positioned above Latest Parts */}
         {featuredStores && featuredStores.length > 0 && (
-          <section className="w-full px-0.5 py-2">
-            <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse">
-              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2"><Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة</h2>
+          <section className="w-full px-0.5 py-4">
+            <div className="flex items-center justify-between mb-4 px-2 flex-row-reverse border-b border-black/5 pb-2">
+              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2">
+                <Star size={18} className="text-blue-500 fill-blue-500" /> متاجر مميزة
+              </h2>
             </div>
             <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
               <CarouselContent className="-ml-2" dir="rtl">
                 {featuredStores.map((campaign, i) => (
                   <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border hover:shadow-md transition-all block text-center space-y-1">
-                       <div className="w-12 h-12 mx-auto rounded-lg overflow-hidden relative border shadow-sm">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border hover:shadow-md transition-all block text-center space-y-2 group">
+                       <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
-                       <h4 className="font-black text-black text-[9px] truncate">{campaign.storeName}</h4>
-                       <Badge variant="outline" className="text-[7px] h-4 border-blue-200 text-blue-600 font-black">مميز</Badge>
+                       <div className="space-y-1">
+                          <h4 className="font-black text-black text-[10px] truncate">{campaign.storeName}</h4>
+                          <Badge variant="outline" className="text-[8px] h-4 border-blue-200 text-blue-600 font-black">مميز</Badge>
+                       </div>
                     </Link>
                   </CarouselItem>
                 ))}
@@ -239,7 +236,7 @@ export default function Home() {
                 </h2>
                 <p className="text-[10px] text-zinc-500 font-black">تصفح القطع المتوفرة حالياً في كافة الولايات.</p>
              </div>
-             <Link href="/catalog" className="text-[10px] font-black text-secondary hover:underline">عرض كافة القطع</Link>
+             <Link href="/catalog" className="text-[10px] font-black text-black hover:underline">عرض كافة القطع</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir="rtl">
             {loadingExplore ? (
