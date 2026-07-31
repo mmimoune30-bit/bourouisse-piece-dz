@@ -99,16 +99,16 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[170px] md:pt-[190px]">
-        {/* Hero Section */}
+        {/* Hero Section - Reduced Height to Half */}
         <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
-            {/* Exclusive Stores Slider */}
-            <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-black/5">
-              <div className="bg-zinc-50 px-4 py-1.5 border-b flex items-center justify-between z-20 shrink-0">
-                 <h2 className="font-black text-xs text-black flex items-center gap-2">
-                   <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
+            {/* Exclusive Stores Slider - Height reduced from 400px to 220px */}
+            <div className="lg:w-3/4 h-[180px] lg:h-[220px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-black/5">
+              <div className="bg-zinc-50 px-4 py-1 border-b flex items-center justify-between z-20 shrink-0">
+                 <h2 className="font-black text-[10px] md:text-xs text-black flex items-center gap-2">
+                   <Crown size={12} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-[10px] font-black text-black hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
+                 <Link href="/catalog" className="text-[9px] md:text-[10px] font-black text-black hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={10} /></Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
@@ -117,15 +117,15 @@ export default function Home() {
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
                     <CarouselContent className="h-full -ml-0">
                       {exclusiveStores.map((campaign, i) => (
-                        <CarouselItem key={i} className="h-full pl-0">
-                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-4">
-                            <div className="w-28 h-28 md:w-56 md:h-56 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
+                        <CarouselItem key={`exclusive-${campaign.id}-${i}`} className="h-full pl-0">
+                          <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-4 px-6 md:px-12 hover:bg-zinc-50/30 transition-colors py-2">
+                            <div className="w-20 h-20 md:w-36 md:h-36 rounded-2xl overflow-hidden relative border-2 border-zinc-100 shadow-sm shrink-0">
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
-                            <div className="flex flex-col gap-2 text-right">
-                               <Badge className="bg-secondary text-black font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
-                               <h3 className="font-black text-2xl md:text-5xl text-black line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-sm md:text-lg text-black font-black flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
+                            <div className="flex flex-col gap-1 text-right">
+                               <Badge className="bg-secondary text-black font-black text-[8px] md:text-[10px] w-fit mr-auto">👑 حصري</Badge>
+                               <h3 className="font-black text-xl md:text-3xl text-black line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-xs md:text-sm text-black font-bold flex items-center gap-1 justify-end"><MapPin size={14} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -138,9 +138,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Side Ads Carousel - Fixed Image, Rotating Text */}
-            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
-              {/* Fixed Background Image */}
+            {/* Side Ads Carousel - Height reduced to match */}
+            <div className="lg:w-1/4 h-[180px] lg:h-[220px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
               <Image 
                 src="https://picsum.photos/seed/auto-hero-real/1200/800" 
                 alt="Ad Background" 
@@ -149,7 +148,6 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-black/65 z-0" />
               
-              {/* Rotating Content */}
               <Carousel 
                 opts={{ loop: true }} 
                 plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
@@ -157,24 +155,24 @@ export default function Home() {
               >
                 <CarouselContent className="h-full -ml-0">
                   <CarouselItem key="side-ad-1" className="h-full pl-0">
-                    <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
-                      <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
+                    <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-3">
+                      <h3 className="text-sm md:text-lg font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
                       <Link href="/seller/register" className="w-full">
-                        <Button className="w-full h-14 bg-secondary text-black font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">سجل كبائع</Button>
+                        <Button className="w-full h-10 bg-secondary text-black font-black rounded-lg text-sm shadow-lg hover:bg-white transition-all">سجل كبائع</Button>
                       </Link>
                     </div>
                   </CarouselItem>
                   <CarouselItem key="side-ad-2" className="h-full pl-0">
-                    <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
-                      <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
+                    <div className="p-4 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-3">
+                      <h3 className="text-sm md:text-lg font-black leading-tight">سجل معنا و اشتري بطريقة احترافية</h3>
                       <Link href="/buyer/register" className="w-full">
-                        <Button className="w-full h-14 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-xl text-lg shadow-lg transition-all">سجل كمشتري</Button>
+                        <Button variant="outline" className="w-full h-10 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-lg text-sm shadow-lg transition-all">سجل كمشتري</Button>
                       </Link>
                     </div>
                   </CarouselItem>
                   <CarouselItem key="side-ad-3" className="h-full pl-0">
-                    <div className="flex flex-col items-center justify-center h-full w-full p-8">
-                        <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
+                    <div className="flex flex-col items-center justify-center h-full w-full p-4">
+                        <SiteLogo brandClassName="text-white text-xs md:text-sm" subtextClassName="text-blue-100 text-[8px]" showTagline={false} />
                     </div>
                   </CarouselItem>
                 </CarouselContent>
@@ -201,14 +199,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Section - New Ribbon Position */}
-        <section className="w-full px-0.5 py-4">
-          <div className="flex items-center justify-between mb-4 px-2 flex-row-reverse border-b-2 border-black/10 pb-1">
+        {/* Featured Stores Section - Height reduced significantly */}
+        <section className="w-full px-0.5 py-2">
+          <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse border-b border-black/10 pb-1">
             <div className="text-right">
-              <h2 className="text-lg md:text-xl font-black text-black flex items-center justify-end gap-2">
-                متاجر مميزة <Star size={20} className="text-black fill-black" />
+              <h2 className="text-xs md:text-sm font-black text-black flex items-center justify-end gap-2">
+                متاجر مميزة <Star size={14} className="text-black fill-black" />
               </h2>
-              <p className="text-[10px] text-zinc-500 font-black">نخبة المتاجر الموثوقة لدينا.</p>
             </div>
           </div>
           
@@ -216,26 +213,23 @@ export default function Home() {
             <CarouselContent className="-ml-2" dir="rtl">
               {loadingCampaigns ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
-                    <div className="h-24 bg-zinc-200 animate-pulse rounded-xl" />
+                  <CarouselItem key={i} className="pl-2 basis-1/3 sm:basis-1/4 lg:basis-1/8">
+                    <div className="h-16 bg-zinc-200 animate-pulse rounded-lg" />
                   </CarouselItem>
                 ))
               ) : featuredStores?.length > 0 ? (
                 featuredStores.map((campaign, i) => (
-                  <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border-2 border-zinc-100 hover:border-black hover:shadow-md transition-all block text-center space-y-2 group">
-                       <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
+                  <CarouselItem key={`featured-${campaign.id}-${i}`} className="pl-2 basis-1/3 sm:basis-1/4 lg:basis-1/8">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-2 rounded-lg border border-zinc-100 hover:border-black hover:shadow-sm transition-all block text-center space-y-1 group">
+                       <div className="w-10 h-10 mx-auto rounded-md overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
-                       <div className="space-y-1">
-                          <h4 className="font-black text-black text-[10px] truncate uppercase">{campaign.storeName}</h4>
-                          <Badge variant="outline" className="text-[8px] h-4 border-black text-black font-black uppercase">مميز</Badge>
-                       </div>
+                       <h4 className="font-black text-black text-[9px] truncate uppercase">{campaign.storeName}</h4>
                     </Link>
                   </CarouselItem>
                 ))
               ) : (
-                <div className="col-span-full py-6 text-center text-zinc-400 font-black italic text-xs w-full">لا توجد متاجر مميزة حالياً.</div>
+                <div className="col-span-full py-4 text-center text-zinc-400 font-black italic text-[10px] w-full">لا توجد متاجر مميزة حالياً.</div>
               )}
             </CarouselContent>
           </Carousel>
