@@ -107,7 +107,7 @@ export default function Home() {
     categories: { AR: "تصنيفات قطع الغيار", EN: "Categories", FR: "Catégories" }
   };
 
-  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-medium';
   const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
   const normalFont = lang === 'AR' ? 'font-bold' : 'font-normal';
 
@@ -115,7 +115,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[155px] md:pt-[155px]">
+      <main className="flex-grow pt-[175px] md:pt-[175px]">
         {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
           <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>

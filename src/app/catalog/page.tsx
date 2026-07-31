@@ -82,12 +82,12 @@ function CatalogContent() {
     category: { AR: "تصنيف القطعة", EN: "Category", FR: "Catégorie" },
     reset: { AR: "مسح الفلاتر", EN: "Reset", FR: "Effacer" },
     title: { AR: "الكتالوج الشامل", EN: "Catalog", FR: "Catalogue" },
-    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts.", FR: "Parcourir et filtrer des milliers de pièces." },
+    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts.", FR: "Parcurir et filtrer des milliers de pièces." },
     results: { AR: "النتائج:", EN: "Results:", FR: "Résultats:" },
     allBrands: { AR: "الماركات", EN: "All Brands", FR: "Marques" },
   };
 
-  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-medium';
   const labelFont = lang === 'AR' ? 'font-black' : 'font-medium';
   const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
 
@@ -143,7 +143,7 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[165px] md:pt-[165px] pb-6">
+      <main className="flex-grow pt-[185px] md:pt-[185px] pb-6">
         <div className="container mx-auto px-2">
           <div className={cn("mb-3 flex flex-col md:flex-row justify-between items-start gap-2", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
             <div className={cn("w-full md:w-auto", lang === 'AR' ? "text-right" : "text-left")}>
