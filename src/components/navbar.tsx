@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -88,7 +89,7 @@ export default function Navbar() {
 
             {isNotHome && (
               <Link href="/">
-                <Button variant="outline" size="sm" className="border-2 border-black text-black font-black rounded-xl h-10 px-4 gap-2 hover:bg-black hover:text-white transition-all shadow-sm">
+                <Button variant="outline" size="sm" className="border-2 border-black text-black font-black rounded-xl h-10 px-4 gap-2 hover:bg-black hover:text-white transition-all shadow-sm uppercase">
                    <Home size={16} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
                 </Button>
               </Link>
@@ -96,17 +97,17 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-2" dir="rtl">
+          <div className="hidden lg:flex items-center gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-3">
+                <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-xl gap-2 h-11 px-3 uppercase">
                   <Tags size={18} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'} <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[70vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
                 {PART_CATEGORIES.map((cat) => (
                   <DropdownMenuItem key={cat.en} asChild>
-                    <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-2 cursor-pointer rounded-xl text-right w-full text-black">
+                    <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-2 cursor-pointer rounded-xl text-right w-full text-black uppercase">
                       {lang === 'AR' ? cat.ar : cat.en}
                     </Link>
                   </DropdownMenuItem>
@@ -115,18 +116,18 @@ export default function Navbar() {
             </DropdownMenu>
 
             <Link href="/seller/register">
-              <Button className="bg-secondary text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 shadow-sm h-11 px-4 transition-all">
-                <Store size={18} /> كن بائعاً معنا
+              <Button className="bg-secondary text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 shadow-sm h-11 px-4 transition-all uppercase">
+                <Store size={18} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}
               </Button>
             </Link>
             <Link href="/join">
-              <Button variant="outline" className="border-2 border-black text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 h-11 px-4 transition-all">
-                <UserPlus size={18} /> إضافة حساب
+              <Button variant="outline" className="border-2 border-black text-black font-black hover:bg-black hover:text-white rounded-xl gap-2 h-11 px-4 transition-all uppercase">
+                <UserPlus size={18} /> {lang === 'AR' ? 'إضافة حساب' : 'Join Now'}
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="ghost" className="text-black font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-3">
-                <LogIn size={18} /> دخول
+              <Button variant="ghost" className="text-black font-black hover:bg-zinc-100 rounded-xl gap-2 h-11 px-3 uppercase">
+                <LogIn size={18} /> {lang === 'AR' ? 'دخول' : 'Login'}
               </Button>
             </Link>
           </div>
@@ -142,10 +143,10 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4" dir="rtl">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-2xl py-6 px-4 space-y-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           {isNotHome && (
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-xl gap-3 text-lg">
+              <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-xl gap-3 text-lg uppercase">
                 <Home size={22} /> {lang === 'AR' ? 'الرجوع للرئيسية' : 'Back to Home'}
               </Button>
             </Link>
@@ -153,14 +154,14 @@ export default function Navbar() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full text-black font-black h-14 rounded-xl gap-3 text-lg justify-start">
+              <Button variant="ghost" className="w-full text-black font-black h-14 rounded-xl gap-3 text-lg justify-start uppercase">
                 <Tags size={22} /> {lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-[calc(100vw-32px)] p-2 rounded-2xl shadow-2xl overflow-y-auto max-h-[50vh]" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
               {PART_CATEGORIES.map((cat) => (
                 <DropdownMenuItem key={cat.en} asChild onClick={() => setIsMobileMenuOpen(false)}>
-                  <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-3 cursor-pointer rounded-xl text-right w-full text-black">
+                  <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-3 cursor-pointer rounded-xl text-right w-full text-black uppercase">
                     {lang === 'AR' ? cat.ar : cat.en}
                   </Link>
                 </DropdownMenuItem>
@@ -169,18 +170,18 @@ export default function Navbar() {
           </DropdownMenu>
 
           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}>
-             <Button className="w-full bg-secondary text-black font-black h-14 rounded-2xl gap-3 text-lg">
-                <Store size={20} /> كن بائعاً معنا
+             <Button className="w-full bg-secondary text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
+                <Store size={20} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}
              </Button>
           </Link>
           <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}>
-             <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-2xl gap-3 text-lg">
-                <UserPlus size={20} /> إضافة حساب
+             <Button variant="outline" className="w-full border-2 border-black text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
+                <UserPlus size={20} /> {lang === 'AR' ? 'إضافة حساب' : 'Join Now'}
              </Button>
           </Link>
           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full text-black font-black h-14 rounded-2xl gap-3 text-lg">
-                <LogIn size={20} /> دخول الحساب
+             <Button variant="ghost" className="w-full text-black font-black h-14 rounded-2xl gap-3 text-lg uppercase">
+                <LogIn size={20} /> {lang === 'AR' ? 'دخول الحساب' : 'Login'}
              </Button>
           </Link>
         </div>

@@ -20,12 +20,18 @@ export default function Footer() {
   const [lang, setLang] = useState<"AR" | "EN">("AR");
 
   useEffect(() => {
-    const userRole = typeof window !== 'undefined' ? localStorage.getItem("user_role") : null;
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN";
+      if (savedLang) setLang(savedLang);
+    };
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
+
+    const userRole = localStorage.getItem("user_role");
     const allowedRoles = ["Super Admin", "Manager", "Financial Officer", "Customer Service"];
     setIsAdmin(allowedRoles.includes(userRole || ""));
-    
-    const savedLang = typeof window !== 'undefined' ? localStorage.getItem("app_lang") as "AR" | "EN" : "AR";
-    if (savedLang) setLang(savedLang);
+
+    return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
   return (
@@ -44,8 +50,10 @@ export default function Footer() {
               />
             </Link>
             
-            <p className="text-sm text-blue-100/60 leading-relaxed max-w-sm text-center md:text-right">
-               المنصة الجزائرية الأولى المتخصصة في ربط محترفي قطع الغيار بالمستهلكين، مع ضمان تجربة بحث ذكية وسريعة.
+            <p className="text-sm text-blue-100/60 leading-relaxed max-w-sm">
+               {lang === 'AR' 
+                 ? "المنصة الجزائرية الأولى المتخصصة في ربط محترفي قطع الغيار بالمستهلكين، مع ضمان تجربة بحث ذكية وسريعة."
+                 : "The first Algerian platform specialized in connecting auto parts professionals with consumers, ensuring a smart and fast search experience."}
             </p>
 
             <div className="flex gap-4">
@@ -56,49 +64,55 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-black text-lg mb-8 border-r-4 border-secondary pr-4 uppercase">تسوق</h4>
-            <ul className="space-y-4 text-sm text-blue-100/70">
-              <li><Link href="/catalog" className="hover:text-secondary font-bold">تصفح الكتالوج</Link></li>
-              <li><Link href="/catalog?category=Engine" className="hover:text-secondary font-bold">المحركات</Link></li>
-              <li><Link href="/catalog?category=Body" className="hover:text-secondary font-bold">الهياكل</Link></li>
-              <li><Link href="/catalog?category=Suspension" className="hover:text-secondary font-bold">نظام التعليق</Link></li>
+            <h4 className={cn("font-black text-lg mb-8 border-secondary uppercase", lang === 'AR' ? "border-r-4 pr-4" : "border-l-4 pl-4")}>
+               {lang === 'AR' ? 'تسوق' : 'Shop'}
+            </h4>
+            <ul className="space-y-4 text-sm text-blue-100/70 font-bold">
+              <li><Link href="/catalog" className="hover:text-secondary">{lang === 'AR' ? 'تصفح الكتالوج' : 'Browse Catalog'}</Link></li>
+              <li><Link href="/catalog?category=Engine" className="hover:text-secondary">{lang === 'AR' ? 'المحركات' : 'Engines'}</Link></li>
+              <li><Link href="/catalog?category=Body" className="hover:text-secondary">{lang === 'AR' ? 'الهياكل' : 'Body Parts'}</Link></li>
+              <li><Link href="/catalog?category=Suspension" className="hover:text-secondary">{lang === 'AR' ? 'نظام التعليق' : 'Suspension'}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-black text-lg mb-8 border-r-4 border-secondary pr-4 uppercase">روابط سريعة</h4>
-            <ul className="space-y-4 text-sm text-blue-100/70">
-              <li><Link href="/seller/register" className="hover:text-secondary font-bold">سجل كبائع</Link></li>
-              <li><Link href="/buyer/register" className="hover:text-secondary font-bold">سجل كمشتري</Link></li>
-              <li><Link href="/login" className="hover:text-secondary font-bold">دخول الحساب</Link></li>
-              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary font-black flex items-center gap-2"><Lock size={12} /> لوحة الإدارة</Link></li>}
+            <h4 className={cn("font-black text-lg mb-8 border-secondary uppercase", lang === 'AR' ? "border-r-4 pr-4" : "border-l-4 pl-4")}>
+               {lang === 'AR' ? 'روابط سريعة' : 'Quick Links'}
+            </h4>
+            <ul className="space-y-4 text-sm text-blue-100/70 font-bold">
+              <li><Link href="/seller/register" className="hover:text-secondary">{lang === 'AR' ? 'سجل كبائع' : 'Register as Seller'}</Link></li>
+              <li><Link href="/buyer/register" className="hover:text-secondary">{lang === 'AR' ? 'سجل كمشتري' : 'Register as Buyer'}</Link></li>
+              <li><Link href="/login" className="hover:text-secondary">{lang === 'AR' ? 'دخول الحساب' : 'Login'}</Link></li>
+              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary font-black flex items-center gap-2"><Lock size={12} /> {lang === 'AR' ? 'لوحة الإدارة' : 'Admin Panel'}</Link></li>}
             </ul>
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="font-black text-lg mb-8 border-r-4 border-secondary pr-4 uppercase">تواصل معنا</h4>
-            <ul className="space-y-6 text-sm text-blue-100/70">
+            <h4 className={cn("font-black text-lg mb-8 border-secondary uppercase", lang === 'AR' ? "border-r-4 pr-4" : "border-l-4 pl-4")}>
+               {lang === 'AR' ? 'تواصل معنا' : 'Contact Us'}
+            </h4>
+            <ul className="space-y-6 text-sm text-blue-100/70 font-bold">
               <li className="flex items-center gap-4">
                 <Mail size={20} className="text-secondary shrink-0" />
-                <span className="font-bold">support@bourouisse-piecedz.com</span>
+                <span>support@bourouisse-piecedz.com</span>
               </li>
               <li className="flex items-center gap-4">
                 <Phone size={20} className="text-secondary shrink-0" />
-                <span dir="ltr" className="font-bold">+213 778 42 89 77</span>
+                <span dir="ltr">+213 778 42 89 77</span>
               </li>
               <li className="flex items-center gap-4">
                 <MapPin size={20} className="text-secondary shrink-0" />
-                <span className="font-bold">الشلف، الجزائر - M-M CHLEF</span>
+                <span>{lang === 'AR' ? 'الشلف، الجزائر - M-M CHLEF' : 'Chlef, Algeria - M-M CHLEF'}</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-10 flex flex-col md:flex-row-reverse justify-between items-center gap-6 text-xs text-blue-100/30">
-          <p className="font-bold uppercase tracking-widest">© 2024 BOUROUISSE PIECE DT-DZ. جميع الحقوق محفوظة.</p>
+          <p className="font-bold uppercase tracking-widest">© 2024 BOUROUISSE PIECE DT-DZ. {lang === 'AR' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
           <div className="flex gap-8">
-            <Link href="/terms-of-service" className="hover:text-white font-bold transition-colors">شروط الخدمة</Link>
-            <Link href="/privacy-policy" className="hover:text-white font-bold transition-colors">سياسة الخصوصية</Link>
+            <Link href="/terms-of-service" className="hover:text-white font-bold transition-colors">{lang === 'AR' ? 'شروط الخدمة' : 'Terms of Service'}</Link>
+            <Link href="/privacy-policy" className="hover:text-white font-bold transition-colors">{lang === 'AR' ? 'سياسة الخصوصية' : 'Privacy Policy'}</Link>
           </div>
         </div>
       </div>
