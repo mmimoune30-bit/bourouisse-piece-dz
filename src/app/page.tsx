@@ -65,12 +65,6 @@ export default function Home() {
       .sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [allCampaigns, today]);
 
-  const featuredStoresList = useMemo(() => {
-    return (allCampaigns || [])
-      .filter(c => c.tier === "Featured" && c.status === "Active" && c.startDate <= today && c.endDate >= today)
-      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }, [allCampaigns, today]);
-
   const activeFeaturedProducts = useMemo(() => {
     return (featuredProducts || [])
       .filter(p => p.startDate <= today && p.endDate >= today)
@@ -93,13 +87,13 @@ export default function Home() {
 
   const t = {
     exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
-    featured: { AR: "متاجر مميزة", EN: "Featured Stores", FR: "Boutiques Vedettes" },
+    featured: { AR: "منتجات مميزة", EN: "Featured Products", FR: "Produits Vedettes" },
     latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Parts", FR: "Pièces Récentes" },
     recommended: { AR: "منتجات موصى بها", EN: "Recommended", FR: "Recommandés" },
     viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" },
     browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir" },
     noAds: { AR: "لا توجد إعلانات حصرية حالياً.", EN: "No ads.", FR: "Aucune pub." },
-    noFeatured: { AR: "لا توجد متاجر مميزة حالياً.", EN: "No featured.", FR: "Aucune boutique." },
+    noFeatured: { AR: "لا توجد منتجات مميزة حالياً.", EN: "No featured products.", FR: "Aucun produit vedette." },
     sellerAd: { AR: "سجل متجرك الآن", EN: "Register your store", FR: "Ouvrez votre boutique" },
     buyerAd: { AR: "سجل معنا و اشتري سلعتك بطريقة احترافية", EN: "Buy professionally with us", FR: "Achetez avec professionnalisme" },
     regSeller: { AR: "سجل كبائع", EN: "Seller Register", FR: "Vendeur" },
@@ -197,34 +191,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Section */}
+        {/* Featured Products Section (Management Collection) */}
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
             className={cn("bg-zinc-100 px-3 py-1.5 flex items-center justify-between mb-1 border-b border-black/5", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
           >
               <h2 className={cn("text-sm md:text-base text-black flex items-center gap-1 uppercase", titleFont)}>
-                {t.featured[lang]} <Star size={16} className="fill-black" />
+                {t.featured[lang]} <Zap size={16} className="text-secondary" />
               </h2>
               <Link href="/catalog" className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>{t.viewAll[lang]}</Link>
           </div>
           <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
             <CarouselContent className="-ml-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
-              {loadingCampaigns ? (
-                Array.from({ length: 8 }).map((_, i) => <CarouselItem key={i} className="pl-1 basis-1/5 sm:basis-1/8 lg:basis-1/12"><div className="h-10 bg-zinc-100 rounded-lg animate-pulse" /></CarouselItem>)
-              ) : featuredStoresList?.length > 0 ? (
-                featuredStoresList.map((campaign, i) => (
-                  <CarouselItem key={i} className="pl-1 basis-1/4 sm:basis-1/6 lg:basis-1/10 xl:basis-[8%]">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-1 rounded-md border hover:border-black transition-all block text-center space-y-0.5">
-                       <div className="w-10 h-10 mx-auto rounded-sm overflow-hidden relative border shadow-xs">
-                         <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover" />
-                       </div>
-                       <h4 className={cn("text-black text-[8px] truncate uppercase", titleFont)}>{campaign.storeName}</h4>
-                    </Link>
+              {activeFeaturedProducts && activeFeaturedProducts.length > 0 ? (
+                activeFeaturedProducts.map((p, i) => (
+                  <CarouselItem key={i} className="pl-1 basis-1/2 sm:basis-1/3 lg:basis-1/5 xl:basis-[18%]">
+                    <ProductCard 
+                      id={p.productId} 
+                      name={p.productName} 
+                      price={p.productPrice} 
+                      image={p.productImage} 
+                      seller={p.sellerName} 
+                      category={lang === 'AR' ? 'مميز' : 'Featured'} 
+                      condition="New" 
+                    />
                   </CarouselItem>
                 ))
               ) : (
-                <div className={cn("py-2 text-center text-zinc-400 text-[10px] italic w-full", titleFont)}>{t.noFeatured[lang]}</div>
+                <div className={cn("py-8 text-center text-zinc-400 text-xs italic w-full", titleFont)}>{t.noFeatured[lang]}</div>
               )}
             </CarouselContent>
           </Carousel>
@@ -264,7 +259,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products Section - Dark */}
+        {/* Featured Products Section - Dark (Recommended) */}
         {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
           <section className="w-full px-1 py-3 bg-zinc-900 text-white rounded-t-2xl mt-4">
             <div 
