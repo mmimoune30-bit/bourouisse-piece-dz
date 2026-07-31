@@ -11,13 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Store, ShieldCheck, Zap, ArrowRight, ImagePlus, Lock, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { WILAYAS_DATA } from "@/lib/algeria-locations";
 import { useAuth, useFirestore } from "@/firebase";
 import { registerUser } from "@/services/auth-service";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function SellerRegister() {
   const router = useRouter();
@@ -27,9 +28,20 @@ export default function SellerRegister() {
   const [agreed, setAgreed] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
+  const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const storeId = useMemo(() => `BR-S-${Math.floor(1000 + Math.random() * 9000)}`, []);
+
+  useEffect(() => {
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (savedLang) setLang(savedLang);
+    };
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
+    return () => window.removeEventListener("languageChange", checkLang);
+  }, []);
 
   const communesList = useMemo(() => {
     return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
@@ -150,131 +162,138 @@ export default function SellerRegister() {
     }
   };
 
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const normalFont = lang === 'AR' ? 'font-bold' : 'font-medium';
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20 pb-12">
+      <main className="flex-grow pt-20 pb-6">
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1 space-y-6 text-right order-2 lg:order-1" dir="rtl">
-              <h1 className="text-4xl font-black text-primary leading-tight">
-                حول عملك إلى <span className="text-secondary">احترافي</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className={cn("lg:col-span-1 space-y-4 text-right order-2 lg:order-1", lang !== 'AR' && "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+              <h1 className={cn("text-3xl md:text-4xl text-primary leading-tight uppercase", titleFont)}>
+                {lang === 'AR' ? 'حول عملك إلى' : lang === 'EN' ? 'Transform your business to' : 'Transformez votre business en'} <span className="text-secondary">{lang === 'AR' ? 'احترافي' : lang === 'EN' ? 'PROFESSIONAL' : 'PROFESSIONNEL'}</span>
               </h1>
-              <p className="text-muted-foreground font-bold">
-                افتح متجرك الآن واحصل على معرف رقمي فوري يسهل عليك تسجيل الدخول وإدارة مبيعاتك.
+              <p className={cn("text-muted-foreground", normalFont)}>
+                {lang === 'AR' 
+                  ? 'افتح متجرك الآن واحصل على معرف رقمي فوري يسهل عليك تسجيل الدخول وإدارة مبيعاتك.' 
+                  : lang === 'EN' 
+                  ? 'Open your store now and get an instant digital ID for easy login and sales management.' 
+                  : 'Ouvrez votre boutique et obtenez un ID digital instantané pour gérer vos ventes.'}
               </p>
               
-              <div className="p-6 bg-primary rounded-3xl text-white shadow-xl">
-                 <h3 className="text-lg font-black mb-4 flex items-center justify-end gap-2 text-secondary">
-                   <ShieldCheck /> مميزات متجر بورويس
+              <div className="p-5 bg-primary rounded-2xl text-white shadow-xl">
+                 <h3 className={cn("text-lg mb-3 flex items-center gap-2 text-secondary justify-end", titleFont)}>
+                   <ShieldCheck /> {lang === 'AR' ? 'مميزات متجر بورويس' : lang === 'EN' ? 'Features' : 'Avantages'}
                  </h3>
-                 <ul className="space-y-4 text-sm font-bold">
-                   <li className="flex items-center justify-end gap-2">تأكيد فوري للقطع <Zap size={14} className="text-secondary" /></li>
-                   <li className="flex items-center justify-end gap-2">إحصائيات حية لمبيعاتك <Zap size={14} className="text-secondary" /></li>
-                   <li className="flex items-center justify-end gap-2">دعم فني خاص بالبائعين <Zap size={14} className="text-secondary" /></li>
+                 <ul className={cn("space-y-3 text-sm", normalFont)}>
+                   <li className="flex items-center justify-end gap-2">{lang === 'AR' ? 'تأكيد فوري للقطع' : 'Instant confirmation'} <Zap size={14} className="text-secondary" /></li>
+                   <li className="flex items-center justify-end gap-2">{lang === 'AR' ? 'إحصائيات حية لمبيعاتك' : 'Live sales stats'} <Zap size={14} className="text-secondary" /></li>
+                   <li className="flex items-center justify-end gap-2">{lang === 'AR' ? 'دعم فني خاص بالبائعين' : 'Seller support'} <Zap size={14} className="text-secondary" /></li>
                  </ul>
               </div>
 
-              <div className="p-6 border-2 border-dashed border-primary/20 rounded-3xl text-center">
-                 <p className="text-xs font-black text-muted-foreground uppercase mb-2">معرفك الرقمي الجديد</p>
-                 <div className="text-3xl font-black text-primary tracking-widest bg-zinc-100 p-4 rounded-xl border-2 border-white shadow-inner">
+              <div className="p-4 border-2 border-dashed border-primary/20 rounded-2xl text-center">
+                 <p className={cn("text-[10px] text-muted-foreground uppercase mb-1", titleFont)}>{lang === 'AR' ? 'معرفك الرقمي الجديد' : 'YOUR DIGITAL ID'}</p>
+                 <div className="text-2xl font-black text-primary tracking-widest bg-zinc-100 p-3 rounded-lg border-2 border-white shadow-inner font-mono">
                     {storeId}
                  </div>
               </div>
             </div>
 
-            <Card className="lg:col-span-2 border-none shadow-2xl order-1 lg:order-2 bg-white">
-              <CardHeader className="bg-destructive text-white p-8 text-right rounded-t-lg">
-                <CardTitle className="text-3xl font-black flex items-center justify-end gap-3">
-                  فتح متجر جديد <Store size={32} />
+            <Card className="lg:col-span-2 border-none shadow-2xl order-1 lg:order-2 bg-white rounded-3xl overflow-hidden">
+              <CardHeader className="bg-primary text-white p-6 text-right">
+                <CardTitle className={cn("text-2xl flex items-center justify-end gap-3 uppercase", titleFont)}>
+                  {lang === 'AR' ? 'فتح متجر جديد' : lang === 'EN' ? 'Open New Store' : 'Ouvrir Boutique'} <Store size={28} />
                 </CardTitle>
-                <CardDescription className="text-blue-100">يرجى ملء كافة البيانات بدقة لتوثيق المتجر</CardDescription>
+                <CardDescription className={cn("text-blue-100", normalFont)}>{lang === 'AR' ? 'يرجى ملء كافة البيانات بدقة لتوثيق المتجر' : 'Please fill all details correctly'}</CardDescription>
               </CardHeader>
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6 text-right" dir="rtl">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">اسم المتجر</Label>
-                      <Input name="storeName" placeholder="مثلاً: بوزيد لقطع الغيار" className="h-12 border-2" required />
+              <CardContent className="p-6">
+                <form onSubmit={handleSubmit} className="space-y-4 text-right" dir={lang === 'AR' ? "rtl" : "ltr"}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'اسم المتجر' : 'Store Name'}</Label>
+                      <Input name="storeName" placeholder={lang === 'AR' ? 'مثلاً: بوزيد لقطع الغيار' : 'e.g. Parts Store'} className="h-11 border-2 rounded-xl" required />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">اسم صاحب المتجر</Label>
-                      <Input name="ownerName" placeholder="الاسم واللقب" className="h-12 border-2" required />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">رقم الهاتف (اختياري)</Label>
-                      <Input name="phone" placeholder="05/06/07..." className="h-12 border-2" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">رقم الواتساب</Label>
-                      <Input name="whatsapp" placeholder="05/06/07..." className="h-12 border-2 border-green-100" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">البريد الإلكتروني (اختياري)</Label>
-                      <Input name="email" type="email" placeholder="email@example.com" className="h-12 border-2" />
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'اسم صاحب المتجر' : 'Owner Name'}</Label>
+                      <Input name="ownerName" placeholder={lang === 'AR' ? 'الاسم واللقب' : 'Full Name'} className="h-11 border-2 rounded-xl" required />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">الولاية</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'رقم الهاتف' : 'Phone'}</Label>
+                      <Input name="phone" placeholder="05/06/07..." className="h-11 border-2 rounded-xl" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>WhatsApp</Label>
+                      <Input name="whatsapp" placeholder="05/06/07..." className="h-11 border-2 rounded-xl border-green-50" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'البريد الإلكتروني' : 'Email'}</Label>
+                      <Input name="email" type="email" placeholder="email@example.com" className="h-11 border-2 rounded-xl" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'الولاية' : 'Wilaya'}</Label>
                       <Select name="wilaya" required onValueChange={setSelectedWilaya}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
+                        <SelectTrigger className="h-11 border-2 rounded-xl"><SelectValue placeholder="-" /></SelectTrigger>
                         <SelectContent>{Object.keys(WILAYAS_DATA).sort().map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">البلدية</Label>
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'البلدية' : 'Commune'}</Label>
                       <Select name="commune" required disabled={!selectedWilaya}>
-                        <SelectTrigger className="h-12 border-2"><SelectValue placeholder="اختر البلدية" /></SelectTrigger>
+                        <SelectTrigger className="h-11 border-2 rounded-xl"><SelectValue placeholder="-" /></SelectTrigger>
                         <SelectContent>{communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-bold">كلمة المرور</Label>
-                      <Input name="password" type="password" placeholder="••••••••" className="h-12 border-2" required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'كلمة المرور' : 'Password'}</Label>
+                      <Input name="password" type="password" placeholder="••••••••" className="h-11 border-2 rounded-xl" required />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="font-bold">تأكيد كلمة المرور</Label>
-                      <Input name="confirmPassword" type="password" placeholder="••••••••" className="h-12 border-2" required />
+                    <div className="space-y-1.5">
+                      <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'تأكيد كلمة المرور' : 'Confirm'}</Label>
+                      <Input name="confirmPassword" type="password" placeholder="••••••••" className="h-11 border-2 rounded-xl" required />
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="font-bold">شعار المتجر (Logo)</Label>
+                  <div className="space-y-3">
+                    <Label className={cn("text-black", normalFont)}>{lang === 'AR' ? 'شعار المتجر (Logo)' : 'Store Logo'}</Label>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoChange} />
                     <div onClick={() => !loading && handleLogoClick()} className={cn(
-                      "border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[200px]",
+                      "border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[160px]",
                       loading && "opacity-50 cursor-not-allowed"
                     )}>
-                       {loading ? <Loader2 className="animate-spin text-primary" size={48} /> : logoPreview ? (
+                       {loading ? <Loader2 className="animate-spin text-primary" size={32} /> : logoPreview ? (
                          <div className="relative w-full h-full flex items-center justify-center">
-                           <Image src={logoPreview} alt="Store Logo Preview" width={150} height={150} className="object-contain max-h-[180px] rounded-xl" />
-                           <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 rounded-full h-8 w-8 shadow-lg" onClick={removeLogo}><X size={16} /></Button>
+                           <Image src={logoPreview} alt="Preview" width={120} height={120} className="object-contain max-h-[140px] rounded-lg" />
+                           <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 rounded-full h-7 w-7 shadow-lg" onClick={removeLogo}><X size={14} /></Button>
                          </div>
                        ) : (
                          <>
-                           <ImagePlus size={48} className="mb-4 group-hover:scale-110 transition-transform text-primary/40" />
-                           <span className="font-bold text-primary">انقر لرفع شعار متجرك</span>
-                           <span className="text-[10px] mt-2 tracking-widest opacity-50 uppercase">PNG, JPG (بحد أقصى 10MB)</span>
+                           <ImagePlus size={32} className="mb-2 group-hover:scale-110 transition-transform text-primary/40" />
+                           <span className={cn("text-primary", normalFont)}>{lang === 'AR' ? 'انقر لرفع شعار متجرك' : 'Click to upload logo'}</span>
+                           <span className="text-[9px] mt-1 tracking-widest opacity-50 uppercase">Max 10MB</span>
                          </>
                        )}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-3 py-2">
-                    <Label htmlFor="terms-seller" className="text-sm font-bold cursor-pointer">أوافق على الشروط والأحكام وسياسة الخصوصية.</Label>
+                  <div className={cn("flex items-center gap-2 py-1", lang === 'AR' ? "justify-end" : "justify-start")}>
+                    <Label htmlFor="terms-seller" className={cn("text-xs cursor-pointer", normalFont)}>{lang === 'AR' ? 'أوافق على الشروط والأحكام وسياسة الخصوصية.' : 'I agree to Terms & Privacy.'}</Label>
                     <Checkbox id="terms-seller" checked={agreed} onCheckedChange={(val) => setAgreed(!!val)} />
                   </div>
 
-                  <Button type="submit" className="w-full h-16 text-xl font-black shadow-2xl rounded-2xl gap-3" disabled={loading || !agreed}>
-                    {loading ? <Loader2 className="animate-spin" /> : <>تسجيل وتفعيل المتجر <ArrowRight className="rotate-180" /></>}
+                  <Button type="submit" className={cn("w-full h-14 text-lg shadow-xl rounded-2xl gap-3 bg-primary text-white hover:bg-secondary hover:text-black uppercase", titleFont)} disabled={loading || !agreed}>
+                    {loading ? <Loader2 className="animate-spin" /> : <>{lang === 'AR' ? 'تسجيل وتفعيل المتجر' : 'REGISTER STORE'} <ArrowRight className={lang === 'AR' ? 'rotate-180' : ''} /></>}
                   </Button>
                 </form>
               </CardContent>
