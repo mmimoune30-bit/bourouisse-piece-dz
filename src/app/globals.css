@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    /* Standard Navy & Gold Theme */
+    /* Pure Black & Gold Theme */
     --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --foreground: 0 0% 0%; /* Pure Black Text */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 20%; /* Navy Blue */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 43 65% 50%; /* Gold */
-    --secondary-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%; /* Pure Black Primary Elements */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 43 65% 50%; /* Gold Remains as Accent */
+    --secondary-foreground: 0 0% 0%;
     --muted: 210 40% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 0 0% 20%;
     --accent: 43 65% 50%;
-    --accent-foreground: 222 47% 11%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 222 47% 20%;
+    --ring: 0 0% 0%;
     --radius: 1rem;
   }
 }

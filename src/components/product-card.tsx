@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -59,11 +58,11 @@ export default function ProductCard({
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-bold shadow-lg">
+          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-black shadow-lg">
             {condition}
           </Badge>
           {condition === 'New' && (
-            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-none shadow-sm text-primary flex items-center gap-1 font-bold">
+            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-none shadow-sm text-black flex items-center gap-1 font-black">
               <ShieldCheck size={12} className="text-secondary" />
               أصلية
             </Badge>
@@ -76,12 +75,12 @@ export default function ProductCard({
           {category}
         </div>
         <Link href={`/products/${id}`} className="block mb-2">
-          <h3 className="font-headline font-black text-lg text-primary line-clamp-1 group-hover:text-secondary transition-colors">
+          <h3 className="font-headline font-black text-lg text-black line-clamp-1 group-hover:text-secondary transition-colors">
             {name}
           </h3>
         </Link>
         <div className="flex items-center justify-end gap-1 mb-2">
-          <span className="text-xs text-muted-foreground font-bold">({rating})</span>
+          <span className="text-xs text-zinc-500 font-black">({rating})</span>
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -94,14 +93,14 @@ export default function ProductCard({
           </div>
         </div>
         <div className="flex items-center justify-between flex-row-reverse mb-2">
-          <span className="text-2xl font-black text-primary">
-            {mounted ? price.toLocaleString() : price} <span className="text-sm font-bold text-muted-foreground">دج</span>
+          <span className="text-2xl font-black text-black">
+            {mounted ? price.toLocaleString() : price} <span className="text-sm font-black text-zinc-500">دج</span>
           </span>
-          <span className="text-[10px] text-muted-foreground font-bold">بواسطة: {seller}</span>
+          <span className="text-[10px] text-zinc-500 font-black">بواسطة: {seller}</span>
         </div>
 
         {formattedDate && (
-          <div className="flex items-center justify-end gap-1 text-[10px] text-zinc-400 font-bold border-t pt-2 mt-2">
+          <div className="flex items-center justify-end gap-1 text-[10px] text-zinc-400 font-black border-t pt-2 mt-2">
             <span>نشر في: {formattedDate}</span>
             <Calendar size={10} />
           </div>
@@ -109,7 +108,7 @@ export default function ProductCard({
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full gap-2 group/btn font-black bg-zinc-50 border-2 hover:bg-primary hover:text-white transition-all rounded-xl" variant="outline" asChild>
+        <Button className="w-full gap-2 group/btn font-black bg-zinc-50 border-2 border-black/10 text-black hover:bg-black hover:text-white transition-all rounded-xl" variant="outline" asChild>
           <Link href={`/products/${id}`}>
             <ShoppingCart size={18} className="group-hover/btn:scale-110 transition-transform" />
             التفاصيل والطلب

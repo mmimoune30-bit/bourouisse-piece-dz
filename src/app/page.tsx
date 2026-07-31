@@ -37,12 +37,7 @@ export default function Home() {
   const { profile } = useUser();
   const [lang, setLang] = useState<"AR" | "EN">("AR");
   const [api, setApi] = useState<CarouselApi>();
-  const [uploadingCat, setUploadingCat] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const currentCatRef = useRef<string>("");
-
-  const isAdmin = profile && ["Super Admin", "Manager"].includes(profile.role);
-
+  
   const categoriesMetaQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "categories_metadata");
@@ -58,11 +53,6 @@ export default function Home() {
     return collection(firestore, "featured_products");
   }, [firestore]);
 
-  const allStoresQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active"));
-  }, [firestore]);
-
   const allListingsExploreQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -73,10 +63,8 @@ export default function Home() {
     );
   }, [firestore]);
 
-  const { data: categoriesMeta } = useCollection(categoriesMetaQuery);
   const { data: allCampaigns, loading: loadingCampaigns } = useCollection(featuredStoresQuery);
-  const { data: featuredProducts, loading: loadingFeaturedProducts } = useCollection(featuredProductsQuery);
-  const { data: allStores, loading: loadingStores } = useCollection(allStoresQuery);
+  const { data: featuredProducts } = useCollection(featuredProductsQuery);
   const { data: exploreListings, loading: loadingExplore } = useCollection(allListingsExploreQuery);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -118,20 +106,20 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[170px] md:pt-[190px]">
-        {/* Hero Section - Unified Height 400px */}
+        {/* Hero Section */}
         <section className="w-full px-0.5 mt-1">
           <div className="flex flex-col lg:flex-row-reverse gap-1.5" dir="rtl">
             {/* Exclusive Stores Slider */}
-            <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-primary/5">
-              <div className="bg-primary/5 px-4 py-1.5 border-b flex items-center justify-between z-20 shrink-0">
-                 <h2 className="font-black text-xs text-primary flex items-center gap-2">
+            <div className="lg:w-3/4 h-[320px] lg:h-[400px] bg-white rounded-xl shadow-sm overflow-hidden flex flex-col relative border border-black/5">
+              <div className="bg-zinc-50 px-4 py-1.5 border-b flex items-center justify-between z-20 shrink-0">
+                 <h2 className="font-black text-xs text-black flex items-center gap-2">
                    <Crown size={14} className="text-secondary fill-secondary" /> متاجر حصرية
                  </h2>
-                 <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
+                 <Link href="/catalog" className="text-[10px] font-black text-secondary hover:underline flex items-center gap-1">تصفح الكل <ArrowLeft size={12} /></Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
-                  <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
+                  <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-black" /></div>
                 ) : exclusiveStores?.length > 0 ? (
                   <Carousel setApi={setApi} opts={{ loop: true }} plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} className="w-full h-full">
                     <CarouselContent className="h-full -ml-0">
@@ -142,9 +130,9 @@ export default function Home() {
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                             </div>
                             <div className="flex flex-col gap-2 text-right">
-                               <Badge className="bg-secondary text-primary font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
-                               <h3 className="font-black text-2xl md:text-5xl text-primary line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-sm md:text-lg text-muted-foreground font-bold flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <Badge className="bg-secondary text-black font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
+                               <h3 className="font-black text-2xl md:text-5xl text-black line-clamp-1">{campaign.storeName}</h3>
+                               <p className="text-sm md:text-lg text-zinc-600 font-black flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -152,14 +140,13 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-bold italic text-xs">لا توجد إعلانات حصرية حالياً.</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black italic text-xs">لا توجد إعلانات حصرية حالياً.</div>
                 )}
               </div>
             </div>
 
-            {/* Alternating Side Ads - Content Swapping Only */}
-            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-primary/5">
-              {/* Static Background Image & Overlay for all slides */}
+            {/* Side Ads Carousel */}
+            <div className="lg:w-1/4 h-[320px] lg:h-[400px] relative rounded-xl overflow-hidden shadow-sm bg-zinc-900 border border-black/5">
               <Image 
                 src="https://picsum.photos/seed/auto-hero-real/1200/800" 
                 alt="Ad Background" 
@@ -174,27 +161,22 @@ export default function Home() {
                 className="w-full h-full relative z-10"
               >
                 <CarouselContent className="h-full -ml-0">
-                  {/* Slide 1: Seller Join */}
                   <CarouselItem key="side-ad-1" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
                       <Link href="/seller/register" className="w-full">
-                        <Button className="w-full h-14 bg-secondary text-primary font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">سجل كبائع</Button>
+                        <Button className="w-full h-14 bg-secondary text-black font-black rounded-xl text-lg shadow-lg hover:bg-white transition-all">سجل كبائع</Button>
                       </Link>
                     </div>
                   </CarouselItem>
-
-                  {/* Slide 2: Buyer Join */}
                   <CarouselItem key="side-ad-2" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
                       <Link href="/buyer/register" className="w-full">
-                        <Button className="w-full h-14 border-2 border-white text-white hover:bg-white hover:text-primary font-black rounded-xl text-lg shadow-lg transition-all">سجل كمشتري</Button>
+                        <Button className="w-full h-14 border-2 border-white text-white hover:bg-white hover:text-black font-black rounded-xl text-lg shadow-lg transition-all">سجل كمشتري</Button>
                       </Link>
                     </div>
                   </CarouselItem>
-
-                  {/* Slide 3: Logo Brand */}
                   <CarouselItem key="side-ad-3" className="h-full pl-0">
                     <div className="flex flex-col items-center justify-center h-full w-full p-8">
                         <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
@@ -206,16 +188,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section - Clean Text Buttons Only */}
+        {/* Categories Section */}
         <section className="w-full px-0.5 py-4">
-          <div className="flex flex-row-reverse justify-center items-center mb-4 px-2 border-b border-primary/5 pb-2">
-             <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
+          <div className="flex flex-row-reverse justify-center items-center mb-4 px-2 border-b border-black/5 pb-2">
+             <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2">تصنيفات قطع الغيار <Tags size={16} className="text-secondary" /></h2>
           </div>
           <div className="flex flex-row-reverse justify-center gap-3 overflow-x-auto pb-4 no-scrollbar px-2" dir="rtl">
             {PART_CATEGORIES.map((cat, i) => (
               <div key={i} className="shrink-0">
                 <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                  <span className="font-black text-xs md:text-sm text-primary bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap">
+                  <span className="font-black text-xs md:text-sm text-black bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap">
                     {lang === 'AR' ? cat.ar : cat.en}
                   </span>
                 </Link>
@@ -228,7 +210,7 @@ export default function Home() {
         {featuredStores && featuredStores.length > 0 && (
           <section className="w-full px-0.5 py-2">
             <div className="flex items-center justify-between mb-2 px-2 flex-row-reverse">
-              <h2 className="text-sm md:text-base font-black text-primary flex items-center gap-2"><Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة</h2>
+              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2"><Star size={16} className="text-blue-500 fill-blue-500" /> متاجر مميزة</h2>
             </div>
             <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
               <CarouselContent className="-ml-2" dir="rtl">
@@ -238,8 +220,8 @@ export default function Home() {
                        <div className="w-12 h-12 mx-auto rounded-lg overflow-hidden relative border shadow-sm">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
-                       <h4 className="font-black text-primary text-[9px] truncate">{campaign.storeName}</h4>
-                       <Badge variant="outline" className="text-[7px] h-4 border-blue-200 text-blue-600">مميز</Badge>
+                       <h4 className="font-black text-black text-[9px] truncate">{campaign.storeName}</h4>
+                       <Badge variant="outline" className="text-[7px] h-4 border-blue-200 text-blue-600 font-black">مميز</Badge>
                     </Link>
                   </CarouselItem>
                 ))}
@@ -250,14 +232,14 @@ export default function Home() {
 
         {/* Explore Latest Parts */}
         <section className="w-full px-0.5 py-6">
-          <div className="flex items-center justify-between mb-4 border-b-2 border-primary/10 pb-1 px-2 flex-row-reverse">
+          <div className="flex items-center justify-between mb-4 border-b-2 border-black/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
-                <h2 className="text-lg md:text-xl font-black text-primary flex items-center justify-end gap-2">
+                <h2 className="text-lg md:text-xl font-black text-black flex items-center justify-end gap-2">
                    أحدث قطع الغيار المضافة <Package size={20} className="text-secondary" />
                 </h2>
-                <p className="text-[10px] text-muted-foreground font-bold">تصفح القطع المتوفرة حالياً في كافة الولايات.</p>
+                <p className="text-[10px] text-zinc-500 font-black">تصفح القطع المتوفرة حالياً في كافة الولايات.</p>
              </div>
-             <Link href="/catalog" className="text-[10px] font-bold text-secondary hover:underline">عرض كافة القطع</Link>
+             <Link href="/catalog" className="text-[10px] font-black text-secondary hover:underline">عرض كافة القطع</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir="rtl">
             {loadingExplore ? (
@@ -294,7 +276,7 @@ export default function Home() {
                     <h2 className="text-xl md:text-2xl font-black flex items-center justify-end gap-3 text-secondary">
                        منتجات ننصح بها <Zap className="fill-secondary animate-pulse" size={24} />
                     </h2>
-                    <p className="text-[10px] text-zinc-400 font-bold">أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.</p>
+                    <p className="text-[10px] text-zinc-400 font-black">أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.</p>
                  </div>
                  <Link href="/catalog">
                     <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2">
@@ -320,7 +302,6 @@ export default function Home() {
             </div>
           </section>
         )}
-
       </main>
       <Footer />
     </div>
