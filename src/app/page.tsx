@@ -107,11 +107,15 @@ export default function Home() {
     categories: { AR: "تصنيفات قطع الغيار", EN: "Categories", FR: "Catégories" }
   };
 
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
+  const normalFont = lang === 'AR' ? 'font-bold' : 'font-normal';
+
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[175px] md:pt-[205px]">
+      <main className="flex-grow pt-[235px] md:pt-[275px]">
         {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
           <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -119,12 +123,12 @@ export default function Home() {
             <div className="lg:w-3/4 h-[180px] md:h-[220px] bg-white rounded-lg shadow-sm overflow-hidden flex flex-col relative border">
               <div 
                 dir={lang === 'AR' ? "rtl" : "ltr"}
-                className="bg-zinc-100 px-3 py-1 border-b flex items-center justify-between z-20 shrink-0"
+                className={cn("bg-zinc-100 px-3 py-1.5 border-b flex items-center justify-between z-20 shrink-0", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
               >
-                 <h2 className="font-black text-sm md:text-base text-black flex items-center gap-1.5 uppercase">
+                 <h2 className={cn("text-sm md:text-base text-black flex items-center gap-1.5 uppercase", titleFont)}>
                    <Crown size={16} className="text-secondary fill-secondary" /> {t.exclusive[lang]}
                  </h2>
-                 <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
+                 <Link href="/catalog" className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>{t.viewAll[lang]}</Link>
               </div>
               <div className="flex-grow relative overflow-hidden">
                 {loadingCampaigns ? (
@@ -139,9 +143,9 @@ export default function Home() {
                                <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover" />
                             </div>
                             <div className={cn("flex flex-col gap-1", lang === 'AR' ? "text-right" : "text-left")}>
-                               <Badge className="bg-secondary text-black font-black text-[8px] md:text-[10px] w-fit">👑 {lang === 'AR' ? 'حصري' : 'EXCL'}</Badge>
-                               <h3 className="font-black text-xl md:text-3xl text-black line-clamp-1 uppercase leading-tight">{campaign.storeName}</h3>
-                               <p className="text-[10px] md:text-sm text-black font-bold flex items-center gap-1"><MapPin size={12} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <Badge className={cn("bg-secondary text-black text-[8px] md:text-[10px] w-fit", titleFont)}>👑 {lang === 'AR' ? 'حصري' : 'EXCL'}</Badge>
+                               <h3 className={cn("text-xl md:text-3xl text-black line-clamp-1 uppercase leading-tight", titleFont)}>{campaign.storeName}</h3>
+                               <p className={cn("text-[10px] md:text-sm text-black flex items-center gap-1", normalFont)}><MapPin size={12} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -149,7 +153,7 @@ export default function Home() {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-zinc-400 text-[10px] font-black italic">{t.noAds[lang]}</div>
+                  <div className={cn("absolute inset-0 flex items-center justify-center text-zinc-400 text-[10px] italic", titleFont)}>{t.noAds[lang]}</div>
                 )}
               </div>
             </div>
@@ -159,12 +163,12 @@ export default function Home() {
               <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full relative z-10">
                 <CarouselContent className="h-full">
                   <CarouselItem className="h-full flex flex-col items-center justify-center p-4 space-y-2 text-center">
-                      <h3 className="text-xs md:text-sm font-black text-white uppercase leading-tight">{t.sellerAd[lang]}</h3>
-                      <Link href="/seller/register" className="w-full"><Button className="w-full h-10 bg-secondary text-black font-black text-[10px] md:text-xs rounded-md uppercase">{t.regSeller[lang]}</Button></Link>
+                      <h3 className={cn("text-xs md:text-sm text-white uppercase leading-tight", titleFont)}>{t.sellerAd[lang]}</h3>
+                      <Link href="/seller/register" className="w-full"><Button className={cn("w-full h-10 bg-secondary text-black text-[10px] md:text-xs rounded-md uppercase", buttonFont)}>{t.regSeller[lang]}</Button></Link>
                   </CarouselItem>
                   <CarouselItem className="h-full flex flex-col items-center justify-center p-4 space-y-2 text-center">
-                      <h3 className="text-[10px] md:text-xs font-black text-white uppercase leading-tight">{t.buyerAd[lang]}</h3>
-                      <Link href="/buyer/register" className="w-full"><Button variant="outline" className="w-full h-10 border-white text-white font-black text-[10px] md:text-xs rounded-md uppercase">{t.regBuyer[lang]}</Button></Link>
+                      <h3 className={cn("text-[10px] md:text-xs text-white uppercase leading-tight", titleFont)}>{t.buyerAd[lang]}</h3>
+                      <Link href="/buyer/register" className="w-full"><Button variant="outline" className={cn("w-full h-10 border-white text-white text-[10px] md:text-xs rounded-md uppercase", buttonFont)}>{t.regBuyer[lang]}</Button></Link>
                   </CarouselItem>
                 </CarouselContent>
               </Carousel>
@@ -178,14 +182,14 @@ export default function Home() {
             dir={lang === 'AR' ? "rtl" : "ltr"}
             className="bg-zinc-100 px-3 py-1.5 flex items-center mb-1.5 border-b border-black/5"
           >
-             <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
+             <h2 className={cn("text-sm md:text-base text-black flex items-center gap-1.5 uppercase", titleFont)}>
                 {t.categories[lang]} <Tags size={18} className="text-secondary" />
              </h2>
           </div>
           <div className="flex flex-row justify-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {PART_CATEGORIES.map((cat, i) => (
               <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0">
-                <span className="font-black text-xs md:text-sm text-black bg-white px-3 py-1.5 rounded-lg border hover:border-secondary transition-all block shadow-sm uppercase whitespace-nowrap">
+                <span className={cn("text-xs md:text-sm text-black bg-white px-3 py-1.5 rounded-lg border hover:border-secondary transition-all block shadow-sm uppercase whitespace-nowrap", titleFont)}>
                   {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                 </span>
               </Link>
@@ -193,16 +197,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Bar */}
-        <section className="px-1 py-0.5">
+        {/* Featured Stores Section */}
+        <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
-            className="bg-zinc-100 flex items-center justify-between mb-1 border-b border-black/5 py-1.5 px-3"
+            className={cn("bg-zinc-100 px-3 py-1.5 flex items-center justify-between mb-1 border-b border-black/5", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
           >
-              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1 uppercase">
+              <h2 className={cn("text-sm md:text-base text-black flex items-center gap-1 uppercase", titleFont)}>
                 {t.featured[lang]} <Star size={16} className="fill-black" />
               </h2>
-              <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
+              <Link href="/catalog" className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>{t.viewAll[lang]}</Link>
           </div>
           <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
             <CarouselContent className="-ml-1" dir={lang === 'AR' ? "rtl" : "ltr"}>
@@ -215,12 +219,12 @@ export default function Home() {
                        <div className="w-10 h-10 mx-auto rounded-sm overflow-hidden relative border shadow-xs">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover" />
                        </div>
-                       <h4 className="font-black text-black text-[8px] truncate uppercase">{campaign.storeName}</h4>
+                       <h4 className={cn("text-black text-[8px] truncate uppercase", titleFont)}>{campaign.storeName}</h4>
                     </Link>
                   </CarouselItem>
                 ))
               ) : (
-                <div className="py-2 text-center text-zinc-400 text-[10px] font-black italic w-full">{t.noFeatured[lang]}</div>
+                <div className={cn("py-2 text-center text-zinc-400 text-[10px] italic w-full", titleFont)}>{t.noFeatured[lang]}</div>
               )}
             </CarouselContent>
           </Carousel>
@@ -230,12 +234,12 @@ export default function Home() {
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
-            className="bg-zinc-100 px-3 py-1.5 flex items-center justify-between mb-2 border-b-2 border-black/10"
+            className={cn("bg-zinc-100 px-3 py-1.5 flex items-center justify-between mb-2 border-b-2 border-black/10", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
           >
-             <h2 className="text-sm md:text-base font-black text-black flex items-center gap-1.5 uppercase">
+             <h2 className={cn("text-sm md:text-base text-black flex items-center gap-1.5 uppercase", titleFont)}>
                 {t.latest[lang]} <Package size={20} />
              </h2>
-             <Link href="/catalog" className="text-sm md:text-base font-black text-black hover:underline uppercase">{t.viewAll[lang]}</Link>
+             <Link href="/catalog" className={cn("text-sm md:text-base text-black hover:underline uppercase", titleFont)}>{t.viewAll[lang]}</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {loadingExplore ? (
@@ -255,7 +259,7 @@ export default function Home() {
                  />
                ))
             ) : (
-               <div className="col-span-full py-8 text-center text-zinc-400 text-xs font-black italic uppercase">Aucune pièce disponible</div>
+               <div className={cn("col-span-full py-8 text-center text-zinc-400 text-xs italic uppercase", titleFont)}>Aucune pièce disponible</div>
             )}
           </div>
         </section>
@@ -265,12 +269,12 @@ export default function Home() {
           <section className="w-full px-1 py-3 bg-zinc-900 text-white rounded-t-2xl mt-4">
             <div 
               dir={lang === 'AR' ? "rtl" : "ltr"}
-              className="flex items-center justify-between mb-3 border-b border-white/10 pb-1 px-1"
+              className={cn("flex items-center justify-between mb-3 border-b border-white/10 pb-1 px-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
             >
-                <h2 className="text-sm md:text-lg font-black flex items-center gap-2 text-secondary uppercase">
+                <h2 className={cn("text-sm md:text-lg flex items-center gap-2 text-secondary uppercase", titleFont)}>
                    {t.recommended[lang]} <Zap size={18} fill="currentColor" />
                 </h2>
-                <Link href="/catalog"><Button variant="outline" size="sm" className="h-8 border-white/20 text-white text-sm font-black rounded-md uppercase">{t.viewAll[lang]}</Button></Link>
+                <Link href="/catalog"><Button variant="outline" size="sm" className={cn("h-8 border-white/20 text-white text-sm rounded-md uppercase", buttonFont)}>{t.viewAll[lang]}</Button></Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
               {activeFeaturedProducts.map((p) => (

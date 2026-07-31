@@ -44,7 +44,10 @@ export default function AISearchBox() {
     return "Recherche (ex: Moteur Clio 4)...";
   };
 
-  const getBtnText = () => lang === 'AR' ? 'بحث' : lang === 'EN' ? 'Search' : 'Recherche';
+  const getBtnText = () => lang === 'AR' ? 'بحث' : lang === 'EN' ? 'Search' : 'Rechercher';
+
+  const textFont = lang === 'AR' ? 'font-bold' : 'font-medium';
+  const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
 
   return (
     <div className="w-full max-w-4xl mx-auto px-0.5">
@@ -56,13 +59,13 @@ export default function AISearchBox() {
               value={value}
               onChange={(e) => { setValue(e.target.value); handleSearch(e.target.value); }}
               placeholder={getPlaceholder()}
-              className={cn("w-full h-full bg-transparent focus:outline-none font-bold text-primary placeholder:text-zinc-400 text-base px-4", lang === 'AR' ? "text-right pr-10" : "text-left pl-10")}
+              className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
               dir={lang === 'AR' ? "rtl" : "ltr"}
             />
             <Search className={cn("absolute top-1/2 -translate-y-1/2 text-primary w-5 h-5", lang === 'AR' ? "right-4" : "left-4")} />
           </div>
           <button type="submit" className={cn("h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-black transition-all active:scale-95", lang === 'AR' ? "border-l" : "border-r")}>
-            <span className="font-black text-sm md:text-base hidden sm:inline uppercase">{getBtnText()}</span>
+            <span className={cn("text-sm md:text-base hidden sm:inline uppercase", buttonFont)}>{getBtnText()}</span>
             <Sparkles size={16} className="text-secondary" />
           </button>
         </form>

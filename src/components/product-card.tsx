@@ -98,17 +98,21 @@ export default function ProductCard({
     return 'DZD';
   };
 
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const normalFont = lang === 'AR' ? 'font-bold' : 'font-normal';
+  const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
+
   return (
     <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
       <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-muted cursor-pointer">
         <Image src={image} alt={name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" data-ai-hint={hint} />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         <div className={cn("absolute top-3 flex flex-col gap-2", lang === 'AR' ? "left-3" : "right-3")}>
-          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className="font-black shadow-lg uppercase">
+          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className={cn("shadow-lg uppercase", titleFont)}>
             {getConditionText()}
           </Badge>
           {condition === 'New' && (
-            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-none shadow-sm text-black flex items-center gap-1 font-black">
+            <Badge variant="outline" className={cn("bg-white/90 backdrop-blur-sm border-none shadow-sm text-black flex items-center gap-1", titleFont)}>
               <ShieldCheck size={12} className="text-secondary" />
               {getGenuineText()}
             </Badge>
@@ -117,12 +121,12 @@ export default function ProductCard({
       </Link>
       
       <CardContent className={cn("p-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-        <div className="text-[10px] uppercase font-black text-secondary mb-1 tracking-widest">{category}</div>
+        <div className={cn("text-[10px] uppercase text-secondary mb-1 tracking-widest", titleFont)}>{category}</div>
         <Link href={`/products/${id}`} className="block mb-2">
-          <h3 className="font-headline font-black text-lg text-black line-clamp-1 group-hover:text-secondary transition-colors uppercase">{name}</h3>
+          <h3 className={cn("font-headline text-lg text-black line-clamp-1 group-hover:text-secondary transition-colors uppercase", titleFont)}>{name}</h3>
         </Link>
         <div className={cn("flex items-center gap-1 mb-2", lang === 'AR' ? "justify-end" : "justify-start")}>
-          <span className="text-xs text-zinc-500 font-black">({rating})</span>
+          <span className={cn("text-xs text-zinc-500", titleFont)}>({rating})</span>
           <div className="flex text-yellow-400">
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={12} fill={i < Math.floor(rating) ? "currentColor" : "none"} className={i < Math.floor(rating) ? "" : "text-zinc-200"} />
@@ -130,14 +134,14 @@ export default function ProductCard({
           </div>
         </div>
         <div className={cn("flex items-center justify-between mb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-          <span className="text-2xl font-black text-black">
-            {mounted ? price.toLocaleString() : price} <span className="text-sm font-black text-zinc-500">{getCurrencyText()}</span>
+          <span className={cn("text-2xl text-black", lang === 'AR' ? 'font-black' : 'font-bold')}>
+            {mounted ? price.toLocaleString() : price} <span className={cn("text-sm text-zinc-500", titleFont)}>{getCurrencyText()}</span>
           </span>
-          <span className="text-[10px] text-zinc-500 font-black">{getByText()} {seller}</span>
+          <span className={cn("text-[10px] text-zinc-500", titleFont)}>{getByText()} {seller}</span>
         </div>
 
         {formattedDate && (
-          <div className={cn("flex items-center gap-1 text-[10px] text-zinc-400 font-black border-t pt-2 mt-2", lang === 'AR' ? "justify-end" : "justify-start")}>
+          <div className={cn("flex items-center gap-1 text-[10px] text-zinc-400 border-t pt-2 mt-2", lang === 'AR' ? "justify-end" : "justify-start", titleFont)}>
             <span>{getPostedAtText()} {formattedDate}</span>
             <Calendar size={10} />
           </div>
@@ -145,7 +149,7 @@ export default function ProductCard({
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full gap-2 group/btn font-black bg-zinc-50 border-2 border-black/10 text-black hover:bg-black hover:text-white transition-all rounded-xl uppercase" variant="outline" asChild>
+        <Button className={cn("w-full gap-2 group/btn bg-zinc-50 border-2 border-black/10 text-black hover:bg-black hover:text-white transition-all rounded-xl uppercase", buttonFont)} variant="outline" asChild>
           <Link href={`/products/${id}`}>
             <ShoppingCart size={18} className="group-hover/btn:scale-110 transition-transform" />
             {getDetailsBtnText()}

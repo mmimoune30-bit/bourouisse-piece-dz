@@ -57,6 +57,9 @@ export default function Navbar() {
   const getJoinNowText = () => lang === 'AR' ? 'إضافة حساب' : lang === 'EN' ? 'Join' : 'S\'inscrire';
   const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
 
+  const navFont = lang === 'AR' ? 'font-black' : 'font-medium';
+  const boldNavFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-sm">
       {/* Layer 1: Compact Top Info Bar */}
@@ -64,18 +67,18 @@ export default function Navbar() {
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-6 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               <div className="flex items-center gap-6 text-black font-black uppercase text-[9px] md:text-[10px]">
+               <div className={cn("flex items-center gap-6 text-black uppercase text-[9px] md:text-[10px]", navFont)}>
                   <span className="text-black tracking-tight">{getInquiryText()}</span>
-                  <span className="flex items-center gap-1.5 font-bold"><Phone size={12} /> +213 778 42 89 77</span>
-                  <span className="flex items-center gap-1.5 font-bold"><WhatsAppIcon /> +213 778 42 89 77</span>
-                  <span className="flex items-center gap-1.5 font-bold"><Mail size={12} /> support@bourouisse-piecedz.com</span>
+                  <span className="flex items-center gap-1.5"><Phone size={12} /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-1.5"><Mail size={12} /> support@bourouisse-piecedz.com</span>
                </div>
             </div>
           </div>
           <div className="shrink-0 pl-1 border-l flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-black hover:bg-zinc-100 gap-1 font-black h-6 px-1">
+                <Button variant="ghost" size="sm" className={cn("text-black hover:bg-zinc-100 gap-1 h-6 px-1", navFont)}>
                   <Globe size={12} />
                   <span className="text-[9px] md:text-xs">{lang === 'AR' ? 'AR' : lang === 'EN' ? 'EN' : 'FR'}</span>
                   <ChevronDown size={10} />
@@ -83,8 +86,8 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-24">
                 <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black text-xs">العربية</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-black text-xs">English</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-black text-xs">Français</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-medium text-xs">English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-medium text-xs">Français</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -100,7 +103,7 @@ export default function Navbar() {
             </Link>
             {isNotHome && (
               <Link href="/">
-                <Button variant="outline" size="sm" className="border-2 border-black text-black font-black rounded-lg h-8 px-2 gap-1.5 hover:bg-black hover:text-white text-[10px] uppercase">
+                <Button variant="outline" size="sm" className={cn("border-2 border-black text-black rounded-lg h-8 px-2 gap-1.5 hover:bg-black hover:text-white text-[10px] uppercase", boldNavFont)}>
                    <Home size={14} /> {getBackHomeText()}
                 </Button>
               </Link>
@@ -110,23 +113,23 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-black font-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-3 text-sm md:text-base uppercase">
+                <Button variant="ghost" className={cn("text-black hover:bg-zinc-50 rounded-lg gap-1.5 h-9 px-3 text-sm md:text-base uppercase", boldNavFont)}>
                   <Tags size={18} /> {getCategoriesText()} <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 p-1.5 rounded-xl shadow-xl overflow-y-auto max-h-[60vh]">
                 {PART_CATEGORIES.map((cat) => (
                   <DropdownMenuItem key={cat.en} asChild>
-                    <Link href={`/catalog?category=${cat.en}`} className="justify-end font-black py-1.5 text-xs text-black uppercase">
+                    <Link href={`/catalog?category=${cat.en}`} className={cn("justify-end py-1.5 text-xs text-black uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}>
                       {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                     </Link>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link href="/seller/register"><Button className="bg-secondary text-black font-black rounded-lg h-9 px-4 text-sm md:text-base uppercase">{getBecomeSellerText()}</Button></Link>
-            <Link href="/join"><Button variant="outline" className="border-2 border-black text-black font-black rounded-lg h-9 px-4 text-sm md:text-base uppercase">{getJoinNowText()}</Button></Link>
-            <Link href="/login"><Button variant="ghost" className="text-black font-black h-9 px-4 text-sm md:text-base uppercase">{getLoginText()}</Button></Link>
+            <Link href="/seller/register"><Button className={cn("bg-secondary text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getBecomeSellerText()}</Button></Link>
+            <Link href="/join"><Button variant="outline" className={cn("border-2 border-black text-black rounded-lg h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
+            <Link href="/login"><Button variant="ghost" className={cn("text-black h-9 px-4 text-sm md:text-base uppercase", boldNavFont)}>{getLoginText()}</Button></Link>
           </div>
 
           <div className="lg:hidden">
@@ -139,7 +142,7 @@ export default function Navbar() {
 
       {/* Layer 3: Search Bar */}
       {showSearch && (
-        <div className="bg-white py-2 border-b relative">
+        <div className="bg-white py-3 border-b relative">
           <div className="w-full px-4">
             <AISearchBox />
           </div>
@@ -149,10 +152,10 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-xl py-4 px-4 space-y-2 flex flex-col" dir={lang === 'AR' ? "rtl" : "ltr"}>
-           {isNotHome && <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="w-full"><Button variant="outline" className="w-full border-2 border-black font-black h-12 rounded-lg text-sm uppercase"><Home size={18} className="ml-2" /> {getBackHomeText()}</Button></Link>}
-           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}><Button className="w-full bg-secondary text-black font-black h-12 rounded-lg text-sm uppercase">{getBecomeSellerText()}</Button></Link>
-           <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}><Button variant="outline" className="w-full border-2 border-black font-black h-12 rounded-lg text-sm uppercase">{getJoinNowText()}</Button></Link>
-           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}><Button variant="ghost" className="w-full font-black h-12 rounded-lg text-sm uppercase">{getLoginText()}</Button></Link>
+           {isNotHome && <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="w-full"><Button variant="outline" className={cn("w-full border-2 border-black h-12 rounded-lg text-sm uppercase", boldNavFont)}><Home size={18} className="ml-2" /> {getBackHomeText()}</Button></Link>}
+           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}><Button className={cn("w-full bg-secondary text-black h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getBecomeSellerText()}</Button></Link>
+           <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}><Button variant="outline" className={cn("w-full border-2 border-black h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
+           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}><Button variant="ghost" className={cn("w-full h-12 rounded-lg text-sm uppercase", boldNavFont)}>{getLoginText()}</Button></Link>
         </div>
       )}
     </nav>

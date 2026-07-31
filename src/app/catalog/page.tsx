@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -80,71 +81,84 @@ function CatalogContent() {
     fuel: { AR: "نوع الطاقة", EN: "Fuel Type", FR: "Énergie" },
     category: { AR: "تصنيف القطعة", EN: "Category", FR: "Catégorie" },
     reset: { AR: "مسح الفلاتر", EN: "Reset", FR: "Effacer" },
-    title: { AR: "الكتالوج", EN: "Catalog", FR: "Catalogue" },
+    title: { AR: "الكتالوج الشامل", EN: "Catalog", FR: "Catalogue" },
+    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts.", FR: "Parcourir et filtrer des milliers de pièces." },
     results: { AR: "النتائج:", EN: "Results:", FR: "Résultats:" },
     allBrands: { AR: "الماركات", EN: "All Brands", FR: "Marques" },
   };
+
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const labelFont = lang === 'AR' ? 'font-black' : 'font-medium';
+  const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
 
   const FilterPanel = ({ isMobile = false }) => (
     <div className={cn("space-y-4 text-right", !isMobile && "sticky top-[220px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
       {!isMobile && (
         <div className={cn("flex items-center justify-between border-b pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-          <h3 className="font-black text-lg text-black">{t.filters[lang]}</h3>
+          <h3 className={cn("text-lg text-black", titleFont)}>{t.filters[lang]}</h3>
           <Filter size={18} className="text-secondary" />
         </div>
       )}
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-black uppercase">{t.brand[lang]}</Label>
+        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.brand[lang]}</Label>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
+          <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
           <SelectContent>{availableBrands.map(b => <SelectItem key={b} value={b} className="text-xs">{b}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-black uppercase">{t.model[lang]}</Label>
-        <Select value={model} onValueChange={setModel} disabled={!brand}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.model[lang]}</Label>
+        <Select value={model} onValueChange={setModel} disabled={!brand}>
+          <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{availableModels.map(m => <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-black uppercase">{t.year[lang]}</Label>
-        <Select value={year} onValueChange={setYear}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.year[lang]}</Label>
+        <Select value={year} onValueChange={setYear}>
+          <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{YEARS.map(y => <SelectItem key={y} value={y} className="text-xs">{y}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-black uppercase">{t.fuel[lang]}</Label>
-        <Select value={fuelType} onValueChange={setFuelType}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.fuel[lang]}</Label>
+        <Select value={fuelType} onValueChange={setFuelType}>
+          <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en} className="text-xs">{f[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className="font-black text-xs text-black uppercase">{t.category[lang]}</Label>
-        <Select value={category} onValueChange={setCategory}><SelectTrigger className="h-9 border-2 text-black font-bold text-xs"><SelectValue placeholder="-" /></SelectTrigger>
+        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.category[lang]}</Label>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en} className="text-xs">{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-      <Button variant="outline" className="w-full h-9 font-black gap-1.5 border-2 text-[10px] uppercase mt-2" onClick={handleReset}><RotateCcw size={14} /> {t.reset[lang]}</Button>
+      <Button variant="outline" className={cn("w-full h-10 gap-1.5 border-2 text-[10px] uppercase mt-2", buttonFont)} onClick={handleReset}>
+        <RotateCcw size={14} /> {t.reset[lang]}
+      </Button>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[165px] md:pt-[195px] pb-6">
+      <main className="flex-grow pt-[245px] md:pt-[285px] pb-6">
         <div className="container mx-auto px-2">
-          <div className={cn("mb-3 flex flex-col md:flex-row justify-between items-center gap-2", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
+          <div className={cn("mb-3 flex flex-col md:flex-row justify-between items-start gap-2", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>
             <div className={cn("w-full md:w-auto", lang === 'AR' ? "text-right" : "text-left")}>
-              <h1 className="text-xl md:text-2xl font-black text-black uppercase">{t.title[lang]}</h1>
+              <h1 className={cn("text-xl md:text-2xl text-black uppercase", titleFont)}>{t.title[lang]}</h1>
+              <p className={cn("text-sm text-muted-foreground", labelFont)}>{t.subtitle[lang]}</p>
             </div>
             <div className={cn("w-full md:w-auto flex items-center justify-between gap-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-              <div className="bg-white px-3 py-1.5 rounded-lg border shadow-xs flex items-center gap-2 text-xs font-bold text-black">
+              <div className={cn("bg-white px-3 py-1.5 rounded-lg border shadow-xs flex items-center gap-2 text-xs text-black", labelFont)}>
                 <span className="text-secondary">{t.results[lang]}</span>
                 <span className="opacity-70">{loading ? "..." : filteredProducts.length}</span>
               </div>
               <div className="lg:hidden">
-                <Sheet><SheetTrigger asChild><Button variant="secondary" className="font-bold gap-1.5 h-8 rounded-lg text-[10px] uppercase"><SlidersHorizontal size={14} /> {t.filters[lang]}</Button></SheetTrigger>
-                  <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[280px] p-4"><SheetHeader><SheetTitle className={cn("font-black uppercase text-sm", lang === 'AR' ? "text-right" : "text-left")}>{t.filters[lang]}</SheetTitle></SheetHeader>
+                <Sheet><SheetTrigger asChild><Button variant="secondary" className={cn("gap-1.5 h-8 rounded-lg text-[10px] uppercase", buttonFont)}><SlidersHorizontal size={14} /> {t.filters[lang]}</Button></SheetTrigger>
+                  <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[280px] p-4">
+                    <SheetHeader><SheetTitle className={cn("uppercase text-sm", titleFont, lang === 'AR' ? "text-right" : "text-left")}>{t.filters[lang]}</SheetTitle></SheetHeader>
                     <div className="mt-4"><FilterPanel isMobile={true} /></div>
                   </SheetContent>
                 </Sheet>
@@ -161,7 +175,7 @@ function CatalogContent() {
                    )) : (
                    <div className="col-span-full py-16 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
                       <Search size={32} className="opacity-10 mb-2" />
-                      <p className="font-black text-xs text-black uppercase">No results</p>
+                      <p className={cn("text-xs text-black uppercase", titleFont)}>No results</p>
                    </div>
                  )}
               </div>
