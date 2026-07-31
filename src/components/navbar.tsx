@@ -58,11 +58,11 @@ export default function Navbar() {
   const getLoginText = () => lang === 'AR' ? 'الدخول الى الحساب' : lang === 'EN' ? 'Account Access' : 'Accès Compte';
 
   const navFont = lang === 'AR' ? 'font-black' : 'font-medium';
-  const boldNavFont = lang === 'AR' ? 'font-black' : 'font-semibold';
+  const boldNavFont = lang === 'AR' ? 'font-black' : 'font-medium';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-sm">
-      {/* Layer 1: Compact Top Info Bar - Increased py for visibility */}
+      {/* Layer 1: Compact Top Info Bar */}
       <div className="bg-white border-b border-zinc-50 py-1.5 overflow-hidden">
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex-1 overflow-hidden relative h-5">
@@ -94,20 +94,21 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding - Increased py for visibility */}
+      {/* Layer 2: Main Branding */}
       <div className="bg-white py-2 border-b">
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
-              <SiteLogo className="min-w-[160px] md:min-w-[200px]" showTagline={true} />
-            </Link>
+            {/* زر الرجوع للرئيسية في أقصى اليمين (في ترتيب الـ Flex) */}
             {isNotHome && (
               <Link href="/">
-                <Button variant="outline" size="sm" className={cn("border-2 border-black text-black rounded-lg h-8 px-2 gap-1.5 hover:bg-black hover:text-white text-[10px] uppercase", boldNavFont)}>
-                   <Home size={14} /> {getBackHomeText()}
+                <Button variant="outline" size="sm" className={cn("border-2 border-black text-black rounded-lg h-9 px-3 gap-1.5 hover:bg-black hover:text-white text-sm md:text-base uppercase", boldNavFont)}>
+                   <Home size={16} /> {getBackHomeText()}
                 </Button>
               </Link>
             )}
+            <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
+              <SiteLogo className="min-w-[160px] md:min-w-[200px]" showTagline={true} />
+            </Link>
           </div>
 
           <div className="hidden lg:flex items-center gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
