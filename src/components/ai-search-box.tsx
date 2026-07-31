@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -29,8 +28,20 @@ export default function AISearchBox() {
 
   const handleSearch = (query: string) => {
     const params = new URLSearchParams(window.location.search);
-    if (query.trim()) params.set("query", query.trim()); else params.delete("query");
-    if (pathname === '/catalog') router.replace(`/catalog?${params.toString()}`); else router.push(`/catalog?${params.toString()}`);
+    if (query.trim()) {
+      params.set("query", query.trim());
+    } else {
+      params.delete("query");
+    }
+
+    const targetUrl = `/catalog?${params.toString()}`;
+    
+    // الانتقال للنتائج فقط عند الطلب الصريح (Submit)
+    if (pathname === '/catalog') {
+      router.replace(targetUrl, { scroll: false });
+    } else {
+      router.push(targetUrl);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,7 +68,7 @@ export default function AISearchBox() {
           <div className="flex-grow relative h-full">
             <input
               value={value}
-              onChange={(e) => { setValue(e.target.value); handleSearch(e.target.value); }}
+              onChange={(e) => setValue(e.target.value)}
               placeholder={getPlaceholder()}
               className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
               dir={lang === 'AR' ? "rtl" : "ltr"}
