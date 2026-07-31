@@ -125,7 +125,7 @@ export default function Home() {
                             <div className="flex flex-col gap-2 text-right">
                                <Badge className="bg-secondary text-black font-black text-[10px] w-fit mr-auto">👑 متجر حصري</Badge>
                                <h3 className="font-black text-2xl md:text-5xl text-black line-clamp-1">{campaign.storeName}</h3>
-                               <p className="text-sm md:text-lg text-zinc-600 font-black flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
+                               <p className="text-sm md:text-lg text-black font-black flex items-center gap-1 justify-end"><MapPin size={18} className="text-secondary" /> {campaign.storeLocation}</p>
                             </div>
                           </Link>
                         </CarouselItem>
@@ -156,7 +156,6 @@ export default function Home() {
                 className="w-full h-full relative z-10"
               >
                 <CarouselContent className="h-full -ml-0">
-                  {/* Slide 1 */}
                   <CarouselItem key="side-ad-1" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">اشترك معنا واعرض منتجاتك</h3>
@@ -165,7 +164,6 @@ export default function Home() {
                       </Link>
                     </div>
                   </CarouselItem>
-                  {/* Slide 2 */}
                   <CarouselItem key="side-ad-2" className="h-full pl-0">
                     <div className="p-6 text-center text-white flex flex-col items-center justify-center h-full w-full space-y-6">
                       <h3 className="text-xl md:text-2xl font-black leading-tight">سجل معنا و اشتري سلعتك بطريقة احترافية</h3>
@@ -174,7 +172,6 @@ export default function Home() {
                       </Link>
                     </div>
                   </CarouselItem>
-                  {/* Slide 3 */}
                   <CarouselItem key="side-ad-3" className="h-full pl-0">
                     <div className="flex flex-col items-center justify-center h-full w-full p-8">
                         <SiteLogo brandClassName="text-white" subtextClassName="text-blue-100" />
@@ -195,7 +192,7 @@ export default function Home() {
             {PART_CATEGORIES.map((cat, i) => (
               <div key={i} className="shrink-0">
                 <Link href={`/catalog?category=${encodeURIComponent(cat.en)}`}>
-                  <span className="font-black text-xs md:text-sm text-black bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap">
+                  <span className="font-black text-xs md:text-sm text-black bg-white px-4 md:px-6 py-2.5 rounded-xl border-2 border-zinc-100 hover:border-secondary hover:text-secondary hover:shadow-md transition-all block text-center shadow-sm whitespace-nowrap uppercase">
                     {lang === 'AR' ? cat.ar : cat.en}
                   </span>
                 </Link>
@@ -204,44 +201,56 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Stores Slider - Positioned above Latest Parts */}
-        {featuredStores && featuredStores.length > 0 && (
-          <section className="w-full px-0.5 py-4">
-            <div className="flex items-center justify-between mb-4 px-2 flex-row-reverse border-b border-black/5 pb-2">
-              <h2 className="text-sm md:text-base font-black text-black flex items-center gap-2">
-                <Star size={18} className="text-blue-500 fill-blue-500" /> متاجر مميزة
+        {/* Featured Stores Section - New Ribbon Position */}
+        <section className="w-full px-0.5 py-4">
+          <div className="flex items-center justify-between mb-4 px-2 flex-row-reverse border-b-2 border-black/10 pb-1">
+            <div className="text-right">
+              <h2 className="text-lg md:text-xl font-black text-black flex items-center justify-end gap-2">
+                متاجر مميزة <Star size={20} className="text-black fill-black" />
               </h2>
+              <p className="text-[10px] text-zinc-500 font-black">نخبة المتاجر الموثوقة لدينا.</p>
             </div>
-            <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
-              <CarouselContent className="-ml-2" dir="rtl">
-                {featuredStores.map((campaign, i) => (
+          </div>
+          
+          <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
+            <CarouselContent className="-ml-2" dir="rtl">
+              {loadingCampaigns ? (
+                Array.from({ length: 6 }).map((_, i) => (
                   <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
-                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border hover:shadow-md transition-all block text-center space-y-2 group">
+                    <div className="h-24 bg-zinc-200 animate-pulse rounded-xl" />
+                  </CarouselItem>
+                ))
+              ) : featuredStores?.length > 0 ? (
+                featuredStores.map((campaign, i) => (
+                  <CarouselItem key={i} className="pl-2 basis-1/2 sm:basis-1/3 lg:basis-1/6">
+                    <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} className="bg-white p-3 rounded-xl border-2 border-zinc-100 hover:border-black hover:shadow-md transition-all block text-center space-y-2 group">
                        <div className="w-16 h-16 mx-auto rounded-lg overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
                          <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt={campaign.storeName} fill className="object-cover" />
                        </div>
                        <div className="space-y-1">
-                          <h4 className="font-black text-black text-[10px] truncate">{campaign.storeName}</h4>
-                          <Badge variant="outline" className="text-[8px] h-4 border-blue-200 text-blue-600 font-black">مميز</Badge>
+                          <h4 className="font-black text-black text-[10px] truncate uppercase">{campaign.storeName}</h4>
+                          <Badge variant="outline" className="text-[8px] h-4 border-black text-black font-black uppercase">مميز</Badge>
                        </div>
                     </Link>
                   </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </section>
-        )}
+                ))
+              ) : (
+                <div className="col-span-full py-6 text-center text-zinc-400 font-black italic text-xs w-full">لا توجد متاجر مميزة حالياً.</div>
+              )}
+            </CarouselContent>
+          </Carousel>
+        </section>
 
-        {/* Explore Latest Parts */}
+        {/* Explore Latest Parts Section */}
         <section className="w-full px-0.5 py-6">
           <div className="flex items-center justify-between mb-4 border-b-2 border-black/10 pb-1 px-2 flex-row-reverse">
              <div className="text-right">
                 <h2 className="text-lg md:text-xl font-black text-black flex items-center justify-end gap-2">
-                   أحدث قطع الغيار المضافة <Package size={20} className="text-secondary" />
+                   أحدث قطع الغيار المضافة <Package size={20} className="text-black" />
                 </h2>
                 <p className="text-[10px] text-zinc-500 font-black">تصفح القطع المتوفرة حالياً في كافة الولايات.</p>
              </div>
-             <Link href="/catalog" className="text-[10px] font-black text-black hover:underline">عرض كافة القطع</Link>
+             <Link href="/catalog" className="text-[10px] font-black text-black hover:underline uppercase">عرض كافة القطع</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-1" dir="rtl">
             {loadingExplore ? (
@@ -275,13 +284,13 @@ export default function Home() {
             <div className="container mx-auto px-2">
               <div className="flex items-center justify-between mb-6 flex-row-reverse">
                  <div className="text-right">
-                    <h2 className="text-xl md:text-2xl font-black flex items-center justify-end gap-3 text-secondary">
+                    <h2 className="text-xl md:text-2xl font-black flex items-center justify-end gap-3 text-secondary uppercase">
                        منتجات ننصح بها <Zap className="fill-secondary animate-pulse" size={24} />
                     </h2>
                     <p className="text-[10px] text-zinc-400 font-black">أفضل قطع الغيار المختارة يدوياً من طرف فريقنا.</p>
                  </div>
                  <Link href="/catalog">
-                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2">
+                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-10 px-6 rounded-xl gap-2 uppercase">
                        تصفح الكتالوج <ShoppingBag size={16} />
                     </Button>
                  </Link>
