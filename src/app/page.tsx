@@ -119,7 +119,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
       <Navbar />
 
-      <main className="flex-grow pt-[170px] md:pt-[190px]">
+      <main className="flex-grow pt-[185px] md:pt-[210px]">
         {/* Hero Section */}
         <section className="w-full px-0.5 mt-1">
           <div className={cn("flex flex-col lg:flex-row-reverse gap-1.5", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>

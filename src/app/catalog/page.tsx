@@ -185,7 +185,7 @@ function CatalogContent() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[170px] md:pt-[190px] pb-12">
+      <main className="flex-grow pt-[185px] md:pt-[210px] pb-12">
         <div className="container mx-auto px-4">
           
           <div className={cn("mb-6 flex flex-col md:flex-row justify-between items-center gap-4", lang === 'AR' ? "md:flex-row-reverse" : "md:flex-row")}>

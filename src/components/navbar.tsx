@@ -35,8 +35,12 @@ export default function Navbar() {
   const isNotHome = pathname !== "/";
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-    if (savedLang) setLang(savedLang);
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (savedLang) setLang(savedLang);
+    };
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
   }, []);
 
   const toggleLang = (newLang: "AR" | "EN" | "FR") => {
@@ -226,8 +230,8 @@ export default function Navbar() {
 
       {/* Layer 3: Global Smart Search Bar */}
       {showSearch && (
-        <div className="bg-white py-0.5 border-b shadow-sm relative">
-          <div className="w-full px-1 relative z-10">
+        <div className="bg-white py-2.5 border-b shadow-sm relative">
+          <div className="w-full px-4 relative z-10">
             <AISearchBox />
           </div>
         </div>

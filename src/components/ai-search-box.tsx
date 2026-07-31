@@ -63,7 +63,7 @@ export default function AISearchBox() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-1 py-1">
+    <div className="w-full max-w-5xl mx-auto px-1 py-1.5">
       <div className="relative p-1 rounded-[32px] overflow-hidden shadow-2xl group transition-all duration-700 hover:shadow-secondary/20">
         <div 
           className="absolute inset-0 opacity-40 pointer-events-none"
