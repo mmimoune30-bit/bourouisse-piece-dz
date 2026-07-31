@@ -51,11 +51,11 @@ export default function Navbar() {
   };
 
   const getInquiryText = () => lang === 'AR' ? 'للاستفسار:' : lang === 'EN' ? 'Inquiry:' : 'Demande:';
-  const getBackHomeText = () => lang === 'AR' ? 'الرئيسية' : lang === 'EN' ? 'Home' : 'Accueil';
+  const getBackHomeText = () => lang === 'AR' ? 'الرجوع الى الرئيسية' : lang === 'EN' ? 'Back Home' : 'Retour';
   const getCategoriesText = () => lang === 'AR' ? 'تصنيفات قطع الغيار' : lang === 'EN' ? 'Categories' : 'Catégories';
   const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Sell with us' : 'Vendre';
   const getJoinNowText = () => lang === 'AR' ? 'إضافة حساب' : lang === 'EN' ? 'Join' : 'S\'inscrire';
-  const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
+  const getLoginText = () => lang === 'AR' ? 'الدخول الى الحساب' : lang === 'EN' ? 'Account Access' : 'Accès Compte';
 
   const navFont = lang === 'AR' ? 'font-black' : 'font-medium';
   const boldNavFont = lang === 'AR' ? 'font-black' : 'font-semibold';
