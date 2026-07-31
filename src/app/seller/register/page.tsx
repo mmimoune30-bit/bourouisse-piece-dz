@@ -168,7 +168,7 @@ export default function SellerRegister() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-20 pb-6">
+      <main className="flex-grow pt-32 pb-6">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className={cn("lg:col-span-1 space-y-4 text-right order-2 lg:order-1", lang !== 'AR' && "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>

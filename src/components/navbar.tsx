@@ -62,8 +62,8 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-sm">
-      {/* Layer 1: Compact Top Info Bar */}
-      <div className="bg-white border-b border-zinc-50 py-0.5 overflow-hidden">
+      {/* Layer 1: Compact Top Info Bar - Increased py for visibility */}
+      <div className="bg-white border-b border-zinc-50 py-1.5 overflow-hidden">
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-6 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -94,8 +94,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 2: Main Branding */}
-      <div className="bg-white py-1.5 border-b">
+      {/* Layer 2: Main Branding - Increased py for visibility */}
+      <div className="bg-white py-2 border-b">
         <div className="w-full px-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Link href="/" className="hover:opacity-90 transition-opacity shrink-0">
@@ -140,7 +140,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Layer 3: Search Bar - Compact padding to remove gap */}
+      {/* Layer 3: Search Bar */}
       {showSearch && (
         <div className="bg-white py-1 border-b relative">
           <div className="w-full px-4">
