@@ -1,13 +1,14 @@
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, memoryLocalCache, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * نظام تهيئة Firebase بنمط النسخة الوحيدة (Singleton).
- * يعالج خطأ INTERNAL ASSERTION FAILED (ID: ca9) عبر الاعتماد على نظام إدارة النسخ المدمج في Firebase.
+ * نظام تهيئة Firebase بنمط النسخة الوحيدة (Singleton) المتقدم.
+ * يعالج خطأ INTERNAL ASSERTION FAILED (ID: ca9) عبر استخدام ذاكرة التخزين المؤقت
+ * ومنع إعادة التهيئة المزدوجة أثناء الـ Fast Refresh.
  */
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
@@ -16,7 +17,7 @@ export function initializeFirebase() {
 
   const g = globalThis as any;
 
-  // استرجاع النسخ إذا كانت مهيأة مسبقاً (Fast Refresh / HMR)
+  // 1. استرجاع النسخ إذا كانت مهيأة مسبقاً في الجلسة الحالية
   if (g.__FIREBASE_READY__) {
     return {
       app: g.__FIREBASE_APP__,
@@ -26,17 +27,24 @@ export function initializeFirebase() {
   }
 
   try {
-    // 1. تهيئة التطبيق أو استرجاع الحالي
+    // 2. تهيئة التطبيق أو استرجاع الحالي (Idempotent)
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 2. استرجاع Firestore بنمط آمن
-    // ملاحظة: نستخدم getFirestore بدلاً من initializeFirestore لمنع تعارض ca9
-    const firestore = getFirestore(app);
+    // 3. تهيئة Firestore مع فرض "ذاكرة التخزين المؤقت" لمنع تعارض IndexedDB
+    let firestore: Firestore;
+    try {
+      firestore = initializeFirestore(app, {
+        localCache: memoryLocalCache(),
+      });
+    } catch (e) {
+      // في حال تم التهيئة مسبقاً بواسطة جزء آخر من الكود
+      firestore = getFirestore(app);
+    }
 
-    // 3. استرجاع Auth
+    // 4. استرجاع Auth
     const auth = getAuth(app);
 
-    // تخزين النسخ عالمياً
+    // 5. تخزين النسخ عالمياً لضمان Singleton مطلق
     g.__FIREBASE_APP__ = app;
     g.__FIREBASE_FIRESTORE__ = firestore;
     g.__FIREBASE_AUTH__ = auth;
@@ -44,7 +52,8 @@ export function initializeFirebase() {
 
     return { app, firestore, auth };
   } catch (error) {
-    console.error("Firebase Init Error:", error);
+    console.error("Firebase Initialization Error:", error);
+    // محاولة أخيرة للاسترجاع في حال الفشل الكارثي
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 

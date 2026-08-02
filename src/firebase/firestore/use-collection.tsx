@@ -11,7 +11,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف الاستماع للمجموعات - نسخة الحماية القصوى.
+ * خطاف الاستماع للمجموعات - نسخة الحماية.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -19,19 +19,19 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // التحقق من استقرار الاستعلام وجاهزية Firestore
+    // التحقق من صلاحية الاستعلام وتوفر نسخة Firestore
     if (!query) {
       setLoading(false);
       return;
     }
 
-    let isSubscribed = true;
+    let isMounted = true;
 
     try {
       const unsubscribe = onSnapshot(
         query,
         (snapshot: QuerySnapshot<DocumentData>) => {
-          if (!isSubscribed) return;
+          if (!isMounted) return;
           const items = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -41,7 +41,7 @@ export function useCollection(query: Query | null) {
           setError(null);
         },
         (err) => {
-          if (!isSubscribed) return;
+          if (!isMounted) return;
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
@@ -57,12 +57,13 @@ export function useCollection(query: Query | null) {
       );
 
       return () => {
-        isSubscribed = false;
+        isMounted = false;
         unsubscribe();
       };
     } catch (e: any) {
-      if (isSubscribed) {
+      if (isMounted) {
         setLoading(false);
+        setError(e);
       }
     }
   }, [query]);

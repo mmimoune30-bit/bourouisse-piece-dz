@@ -5,34 +5,37 @@ import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
 /**
- * مزود Firebase للعميل - النسخة المستقرة.
- * يضمن تثبيت مراجع Firebase ومنع أخطاء Hydration و Assertion (ca9).
+ * مزود Firebase للعميل - النسخة المؤمنة.
+ * يضمن تثبيت مراجع Firebase عبر useRef لمنع أخطاء ca9 الناتجة عن إعادة التهيئة.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   
-  // استخدام Ref لتثبيت مراجع النسخ ومنع إعادة الإنشاء مع كل رندر
-  const instances = useRef<{
+  // استخدام Ref لتثبيت المراجع ومنع تغيرها مع الـ Re-render
+  const firebaseInstances = useRef<{
     app: any;
     firestore: any;
     auth: any;
-  } | null>(null);
+  }>(null);
 
   useEffect(() => {
-    // التهيئة تتم مرة واحدة فقط بعد mount المتصفح
-    if (!instances.current) {
-      instances.current = initializeFirebase();
+    // تتم التهيئة مرة واحدة فقط بعد mount المكون في المتصفح
+    if (!firebaseInstances.current) {
+      const { app, firestore, auth } = initializeFirebase();
+      (firebaseInstances as any).current = { app, firestore, auth };
     }
-    setReady(true);
+    setIsReady(true);
   }, []);
 
-  // الانتظار حتى استقرار خدمات Firebase في المتصفح
-  if (!ready || !instances.current?.app) {
+  // شاشة انتظار حتى استقرار الخدمات
+  if (!isReady || !firebaseInstances.current?.app) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-white font-black tracking-widest text-[10px] uppercase opacity-50">Securely Connecting to Firestore...</span>
+          <span className="text-white font-black tracking-widest text-[10px] uppercase opacity-50">
+            Establishing Secure Connection...
+          </span>
         </div>
       </div>
     );
@@ -40,9 +43,9 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
 
   return (
     <FirebaseProvider 
-      firebaseApp={instances.current.app} 
-      firestore={instances.current.firestore} 
-      auth={instances.current.auth}
+      firebaseApp={firebaseInstances.current.app} 
+      firestore={firebaseInstances.current.firestore} 
+      auth={firebaseInstances.current.auth}
     >
       {children}
     </FirebaseProvider>

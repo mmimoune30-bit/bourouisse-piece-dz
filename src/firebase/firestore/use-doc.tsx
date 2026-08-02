@@ -11,7 +11,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف الاستماع لمستند واحد - نسخة الحماية القصوى.
+ * خطاف الاستماع لمستند واحد - نسخة الحماية.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
@@ -24,19 +24,19 @@ export function useDoc(docRef: DocumentReference | null) {
       return;
     }
 
-    let isSubscribed = true;
+    let isMounted = true;
 
     try {
       const unsubscribe = onSnapshot(
         docRef,
         (snapshot: DocumentSnapshot<DocumentData>) => {
-          if (!isSubscribed) return;
+          if (!isMounted) return;
           setData(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
           setLoading(false);
           setError(null);
         },
         (err) => {
-          if (!isSubscribed) return;
+          if (!isMounted) return;
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
@@ -52,12 +52,13 @@ export function useDoc(docRef: DocumentReference | null) {
       );
 
       return () => {
-        isSubscribed = false;
+        isMounted = false;
         unsubscribe();
       };
     } catch (e: any) {
-      if (isSubscribed) {
+      if (isMounted) {
         setLoading(false);
+        setError(e);
       }
     }
   }, [docRef]);
