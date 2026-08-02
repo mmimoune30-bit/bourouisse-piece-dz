@@ -1,71 +1,51 @@
 'use client';
 
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  Firestore, 
-  initializeFirestore, 
-  memoryLocalCache 
-} from 'firebase/firestore';
+import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * تهيئة Firebase بشكل آمن ومستقر لتجنب أخطاء Assertion (ID: ca9) 
- * الناتجة عن التكرار في بيئة Next.js (Fast Refresh).
- * 
- * الحل المطبق:
- * 1. استخدام Singleton صارم عبر كائن 'window' لضمان عدم إعادة الإنشاء عند تحديث الكود (HMR).
- * 2. استخدام memoryLocalCache() لتعطيل محاولات الوصول لـ IndexedDB التي تسبب غالباً تعارضات الحالة.
+ * تهيئة Firebase بشكل مبسط ومستقر لمعالجة خطأ Firestore Assertion (ID: ca9).
+ * يعتمد هذا الحل على نظام Singleton الداخلي لـ Firebase لمنع تكرار التهيئة.
  */
 
+let cachedApp: FirebaseApp | undefined;
+let cachedFirestore: Firestore | undefined;
+let cachedAuth: Auth | undefined;
+
 export function initializeFirebase() {
-  // لا نقوم بالتهيئة إلا في المتصفح
+  // التأكد من التنفيذ في المتصفح فقط
   if (typeof window === 'undefined') return {};
 
-  const g = window as any;
-
   try {
-    // 1. تهيئة التطبيق (Singleton)
-    if (!g.__FIREBASE_APP__) {
-      const existingApps = getApps();
-      if (existingApps.length > 0) {
-        g.__FIREBASE_APP__ = existingApps[0];
-      } else {
-        g.__FIREBASE_APP__ = initializeApp(firebaseConfig);
-      }
+    // 1. جلب أو إنشاء نسخة التطبيق
+    if (!cachedApp) {
+      const apps = getApps();
+      cachedApp = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
     }
 
-    // 2. تهيئة Firestore (Singleton) - هذا هو الجزء الحساس للخطأ ca9
-    if (!g.__FIREBASE_FIRESTORE__) {
-      try {
-        // نستخدم initializeFirestore مع memoryLocalCache لتجنب مشاكل الوصول لملفات IndexedDB
-        // التي تسبب خطأ "Unexpected state (ID: ca9)" عند فتح تبويبات متعددة أو إعادة التحميل السريع.
-        g.__FIREBASE_FIRESTORE__ = initializeFirestore(g.__FIREBASE_APP__, {
-          localCache: memoryLocalCache(),
-        });
-      } catch (innerError) {
-        // إذا فشلت التهيئة الصريحة (لأنها تمت بالفعل داخلياً مثلاً)، نقوم بجلب النسخة الافتراضية
-        g.__FIREBASE_FIRESTORE__ = getFirestore(g.__FIREBASE_APP__);
-      }
+    // 2. جلب نسخة Firestore (تلقائياً Singleton من قبل Firebase SDK)
+    if (!cachedFirestore) {
+      cachedFirestore = getFirestore(cachedApp);
     }
 
-    // 3. تهيئة Auth (Singleton)
-    if (!g.__FIREBASE_AUTH__) {
-      g.__FIREBASE_AUTH__ = getAuth(g.__FIREBASE_APP__);
+    // 3. جلب نسخة Auth
+    if (!cachedAuth) {
+      cachedAuth = getAuth(cachedApp);
     }
 
     return { 
-      app: g.__FIREBASE_APP__, 
-      firestore: g.__FIREBASE_FIRESTORE__, 
-      auth: g.__FIREBASE_AUTH__ 
+      app: cachedApp, 
+      firestore: cachedFirestore, 
+      auth: cachedAuth 
     };
   } catch (error) {
-    // في حالة حدوث خطأ كارثي، نحاول إرجاع أي نسخ تم إنشاؤها بالفعل
+    console.error("Critical: Firebase failed to initialize:", error);
     return {
-      app: g.__FIREBASE_APP__ || null,
-      firestore: g.__FIREBASE_FIRESTORE__ || null,
-      auth: g.__FIREBASE_AUTH__ || null
+      app: cachedApp || null,
+      firestore: cachedFirestore || null,
+      auth: cachedAuth || null
     };
   }
 }
