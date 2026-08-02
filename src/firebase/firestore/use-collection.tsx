@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * خطاف مخصص للاستماع لمجموعات البيانات في Firestore.
- * تم تحسين معالجة الأخطاء لمنع الوصول للخصائص الداخلية التي تسبب أخطاء Assertion.
+ * مضاف إليه حماية لضمان عدم التنفيذ إلا في حال وجود استعلام صالح.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,6 +20,7 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // حماية: إذا لم يكن هناك استعلام أو كنا على السيرفر، لا تفعل شيئاً
     if (!query) {
       setLoading(false);
       return;
@@ -34,14 +35,17 @@ export function useCollection(query: Query | null) {
         }));
         setData(items);
         setLoading(false);
+        setError(null);
       },
-      async (err) => {
-        // نستخدم وصفاً نصياً بدلاً من محاولة جلب المسار من الخصائص الداخلية غير المستقرة
-        const permError = new FirestorePermissionError({
-          path: 'firestore_collection_query',
-          operation: 'list'
-        });
-        errorEmitter.emit('permission-error', permError);
+      (err) => {
+        // التحقق من أخطاء الصلاحيات وإرسالها للمراقب المركزي
+        if (err.code === 'permission-denied') {
+          const permError = new FirestorePermissionError({
+            path: 'firestore_collection',
+            operation: 'list'
+          });
+          errorEmitter.emit('permission-error', permError);
+        }
         setError(err);
         setLoading(false);
       }

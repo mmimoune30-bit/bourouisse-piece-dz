@@ -1,76 +1,45 @@
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  initializeFirestore, 
-  memoryLocalCache, 
-  Firestore 
-} from 'firebase/firestore';
+import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * تهيئة Firebase باستخدام نمط Singleton العالمي والتهيئة الدفاعية.
- * يحل هذا الملف مشكلة Firestore Assertion (ID: ca9) عبر تعطيل التخزين المستمر
- * واستخدام ذاكرة التخزين المؤقت (Memory Cache) فقط في بيئة التطوير.
+ * تهيئة Firebase باستخدام نمط Singleton العالمي.
+ * هذا الملف يحل مشكلة Firestore Assertion (ID: ca9) من خلال الاعتماد على
+ * getFirestore() بدلاً من initializeFirestore() المتكرر.
  */
 
-// متغيرات محلية للحفاظ على النسخ داخل الموديول
-let globalApp: FirebaseApp | null = null;
-let globalFirestore: Firestore | null = null;
-let globalAuth: Auth | null = null;
+let app: FirebaseApp | undefined;
+let firestore: Firestore | undefined;
+let auth: Auth | undefined;
 
 export function initializeFirebase() {
-  // التأكد من التنفيذ في المتصفح فقط
   if (typeof window === 'undefined') {
     return { app: null, firestore: null, auth: null };
   }
 
-  const _window = window as any;
-
-  // إذا كانت النسخ موجودة في الكائن العالمي (window)، نستخدمها مباشرة
-  if (_window.__FIREBASE_INSTANCES__) {
-    return _window.__FIREBASE_INSTANCES__;
-  }
-
-  // إذا لم تكن موجودة، نبدأ عملية التهيئة الدفاعية
   try {
-    // 1. تهيئة التطبيق (App)
-    if (!globalApp) {
-      const apps = getApps();
-      globalApp = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
+    // 1. تهيئة أو استعادة التطبيق
+    if (!app) {
+      app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     }
 
-    // 2. تهيئة قاعدة البيانات (Firestore) مع تعطيل Persistence لمنع خطأ ca9
-    if (!globalFirestore) {
-      try {
-        globalFirestore = initializeFirestore(globalApp, {
-          localCache: memoryLocalCache()
-        });
-      } catch (e) {
-        // إذا فشل initializeFirestore (غالباً لأنه تم مسبقاً)، نستخدم getFirestore
-        globalFirestore = getFirestore(globalApp);
-      }
+    // 2. الحصول على نسخة Firestore المستقرة
+    // نستخدم getFirestore مباشرة لأنه يتعامل داخلياً مع النسخ الموجودة
+    if (!firestore) {
+      firestore = getFirestore(app);
     }
 
-    // 3. تهيئة نظام المصادقة (Auth)
-    if (!globalAuth) {
-      globalAuth = getAuth(globalApp);
+    // 3. الحصول على نسخة Auth المستقرة
+    if (!auth) {
+      auth = getAuth(app);
     }
 
-    // تخزين النسخ في الكائن العالمي لضمان الاستمرارية عبر HMR
-    _window.__FIREBASE_INSTANCES__ = { 
-      app: globalApp, 
-      firestore: globalFirestore, 
-      auth: globalAuth 
-    };
-
-    console.log("🔥 Firebase Initialized Successfully (Memory Cache Enabled)");
+    return { app, firestore, auth };
   } catch (error) {
-    console.error("❌ Critical: Firebase failed to initialize:", error);
+    console.error("❌ Firebase Initialization Error:", error);
     return { app: null, firestore: null, auth: null };
   }
-
-  return _window.__FIREBASE_INSTANCES__;
 }
