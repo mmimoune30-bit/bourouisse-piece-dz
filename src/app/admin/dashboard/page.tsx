@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -70,6 +69,7 @@ export default function AdminDashboard() {
     fetchStats();
   }, [firestore]);
 
+  // Stable Memoized Query
   const transactionsQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
@@ -82,7 +82,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!transactionsQuery) return;
 
+    let isMounted = true;
     const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
+      if (!isMounted) return;
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -91,6 +93,7 @@ export default function AdminDashboard() {
       setTransactions(data);
       setLoadingTransactions(false);
     }, async (err) => {
+      if (!isMounted) return;
       const permissionError = new FirestorePermissionError({
         path: "subscription_requests",
         operation: 'list',
@@ -99,7 +102,10 @@ export default function AdminDashboard() {
       setLoadingTransactions(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [transactionsQuery]);
 
   const STATS = [
@@ -181,7 +187,6 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Transactions */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
             <CardTitle className="text-xl font-black">آخر عمليات الاشتراك (تحديث لحظي)</CardTitle>
@@ -209,7 +214,7 @@ export default function AdminDashboard() {
                   </TableRow>
                 ) : transactions.length > 0 ? (
                   transactions.map((tx, i) => (
-                    <TableRow key={i}>
+                    <TableRow key={tx.id || i}>
                       <TableCell className="pr-6 font-bold">{tx.sellerName || "N/A"}</TableCell>
                       <TableCell><Badge variant="outline">{tx.planName}</Badge></TableCell>
                       <TableCell className="font-black text-green-600">{tx.amount} دج</TableCell>
@@ -230,7 +235,7 @@ export default function AdminDashboard() {
                       </TableCell>
 
                       <TableCell className="text-left pl-6 text-muted-foreground text-xs">
-                        {tx.createdAt?.toDate().toLocaleDateString('ar-DZ')}
+                        {tx.createdAt?.toDate ? tx.createdAt.toDate().toLocaleDateString('ar-DZ') : "..."}
                       </TableCell>
                     </TableRow>
                   ))
@@ -246,7 +251,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* System Activity */}
         <div className="space-y-6">
           <Card className="border-none shadow-sm bg-primary text-white overflow-hidden relative">
             <CardContent className="p-6 relative z-10 text-right">

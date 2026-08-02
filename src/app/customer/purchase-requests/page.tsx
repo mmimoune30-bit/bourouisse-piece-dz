@@ -24,15 +24,16 @@ export default function MyPurchaseRequests() {
   const { firestore } = useFirestore();
   const { user } = useUser();
 
+  // Stable Memoized Query to prevent ID: ca9 assertion failures
   const requestsQuery = useMemo(() => {
-    if (!firestore || !user) return null;
+    if (!firestore || !user?.uid) return null;
   
     return query(
       collection(firestore, "purchase_requests"),
       where("buyerId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
-  }, [firestore, user]);
+  }, [firestore, user?.uid]);
   
   const { data: requests, loading } = useCollection(requestsQuery);
 
@@ -56,7 +57,7 @@ export default function MyPurchaseRequests() {
           <div className="space-y-6">
             {loading ? (
               <div className="text-center py-20 font-bold animate-pulse text-zinc-400">جاري تحميل طلباتك...</div>
-            ) : requests?.length === 0 ? (
+            ) : !requests || requests.length === 0 ? (
               <Card className="border-none shadow-sm p-20 text-center rounded-[40px] bg-white">
                 <Package size={64} className="mx-auto mb-4 text-muted-foreground opacity-20" />
                 <h3 className="text-2xl font-black text-primary mb-2">ليس لديك أي طلبات شراء بعد</h3>
@@ -66,8 +67,7 @@ export default function MyPurchaseRequests() {
                 </Link>
               </Card>
             ) : (
-              requests?.map((req) => {
-                // معالجة آمنة للتاريخ لتفادي أخطاء الـ rendering أثناء المزامنة
+              requests.map((req) => {
                 const dateObj = req.createdAt?.toDate ? req.createdAt.toDate() : (req.createdAt ? new Date(req.createdAt) : null);
                 const formattedDate = dateObj ? dateObj.toLocaleDateString('ar-DZ') : "...";
 

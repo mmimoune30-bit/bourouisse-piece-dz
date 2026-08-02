@@ -6,16 +6,15 @@ import {
   initializeFirestore, 
   memoryLocalCache, 
   persistentLocalCache,
-  Firestore,
-  connectFirestoreEmulator
+  Firestore
 } from 'firebase/firestore';
-import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * Robust Singleton initialization for Firebase services.
- * Specifically handles Next.js Fast Refresh to prevent "Unexpected state (ID: ca9)" errors
- * by storing instances in globalThis.
+ * Strict Singleton initialization for Firebase.
+ * Surmounts the "INTERNAL ASSERTION FAILED (ID: ca9)" error by ensuring 
+ * settings are applied exactly once and instances are cached globally.
  */
 
 interface FirebaseInstances {
@@ -25,53 +24,48 @@ interface FirebaseInstances {
 }
 
 export function initializeFirebase(): FirebaseInstances {
-  // SSR Safety
   if (typeof window === 'undefined') {
     return {} as FirebaseInstances;
   }
 
   const global = globalThis as any;
 
-  // 1. Check if we already have stable instances stored globally
+  // 1. Return cached instances if they exist (Survivability during HMR)
   if (global.__FIREBASE_STORE__) {
     return global.__FIREBASE_STORE__;
   }
 
   try {
-    // 2. Initialize or retrieve Firebase App
+    // 2. Init App
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. Initialize Firestore with absolute singleton logic
+    // 3. Init Firestore with strict settings
     let firestore: Firestore;
-    
-    // Try to get the existing instance first to avoid re-initialization conflicts
+    const isDev = process.env.NODE_ENV === 'development';
+
     try {
-      firestore = getFirestore(app);
-    } catch (e) {
-      // If no instance exists, initialize with specific cache settings
-      const isDev = process.env.NODE_ENV === 'development';
+      // In SDK 11, try to initialize once. If fails, fallback to getFirestore.
       firestore = initializeFirestore(app, {
         localCache: isDev ? memoryLocalCache() : persistentLocalCache({}),
-        // Ensure experimentalForceLongPolling is NOT set here unless explicitly needed, 
-        // as it can sometimes trigger internal engine issues.
       });
+    } catch (e) {
+      // Re-initialization occurred (likely HMR), recover the existing instance
+      firestore = getFirestore(app);
     }
 
-    // 4. Initialize Auth
+    // 4. Init Auth
     const auth = getAuth(app);
 
     const instances = { app, firestore, auth };
     
-    // Store globally to ensure absolute singleton behavior across Fast Refresh cycles
+    // Store globally for Next.js Fast Refresh stability
     global.__FIREBASE_STORE__ = instances;
 
     return instances;
   } catch (error) {
-    console.error("Critical Firebase Initialization Failure:", error);
-    // Extreme fallback to keep the app alive
-    const app = initializeApp(firebaseConfig);
-    const firestore = getFirestore(app);
-    const auth = getAuth(app);
-    return { app, firestore, auth };
+    console.error("Firebase Boot Error:", error);
+    // Absolute fallback
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    return { app, firestore: getFirestore(app), auth: getAuth(app) };
   }
 }

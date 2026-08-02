@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -38,15 +37,15 @@ export default function SellerListingsPage() {
   const { user } = useUser();
   const [search, setSearch] = useState("");
 
-  // استعلام جلب الإعلانات الخاصة بالبائع الحالي فقط
+  // Memoized query to ensure stability and avoid ID: ca9 errors
   const listingsQuery = useMemo(() => {
-    if (!firestore || !user) return null;
+    if (!firestore || !user?.uid) return null;
     return query(
       collection(firestore, "listings"),
       where("sellerId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
-  }, [firestore, user]);
+  }, [firestore, user?.uid]);
 
   const { data: listings, loading } = useCollection(listingsQuery);
 
@@ -63,7 +62,8 @@ export default function SellerListingsPage() {
   };
 
   const filtered = useMemo(() => {
-    return listings?.filter(l => 
+    if (!listings) return [];
+    return listings.filter(l => 
       l.name?.toLowerCase().includes(search.toLowerCase()) || 
       l.category?.toLowerCase().includes(search.toLowerCase())
     );
@@ -116,7 +116,7 @@ export default function SellerListingsPage() {
                       <TableHead className="text-right">السعر (دج)</TableHead>
                       <TableHead className="text-right">التصنيف</TableHead>
                       <TableHead className="text-right">الحالة</TableHead>
-                      <TableHead className="text-right">تاريخ النشر</TableHead>
+                      <TableHead className="text-right">التاريخ</TableHead>
                       <TableHead className="text-left pl-8">إجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -135,7 +135,7 @@ export default function SellerListingsPage() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filtered?.map((item) => (
+                      filtered.map((item) => (
                         <TableRow key={item.id} className="hover:bg-zinc-50 transition-colors">
                           <TableCell className="pr-8 py-4">
                              <div className="flex items-center gap-4 justify-start flex-row-reverse">
@@ -160,7 +160,7 @@ export default function SellerListingsPage() {
                              </Badge>
                           </TableCell>
                           <TableCell className="text-xs font-bold text-muted-foreground">
-                            {item.createdAt?.toDate().toLocaleDateString('ar-DZ')}
+                            {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('ar-DZ') : "..."}
                           </TableCell>
                           <TableCell className="text-left pl-8">
                              <DropdownMenu>
@@ -181,7 +181,7 @@ export default function SellerListingsPage() {
                                   >
                                      <Archive size={16} /> {item.status === 'Active' ? 'أرشفة المنتج' : 'تنشيط المنتج'}
                                   </DropdownMenuItem>
-                               </DropdownMenuContent>
+                                </DropdownMenuContent>
                              </DropdownMenu>
                           </TableCell>
                         </TableRow>

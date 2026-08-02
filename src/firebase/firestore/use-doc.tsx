@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   DocumentReference, 
   onSnapshot, 
@@ -11,24 +11,27 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * Safe Document Hook that guards against internal Firestore errors (ID: ca9)
+ * Defensive Document Hook.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const activeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // 1. Safety Check: Ensure ref exists and we are in client environment
     if (!docRef || typeof window === 'undefined') {
       if (!docRef) setLoading(false);
       return;
     }
 
+    const path = docRef.path;
+    if (activeRef.current === path) return;
+
     let isMounted = true;
+    activeRef.current = path;
 
     try {
-      // 2. Attach real-time listener
       const unsubscribe = onSnapshot(
         docRef,
         (snapshot: DocumentSnapshot<DocumentData>) => {
@@ -40,7 +43,6 @@ export function useDoc(docRef: DocumentReference | null) {
         async (err) => {
           if (!isMounted) return;
           
-          // 3. Handle Permission Errors
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
               path: docRef.path || 'document_reference',
@@ -56,6 +58,7 @@ export function useDoc(docRef: DocumentReference | null) {
 
       return () => {
         isMounted = false;
+        activeRef.current = null;
         unsubscribe();
       };
     } catch (e: any) {
