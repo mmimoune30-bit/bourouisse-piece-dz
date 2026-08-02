@@ -11,7 +11,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف الاستماع للمجموعات - نسخة الحماية.
+ * Hook for listening to collections with protection against initialization race conditions.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -19,8 +19,8 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // التحقق من صلاحية الاستعلام وتوفر نسخة Firestore
-    if (!query) {
+    // Safety check: ensure query exists and we are in the browser
+    if (!query || typeof window === 'undefined') {
       setLoading(false);
       return;
     }
@@ -45,7 +45,7 @@ export function useCollection(query: Query | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: 'firestore_collection',
+              path: 'firestore_collection_listener',
               operation: 'list'
             });
             errorEmitter.emit('permission-error', permError);

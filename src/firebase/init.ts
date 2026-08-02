@@ -1,14 +1,14 @@
 'use client';
 
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, initializeFirestore, memoryLocalCache, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * نظام تهيئة Firebase بنمط النسخة الوحيدة (Singleton) المتقدم.
- * يعالج خطأ INTERNAL ASSERTION FAILED (ID: ca9) عبر استخدام ذاكرة التخزين المؤقت
- * ومنع إعادة التهيئة المزدوجة أثناء الـ Fast Refresh.
+ * Advanced Singleton Initialization for Firebase.
+ * Fixes INTERNAL ASSERTION FAILED (ID: ca9) by preventing double initialization 
+ * of Firestore settings during Fast Refresh.
  */
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
@@ -17,43 +17,46 @@ export function initializeFirebase() {
 
   const g = globalThis as any;
 
-  // 1. استرجاع النسخ إذا كانت مهيأة مسبقاً في الجلسة الحالية
-  if (g.__FIREBASE_READY__) {
-    return {
-      app: g.__FIREBASE_APP__,
-      firestore: g.__FIREBASE_FIRESTORE__,
-      auth: g.__FIREBASE_AUTH__
-    };
+  // 1. Return existing instances if they are already stable in the global scope
+  if (g.__FIREBASE_INSTANCES__) {
+    return g.__FIREBASE_INSTANCES__;
   }
 
   try {
-    // 2. تهيئة التطبيق أو استرجاع الحالي (Idempotent)
+    // 2. Handle App initialization (Idempotent)
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. تهيئة Firestore مع فرض "ذاكرة التخزين المؤقت" لمنع تعارض IndexedDB
+    // 3. Handle Firestore initialization with explicit memory cache
+    // This is critical to avoid IndexedDB lock conflicts during HMR
     let firestore: Firestore;
-    try {
+    if (getApps().length > 0) {
+      // If app existed, try to get existing firestore
+      try {
+        firestore = getFirestore(app);
+      } catch (e) {
+        // Fallback for edge cases
+        firestore = initializeFirestore(app, {
+          localCache: memoryLocalCache(),
+        });
+      }
+    } else {
+      // First time initialization
       firestore = initializeFirestore(app, {
         localCache: memoryLocalCache(),
       });
-    } catch (e) {
-      // في حال تم التهيئة مسبقاً بواسطة جزء آخر من الكود
-      firestore = getFirestore(app);
     }
 
-    // 4. استرجاع Auth
+    // 4. Handle Auth
     const auth = getAuth(app);
 
-    // 5. تخزين النسخ عالمياً لضمان Singleton مطلق
-    g.__FIREBASE_APP__ = app;
-    g.__FIREBASE_FIRESTORE__ = firestore;
-    g.__FIREBASE_AUTH__ = auth;
-    g.__FIREBASE_READY__ = true;
+    // 5. Store globally to ensure absolute singleton behavior
+    const instances = { app, firestore, auth };
+    g.__FIREBASE_INSTANCES__ = instances;
 
-    return { app, firestore, auth };
+    return instances;
   } catch (error) {
-    console.error("Firebase Initialization Error:", error);
-    // محاولة أخيرة للاسترجاع في حال الفشل الكارثي
+    console.warn("Firebase Init Warning (Non-Fatal):", error);
+    // Final emergency fallback
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 
