@@ -6,7 +6,7 @@ import { FirebaseProvider } from './provider';
 
 /**
  * مزود Firebase للعميل.
- * يضمن التهيئة الآمنة بعد Mount لضمان عدم حدوث Assertion errors في Firestore.
+ * يضمن التهيئة الآمنة والوحيدة بعد Mount لضمان عدم حدوث Assertion errors.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [instances, setInstances] = useState<{
@@ -16,15 +16,16 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
 
   useEffect(() => {
-    // نقوم بالتهيئة فقط عند التحميل الأول في المتصفح
+    // تنفيذ التهيئة مرة واحدة فقط عند تحميل العميل
     const result = initializeFirebase();
-    setInstances(result);
+    if (result.app) {
+      setInstances(result);
+    }
   }, []);
 
-  // ننتظر حتى تكتمل التهيئة قبل تقديم الخدمات
-  // هذا يمنع المكونات التابعة من محاولة استخدام Firestore قبل استقراره
+  // ننتظر حتى تكتمل التهيئة قبل تقديم الخدمات للمكونات التابعة
   if (!instances) {
-    return <>{children}</>;
+    return null;
   }
 
   return (

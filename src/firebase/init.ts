@@ -6,14 +6,14 @@ import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * تهيئة Firebase باستخدام نمط Singleton العالمي.
- * هذا الملف يحل مشكلة Firestore Assertion (ID: ca9) من خلال الاعتماد على
- * getFirestore() بدلاً من initializeFirestore() المتكرر.
+ * تهيئة Firebase باستخدام نمط Singleton الصارم.
+ * يتم تخزين النسخ في متغيرات خارج نطاق الدالة لضمان بقائها مستقرة
+ * عبر عمليات إعادة التحميل السريعة (HMR) في Next.js، مما يمنع خطأ ca9.
  */
 
-let app: FirebaseApp | undefined;
-let firestore: Firestore | undefined;
-let auth: Auth | undefined;
+let cachedApp: FirebaseApp | undefined;
+let cachedFirestore: Firestore | undefined;
+let cachedAuth: Auth | undefined;
 
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
@@ -21,23 +21,26 @@ export function initializeFirebase() {
   }
 
   try {
-    // 1. تهيئة أو استعادة التطبيق
-    if (!app) {
-      app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    // 1. التأكد من تهيئة التطبيق مرة واحدة فقط
+    if (!cachedApp) {
+      cachedApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     }
 
-    // 2. الحصول على نسخة Firestore المستقرة
-    // نستخدم getFirestore مباشرة لأنه يتعامل داخلياً مع النسخ الموجودة
-    if (!firestore) {
-      firestore = getFirestore(app);
+    // 2. الحصول على نسخة Firestore المستقرة المرتبطة بالتطبيق
+    if (!cachedFirestore) {
+      cachedFirestore = getFirestore(cachedApp);
     }
 
-    // 3. الحصول على نسخة Auth المستقرة
-    if (!auth) {
-      auth = getAuth(app);
+    // 3. الحصول على نسخة Auth المستقرة المرتبطة بالتطبيق
+    if (!cachedAuth) {
+      cachedAuth = getAuth(cachedApp);
     }
 
-    return { app, firestore, auth };
+    return { 
+      app: cachedApp, 
+      firestore: cachedFirestore, 
+      auth: cachedAuth 
+    };
   } catch (error) {
     console.error("❌ Firebase Initialization Error:", error);
     return { app: null, firestore: null, auth: null };
