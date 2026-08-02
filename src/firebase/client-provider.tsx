@@ -1,44 +1,34 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
 /**
  * مزود Firebase للعميل (Client Provider).
- * يضمن تهيئة مستقرة لمرة واحدة فقط ومعالجة حالة الانتظار بشكل صحيح.
+ * يضمن تشغيل التهيئة مرة واحدة فقط في المتصفح ويمنع أخطاء الـ Hydration والـ Assertion.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
-  const [instances, setInstances] = useState<{
-    app: any;
-    firestore: any;
-    auth: any;
-  } | null>(null);
-  
-  const initialized = useRef(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // نمنع التهيئة المزدوجة حتى في وضع React Strict Mode
-    if (initialized.current) return;
-    
-    const firebase = initializeFirebase();
-    
-    if (firebase.app && firebase.firestore && firebase.auth) {
-      setInstances({
-        app: firebase.app,
-        firestore: firebase.firestore,
-        auth: firebase.auth,
-      });
-      initialized.current = true;
-    }
+    // تفعيل الحالة عند التحميل في المتصفح
+    setMounted(true);
   }, []);
 
-  // تمرير القيم للـ Provider (تكون null في أول رندرة فقط قبل الـ useEffect)
+  // منع الرندرة على السيرفر لضمان سلامة كود Firebase
+  if (!mounted) {
+    return <>{children}</>;
+  }
+
+  // جلب النسخ من الـ Singleton العالمي
+  const { app, firestore, auth } = initializeFirebase();
+
   return (
     <FirebaseProvider 
-      firebaseApp={instances?.app || null} 
-      firestore={instances?.firestore || null} 
-      auth={instances?.auth || null}
+      firebaseApp={app} 
+      firestore={firestore} 
+      auth={auth}
     >
       {children}
     </FirebaseProvider>
