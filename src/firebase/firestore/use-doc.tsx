@@ -40,7 +40,7 @@ export function useDoc(docRef: DocumentReference | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: docRef.path || 'firestore_document_sync',
+              path: docRef.path || 'firestore_document',
               operation: 'get'
             });
             errorEmitter.emit('permission-error', permError);

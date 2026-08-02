@@ -1,22 +1,22 @@
 'use client';
 
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, initializeFirestore, memoryLocalCache } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * نظام تهيئة Firebase بنمط النسخة الوحيدة العالمي (Global Singleton Pattern).
- * يعالج هذا النظام خطأ INTERNAL ASSERTION FAILED (ID: ca9) عبر منع إعادة التهيئة المتكررة.
+ * نظام تهيئة Firebase بنمط النسخة الوحيدة (Singleton).
+ * يعالج خطأ INTERNAL ASSERTION FAILED (ID: ca9) عبر الاعتماد على نظام إدارة النسخ المدمج في Firebase.
  */
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
     return { app: null, firestore: null, auth: null };
   }
 
-  // استخدام كائن globalThis لضمان بقاء النسخ حية ومستقرة عبر عمليات Hot Reload
   const g = globalThis as any;
 
+  // استرجاع النسخ إذا كانت مهيأة مسبقاً (Fast Refresh / HMR)
   if (g.__FIREBASE_READY__) {
     return {
       app: g.__FIREBASE_APP__,
@@ -26,26 +26,17 @@ export function initializeFirebase() {
   }
 
   try {
-    // 1. إدارة نسخة التطبيق
-    const existingApps = getApps();
-    const app = existingApps.length > 0 ? existingApps[0] : initializeApp(firebaseConfig);
+    // 1. تهيئة التطبيق أو استرجاع الحالي
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 2. إدارة نسخة Firestore (النقطة الحرجة لخطأ ca9)
-    let firestore: Firestore;
-    try {
-      // محاولة التهيئة بالإعدادات المخصصة مرة واحدة فقط
-      firestore = initializeFirestore(app, {
-        localCache: memoryLocalCache(),
-      });
-    } catch (e) {
-      // في حال كان Firestore مهيأ مسبقاً (HMR)، نسترجع النسخة الافتراضية
-      firestore = getFirestore(app);
-    }
+    // 2. استرجاع Firestore بنمط آمن
+    // ملاحظة: نستخدم getFirestore بدلاً من initializeFirestore لمنع تعارض ca9
+    const firestore = getFirestore(app);
 
-    // 3. إدارة نسخة المصادقة
+    // 3. استرجاع Auth
     const auth = getAuth(app);
 
-    // تخزين النسخ عالمياً لمنع التكرار
+    // تخزين النسخ عالمياً
     g.__FIREBASE_APP__ = app;
     g.__FIREBASE_FIRESTORE__ = firestore;
     g.__FIREBASE_AUTH__ = auth;
@@ -53,9 +44,8 @@ export function initializeFirebase() {
 
     return { app, firestore, auth };
   } catch (error) {
-    console.error("Critical Firebase Singleton Init Error:", error);
-    // استعادة أخيرة في حالة الفشل
-    const app = initializeApp(firebaseConfig);
+    console.error("Firebase Init Error:", error);
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 
       firestore: getFirestore(app), 

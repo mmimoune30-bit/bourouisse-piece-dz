@@ -19,7 +19,7 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // التأكد من توفر الاستعلام واستقرار نسخة Firestore
+    // التحقق من استقرار الاستعلام وجاهزية Firestore
     if (!query) {
       setLoading(false);
       return;
@@ -43,15 +43,12 @@ export function useCollection(query: Query | null) {
         (err) => {
           if (!isSubscribed) return;
           
-          // معالجة منظمة لأخطاء الصلاحيات
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: 'firestore_collection_sync',
+              path: 'firestore_collection',
               operation: 'list'
             });
             errorEmitter.emit('permission-error', permError);
-          } else if (err.code !== 'cancelled') {
-            console.warn("Firestore Real-time Sync Warning:", err.message);
           }
           
           setError(err);
@@ -65,7 +62,6 @@ export function useCollection(query: Query | null) {
       };
     } catch (e: any) {
       if (isSubscribed) {
-        setError(e);
         setLoading(false);
       }
     }
