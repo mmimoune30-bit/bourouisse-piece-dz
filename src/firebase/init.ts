@@ -6,60 +6,63 @@ import {
   initializeFirestore, 
   memoryLocalCache, 
   persistentLocalCache,
-  Firestore,
-  clearIndexedDbPersistence
+  Firestore
 } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * تهيئة Firebase بنمط Singleton فائق الاستقرار لمعالجة خطأ ca9 وانهيار العميل في Next.js.
+ * Robust Singleton initialization to prevent Firestore "Unexpected state (ID: ca9)" error.
+ * This error is caused by attempting to initialize Firestore multiple times with conflicting persistence settings,
+ * which often happens during Next.js Fast Refresh / HMR.
  */
 export function initializeFirebase() {
-  // 1. التأكد من أننا في جهة العميل
+  // Ensure this only runs on the client side
   if (typeof window === 'undefined') {
     return { app: null, firestore: null, auth: null };
   }
 
-  const g = globalThis as any;
+  // Use globalThis to store instances persistently across HMR cycles.
+  // This is more reliable than local variables in Next.js development mode.
+  const global = globalThis as any;
 
-  // 2. استعادة النسخ المستقرة من الكائن العالمي إذا كانت موجودة (HMR Resilience)
-  if (g.__FIREBASE_STABLE_INSTANCES__) {
-    return g.__FIREBASE_STABLE_INSTANCES__;
+  if (global.__FIREBASE_STORE__) {
+    return global.__FIREBASE_STORE__;
   }
 
   try {
-    // 3. تهيئة التطبيق (Idempotent)
+    // 1. Initialize App (Idempotent check)
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 4. تهيئة Firestore بدقة (حل خطأ ca9)
+    // 2. Initialize Firestore with memory cache in development
+    // ca9 error happens when IndexedDB is locked by a previous instance.
     let firestore: Firestore;
     
-    // فحص بيئة العمل
-    const isDev = process.env.NODE_ENV === 'development';
-
     try {
-      // استخدام ذاكرة التخزين المؤقت في التطوير يمنع تعارض IndexedDB (ca9 error)
+      const isDev = process.env.NODE_ENV === 'development';
+      
+      // Initialize with specific cache settings to prevent engine collisions
       firestore = initializeFirestore(app, {
         localCache: isDev ? memoryLocalCache() : persistentLocalCache({}),
       });
     } catch (e) {
-      // إذا فشلت التهيئة المخصصة (بسبب وجودها مسبقاً)، نستخدم النسخة الافتراضية
+      // Fallback: If initializeFirestore fails because it's already initialized,
+      // get the existing instance to avoid assertion failures.
       firestore = getFirestore(app);
     }
 
-    // 5. تهيئة Auth
+    // 3. Initialize Auth
     const auth = getAuth(app);
 
     const instances = { app, firestore, auth };
     
-    // تخزين عالمي لضمان بقاء المراجع حية ومستقرة تماماً
-    g.__FIREBASE_STABLE_INSTANCES__ = instances;
+    // Store globally to ensure absolute singleton behavior
+    global.__FIREBASE_STORE__ = instances;
 
     return instances;
   } catch (error) {
-    console.error("Critical Firebase Init Fail:", error);
-    // العودة للوضع الافتراضي في حالة الفشل القصوى لتجنب كسر التطبيق
+    console.error("Critical Firebase Initialization Failure:", error);
+    // Extreme fallback to keep the app alive
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 
