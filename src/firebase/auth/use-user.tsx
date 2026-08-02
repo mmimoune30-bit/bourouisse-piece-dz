@@ -22,12 +22,16 @@ export function useUser() {
       return;
     }
 
+    let isMounted = true;
+
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+      if (!isMounted) return;
       setUser(u);
       
       if (u) {
         // الاستماع لتغييرات الملف الشخصي في Firestore
         const unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
+          if (!isMounted) return;
           if (snap.exists()) {
             setProfile(snap.data());
           } else {
@@ -35,7 +39,8 @@ export function useUser() {
           }
           setLoading(false);
         }, (error) => {
-          console.error("Error fetching user profile:", error);
+          if (!isMounted) return;
+          console.warn("Profile Listener Error:", error.message);
           setLoading(false);
         });
 
@@ -46,7 +51,10 @@ export function useUser() {
       }
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+      isMounted = false;
+      unsubscribeAuth();
+    };
   }, [auth, firestore]);
 
   return { user, profile, loading };

@@ -42,6 +42,8 @@ export function useCollection(query: Query | null) {
       },
       (err) => {
         if (!isSubscribed) return;
+        
+        // معالجة صامتة لخطأ انقطاع الاتصال أو الصلاحيات أثناء التطوير
         if (err.code === 'permission-denied') {
           const permError = new FirestorePermissionError({
             path: 'firestore_collection',
@@ -49,6 +51,7 @@ export function useCollection(query: Query | null) {
           });
           errorEmitter.emit('permission-error', permError);
         }
+        
         setError(err);
         setLoading(false);
       }

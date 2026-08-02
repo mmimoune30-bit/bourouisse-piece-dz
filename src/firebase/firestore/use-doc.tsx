@@ -24,24 +24,36 @@ export function useDoc(docRef: DocumentReference | null) {
       return;
     }
 
+    let isSubscribed = true;
+
     const unsubscribe = onSnapshot(
       docRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
+        if (!isSubscribed) return;
         setData(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
         setLoading(false);
+        setError(null);
       },
       async (err) => {
-        const permError = new FirestorePermissionError({
-          path: docRef.path || 'firestore_doc_query',
-          operation: 'get'
-        });
-        errorEmitter.emit('permission-error', permError);
+        if (!isSubscribed) return;
+        
+        if (err.code === 'permission-denied') {
+          const permError = new FirestorePermissionError({
+            path: docRef.path || 'firestore_doc_query',
+            operation: 'get'
+          });
+          errorEmitter.emit('permission-error', permError);
+        }
+        
         setError(err);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      isSubscribed = false;
+      unsubscribe();
+    };
   }, [docRef]);
 
   return { data, loading, error };
