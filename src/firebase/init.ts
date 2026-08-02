@@ -1,71 +1,55 @@
-'use client';
-
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { 
-  getFirestore, 
   initializeFirestore, 
-  memoryLocalCache,
-  Firestore
-} from 'firebase/firestore';
-import { getAuth, Auth } from 'firebase/auth';
-import { firebaseConfig } from './config';
+  getFirestore, 
+  Firestore, 
+  memoryLocalCache 
+} from "firebase/firestore";
+import { getAuth, Auth } from "firebase/auth";
+import { firebaseConfig } from "./config";
 
 /**
- * Robust Singleton initialization for Firebase.
- * Fixes "INTERNAL ASSERTION FAILED (ID: ca9)" by ensuring strict single initialization
- * of the Virtual Engine and consistent caching settings.
+ * @fileOverview تهيئة خدمات Firebase بنمط Singleton صارم.
+ * يحل هذا الملف مشكلتين:
+ * 1. auth/invalid-api-key: عبر استخدام الإعدادات المباشرة من config.ts.
+ * 2. ID: ca9: عبر استخدام الذاكرة المؤقتة وتثبيت النسخ في globalThis.
  */
 
-interface FirebaseInstances {
-  app: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+const globalForFirebase = globalThis as unknown as {
+  app: FirebaseApp | undefined;
+  db: Firestore | undefined;
+  auth: Auth | undefined;
+};
+
+// تهيئة التطبيق (استخدام النسخة الموجودة أو إنشاء واحدة جديدة)
+export const app = globalForFirebase.app ?? (getApps().length ? getApp() : initializeApp(firebaseConfig));
+
+// تهيئة Firestore مع حماية ضد إعادة التهيئة (خطأ ca9)
+export const db = globalForFirebase.db ?? (() => {
+  try {
+    // محاولة إنشاء Firestore مع ذاكرة مؤقتة لمنع تعارضات الملفات في بيئة التطوير
+    return initializeFirestore(app, {
+      localCache: memoryLocalCache(),
+    });
+  } catch (e) {
+    // في حال كان Firestore مهيأ مسبقاً (أثناء Fast Refresh)
+    return getFirestore(app);
+  }
+})();
+
+// تهيئة Auth
+export const auth = globalForFirebase.auth ?? getAuth(app);
+
+// تخزين النسخ عالمياً لمنع التكرار المسبب للأخطاء
+if (typeof window !== "undefined") {
+  globalForFirebase.app = app;
+  globalForFirebase.db = db;
+  globalForFirebase.auth = auth;
 }
 
-export function initializeFirebase(): FirebaseInstances {
-  if (typeof window === 'undefined') {
-    return { app: null as any, firestore: null as any, auth: null as any };
-  }
-
-  const global = globalThis as any;
-
-  // 1. Check if we already have a fully initialized instances in this session
-  if (global.__FIREBASE_STORE__) {
-    return global.__FIREBASE_STORE__;
-  }
-
-  try {
-    // 2. Initialize or retrieve the Firebase App
-    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-
-    // 3. Initialize Firestore
-    // To prevent ID: ca9, we MUST NOT call initializeFirestore if it's already touched by getFirestore
-    // or call it with inconsistent settings during HMR.
-    let firestore: Firestore;
-    
-    try {
-      // Use memory-only cache in development to avoid persistence locks causing ca9
-      firestore = initializeFirestore(app, {
-        localCache: memoryLocalCache(),
-      });
-    } catch (e) {
-      // Fallback to getFirestore if initializeFirestore was already called
-      firestore = getFirestore(app);
-    }
-
-    // 4. Initialize Auth
-    const auth = getAuth(app);
-
-    const instances = { app, firestore, auth };
-    
-    // 5. Store globally to prevent Fast Refresh from breaking the virtual engine state
-    global.__FIREBASE_STORE__ = instances;
-
-    return instances;
-  } catch (error) {
-    console.error("Firebase Initialization Critical Failure:", error);
-    // Absolute fallback to prevent UI crash
-    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-    return { app, firestore: getFirestore(app), auth: getAuth(app) };
-  }
+/**
+ * دالة مساعدة للحصول على كافة النسخ دفعة واحدة
+ */
+export function initializeFirebase() {
+  return { app, firestore: db, auth };
 }
