@@ -159,11 +159,9 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      {/* Reduced padding-top from 230px/270px to 160px/180px */}
-      <main className="flex-grow pt-[160px] md:pt-[180px] pb-12">
+      <main className="flex-grow pt-[190px] md:pt-[210px] pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           
-          {/* Reduced margin-bottom from mb-6 to mb-3 */}
           <div className="mb-3 text-center space-y-1">
             <h1 className={cn("text-xl md:text-3xl text-zinc-800 tracking-tight leading-relaxed uppercase px-4", titleFont)}>
               {product.name}
@@ -173,7 +171,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          {/* Reduced gap from gap-8 to gap-4 */}
           <div className={cn("grid grid-cols-1 lg:grid-cols-4 gap-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
             <div className="lg:col-span-1 space-y-4">
@@ -251,7 +248,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                    <h2 className={cn("text-xl md:text-2xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
                       {t.specs[lang]}
                    </h2>
-                   {/* Reduced space-y from 8 to 4 and gap from 12 to 6 */}
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 text-sm">
                       <div className="space-y-2">
                          <div className={cn("flex justify-between border-b pb-2 items-center", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>

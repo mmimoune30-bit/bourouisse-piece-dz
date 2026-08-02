@@ -102,7 +102,7 @@ export default function Home() {
   const t = {
     exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
     featured: { AR: "منتجات مميزة", EN: "Featured Products", FR: "Produits Vedettes" },
-    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Parts", FR: "Pièces Récentes" },
+    latest: { AR: "أحدث قطع الغيار المضافة", EN: "Latest Parts", FR: "Pièces الرécentes" },
     recommended: { AR: "منتجات موصى بها", EN: "Recommended", FR: "Recommandés" },
     viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" },
     browseCatalog: { AR: "تصفح الكتالوج", EN: "Browse Catalog", FR: "Parcourir" },
@@ -123,7 +123,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-zinc-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[165px] md:pt-[175px]">
+      <main className="flex-grow pt-[190px] md:pt-[210px]">
         {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
           <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
