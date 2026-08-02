@@ -16,9 +16,9 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // فحص أمان: منع التنفيذ على السيرفر أو بدون استعلام صالح
+    // Safety check: Don't run on server or without a valid query
     if (!query || typeof window === 'undefined') {
-      setLoading(false);
+      if (!query) setLoading(false);
       return;
     }
 

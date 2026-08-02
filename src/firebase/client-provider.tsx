@@ -24,11 +24,11 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
       setIsReady(true);
     } catch (error) {
       console.error("Critical Client Provider Error:", error);
-      setIsReady(true); // Ensure app doesn't hang in a black hole
+      setIsReady(true); 
     }
   }, []);
 
-  // Prevent white screen - show a light, branded loading state while establishing secure core
+  // Show a branded loading state while establishing secure core
   if (!isReady || !instancesRef.current?.app) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">

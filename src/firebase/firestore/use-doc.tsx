@@ -16,9 +16,9 @@ export function useDoc(docRef: DocumentReference | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // فحص أمان: ضمان وجود المرجع واستقرار بيئة العميل
+    // Safety check: Ensure ref exists and we are in client environment
     if (!docRef || typeof window === 'undefined') {
-      setLoading(false);
+      if (!docRef) setLoading(false);
       return;
     }
 
