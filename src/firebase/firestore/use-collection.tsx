@@ -10,16 +10,13 @@ import {
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
-/**
- * Hook for listening to collections with protection against initialization race conditions.
- */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Safety check: ensure query exists and we are in the browser
+    // فحص أمان: منع التنفيذ على السيرفر أو بدون استعلام صالح
     if (!query || typeof window === 'undefined') {
       setLoading(false);
       return;
@@ -45,7 +42,7 @@ export function useCollection(query: Query | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: 'firestore_collection_listener',
+              path: 'collection_stream',
               operation: 'list'
             });
             errorEmitter.emit('permission-error', permError);

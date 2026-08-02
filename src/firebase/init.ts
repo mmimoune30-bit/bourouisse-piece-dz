@@ -1,68 +1,67 @@
 'use client';
 
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { 
   getFirestore, 
   initializeFirestore, 
   memoryLocalCache, 
-  Firestore,
-  clearIndexedDbPersistence
+  clearIndexedDbPersistence,
+  Firestore
 } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * Advanced Singleton Initialization for Firebase to fix ID: ca9.
- * Implements a strict cleanup and initialization pattern for stable HMR.
+ * تهيئة Firebase بنمط Singleton فائق الاستقرار لمعالجة خطأ ca9 وانهيار العميل.
  */
 export function initializeFirebase() {
+  // 1. التأكد من أننا في جهة العميل
   if (typeof window === 'undefined') {
     return { app: null, firestore: null, auth: null };
   }
 
   const g = globalThis as any;
 
-  // 1. Return stable instances if already initialized in this session
+  // 2. استعادة النسخ المستقرة إذا كانت موجودة
   if (g.__FIREBASE_STABLE_INSTANCES__) {
     return g.__FIREBASE_STABLE_INSTANCES__;
   }
 
   try {
-    // 2. Setup Firebase App (Idempotent)
+    // 3. تهيئة التطبيق (Idempotent)
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. Clear persistence to avoid ca9 "Virtual Engine" conflicts
-    // This is called asynchronously but will reset the DB state for this device.
-    const tempDb = getFirestore(app);
-    clearIndexedDbPersistence(tempDb).catch(() => {});
-
-    // 4. Initialize Firestore with Memory Cache for maximum stability in development
+    // 4. تهيئة Firestore بدقة
     let firestore: Firestore;
-    if (getApps().length > 1) {
-       // If app was already there, don't try to initialize with settings again
-       firestore = getFirestore(app);
-    } else {
-       try {
-         firestore = initializeFirestore(app, {
-           localCache: memoryLocalCache(),
-         });
-       } catch (e) {
-         firestore = getFirestore(app);
-       }
+    
+    // محاولة تنظيف الذاكرة القديمة بصمت لحل تعارضات ca9
+    try {
+      const tempDb = getFirestore(app);
+      clearIndexedDbPersistence(tempDb).catch(() => {});
+    } catch (e) {}
+
+    // استخدام الذاكرة المؤقتة (Memory Cache) هو الحل الأضمن لـ Studio/HMR
+    try {
+      firestore = initializeFirestore(app, {
+        localCache: memoryLocalCache(),
+      });
+    } catch (e) {
+      // إذا فشلت التهيئة المخصصة (بسبب وجودها مسبقاً)، نستخدم النسخة الافتراضية
+      firestore = getFirestore(app);
     }
 
-    // 5. Handle Auth
+    // 5. تهيئة Auth
     const auth = getAuth(app);
 
     const instances = { app, firestore, auth };
     
-    // Store in global scope to survive HMR
+    // تخزين عالمي لضمان بقاء المراجع حية أثناء الـ Refresh
     g.__FIREBASE_STABLE_INSTANCES__ = instances;
 
     return instances;
   } catch (error) {
-    console.error("Firebase Initialization Critical Error:", error);
-    // Emergency Fallback
+    console.error("Firebase Sync Error:", error);
+    // العودة للوضع الافتراضي في حالة الفشل لتجنب كسر التطبيق
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 

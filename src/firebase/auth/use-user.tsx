@@ -5,9 +5,6 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useAuth, useFirestore } from '../provider';
 
-/**
- * خطاف إدارة المستخدم - النسخة المؤمنة ضد Hot Reload.
- */
 export function useUser() {
   const { auth } = useAuth();
   const { firestore } = useFirestore();
@@ -16,8 +13,8 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // التأكد من توفر الخدمات قبل بدء المراقبة
-    if (!auth || !firestore) {
+    // تأمين: الخروج بصمت إذا لم تكن الخدمات جاهزة
+    if (!auth || !firestore || typeof window === 'undefined') {
       return;
     }
 
@@ -29,16 +26,13 @@ export function useUser() {
       setUser(u);
       
       if (u) {
-        // مراقبة الملف الشخصي فقط عند توفر مستخدم
         try {
           unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
             if (!isMounted) return;
             setProfile(snap.exists() ? snap.data() : null);
             setLoading(false);
           }, (error) => {
-            if (isMounted) {
-              setLoading(false);
-            }
+            if (isMounted) setLoading(false);
           });
         } catch (e) {
           if (isMounted) setLoading(false);

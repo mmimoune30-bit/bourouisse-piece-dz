@@ -10,16 +10,13 @@ import {
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
-/**
- * Hook for listening to a single document with protection against internal state conflicts.
- */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Safety check: ensure ref exists and we are in the browser
+    // فحص أمان: ضمان وجود المرجع واستقرار بيئة العميل
     if (!docRef || typeof window === 'undefined') {
       setLoading(false);
       return;
@@ -41,7 +38,7 @@ export function useDoc(docRef: DocumentReference | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: docRef.path || 'firestore_document_listener',
+              path: docRef.path || 'document_stream',
               operation: 'get'
             });
             errorEmitter.emit('permission-error', permError);
