@@ -11,15 +11,15 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * Defensive Document Hook.
- * Stabilizes document listeners to prevent internal SDK assertion errors during HMR.
+ * الخطاف الدفاعي لجلب مستند واحد.
+ * يحافظ على استقرار المستمعين لمنع أخطاء Assertion في بيئة Next.js.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  const activePathRef = useRef<string | null>(null);
+  const activePath = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -32,16 +32,16 @@ export function useDoc(docRef: DocumentReference | null) {
     }
 
     const path = docRef.path;
-    if (activePathRef.current === path) return;
+    if (activePath.current === path) return;
 
-    // Cleanup previous listener before starting a new one
+    // تنظيف المستمع السابق لمنع تعارض Virtual Engine
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
 
     let isMounted = true;
-    activePathRef.current = path;
+    activePath.current = path;
     setLoading(true);
 
     try {
@@ -58,7 +58,7 @@ export function useDoc(docRef: DocumentReference | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: docRef.path || 'document_reference',
+              path: docRef.path || 'document',
               operation: 'get'
             });
             errorEmitter.emit('permission-error', permError);
@@ -73,7 +73,7 @@ export function useDoc(docRef: DocumentReference | null) {
 
       return () => {
         isMounted = false;
-        activePathRef.current = null;
+        activePath.current = null;
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
