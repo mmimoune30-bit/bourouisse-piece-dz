@@ -16,22 +16,30 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
   
   // نستخدم ref للتأكد من أن التهيئة تتم مرة واحدة فقط حتى في حالة Strict Mode
+  // هذا ضروري جداً لتجنب أخطاء Firestore Assertion الناتجة عن التهيئة المزدوجة.
   const initialized = useRef(false);
 
   useEffect(() => {
     if (initialized.current) return;
     
-    // يتم التنفيذ فقط في المتصفح بعد الهيدريشن
-    const firebase = initializeFirebase();
-    setInstances({
-      app: firebase.app || null,
-      firestore: firebase.firestore || null,
-      auth: firebase.auth || null,
-    });
-    
-    initialized.current = true;
+    try {
+      // يتم التنفيذ فقط في المتصفح بعد الهيدريشن
+      const firebase = initializeFirebase();
+      
+      if (firebase.app && firebase.firestore && firebase.auth) {
+        setInstances({
+          app: firebase.app,
+          firestore: firebase.firestore,
+          auth: firebase.auth,
+        });
+        initialized.current = true;
+      }
+    } catch (err) {
+      console.error("Firebase Client Provider failed to initialize:", err);
+    }
   }, []);
 
+  // إذا لم تكتمل التهيئة بعد، نعرض الأبناء مع قيم فارغة لتجنب كسر الهيدريشن
   return (
     <FirebaseProvider 
       firebaseApp={instances?.app || null} 

@@ -1,13 +1,22 @@
 'use client';
 
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { 
+  getFirestore, 
+  Firestore, 
+  initializeFirestore, 
+  memoryLocalCache 
+} from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
  * تهيئة Firebase بشكل آمن ومستقر لتجنب أخطاء Assertion (ID: ca9) 
  * الناتجة عن التكرار في بيئة Next.js (Fast Refresh).
+ * 
+ * الحل المطبق:
+ * 1. استخدام Singleton صارم عبر كائن 'window' لضمان عدم إعادة الإنشاء عند تحديث الكود (HMR).
+ * 2. استخدام memoryLocalCache() لتعطيل محاولات الوصول لـ IndexedDB التي تسبب غالباً تعارضات الحالة.
  */
 
 export function initializeFirebase() {
@@ -29,7 +38,16 @@ export function initializeFirebase() {
 
     // 2. تهيئة Firestore (Singleton) - هذا هو الجزء الحساس للخطأ ca9
     if (!g.__FIREBASE_FIRESTORE__) {
-      g.__FIREBASE_FIRESTORE__ = getFirestore(g.__FIREBASE_APP__);
+      try {
+        // نستخدم initializeFirestore مع memoryLocalCache لتجنب مشاكل الوصول لملفات IndexedDB
+        // التي تسبب خطأ "Unexpected state (ID: ca9)" عند فتح تبويبات متعددة أو إعادة التحميل السريع.
+        g.__FIREBASE_FIRESTORE__ = initializeFirestore(g.__FIREBASE_APP__, {
+          localCache: memoryLocalCache(),
+        });
+      } catch (innerError) {
+        // إذا فشلت التهيئة الصريحة (لأنها تمت بالفعل داخلياً مثلاً)، نقوم بجلب النسخة الافتراضية
+        g.__FIREBASE_FIRESTORE__ = getFirestore(g.__FIREBASE_APP__);
+      }
     }
 
     // 3. تهيئة Auth (Singleton)
@@ -43,7 +61,7 @@ export function initializeFirebase() {
       auth: g.__FIREBASE_AUTH__ 
     };
   } catch (error) {
-    console.error("Firebase Initialization Error:", error);
+    // في حالة حدوث خطأ كارثي، نحاول إرجاع أي نسخ تم إنشاؤها بالفعل
     return {
       app: g.__FIREBASE_APP__ || null,
       firestore: g.__FIREBASE_FIRESTORE__ || null,
