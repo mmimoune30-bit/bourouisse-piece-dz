@@ -1,67 +1,75 @@
 'use client';
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { 
   getFirestore, 
   initializeFirestore, 
   memoryLocalCache, 
   persistentLocalCache,
-  Firestore
+  Firestore,
+  connectFirestoreEmulator
 } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * Robust Singleton initialization to prevent Firestore "Unexpected state (ID: ca9)" error.
- * This error is caused by attempting to initialize Firestore multiple times with conflicting persistence settings,
- * which often happens during Next.js Fast Refresh / HMR.
+ * Robust Singleton initialization for Firebase services.
+ * Specifically handles Next.js Fast Refresh to prevent "Unexpected state (ID: ca9)" errors
+ * by storing instances in globalThis.
  */
-export function initializeFirebase() {
-  // Ensure this only runs on the client side
+
+interface FirebaseInstances {
+  app: FirebaseApp;
+  firestore: Firestore;
+  auth: Auth;
+}
+
+export function initializeFirebase(): FirebaseInstances {
+  // SSR Safety
   if (typeof window === 'undefined') {
-    return { app: null, firestore: null, auth: null };
+    return {} as FirebaseInstances;
   }
 
-  // Use globalThis to store instances persistently across HMR cycles.
   const global = globalThis as any;
 
+  // 1. Check if we already have stable instances stored globally
   if (global.__FIREBASE_STORE__) {
     return global.__FIREBASE_STORE__;
   }
 
   try {
-    // 1. Initialize App (Idempotent check)
+    // 2. Initialize or retrieve Firebase App
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 2. Initialize Firestore with memory cache in development
+    // 3. Initialize Firestore with absolute singleton logic
     let firestore: Firestore;
     
+    // Try to get the existing instance first to avoid re-initialization conflicts
     try {
+      firestore = getFirestore(app);
+    } catch (e) {
+      // If no instance exists, initialize with specific cache settings
       const isDev = process.env.NODE_ENV === 'development';
-      
-      // Force memory cache in dev to stop ca9 errors (IndexedDB locking)
       firestore = initializeFirestore(app, {
         localCache: isDev ? memoryLocalCache() : persistentLocalCache({}),
+        // Ensure experimentalForceLongPolling is NOT set here unless explicitly needed, 
+        // as it can sometimes trigger internal engine issues.
       });
-    } catch (e) {
-      // Fallback: If initializeFirestore fails because it's already initialized,
-      // get the existing instance to avoid assertion failures.
-      firestore = getFirestore(app);
     }
 
-    // 3. Initialize Auth
+    // 4. Initialize Auth
     const auth = getAuth(app);
 
     const instances = { app, firestore, auth };
     
-    // Store globally to ensure absolute singleton behavior
+    // Store globally to ensure absolute singleton behavior across Fast Refresh cycles
     global.__FIREBASE_STORE__ = instances;
 
     return instances;
   } catch (error) {
     console.error("Critical Firebase Initialization Failure:", error);
     // Extreme fallback to keep the app alive
-    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const firestore = getFirestore(app);
     const auth = getAuth(app);
     return { app, firestore, auth };

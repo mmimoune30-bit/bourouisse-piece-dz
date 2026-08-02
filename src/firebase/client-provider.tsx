@@ -5,8 +5,8 @@ import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
 /**
- * Safe Firebase Provider that guards against hydration errors and Firestore ca9 crashes.
- * Uses a global singleton pattern to maintain stable instances during Next.js Fast Refresh.
+ * Enhanced Firebase Client Provider.
+ * Guarantees that Firebase services are initialized exactly once and only on the client.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -17,26 +17,36 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
 
   useEffect(() => {
-    // Execution happens strictly on client-side after mount to ensure hydration safety
-    try {
-      const instances = initializeFirebase();
-      instancesRef.current = instances;
+    // Execution happens strictly on client-side after mount to ensure hydration and singleton safety
+    if (!instancesRef.current) {
+      try {
+        const instances = initializeFirebase();
+        if (instances.app) {
+          instancesRef.current = instances;
+          setIsReady(true);
+        }
+      } catch (error) {
+        console.error("Firebase Client Provider failed to boot:", error);
+        // We still set ready to allow standard error handling to take over
+        setIsReady(true);
+      }
+    } else {
       setIsReady(true);
-    } catch (error) {
-      console.error("Critical Client Provider Error:", error);
-      setIsReady(true); 
     }
   }, []);
 
-  // Show a branded loading state while establishing secure core
+  // Show a branded, stable loading state while core is booting
   if (!isReady || !instancesRef.current?.app) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-white/40 font-black tracking-widest text-[8px] uppercase">
-            BOUROUISSE - Establishing Secure Data Core...
-          </span>
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-center space-y-2">
+            <h2 className="text-white font-black tracking-widest text-lg uppercase">BOUROUISSE</h2>
+            <p className="text-white/40 text-[10px] uppercase tracking-widest animate-pulse">
+              Establishing Secure Connection...
+            </p>
+          </div>
         </div>
       </div>
     );

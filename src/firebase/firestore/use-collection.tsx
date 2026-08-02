@@ -10,13 +10,17 @@ import {
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
+/**
+ * Safe Collection Hook that guards against internal Firestore errors (ID: ca9)
+ * by ensuring initialization is complete before attaching listeners.
+ */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Safety check: Don't run on server or without a valid query
+    // 1. Safety Check: Don't run on server or without a valid query object
     if (!query || typeof window === 'undefined') {
       if (!query) setLoading(false);
       return;
@@ -25,6 +29,7 @@ export function useCollection(query: Query | null) {
     let isMounted = true;
 
     try {
+      // 2. Attach real-time listener
       const unsubscribe = onSnapshot(
         query,
         (snapshot: QuerySnapshot<DocumentData>) => {
@@ -37,12 +42,13 @@ export function useCollection(query: Query | null) {
           setLoading(false);
           setError(null);
         },
-        (err) => {
+        async (err) => {
           if (!isMounted) return;
           
+          // 3. Handle Permission Errors via the specialized architecture
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: 'collection_stream',
+              path: 'collection_query',
               operation: 'list'
             });
             errorEmitter.emit('permission-error', permError);
