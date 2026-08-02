@@ -1,7 +1,11 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useFirestore, useDoc } from "@/firebase";
+import { doc } from "firebase/firestore";
+import Image from "next/image";
 
 interface SiteLogoProps {
   className?: string;
@@ -17,20 +21,35 @@ export default function SiteLogo({
   showTagline = true 
 }: SiteLogoProps) {
   const [isArabic, setIsArabic] = useState(false);
+  const { firestore } = useFirestore();
+  const { data: settings } = useDoc(firestore ? doc(firestore, "site_settings", "global") : null);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIsArabic((prev) => !prev);
-    }, 10000); // يتبدل كل 10 ثوانٍ
+    }, 10000); 
     return () => clearInterval(interval);
   }, []);
 
+  // إذا كان هناك شعار صورة مرفوع من لوحة التحكم، نعرضه هو فقط
+  if (settings?.logoUrl) {
+    return (
+      <div className={cn("flex items-center justify-center min-w-[160px]", className)}>
+        <Image 
+          src={settings.logoUrl} 
+          alt="Site Logo" 
+          width={220} 
+          height={60} 
+          className="object-contain max-h-[50px] md:max-h-[60px]" 
+          priority 
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex flex-col items-center gap-0 min-w-[220px] relative overflow-hidden", className)} dir="ltr">
-      {/* Container for logo */}
       <div className="relative w-full h-[32px] md:h-[42px]">
-        
-        {/* English Version */}
         <div 
           className={cn(
             "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
@@ -45,7 +64,6 @@ export default function SiteLogo({
           </span>
         </div>
 
-        {/* Arabic Version */}
         <div 
           className={cn(
             "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
@@ -58,7 +76,6 @@ export default function SiteLogo({
         </div>
       </div>
       
-      {/* Tagline */}
       {showTagline && (
         <div className="flex flex-col items-center mt-0 w-full border-t border-black/5 pt-0.5">
           <span className={cn("text-[9px] md:text-[11px] font-black text-center leading-none", subtextClassName || "text-black/80")} dir="rtl">

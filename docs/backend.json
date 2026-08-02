@@ -27,52 +27,24 @@
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
-    "FeaturedStore": {
-      "title": "حملة إعلانية لمتجر",
-      "description": "بيانات المتجر المميز أو الحصري في المساحات الإعلانية",
+    "CategoryMetadata": {
+      "title": "بيانات التصنيف",
+      "description": "الصور والروابط المخصصة لكل تصنيف قطع غيار",
       "type": "object",
       "properties": {
-        "storeId": { "type": "string" },
-        "storeName": { "type": "string" },
-        "storeLocation": { "type": "string" },
-        "storeLogo": { "type": "string" },
-        "tier": { "type": "string", "enum": ["Exclusive", "Featured"] },
-        "placement": { "type": "string", "enum": ["Home", "Search", "Both"] },
-        "priority": { "type": "number" },
-        "startDate": { "type": "string", "format": "date" },
-        "endDate": { "type": "string", "format": "date" },
-        "status": { "type": "string", "enum": ["Active", "Paused", "Expired"] }
+        "name_en": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       }
     },
-    "FeaturedProduct": {
-      "title": "منتج مميز",
-      "description": "منتجات مختارة من طرف الإدارة للظهور في الواجهة الرئيسية",
+    "SiteSettings": {
+      "title": "إعدادات الموقع",
+      "description": "الإعدادات العامة والشعار الرئيسي",
       "type": "object",
       "properties": {
-        "productId": { "type": "string" },
-        "productName": { "type": "string" },
-        "productPrice": { "type": "number" },
-        "productImage": { "type": "string" },
-        "sellerName": { "type": "string" },
-        "priority": { "type": "number" },
-        "startDate": { "type": "string", "format": "date" },
-        "endDate": { "type": "string", "format": "date" }
-      }
-    },
-    "SubscriptionRequest": {
-      "title": "طلب اشتراك",
-      "description": "طلب تفعيل أو تجديد باقة من قبل البائع",
-      "type": "object",
-      "properties": {
-        "sellerId": { "type": "string" },
-        "sellerName": { "type": "string" },
-        "planId": { "type": "string" },
-        "type": { "type": "string", "enum": ["New", "Renew", "Upgrade"] },
-        "paymentMethod": { "type": "string" },
-        "receiptUrl": { "type": "string" },
-        "refNumber": { "type": "string" },
-        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "logoUrl": { "type": "string" },
+        "platformName": { "type": "string" },
+        "maintenanceMode": { "type": "boolean" }
       }
     }
   },
@@ -81,9 +53,11 @@
   },
   "firestore": {
     "/users/{userId}": { "schema": "User", "description": "سجلات المستخدمين" },
-    "/featured_stores/{campaignId}": { "schema": "FeaturedStore", "description": "إدارة المتاجر المميزة والحصرية" },
-    "/featured_products/{campaignId}": { "schema": "FeaturedProduct", "description": "إدارة المنتجات المميزة المروجة" },
-    "/subscription_requests/{requestId}": { "schema": "SubscriptionRequest", "description": "طلبات الدفع والتنشيط" },
+    "/category_images/{categoryId}": { "schema": "CategoryMetadata", "description": "صور وأيقونات التصنيفات" },
+    "/site_settings/global": { "schema": "SiteSettings", "description": "إعدادات المنصة والشعار" },
+    "/featured_stores/{campaignId}": { "description": "إدارة المتاجر المميزة والحصرية" },
+    "/featured_products/{campaignId}": { "description": "إدارة المنتجات المميزة المروجة" },
+    "/subscription_requests/{requestId}": { "description": "طلبات الدفع والتنشيط" },
     "/notifications/{notificationId}": { "description": "إشعارات النظام" }
   }
 }

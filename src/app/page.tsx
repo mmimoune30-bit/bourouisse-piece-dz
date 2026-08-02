@@ -33,6 +33,19 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [api, setApi] = useState<CarouselApi>();
   
+  // جلب الصور المخصصة للتصنيفات
+  const { data: categoryImagesData } = useCollection(
+    firestore ? collection(firestore, "category_images") : null
+  );
+
+  const categoryImagesMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    categoryImagesData?.forEach(item => {
+      map[item.name_en] = item.imageUrl;
+    });
+    return map;
+  }, [categoryImagesData]);
+
   const featuredStoresQuery = useMemo(() => {
     if (!firestore) return null;
     return collection(firestore, "featured_stores");
@@ -170,7 +183,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section */}
+        {/* Categories Section (Visual Style with Images) */}
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
@@ -180,18 +193,26 @@ export default function Home() {
                 {t.categories[lang]} <Tags size={18} className="text-secondary" />
              </h2>
           </div>
-          <div className="flex flex-row justify-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
-            {PART_CATEGORIES.map((cat, i) => (
-              <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0">
-                <span className={cn("text-xs md:text-sm text-black bg-white px-3 py-1.5 rounded-lg border hover:border-secondary transition-all block shadow-sm uppercase whitespace-nowrap", titleFont)}>
-                  {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
-                </span>
-              </Link>
-            ))}
+          <div className="flex flex-row justify-center gap-2 overflow-x-auto pb-2 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            {PART_CATEGORIES.map((cat, i) => {
+              const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
+              return (
+                <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0 group">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-white shadow-sm group-hover:border-secondary transition-all relative bg-white">
+                      <Image src={categoryImage} alt={cat.ar} fill className="object-cover transition-transform group-hover:scale-110" />
+                    </div>
+                    <span className={cn("text-[10px] md:text-[11px] text-black uppercase tracking-tight text-center max-w-[80px] leading-tight", titleFont)}>
+                      {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
-        {/* Featured Products Section (Management Collection) */}
+        {/* Featured Products Section */}
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
@@ -258,26 +279,6 @@ export default function Home() {
             )}
           </div>
         </section>
-
-        {/* Featured Products Section - Dark (Recommended) */}
-        {activeFeaturedProducts && activeFeaturedProducts.length > 0 && (
-          <section className="w-full px-1 py-3 bg-zinc-900 text-white rounded-t-2xl mt-4">
-            <div 
-              dir={lang === 'AR' ? "rtl" : "ltr"}
-              className={cn("flex items-center justify-between mb-3 border-b border-white/10 pb-1 px-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}
-            >
-                <h2 className={cn("text-sm md:text-lg flex items-center gap-2 text-secondary uppercase", titleFont)}>
-                   {t.recommended[lang]} <Zap size={18} fill="currentColor" />
-                </h2>
-                <Link href="/catalog"><Button variant="outline" size="sm" className={cn("h-8 border-white/20 text-white text-sm rounded-md uppercase", buttonFont)}>{t.viewAll[lang]}</Button></Link>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2" dir={lang === 'AR' ? "rtl" : "ltr"}>
-              {activeFeaturedProducts.map((p) => (
-                <ProductCard key={p.id} id={p.productId} name={p.productName} price={p.productPrice} image={p.productImage} seller={p.sellerName} category={lang === 'AR' ? 'مميز' : 'Featured'} condition="New" />
-              ))}
-            </div>
-          </section>
-        )}
       </main>
       <Footer />
     </div>
