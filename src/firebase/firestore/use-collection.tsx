@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * خطاف مخصص للاستماع لمجموعات البيانات في Firestore.
- * مضاف إليه حماية لضمان عدم التنفيذ إلا في حال وجود استعلام صالح.
+ * مضاف إليه حماية لمنع العمليات على الـ VE الميت أثناء HMR.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,15 +20,18 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // حماية: إذا لم يكن هناك استعلام أو كنا على السيرفر، لا تفعل شيئاً
     if (!query) {
       setLoading(false);
       return;
     }
 
+    // نستخدم متغير محلي للتحقق من استمرار الـ Mount لمنع تحديث الحالة على مكون ملغى
+    let isSubscribed = true;
+
     const unsubscribe = onSnapshot(
       query,
       (snapshot: QuerySnapshot<DocumentData>) => {
+        if (!isSubscribed) return;
         const items = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -38,7 +41,7 @@ export function useCollection(query: Query | null) {
         setError(null);
       },
       (err) => {
-        // التحقق من أخطاء الصلاحيات وإرسالها للمراقب المركزي
+        if (!isSubscribed) return;
         if (err.code === 'permission-denied') {
           const permError = new FirestorePermissionError({
             path: 'firestore_collection',
@@ -51,7 +54,10 @@ export function useCollection(query: Query | null) {
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      isSubscribed = false;
+      unsubscribe();
+    };
   }, [query]);
 
   return { data, loading, error };
