@@ -1,11 +1,12 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { 
   initializeFirestore, 
   getFirestore, 
   memoryLocalCache,
-  Firestore
+  Firestore,
+  connectFirestoreEmulator
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, Auth, connectAuthEmulator } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
@@ -17,12 +18,18 @@ import { firebaseConfig } from "./config";
  * 3. معالجة استباقية لمحاولات إعادة التهيئة عبر try/catch.
  */
 
-const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL__";
+const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_V4__";
 
-function getFirebaseInstances() {
+interface FirebaseInstances {
+  app: FirebaseApp;
+  db: Firestore;
+  auth: Auth;
+}
+
+function getFirebaseInstances(): FirebaseInstances {
   // الحماية من التنفيذ في جانب السيرفر
   if (typeof window === "undefined") {
-    return { app: null, db: null, auth: null };
+    return { app: null as any, db: null as any, auth: null as any };
   }
 
   const globalScope = globalThis as any;
@@ -41,25 +48,25 @@ function getFirebaseInstances() {
           localCache: memoryLocalCache(),
         });
       } catch (e) {
-        // في حال كان المحرك قيد التشغيل بالفعل، نسترجع النسخة الحالية فقط
+        // في حال كان المحرك قيد التشغيل بالفعل أو فشلت التهيئة المخصصة، نسترجع النسخة الحالية
         db = getFirestore(app);
       }
 
       // 3. تهيئة خدمة الهوية (Auth)
       const auth = getAuth(app);
 
-      // حفظ النسخ في النطاق العالمي لضمان ثبات المراجع
+      // حفظ النسخ في النطاق العالمي لضمان ثبات المراجع طوال فترة جلسة المتصفح
       globalScope[FIREBASE_GLOBAL_KEY] = { app, db, auth };
     } catch (error) {
       console.error("Critical Firebase Failure:", error);
-      return { app: null, db: null, auth: null };
+      throw error;
     }
   }
 
   return globalScope[FIREBASE_GLOBAL_KEY];
 }
 
-// تصدير النسخ المستقرة كـ Singletons
+// استخراج النسخ المستقرة
 const instances = getFirebaseInstances();
 
 export const app = instances.app;
@@ -67,6 +74,6 @@ export const db = instances.db;
 export const auth = instances.auth;
 
 /**
- * وظيفة التهيئة الرئيسية للتصدير
+ * وظيفة التهيئة الرئيسية للتصدير (Idempotent)
  */
 export const initializeFirebase = () => instances;
