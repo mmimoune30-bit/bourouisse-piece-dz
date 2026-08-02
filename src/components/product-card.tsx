@@ -84,11 +84,14 @@ export default function ProductCard({
   const normalFont = lang === 'AR' ? 'font-bold' : 'font-bold';
   const buttonFont = lang === 'AR' ? 'font-black' : 'font-black';
 
+  // Safe image source to prevent Next.js "empty string" error
+  const finalImageSrc = image && image.trim() !== "" ? image : "https://picsum.photos/seed/placeholder/400/400";
+
   return (
     <Card className="group overflow-hidden border-2 border-transparent hover:border-secondary/20 shadow-sm hover:shadow-2xl transition-all duration-500 bg-white rounded-[24px] flex flex-col h-full">
       <Link href={`/products/${id}`} className="block relative aspect-[5/4] overflow-hidden bg-zinc-100 cursor-pointer">
         <Image 
-          src={image} 
+          src={finalImageSrc} 
           alt={name} 
           fill 
           className="object-cover transition-transform duration-700 group-hover:scale-110" 
