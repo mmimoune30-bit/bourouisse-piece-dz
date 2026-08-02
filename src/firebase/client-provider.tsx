@@ -5,8 +5,9 @@ import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
 /**
- * Enhanced Firebase Client Provider.
- * Guarantees that Firebase services are initialized exactly once and only on the client.
+ * Firebase Client Provider.
+ * Ensures Firebase services are initialized exactly once and stable references
+ * are provided to the component tree.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -17,17 +18,14 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
 
   useEffect(() => {
-    // Execution happens strictly on client-side after mount to ensure hydration and singleton safety
+    // Initialize once on component mount (client-side only)
     if (!instancesRef.current) {
       try {
         const instances = initializeFirebase();
-        if (instances.app) {
-          instancesRef.current = instances;
-          setIsReady(true);
-        }
+        instancesRef.current = instances;
+        setIsReady(true);
       } catch (error) {
-        console.error("Firebase Client Provider failed to boot:", error);
-        // We still set ready to allow standard error handling to take over
+        console.error("Firebase Boot Failure:", error);
         setIsReady(true);
       }
     } else {
@@ -35,7 +33,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
     }
   }, []);
 
-  // Show a branded, stable loading state while core is booting
+  // Show a branded loading state while core instances are being established
   if (!isReady || !instancesRef.current?.app) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center">
@@ -44,7 +42,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
           <div className="text-center space-y-2">
             <h2 className="text-white font-black tracking-widest text-lg uppercase">BOUROUISSE</h2>
             <p className="text-white/40 text-[10px] uppercase tracking-widest animate-pulse">
-              Establishing Secure Connection...
+              SYNCING WITH CLOUD...
             </p>
           </div>
         </div>

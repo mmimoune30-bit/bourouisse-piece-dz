@@ -20,21 +20,22 @@ export function useCollection(query: Query | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  // Track current query to avoid duplicate listeners during HMR
-  const activeQueryRef = useRef<string | null>(null);
+  // Track active query to avoid multiple listeners for the same query object
+  const activeQueryIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Validation
+    // SSR Check & Validation
     if (!query || typeof window === 'undefined') {
       if (!query) setLoading(false);
       return;
     }
 
+    // Stabilize query identification
     const queryKey = query.toString();
-    if (activeQueryRef.current === queryKey) return;
+    if (activeQueryIdRef.current === queryKey) return;
 
     let isMounted = true;
-    activeQueryRef.current = queryKey;
+    activeQueryIdRef.current = queryKey;
 
     try {
       const unsubscribe = onSnapshot(
@@ -67,7 +68,7 @@ export function useCollection(query: Query | null) {
 
       return () => {
         isMounted = false;
-        activeQueryRef.current = null;
+        activeQueryIdRef.current = null;
         unsubscribe();
       };
     } catch (e: any) {
@@ -76,7 +77,7 @@ export function useCollection(query: Query | null) {
         setError(e);
       }
     }
-  }, [query]); // Query MUST be memoized in the component using it
+  }, [query]); // Query MUST be memoized (useMemo) in the parent component
 
   return { data, loading, error };
 }

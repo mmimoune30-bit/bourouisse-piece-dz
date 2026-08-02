@@ -12,9 +12,11 @@ import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * Strict Singleton initialization for Firebase.
- * Surmounts the "INTERNAL ASSERTION FAILED (ID: ca9)" error by ensuring 
- * settings are applied exactly once and instances are cached globally.
+ * Robust Singleton initialization for Firebase.
+ * Surmounts the "INTERNAL ASSERTION FAILED (ID: ca9)" error by:
+ * 1. Using globalThis to cache instances across Fast Refresh (HMR).
+ * 2. Forcing memoryLocalCache in development to avoid IndexedDB lock contention.
+ * 3. Safely fallback to getFirestore if initializeFirestore was already called.
  */
 
 interface FirebaseInstances {
@@ -24,47 +26,50 @@ interface FirebaseInstances {
 }
 
 export function initializeFirebase(): FirebaseInstances {
+  // Ensure this only runs on the client
   if (typeof window === 'undefined') {
     return {} as FirebaseInstances;
   }
 
   const global = globalThis as any;
 
-  // 1. Return cached instances if they exist (Survivability during HMR)
+  // 1. Check for cached instances to preserve state during HMR
   if (global.__FIREBASE_STORE__) {
     return global.__FIREBASE_STORE__;
   }
 
   try {
-    // 2. Init App
+    // 2. Initialize App
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. Init Firestore with strict settings
+    // 3. Initialize Firestore with specific cache settings for the environment
     let firestore: Firestore;
     const isDev = process.env.NODE_ENV === 'development';
 
     try {
-      // In SDK 11, try to initialize once. If fails, fallback to getFirestore.
+      // In Dev, we MUST use memoryLocalCache to prevent the "ca9" assertion failure
+      // which happens when multiple tabs or HMR try to grab the same IndexedDB lock.
       firestore = initializeFirestore(app, {
         localCache: isDev ? memoryLocalCache() : persistentLocalCache({}),
       });
     } catch (e) {
-      // Re-initialization occurred (likely HMR), recover the existing instance
+      // If Firestore was already initialized (e.g. by a another module during HMR)
+      // retrieve the existing instance instead of crashing.
       firestore = getFirestore(app);
     }
 
-    // 4. Init Auth
+    // 4. Initialize Auth
     const auth = getAuth(app);
 
     const instances = { app, firestore, auth };
     
-    // Store globally for Next.js Fast Refresh stability
+    // Store in global scope for Next.js Fast Refresh stability
     global.__FIREBASE_STORE__ = instances;
 
     return instances;
   } catch (error) {
-    console.error("Firebase Boot Error:", error);
-    // Absolute fallback
+    console.error("Firebase Initialization Error:", error);
+    // Absolute fallback attempt
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { app, firestore: getFirestore(app), auth: getAuth(app) };
   }
