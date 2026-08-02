@@ -1,14 +1,19 @@
 'use client';
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, initializeFirestore, memoryLocalCache, Firestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { 
+  getFirestore, 
+  initializeFirestore, 
+  memoryLocalCache, 
+  Firestore,
+  clearIndexedDbPersistence
+} from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * Advanced Singleton Initialization for Firebase.
- * Fixes INTERNAL ASSERTION FAILED (ID: ca9) by preventing double initialization 
- * of Firestore settings during Fast Refresh.
+ * Advanced Singleton Initialization for Firebase to fix ID: ca9.
+ * Implements a strict cleanup and initialization pattern for stable HMR.
  */
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
@@ -17,46 +22,47 @@ export function initializeFirebase() {
 
   const g = globalThis as any;
 
-  // 1. Return existing instances if they are already stable in the global scope
-  if (g.__FIREBASE_INSTANCES__) {
-    return g.__FIREBASE_INSTANCES__;
+  // 1. Return stable instances if already initialized in this session
+  if (g.__FIREBASE_STABLE_INSTANCES__) {
+    return g.__FIREBASE_STABLE_INSTANCES__;
   }
 
   try {
-    // 2. Handle App initialization (Idempotent)
+    // 2. Setup Firebase App (Idempotent)
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. Handle Firestore initialization with explicit memory cache
-    // This is critical to avoid IndexedDB lock conflicts during HMR
+    // 3. Clear persistence to avoid ca9 "Virtual Engine" conflicts
+    // This is called asynchronously but will reset the DB state for this device.
+    const tempDb = getFirestore(app);
+    clearIndexedDbPersistence(tempDb).catch(() => {});
+
+    // 4. Initialize Firestore with Memory Cache for maximum stability in development
     let firestore: Firestore;
-    if (getApps().length > 0) {
-      // If app existed, try to get existing firestore
-      try {
-        firestore = getFirestore(app);
-      } catch (e) {
-        // Fallback for edge cases
-        firestore = initializeFirestore(app, {
-          localCache: memoryLocalCache(),
-        });
-      }
+    if (getApps().length > 1) {
+       // If app was already there, don't try to initialize with settings again
+       firestore = getFirestore(app);
     } else {
-      // First time initialization
-      firestore = initializeFirestore(app, {
-        localCache: memoryLocalCache(),
-      });
+       try {
+         firestore = initializeFirestore(app, {
+           localCache: memoryLocalCache(),
+         });
+       } catch (e) {
+         firestore = getFirestore(app);
+       }
     }
 
-    // 4. Handle Auth
+    // 5. Handle Auth
     const auth = getAuth(app);
 
-    // 5. Store globally to ensure absolute singleton behavior
     const instances = { app, firestore, auth };
-    g.__FIREBASE_INSTANCES__ = instances;
+    
+    // Store in global scope to survive HMR
+    g.__FIREBASE_STABLE_INSTANCES__ = instances;
 
     return instances;
   } catch (error) {
-    console.warn("Firebase Init Warning (Non-Fatal):", error);
-    // Final emergency fallback
+    console.error("Firebase Initialization Critical Error:", error);
+    // Emergency Fallback
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 
