@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * Defensive Document Hook.
- * Stabilizes document listeners to prevent internal SDK assertion errors.
+ * Stabilizes document listeners to prevent internal SDK assertion errors during HMR.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
@@ -34,7 +34,7 @@ export function useDoc(docRef: DocumentReference | null) {
     const path = docRef.path;
     if (activePathRef.current === path) return;
 
-    // Cleanup previous listener
+    // Cleanup previous listener before starting a new one
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;

@@ -3,59 +3,64 @@ import {
   initializeFirestore, 
   getFirestore, 
   Firestore, 
-  memoryLocalCache 
+  memoryLocalCache,
+  terminate
 } from "firebase/firestore";
 import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
  * @fileOverview نظام تهيئة Firebase فائق الاستقرار.
- * يستخدم نمط Singleton العالمي لمنع تعارضات ID: ca9 وضمان صحة الـ API Key.
+ * يستخدم نمط Singleton العالمي لمنع تعارضات ID: ca9 وضمان استقرار المحرك الافتراضي.
  */
 
-interface FirebaseInstances {
-  app: FirebaseApp;
-  db: Firestore;
-  auth: Auth;
+interface FirebaseStore {
+  app?: FirebaseApp;
+  db?: Firestore;
+  auth?: Auth;
 }
 
-const GLOBAL_KEY = "__BOUR_FIREBASE_INSTANCE__";
+const GLOBAL_KEY = "__BOUR_FIREBASE_STORE__";
 
-export const initializeFirebase = (): FirebaseInstances => {
-  // التأكد من العمل في جهة العميل فقط
-  if (typeof window === "undefined") {
-    return {} as any;
-  }
+export const initializeFirebase = () => {
+  if (typeof window === "undefined") return { app: null, db: null, auth: null };
 
   const globalScope = globalThis as any;
-
-  // استعادة النسخة إذا كانت موجودة مسبقاً (لحماية Fast Refresh)
-  if (globalScope[GLOBAL_KEY]) {
-    return globalScope[GLOBAL_KEY];
+  if (!globalScope[GLOBAL_KEY]) {
+    globalScope[GLOBAL_KEY] = {} as FirebaseStore;
   }
 
-  try {
-    // 1. تهيئة التطبيق باستخدام الإعدادات الصحيحة من config.ts
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const store = globalScope[GLOBAL_KEY] as FirebaseStore;
 
-    // 2. تهيئة Firestore بنمط دفاعي
-    // نستخدم الذاكرة المؤقتة (Memory) لمنع خطأ ca9 الناتج عن تعارض قفل IndexedDB
-    const db = initializeFirestore(app, {
-      localCache: memoryLocalCache(),
-    });
+  try {
+    // 1. تهيئة التطبيق (Singleton)
+    if (!store.app) {
+      store.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    }
+
+    // 2. تهيئة Firestore بنمط دفاعي لمنع خطأ ca9
+    if (!store.db) {
+      try {
+        // نحاول الحصول على النسخة الحالية أولاً
+        store.db = getFirestore(store.app);
+      } catch (e) {
+        // إذا فشلنا، نقوم بالتهيئة مع إعدادات الذاكرة المؤقتة الصريحة
+        store.db = initializeFirestore(store.app, {
+          localCache: memoryLocalCache(), // الذاكرة المؤقتة تمنع تعارضات IndexedDB في HMR
+        });
+      }
+    }
 
     // 3. تهيئة Auth
-    const auth = getAuth(app);
+    if (!store.auth) {
+      store.auth = getAuth(store.app);
+    }
 
-    const instances: FirebaseInstances = { app, db, auth };
-
-    // حفظ النسخة عالمياً
-    globalScope[GLOBAL_KEY] = instances;
-
-    return instances;
+    return { app: store.app, db: store.db, auth: store.auth };
   } catch (error) {
-    console.warn("Firebase recovery mode activated:", error);
-    const app = getApp();
+    console.error("Firebase Initialization Failure:", error);
+    // حالة استرجاع الطوارئ
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return {
       app,
       db: getFirestore(app),
@@ -64,9 +69,9 @@ export const initializeFirebase = (): FirebaseInstances => {
   }
 };
 
-// تصدير النسخ للاستخدام السريع (مع فحص الأمان)
+// تصدير النسخ المباشرة مع التحقق من البيئة
 const instances = typeof window !== "undefined" ? initializeFirebase() : { app: null, db: null, auth: null };
 
-export const app = instances.app as FirebaseApp;
-export const db = instances.db as Firestore;
-export const auth = instances.auth as Auth;
+export const app = instances.app;
+export const db = instances.db;
+export const auth = instances.auth;

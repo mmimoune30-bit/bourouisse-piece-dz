@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * الخطاف المطور لجلب المجموعات.
- * يعالج تعارضات ID: ca9 عبر ضمان عدم تكرار المستمعين على استعلامات غير مستقرة.
+ * يعالج تعارضات ID: ca9 عبر ضمان عدم تكرار المستمعين وتوفير تنظيف صارم.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,10 +20,10 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
   
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const lastQueryRef = useRef<string | null>(null);
+  const activeQueryRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // التحقق من الجاهزية
+    // 1. فحص الجاهزية والاستقرار
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -32,18 +32,18 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    const currentQueryKey = query.toString();
-    
-    // منع إعادة التشغيل إذا كان الاستعلام متطابقاً (حماية من الحلقات المفرغة)
-    if (lastQueryRef.current === currentQueryKey) return;
-    lastQueryRef.current = currentQueryKey;
+    // منع إعادة التشغيل إذا كان مرجع الاستعلام لم يتغير (استخدام toString كبصمة)
+    const queryKey = query.toString();
+    if (activeQueryRef.current === queryKey) return;
 
-    // تنظيف المستمع السابق
+    // 2. تنظيف أي مستمع نشط قبل البدء بجديد
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
+      unsubscribeRef.current = null;
     }
 
     let isMounted = true;
+    activeQueryRef.current = queryKey;
     setLoading(true);
 
     try {
@@ -70,7 +70,7 @@ export function useCollection(query: Query | null) {
             errorEmitter.emit('permission-error', permError);
           }
           
-          console.warn("Firestore sync warning:", err.message);
+          console.warn("Firestore collection sync issue:", err.message);
           setError(err);
           setLoading(false);
         }
@@ -80,6 +80,7 @@ export function useCollection(query: Query | null) {
 
       return () => {
         isMounted = false;
+        activeQueryRef.current = null;
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
