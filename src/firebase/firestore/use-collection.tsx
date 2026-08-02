@@ -20,22 +20,33 @@ export function useCollection(query: Query | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  // Track active query to avoid multiple listeners for the same query object
-  const activeQueryIdRef = useRef<string | null>(null);
+  // Track active query string to avoid multiple listeners for identical query logical state
+  const activeQueryKeyRef = useRef<string | null>(null);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     // SSR Check & Validation
     if (!query || typeof window === 'undefined') {
-      if (!query) setLoading(false);
+      if (!query) {
+        setData([]);
+        setLoading(false);
+      }
       return;
     }
 
-    // Stabilize query identification
+    // Stabilize query identification to prevent redundant listeners during Fast Refresh
     const queryKey = query.toString();
-    if (activeQueryIdRef.current === queryKey) return;
+    if (activeQueryKeyRef.current === queryKey) return;
+
+    // Cleanup previous listener before starting new one
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
 
     let isMounted = true;
-    activeQueryIdRef.current = queryKey;
+    activeQueryKeyRef.current = queryKey;
+    setLoading(true);
 
     try {
       const unsubscribe = onSnapshot(
@@ -61,15 +72,21 @@ export function useCollection(query: Query | null) {
             errorEmitter.emit('permission-error', permError);
           }
           
+          console.warn("Firestore collection sync error:", err);
           setError(err);
           setLoading(false);
         }
       );
 
+      unsubscribeRef.current = unsubscribe;
+
       return () => {
         isMounted = false;
-        activeQueryIdRef.current = null;
-        unsubscribe();
+        activeQueryKeyRef.current = null;
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
+          unsubscribeRef.current = null;
+        }
       };
     } catch (e: any) {
       if (isMounted) {

@@ -12,24 +12,37 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * Defensive Document Hook.
+ * Stabilizes document listeners to prevent internal SDK assertion errors.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const activeRef = useRef<string | null>(null);
+  
+  const activePathRef = useRef<string | null>(null);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!docRef || typeof window === 'undefined') {
-      if (!docRef) setLoading(false);
+      if (!docRef) {
+        setData(null);
+        setLoading(false);
+      }
       return;
     }
 
     const path = docRef.path;
-    if (activeRef.current === path) return;
+    if (activePathRef.current === path) return;
+
+    // Cleanup previous listener
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
 
     let isMounted = true;
-    activeRef.current = path;
+    activePathRef.current = path;
+    setLoading(true);
 
     try {
       const unsubscribe = onSnapshot(
@@ -56,10 +69,15 @@ export function useDoc(docRef: DocumentReference | null) {
         }
       );
 
+      unsubscribeRef.current = unsubscribe;
+
       return () => {
         isMounted = false;
-        activeRef.current = null;
-        unsubscribe();
+        activePathRef.current = null;
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
+          unsubscribeRef.current = null;
+        }
       };
     } catch (e: any) {
       if (isMounted) {

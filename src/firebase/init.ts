@@ -5,17 +5,15 @@ import {
   getFirestore, 
   initializeFirestore, 
   memoryLocalCache,
-  Firestore,
-  terminate
+  Firestore
 } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
  * Robust Singleton initialization for Firebase.
- * Fixes "INTERNAL ASSERTION FAILED (ID: ca9)" by:
- * 1. Using memory-only cache to avoid IndexedDB lock contention in dev/studio environments.
- * 2. Ensuring initializeFirestore is only called once via global flag.
+ * Fixes "INTERNAL ASSERTION FAILED (ID: ca9)" by strictly reusing existing instances
+ * and avoiding re-initialization of the Virtual Engine.
  */
 
 interface FirebaseInstances {
@@ -31,39 +29,45 @@ export function initializeFirebase(): FirebaseInstances {
 
   const global = globalThis as any;
 
-  // Preserve instances across Fast Refresh
+  // 1. Check if we already have a fully initialized store in this browser session
   if (global.__FIREBASE_STORE__) {
     return global.__FIREBASE_STORE__;
   }
 
   try {
+    // 2. Initialize or retrieve the Firebase App
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
+    // 3. Initialize Firestore with memory-only cache to avoid ca9 persistence conflicts
     let firestore: Firestore;
-    if (global.__FIRESTORE_INITIALIZED__) {
-      firestore = getFirestore(app);
-    } else {
+    
+    // We use a specific flag to ensure initializeFirestore is ONLY called once per page load
+    if (!global.__FIRESTORE_INITIALIZED__) {
       try {
-        // Use memoryLocalCache to prevent the "ca9" assertion failure which happens
-        // when Fast Refresh tries to re-initialize Firestore with persistence.
         firestore = initializeFirestore(app, {
           localCache: memoryLocalCache(),
         });
         global.__FIRESTORE_INITIALIZED__ = true;
       } catch (e) {
+        // If initializeFirestore fails (e.g. already initialized), fallback to getFirestore
         firestore = getFirestore(app);
-        global.__FIRESTORE_INITIALIZED__ = true;
       }
+    } else {
+      firestore = getFirestore(app);
     }
 
+    // 4. Initialize Auth
     const auth = getAuth(app);
+
     const instances = { app, firestore, auth };
+    
+    // 5. Store globally to prevent Fast Refresh from breaking the engine state
     global.__FIREBASE_STORE__ = instances;
 
     return instances;
   } catch (error) {
     console.error("Firebase Initialization Critical Failure:", error);
-    // Absolute fallback to prevent white screen
+    // Absolute fallback to prevent UI crash
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { app, firestore: getFirestore(app), auth: getAuth(app) };
   }
