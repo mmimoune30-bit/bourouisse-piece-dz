@@ -25,8 +25,6 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
         setIsReady(true);
       } catch (error) {
         console.error("Firebase Initialization Exception:", error);
-        // We still set isReady to true to prevent a permanent loading loop
-        // if initialization fails in a way that doesn't block basic routing.
         setIsReady(true);
       }
     } else {
@@ -37,7 +35,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   // Branded fallback to avoid blank screen during hydration/initialization
   if (!isReady || !instancesRef.current?.app) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-center text-white">
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
           <div className="w-10 h-10 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
           <div className="space-y-2">

@@ -26,7 +26,7 @@ export default function BuyerRegister() {
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
   const [customerId, setCustomerId] = useState("");
   
-  // Generate ID on mount to prevent hydration mismatch
+  // CRITICAL: Generate ID only on client to prevent Hydration Exception
   useEffect(() => {
     setCustomerId(`BR-C-${Math.floor(1000 + Math.random() * 9000)}`);
   }, []);
@@ -72,7 +72,7 @@ export default function BuyerRegister() {
         commune: formData.get("commune") as string
       }, password);
 
-      toast({ title: "تم التسجيل بنجاح", description: `معرفك الخاص هو ${customerId}. استخدمه للدخول مستقبلاً.` });
+      toast({ title: "تم التسجيل بنجاح", description: `مرحباً بك في بورويس.` });
       router.push("/customer/dashboard");
     } catch (err: any) {
       toast({ variant: "destructive", title: "فشل التسجيل", description: err.message });

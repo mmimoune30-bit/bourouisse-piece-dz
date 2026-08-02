@@ -5,7 +5,8 @@ import {
   getFirestore, 
   initializeFirestore, 
   memoryLocalCache,
-  Firestore
+  Firestore,
+  terminate
 } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
@@ -62,7 +63,7 @@ export function initializeFirebase(): FirebaseInstances {
     return instances;
   } catch (error) {
     console.error("Firebase Initialization Critical Failure:", error);
-    // Absolute fallback
+    // Absolute fallback to prevent white screen
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { app, firestore: getFirestore(app), auth: getAuth(app) };
   }
