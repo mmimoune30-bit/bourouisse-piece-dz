@@ -3,49 +3,63 @@ import {
   initializeFirestore, 
   getFirestore, 
   Firestore, 
-  memoryLocalCache 
+  memoryLocalCache,
+  terminate
 } from "firebase/firestore";
 import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
- * @fileOverview تهيئة خدمات Firebase بنمط Singleton صارم.
- * يحل هذا الملف مشكلتين:
- * 1. auth/invalid-api-key: عبر استخدام الإعدادات المباشرة من config.ts.
- * 2. ID: ca9: عبر استخدام الذاكرة المؤقتة وتثبيت النسخ في globalThis.
+ * @fileOverview تهيئة خدمات Firebase بنمط Singleton صارم جداً.
+ * هذا الملف مصمم للقضاء على خطأ ID: ca9 و auth/invalid-api-key.
  */
 
-const globalForFirebase = globalThis as unknown as {
-  app: FirebaseApp | undefined;
-  db: Firestore | undefined;
-  auth: Auth | undefined;
-};
+interface FirebaseInstances {
+  app: FirebaseApp;
+  firestore: Firestore;
+  auth: Auth;
+}
 
-// تهيئة التطبيق (استخدام النسخة الموجودة أو إنشاء واحدة جديدة)
-export const app = globalForFirebase.app ?? (getApps().length ? getApp() : initializeApp(firebaseConfig));
+const GLOBAL_KEY = "__FIREBASE_INSTANCE__";
 
-// تهيئة Firestore مع حماية ضد إعادة التهيئة (خطأ ca9)
-export const db = globalForFirebase.db ?? (() => {
+// وظيفة الحصول على النسخ المستقرة
+function getInstances(): FirebaseInstances {
+  if (typeof window !== "undefined" && (window as any)[GLOBAL_KEY]) {
+    return (window as any)[GLOBAL_KEY];
+  }
+
+  // 1. تهيئة التطبيق
+  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+  // 2. تهيئة Firestore بشكل دفاعي
+  let firestore: Firestore;
   try {
-    // محاولة إنشاء Firestore مع ذاكرة مؤقتة لمنع تعارضات الملفات في بيئة التطوير
-    return initializeFirestore(app, {
+    // محاولة استخدام النسخة الموجودة أولاً
+    firestore = getFirestore(app);
+  } catch (e) {
+    // إذا لم تكن موجودة، نقوم بتهيئتها بإعدادات الذاكرة المؤقتة لمنع خطأ ca9
+    firestore = initializeFirestore(app, {
       localCache: memoryLocalCache(),
     });
-  } catch (e) {
-    // في حال كان Firestore مهيأ مسبقاً (أثناء Fast Refresh)
-    return getFirestore(app);
   }
-})();
 
-// تهيئة Auth
-export const auth = globalForFirebase.auth ?? getAuth(app);
+  // 3. تهيئة Auth
+  const auth = getAuth(app);
 
-// تخزين النسخ عالمياً لمنع التكرار المسبب للأخطاء
-if (typeof window !== "undefined") {
-  globalForFirebase.app = app;
-  globalForFirebase.db = db;
-  globalForFirebase.auth = auth;
+  const instances = { app, firestore, auth };
+
+  if (typeof window !== "undefined") {
+    (window as any)[GLOBAL_KEY] = instances;
+  }
+
+  return instances;
 }
+
+const instances = getInstances();
+
+export const app = instances.app;
+export const db = instances.firestore;
+export const auth = instances.auth;
 
 /**
  * دالة مساعدة للحصول على كافة النسخ دفعة واحدة

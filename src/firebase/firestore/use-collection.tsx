@@ -11,19 +11,19 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * Robust Collection Hook.
- * Prevents "Unexpected state (ID: ca9)" by strictly stabilizing listeners.
+ * الخطاف المطور لجلب المجموعات.
+ * يعالج تعارضات ID: ca9 عبر ضمان عدم تكرار المستمعين على استعلامات غير مستقرة.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  const activeQueryKeyRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const lastQueryRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // 1. Validation & SSR Safety
+    // التحقق من الجاهزية
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -32,18 +32,18 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    // 2. Prevent redundant listeners (ID: ca9 protection)
-    const queryKey = query.toString();
-    if (activeQueryKeyRef.current === queryKey) return;
+    const currentQueryKey = query.toString();
+    
+    // منع إعادة التشغيل إذا كان الاستعلام متطابقاً (حماية من الحلقات المفرغة)
+    if (lastQueryRef.current === currentQueryKey) return;
+    lastQueryRef.current = currentQueryKey;
 
-    // 3. Clean up previous listener
+    // تنظيف المستمع السابق
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
-      unsubscribeRef.current = null;
     }
 
     let isMounted = true;
-    activeQueryKeyRef.current = queryKey;
     setLoading(true);
 
     try {
@@ -70,7 +70,7 @@ export function useCollection(query: Query | null) {
             errorEmitter.emit('permission-error', permError);
           }
           
-          console.warn("Firestore collection sync error:", err);
+          console.warn("Firestore sync warning:", err.message);
           setError(err);
           setLoading(false);
         }
@@ -80,7 +80,6 @@ export function useCollection(query: Query | null) {
 
       return () => {
         isMounted = false;
-        activeQueryKeyRef.current = null;
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
           unsubscribeRef.current = null;
