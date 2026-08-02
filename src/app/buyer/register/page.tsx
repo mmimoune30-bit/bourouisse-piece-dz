@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -11,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserPlus, Mail, Phone, Lock, ArrowLeft, MapPin, User, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { WILAYAS_DATA } from "@/lib/algeria-locations";
 import { useAuth, useFirestore } from "@/firebase";
@@ -25,8 +24,12 @@ export default function BuyerRegister() {
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
+  const [customerId, setCustomerId] = useState("");
   
-  const customerId = useMemo(() => `BR-C-${Math.floor(1000 + Math.random() * 9000)}`, []);
+  // Generate ID on mount to prevent hydration mismatch
+  useEffect(() => {
+    setCustomerId(`BR-C-${Math.floor(1000 + Math.random() * 9000)}`);
+  }, []);
 
   const communesList = useMemo(() => {
     return selectedWilaya ? WILAYAS_DATA[selectedWilaya] || [] : [];
@@ -94,7 +97,7 @@ export default function BuyerRegister() {
             <CardContent className="p-10 space-y-6 text-right" dir="rtl">
               <div className="bg-zinc-50 p-4 rounded-2xl border-2 border-primary/10 flex items-center justify-between">
                  <span className="text-xs font-black text-muted-foreground">رقم العميل التلقائي:</span>
-                 <span className="text-lg font-black text-primary font-mono">{customerId}</span>
+                 <span className="text-lg font-black text-primary font-mono">{customerId || '...'}</span>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">

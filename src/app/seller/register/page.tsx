@@ -1,4 +1,3 @@
-
 "use client";
 
 import Navbar from "@/components/navbar";
@@ -29,11 +28,13 @@ export default function SellerRegister() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
+  const [storeId, setStoreId] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const storeId = useMemo(() => `BR-S-${Math.floor(1000 + Math.random() * 9000)}`, []);
-
   useEffect(() => {
+    // Generate ID and check lang on mount to avoid hydration mismatch
+    setStoreId(`BR-S-${Math.floor(1000 + Math.random() * 9000)}`);
+    
     const checkLang = () => {
       const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
       if (savedLang) setLang(savedLang);
@@ -197,7 +198,7 @@ export default function SellerRegister() {
               <div className="p-4 border-2 border-dashed border-primary/20 rounded-2xl text-center">
                  <p className={cn("text-[10px] text-muted-foreground uppercase mb-1", titleFont)}>{lang === 'AR' ? 'معرفك الرقمي الجديد' : 'YOUR DIGITAL ID'}</p>
                  <div className="text-2xl font-black text-primary tracking-widest bg-zinc-100 p-3 rounded-lg border-2 border-white shadow-inner font-mono">
-                    {storeId}
+                    {storeId || '...'}
                  </div>
               </div>
             </div>
