@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { initializeFirebase } from './init';
 import { FirebaseProvider } from './provider';
 
@@ -14,8 +14,13 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
     firestore: any;
     auth: any;
   } | null>(null);
+  
+  // نستخدم ref للتأكد من أن التهيئة تتم مرة واحدة فقط حتى في حالة Strict Mode
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+    
     // يتم التنفيذ فقط في المتصفح بعد الهيدريشن
     const firebase = initializeFirebase();
     setInstances({
@@ -23,6 +28,8 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
       firestore: firebase.firestore || null,
       auth: firebase.auth || null,
     });
+    
+    initialized.current = true;
   }, []);
 
   return (
