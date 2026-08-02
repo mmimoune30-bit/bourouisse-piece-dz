@@ -5,7 +5,7 @@ import {
   memoryLocalCache,
   Firestore
 } from "firebase/firestore";
-import { getAuth, Auth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
@@ -14,10 +14,10 @@ import { firebaseConfig } from "./config";
  * المبادئ المتبعة:
  * 1. استخدام Singleton عالمي عبر globalThis لمنع تعارضات Fast Refresh.
  * 2. تعطيل IndexedDB صراحة واستخدام Memory Cache فقط لحل مشكلة قفل البيانات.
- * 3. معالجة استباقية لمحاولات إعادة التهيئة (Idempotent Initialization).
+ * 3. معالجة استباقية لمحاولات إعادة التهيئة عبر try/catch.
  */
 
-const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_V3__";
+const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL__";
 
 function getFirebaseInstances() {
   // الحماية من التنفيذ في جانب السيرفر
@@ -33,22 +33,22 @@ function getFirebaseInstances() {
       // 1. تهيئة التطبيق (App)
       const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
       
-      // 2. تهيئة قاعدة البيانات (Firestore) مع تعطيل التخزين المستمر
+      // 2. تهيئة قاعدة البيانات (Firestore) مع تعطيل التخزين المستمر صراحة
       let db: Firestore;
       try {
-        // محاولة التهيئة بالإعدادات المخصصة (ذاكرة فقط)
+        // الحل الجذري: إجبار استخدام ذاكرة التخزين المؤقت فقط لمنع خطأ ca9
         db = initializeFirestore(app, {
           localCache: memoryLocalCache(),
         });
       } catch (e) {
-        // إذا فشل (بسبب تهيئة سابقة مثلاً)، نسترجع النسخة الموجودة
+        // في حال كان المحرك قيد التشغيل بالفعل، نسترجع النسخة الحالية فقط
         db = getFirestore(app);
       }
 
       // 3. تهيئة خدمة الهوية (Auth)
       const auth = getAuth(app);
 
-      // حفظ النسخ في النطاق العالمي
+      // حفظ النسخ في النطاق العالمي لضمان ثبات المراجع
       globalScope[FIREBASE_GLOBAL_KEY] = { app, db, auth };
     } catch (error) {
       console.error("Critical Firebase Failure:", error);
@@ -59,7 +59,7 @@ function getFirebaseInstances() {
   return globalScope[FIREBASE_GLOBAL_KEY];
 }
 
-// تصدير النسخ المستقرة
+// تصدير النسخ المستقرة كـ Singletons
 const instances = getFirebaseInstances();
 
 export const app = instances.app;

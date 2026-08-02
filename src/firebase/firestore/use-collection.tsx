@@ -11,8 +11,8 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * الخطاف الدفاعي لجلب المجموعات.
- * يعالج تعارضات Virtual Engine عبر ضمان عدم تكرار المستمعين.
+ * الخطاف الدفاعي المستقر لجلب المجموعات.
+ * يعالج تعارضات Virtual Engine عبر التأكد من ثبات مراجع الاستعلام قبل بدء المستمع.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,9 +20,10 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
   
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const activeQueryId = useRef<string | null>(null);
+  const lastQueryKey = useRef<string | null>(null);
 
   useEffect(() => {
+    // 1. التحقق من جاهزية الاستعلام وبيئة المتصفح
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -31,18 +32,17 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    // استخدام وصف الاستعلام كبصمة فريدة للتحقق من التغيير
-    const currentId = query.toString();
-    if (activeQueryId.current === currentId) return;
+    // 2. منع إعادة الاشتراك إذا لم يتغير الاستعلام (تثبيت المرجع)
+    const currentQueryKey = query.toString();
+    if (lastQueryKey.current === currentQueryKey) return;
 
-    // تنظيف أي مستمع سابق فوراً قبل البدء بالجديد
+    // 3. تنظيف أي مستمع نشط فوراً
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
-      unsubscribeRef.current = null;
     }
 
     let isMounted = true;
-    activeQueryId.current = currentId;
+    lastQueryKey.current = currentQueryKey;
     setLoading(true);
 
     try {
@@ -76,20 +76,21 @@ export function useCollection(query: Query | null) {
 
       unsubscribeRef.current = unsubscribe;
 
-      return () => {
-        isMounted = false;
-        activeQueryId.current = null;
-        if (unsubscribeRef.current) {
-          unsubscribeRef.current();
-          unsubscribeRef.current = null;
-        }
-      };
     } catch (e: any) {
       if (isMounted) {
         setLoading(false);
         setError(e);
       }
     }
+
+    return () => {
+      isMounted = false;
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+      lastQueryKey.current = null;
+    };
   }, [query]);
 
   return { data, loading, error };
