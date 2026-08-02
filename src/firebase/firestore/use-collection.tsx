@@ -11,21 +11,19 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * Defensive Collection Hook.
- * Prevents "Unexpected state (ID: ca9)" by stabilizing listeners 
- * and ensuring clean unmounts.
+ * Robust Collection Hook.
+ * Prevents "Unexpected state (ID: ca9)" by strictly stabilizing listeners.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
-  // Track active query string to avoid multiple listeners for identical query logical state
   const activeQueryKeyRef = useRef<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    // SSR Check & Validation
+    // 1. Validation & SSR Safety
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -34,11 +32,11 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    // Stabilize query identification to prevent redundant listeners during Fast Refresh
+    // 2. Prevent redundant listeners (ID: ca9 protection)
     const queryKey = query.toString();
     if (activeQueryKeyRef.current === queryKey) return;
 
-    // Cleanup previous listener before starting new one
+    // 3. Clean up previous listener
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
@@ -94,7 +92,7 @@ export function useCollection(query: Query | null) {
         setError(e);
       }
     }
-  }, [query]); // Query MUST be memoized (useMemo) in the parent component
+  }, [query]);
 
   return { data, loading, error };
 }

@@ -6,7 +6,7 @@ import { FirebaseProvider } from './provider';
 
 /**
  * Defensive Firebase Client Provider.
- * Prevents hydration crashes and ensures single initialization.
+ * Prevents hydration crashes and ensures the Virtual Engine is only started once.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -17,22 +17,22 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   } | null>(null);
 
   useEffect(() => {
-    // Safety check to ensure we only init on the client mount
-    if (!instancesRef.current) {
+    // Run initialization once on mount
+    if (typeof window !== 'undefined' && !instancesRef.current) {
       try {
         const instances = initializeFirebase();
         instancesRef.current = instances;
         setIsReady(true);
       } catch (error) {
-        console.error("Firebase Initialization Exception:", error);
-        setIsReady(true);
+        console.error("Firebase Provider Initialization Error:", error);
+        setIsReady(true); // Proceed to allow error boundaries to catch failures
       }
     } else {
       setIsReady(true);
     }
   }, []);
 
-  // Branded fallback to avoid blank screen during hydration/initialization
+  // Branded fallback loader to avoid flickering and blank screens during init
   if (!isReady || !instancesRef.current?.app) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-center text-white">
@@ -41,7 +41,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
           <div className="space-y-2">
             <h2 className="text-white font-black tracking-widest text-lg uppercase">BOUROUISSE</h2>
             <p className="text-white/30 text-[10px] uppercase tracking-widest animate-pulse font-bold">
-              Establishing Secure Connection...
+              Secure Engine Initializing...
             </p>
           </div>
         </div>

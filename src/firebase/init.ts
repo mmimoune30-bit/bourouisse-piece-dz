@@ -12,8 +12,8 @@ import { firebaseConfig } from './config';
 
 /**
  * Robust Singleton initialization for Firebase.
- * Fixes "INTERNAL ASSERTION FAILED (ID: ca9)" by strictly reusing existing instances
- * and avoiding re-initialization of the Virtual Engine.
+ * Fixes "INTERNAL ASSERTION FAILED (ID: ca9)" by ensuring strict single initialization
+ * of the Virtual Engine and consistent caching settings.
  */
 
 interface FirebaseInstances {
@@ -24,12 +24,12 @@ interface FirebaseInstances {
 
 export function initializeFirebase(): FirebaseInstances {
   if (typeof window === 'undefined') {
-    return {} as FirebaseInstances;
+    return { app: null as any, firestore: null as any, auth: null as any };
   }
 
   const global = globalThis as any;
 
-  // 1. Check if we already have a fully initialized store in this browser session
+  // 1. Check if we already have a fully initialized instances in this session
   if (global.__FIREBASE_STORE__) {
     return global.__FIREBASE_STORE__;
   }
@@ -38,21 +38,18 @@ export function initializeFirebase(): FirebaseInstances {
     // 2. Initialize or retrieve the Firebase App
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-    // 3. Initialize Firestore with memory-only cache to avoid ca9 persistence conflicts
+    // 3. Initialize Firestore
+    // To prevent ID: ca9, we MUST NOT call initializeFirestore if it's already touched by getFirestore
+    // or call it with inconsistent settings during HMR.
     let firestore: Firestore;
     
-    // We use a specific flag to ensure initializeFirestore is ONLY called once per page load
-    if (!global.__FIRESTORE_INITIALIZED__) {
-      try {
-        firestore = initializeFirestore(app, {
-          localCache: memoryLocalCache(),
-        });
-        global.__FIRESTORE_INITIALIZED__ = true;
-      } catch (e) {
-        // If initializeFirestore fails (e.g. already initialized), fallback to getFirestore
-        firestore = getFirestore(app);
-      }
-    } else {
+    try {
+      // Use memory-only cache in development to avoid persistence locks causing ca9
+      firestore = initializeFirestore(app, {
+        localCache: memoryLocalCache(),
+      });
+    } catch (e) {
+      // Fallback to getFirestore if initializeFirestore was already called
       firestore = getFirestore(app);
     }
 
@@ -61,7 +58,7 @@ export function initializeFirebase(): FirebaseInstances {
 
     const instances = { app, firestore, auth };
     
-    // 5. Store globally to prevent Fast Refresh from breaking the engine state
+    // 5. Store globally to prevent Fast Refresh from breaking the virtual engine state
     global.__FIREBASE_STORE__ = instances;
 
     return instances;
