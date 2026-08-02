@@ -6,32 +6,43 @@ import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
 /**
- * تهيئة Firebase مع حماية نهائية ضد خطأ ca9 (Assertion Failure).
- * يعتمد الحل على التأكد من عدم استدعاء initializeFirestore إلا مرة واحدة فقط في حياة التطبيق.
+ * تهيئة Firebase بنمط النسخة الوحيدة (Strict Singleton Pattern).
+ * يمنع هذا النمط تكرار التهيئة الذي يسبب خطأ Assertion ca9 في Firestore.
  */
 export function initializeFirebase() {
   if (typeof window === 'undefined') {
     return { app: null, firestore: null, auth: null };
   }
 
-  // استخدام globalThis كمرجع أخير لضمان الـ Singleton عبر HMR
+  // استخدام globalThis كمرجع ثابت عبر عمليات Hot Reload
   const g = globalThis as any;
 
   try {
-    const existingApps = getApps();
-    
-    if (existingApps.length > 0) {
-      // إذا كان التطبيق موجوداً، نسترجع النسخ الحالية دون إعادة تهيئة
-      if (!g.__FIREBASE_APP__) g.__FIREBASE_APP__ = getApp();
-      if (!g.__FIREBASE_FIRESTORE__) g.__FIREBASE_FIRESTORE__ = getFirestore(g.__FIREBASE_APP__);
-      if (!g.__FIREBASE_AUTH__) g.__FIREBASE_AUTH__ = getAuth(g.__FIREBASE_APP__);
-    } else {
-      // تهيئة لأول مرة فقط
-      g.__FIREBASE_APP__ = initializeApp(firebaseConfig);
-      // نضبط ذاكرة التخزين المؤقت هنا فقط لأنها المرة الأولى
-      g.__FIREBASE_FIRESTORE__ = initializeFirestore(g.__FIREBASE_APP__, {
-        localCache: memoryLocalCache(),
-      });
+    // 1. إدارة نسخة التطبيق (Firebase App)
+    if (!g.__FIREBASE_APP__) {
+      const existingApps = getApps();
+      if (existingApps.length > 0) {
+        g.__FIREBASE_APP__ = existingApps[0];
+      } else {
+        g.__FIREBASE_APP__ = initializeApp(firebaseConfig);
+      }
+    }
+
+    // 2. إدارة نسخة قاعدة البيانات (Firestore)
+    if (!g.__FIREBASE_FIRESTORE__) {
+      try {
+        // محاولة التهيئة بالإعدادات المخصصة (ذاكرة فقط لمنع تعارض الأقفال)
+        g.__FIREBASE_FIRESTORE__ = initializeFirestore(g.__FIREBASE_APP__, {
+          localCache: memoryLocalCache(),
+        });
+      } catch (e) {
+        // في حال تم التهيئة مسبقاً، نسترجع النسخة الافتراضية
+        g.__FIREBASE_FIRESTORE__ = getFirestore(g.__FIREBASE_APP__);
+      }
+    }
+
+    // 3. إدارة نسخة المصادقة (Auth)
+    if (!g.__FIREBASE_AUTH__) {
       g.__FIREBASE_AUTH__ = getAuth(g.__FIREBASE_APP__);
     }
 
@@ -41,8 +52,8 @@ export function initializeFirebase() {
       auth: g.__FIREBASE_AUTH__ as Auth 
     };
   } catch (error) {
-    console.warn("Firebase Recovery Mode:", error);
-    // محاولة استرجاع آمنة في حال حدوث أي خلل
+    console.error("Critical Firebase Init Error:", error);
+    // محاولة استرجاع أخيرة في حالة الفشل الكارثي
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return { 
       app, 

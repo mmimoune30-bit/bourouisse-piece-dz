@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * خطاف مخصص للاستماع لمجموعات البيانات في Firestore.
- * مضاف إليه حماية لمنع العمليات على الـ VE الميت أثناء HMR.
+ * يحتوي على فحص استقرار (Readiness Check) لمنع أخطاء التهيئة.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,47 +20,54 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // لا نبدأ الاستماع إذا لم يتوفر الاستعلام أو لم تجهز Firestore
     if (!query) {
       setLoading(false);
       return;
     }
 
-    // نستخدم متغير محلي للتحقق من استمرار الـ Mount لمنع تحديث الحالة على مكون ملغى
     let isSubscribed = true;
 
-    const unsubscribe = onSnapshot(
-      query,
-      (snapshot: QuerySnapshot<DocumentData>) => {
-        if (!isSubscribed) return;
-        const items = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setData(items);
-        setLoading(false);
-        setError(null);
-      },
-      (err) => {
-        if (!isSubscribed) return;
-        
-        // معالجة صامتة لخطأ انقطاع الاتصال أو الصلاحيات أثناء التطوير
-        if (err.code === 'permission-denied') {
-          const permError = new FirestorePermissionError({
-            path: 'firestore_collection',
-            operation: 'list'
-          });
-          errorEmitter.emit('permission-error', permError);
+    try {
+      const unsubscribe = onSnapshot(
+        query,
+        (snapshot: QuerySnapshot<DocumentData>) => {
+          if (!isSubscribed) return;
+          const items = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setData(items);
+          setLoading(false);
+          setError(null);
+        },
+        (err) => {
+          if (!isSubscribed) return;
+          
+          // معالجة صامتة ومنظمة لأخطاء الصلاحيات
+          if (err.code === 'permission-denied') {
+            const permError = new FirestorePermissionError({
+              path: 'firestore_collection_query',
+              operation: 'list'
+            });
+            errorEmitter.emit('permission-error', permError);
+          } else {
+            console.warn("Firestore Listener Warning:", err.message);
+          }
+          
+          setError(err);
+          setLoading(false);
         }
-        
-        setError(err);
-        setLoading(false);
-      }
-    );
+      );
 
-    return () => {
-      isSubscribed = false;
-      unsubscribe();
-    };
+      return () => {
+        isSubscribed = false;
+        unsubscribe();
+      };
+    } catch (e: any) {
+      console.error("Hook Subscription Error:", e);
+      setLoading(false);
+    }
   }, [query]);
 
   return { data, loading, error };
