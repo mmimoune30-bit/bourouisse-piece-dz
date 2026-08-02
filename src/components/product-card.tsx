@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, ShieldCheck, Calendar } from "lucide-react";
+import { Star, ShoppingCart, ShieldCheck, Calendar, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -30,7 +30,7 @@ export default function ProductCard({
   image,
   category,
   seller,
-  rating = 4.5,
+  rating = 4.8,
   condition = "New",
   hint = "car parts",
   createdAt
@@ -69,28 +69,10 @@ export default function ProductCard({
     return condition === 'New' ? 'Neuf' : condition === 'Used' ? 'Occasion' : 'Reconditionné';
   };
 
-  const getGenuineText = () => {
-    if (lang === 'AR') return 'أصلية';
-    if (lang === 'EN') return 'GENUINE';
-    return 'D\'ORIGINE';
-  };
-
-  const getByText = () => {
-    if (lang === 'AR') return 'بواسطة:';
-    if (lang === 'EN') return 'By:';
-    return 'Par:';
-  };
-
-  const getPostedAtText = () => {
-    if (lang === 'AR') return 'نشر في:';
-    if (lang === 'EN') return 'Posted:';
-    return 'Publié le:';
-  };
-
   const getDetailsBtnText = () => {
-    if (lang === 'AR') return 'التفاصيل والطلب';
-    if (lang === 'EN') return 'Details & Order';
-    return 'Détails & Commande';
+    if (lang === 'AR') return 'عرض التفاصيل';
+    if (lang === 'EN') return 'View Details';
+    return 'Détails';
   };
 
   const getCurrencyText = () => {
@@ -98,61 +80,82 @@ export default function ProductCard({
     return 'DZD';
   };
 
-  const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
-  const normalFont = lang === 'AR' ? 'font-bold' : 'font-normal';
-  const buttonFont = lang === 'AR' ? 'font-black' : 'font-medium';
+  const titleFont = lang === 'AR' ? 'font-black' : 'font-black';
+  const normalFont = lang === 'AR' ? 'font-bold' : 'font-bold';
+  const buttonFont = lang === 'AR' ? 'font-black' : 'font-black';
 
   return (
-    <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-300 bg-white transform hover:-translate-y-1">
-      <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-muted cursor-pointer">
-        <Image src={image} alt={name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" data-ai-hint={hint} />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+    <Card className="group overflow-hidden border-2 border-transparent hover:border-secondary/20 shadow-sm hover:shadow-2xl transition-all duration-500 bg-white rounded-[24px] flex flex-col h-full">
+      <Link href={`/products/${id}`} className="block relative aspect-[5/4] overflow-hidden bg-zinc-100 cursor-pointer">
+        <Image 
+          src={image} 
+          alt={name} 
+          fill 
+          className="object-cover transition-transform duration-700 group-hover:scale-110" 
+          data-ai-hint={hint} 
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center">
+           <div className="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-full text-primary text-xs font-black shadow-xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+             {getDetailsBtnText()}
+           </div>
+        </div>
         <div className={cn("absolute top-3 flex flex-col gap-2", lang === 'AR' ? "left-3" : "right-3")}>
-          <Badge variant={condition === 'New' ? 'default' : 'secondary'} className={cn("shadow-lg uppercase", titleFont)}>
+          <Badge className={cn(
+            "shadow-lg uppercase text-[9px] px-3 py-1 border-none",
+            condition === 'New' ? "bg-green-600 text-white" : "bg-orange-500 text-white",
+            titleFont
+          )}>
             {getConditionText()}
           </Badge>
           {condition === 'New' && (
-            <Badge variant="outline" className={cn("bg-white/90 backdrop-blur-sm border-none shadow-sm text-black flex items-center gap-1", titleFont)}>
-              <ShieldCheck size={12} className="text-secondary" />
-              {getGenuineText()}
-            </Badge>
+            <div className="bg-white/95 backdrop-blur-md px-2 py-1 rounded-lg shadow-sm border border-zinc-100 flex items-center gap-1">
+              <ShieldCheck size={10} className="text-secondary fill-secondary" />
+              <span className="text-[8px] font-black text-primary tracking-tighter">أصلية</span>
+            </div>
           )}
         </div>
       </Link>
       
-      <CardContent className={cn("p-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-        <div className={cn("text-[10px] uppercase text-secondary mb-1 tracking-widest", titleFont)}>{category}</div>
-        <Link href={`/products/${id}`} className="block mb-2">
-          <h3 className={cn("font-headline text-lg text-black line-clamp-1 group-hover:text-secondary transition-colors uppercase", titleFont)}>{name}</h3>
+      <CardContent className={cn("p-4 flex-grow flex flex-col gap-1.5", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+        <div className={cn("text-[9px] uppercase text-secondary font-black tracking-widest mb-0.5", titleFont)}>{category}</div>
+        
+        <Link href={`/products/${id}`} className="block">
+          <h3 className={cn("text-base md:text-lg text-zinc-900 line-clamp-1 group-hover:text-secondary transition-colors uppercase leading-tight", titleFont)}>{name}</h3>
         </Link>
-        <div className={cn("flex items-center gap-1 mb-2", lang === 'AR' ? "justify-end" : "justify-start")}>
-          <span className={cn("text-xs text-zinc-500", titleFont)}>({rating})</span>
-          <div className="flex text-yellow-400">
+
+        <div className={cn("flex items-center justify-between mb-1 mt-1", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+          <div className="flex text-yellow-400 gap-0.5">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={12} fill={i < Math.floor(rating) ? "currentColor" : "none"} className={i < Math.floor(rating) ? "" : "text-zinc-200"} />
+              <Star key={i} size={10} fill={i < 4 ? "currentColor" : "none"} className={i < 4 ? "" : "text-zinc-200"} />
             ))}
           </div>
-        </div>
-        <div className={cn("flex items-center justify-between mb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-          <span className={cn("text-2xl text-black", lang === 'AR' ? 'font-black' : 'font-bold')}>
-            {mounted ? price.toLocaleString() : price} <span className={cn("text-sm text-zinc-500", titleFont)}>{getCurrencyText()}</span>
+          <span className={cn("text-[10px] text-zinc-500 flex items-center gap-1", normalFont)}>
+            <MapPin size={10} className="text-zinc-400" /> {seller}
           </span>
-          <span className={cn("text-[10px] text-zinc-500", titleFont)}>{getByText()} {seller}</span>
         </div>
 
-        {formattedDate && (
-          <div className={cn("flex items-center gap-1 text-[10px] text-zinc-400 border-t pt-2 mt-2", lang === 'AR' ? "justify-end" : "justify-start", titleFont)}>
-            <span>{getPostedAtText()} {formattedDate}</span>
-            <Calendar size={10} />
+        <div className="mt-auto pt-2 border-t border-zinc-100 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className={cn("text-xl md:text-2xl text-primary leading-none", lang === 'AR' ? 'font-black' : 'font-black')}>
+              {mounted ? price.toLocaleString() : price}
+            </span>
+            <span className={cn("text-[10px] text-zinc-500 font-black mt-0.5 uppercase", titleFont)}>{getCurrencyText()}</span>
           </div>
-        )}
+          
+          {formattedDate && (
+            <div className={cn("flex items-center gap-1.5 text-[9px] text-zinc-400 bg-zinc-50 px-2 py-1 rounded-md", normalFont)}>
+              <Clock size={10} />
+              <span>{formattedDate}</span>
+            </div>
+          )}
+        </div>
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
-        <Button className={cn("w-full gap-2 group/btn bg-zinc-50 border-2 border-black/10 text-black hover:bg-black hover:text-white transition-all rounded-xl uppercase", buttonFont)} variant="outline" asChild>
+        <Button className={cn("w-full h-11 gap-2 bg-zinc-950 text-secondary hover:bg-black hover:scale-[1.02] transition-all rounded-xl uppercase shadow-md shadow-black/10 border-none", buttonFont)} asChild>
           <Link href={`/products/${id}`}>
-            <ShoppingCart size={18} className="group-hover/btn:scale-110 transition-transform" />
-            {getDetailsBtnText()}
+            <ShoppingCart size={16} />
+            {lang === 'AR' ? 'طلب القطعة' : 'ORDER NOW'}
           </Link>
         </Button>
       </CardFooter>

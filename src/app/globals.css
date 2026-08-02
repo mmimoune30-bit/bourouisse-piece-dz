@@ -1,30 +1,31 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Pure Black & Gold Theme */
-    --background: 210 40% 98%;
-    --foreground: 0 0% 0%; /* Pure Black Text */
+    /* Enhanced Pure Black & Gold Theme with High Contrast */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%; /* Absolute Black */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%; /* Pure Black Primary Elements */
+    --primary: 0 0% 0%; /* Absolute Black Elements */
     --primary-foreground: 0 0% 100%;
-    --secondary: 43 65% 50%; /* Gold Remains as Accent */
+    --secondary: 43 100% 50%; /* Vibrant Gold/Yellow Accent */
     --secondary-foreground: 0 0% 0%;
-    --muted: 210 40% 92%;
-    --muted-foreground: 0 0% 20%;
-    --accent: 43 65% 50%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 15%; /* Darker Gray for readability */
+    --accent: 43 100% 50%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 0 0% 0%;
-    --radius: 1rem;
+    --radius: 1.25rem;
   }
 }
 
@@ -34,6 +35,9 @@
   }
   body {
     @apply bg-background text-foreground font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
   }
 }
 
@@ -80,4 +84,15 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom Scrollbar for modern look */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-zinc-100;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-300 rounded-full hover:bg-zinc-400 transition-colors;
 }
