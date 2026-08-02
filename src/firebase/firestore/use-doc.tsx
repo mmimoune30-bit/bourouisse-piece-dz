@@ -11,7 +11,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف مخصص للاستماع لمستند واحد في Firestore مع فحص الجاهزية.
+ * خطاف الاستماع لمستند واحد - نسخة الحماية القصوى.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
@@ -40,12 +40,10 @@ export function useDoc(docRef: DocumentReference | null) {
           
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: docRef.path || 'firestore_doc_query',
+              path: docRef.path || 'firestore_document_sync',
               operation: 'get'
             });
             errorEmitter.emit('permission-error', permError);
-          } else {
-            console.warn("Firestore Doc Error:", err.message);
           }
           
           setError(err);
@@ -57,8 +55,10 @@ export function useDoc(docRef: DocumentReference | null) {
         isSubscribed = false;
         unsubscribe();
       };
-    } catch (e) {
-      setLoading(false);
+    } catch (e: any) {
+      if (isSubscribed) {
+        setLoading(false);
+      }
     }
   }, [docRef]);
 

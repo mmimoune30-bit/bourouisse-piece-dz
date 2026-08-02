@@ -6,7 +6,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { useAuth, useFirestore } from '../provider';
 
 /**
- * خطاف مخصص لإدارة حالة المستخدم مع حماية ضد أخطاء التهيئة والـ HMR.
+ * خطاف إدارة المستخدم - النسخة المؤمنة ضد Hot Reload.
  */
 export function useUser() {
   const { auth } = useAuth();
@@ -16,7 +16,7 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // التأكد من جاهزية الخدمات قبل بدء أي عملية
+    // التأكد من توفر الخدمات قبل بدء المراقبة
     if (!auth || !firestore) {
       return;
     }
@@ -29,19 +29,19 @@ export function useUser() {
       setUser(u);
       
       if (u) {
-        // الاستماع لتغييرات الملف الشخصي بوعي تام بـ Firestore Engine
+        // مراقبة الملف الشخصي فقط عند توفر مستخدم
         try {
           unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
             if (!isMounted) return;
             setProfile(snap.exists() ? snap.data() : null);
             setLoading(false);
           }, (error) => {
-            if (!isMounted) return;
-            console.warn("User Profile Sync Error:", error.message);
-            setLoading(false);
+            if (isMounted) {
+              setLoading(false);
+            }
           });
         } catch (e) {
-          setLoading(false);
+          if (isMounted) setLoading(false);
         }
       } else {
         setProfile(null);

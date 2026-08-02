@@ -11,8 +11,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف مخصص للاستماع لمجموعات البيانات في Firestore.
- * يحتوي على فحص استقرار (Readiness Check) لمنع أخطاء التهيئة.
+ * خطاف الاستماع للمجموعات - نسخة الحماية القصوى.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,7 +19,7 @@ export function useCollection(query: Query | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // لا نبدأ الاستماع إذا لم يتوفر الاستعلام أو لم تجهز Firestore
+    // التأكد من توفر الاستعلام واستقرار نسخة Firestore
     if (!query) {
       setLoading(false);
       return;
@@ -44,15 +43,15 @@ export function useCollection(query: Query | null) {
         (err) => {
           if (!isSubscribed) return;
           
-          // معالجة صامتة ومنظمة لأخطاء الصلاحيات
+          // معالجة منظمة لأخطاء الصلاحيات
           if (err.code === 'permission-denied') {
             const permError = new FirestorePermissionError({
-              path: 'firestore_collection_query',
+              path: 'firestore_collection_sync',
               operation: 'list'
             });
             errorEmitter.emit('permission-error', permError);
-          } else {
-            console.warn("Firestore Listener Warning:", err.message);
+          } else if (err.code !== 'cancelled') {
+            console.warn("Firestore Real-time Sync Warning:", err.message);
           }
           
           setError(err);
@@ -65,8 +64,10 @@ export function useCollection(query: Query | null) {
         unsubscribe();
       };
     } catch (e: any) {
-      console.error("Hook Subscription Error:", e);
-      setLoading(false);
+      if (isSubscribed) {
+        setError(e);
+        setLoading(false);
+      }
     }
   }, [query]);
 
