@@ -4,14 +4,15 @@ import {
   getFirestore, 
   Firestore, 
   memoryLocalCache,
-  terminate
+  persistentLocalCache,
+  persistentMultipleTabManager
 } from "firebase/firestore";
 import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
  * @fileOverview نظام تهيئة Firebase فائق الاستقرار.
- * يستخدم نمط Singleton العالمي لمنع تعارضات ID: ca9 وضمان استقرار المحرك الافتراضي.
+ * يستخدم نمط Singleton العالمي لمنع تعارضات ID: ca9 وضمان استقرار المحرك الافتراضي في Next.js 15.
  */
 
 interface FirebaseStore {
@@ -20,7 +21,7 @@ interface FirebaseStore {
   auth?: Auth;
 }
 
-const GLOBAL_KEY = "__BOUR_FIREBASE_STORE__";
+const GLOBAL_KEY = "__BOUR_FIREBASE_STORE_V2__";
 
 export const initializeFirebase = () => {
   if (typeof window === "undefined") return { app: null, db: null, auth: null };
@@ -41,13 +42,21 @@ export const initializeFirebase = () => {
     // 2. تهيئة Firestore بنمط دفاعي لمنع خطأ ca9
     if (!store.db) {
       try {
-        // نحاول الحصول على النسخة الحالية أولاً
-        store.db = getFirestore(store.app);
+        // في بيئة التطوير، نستخدم الذاكرة المؤقتة فقط لمنع تعارضات IndexedDB Lock (ID: ca9)
+        if (process.env.NODE_ENV === 'development') {
+          store.db = initializeFirestore(store.app, {
+            localCache: memoryLocalCache(),
+          });
+        } else {
+          // في الإنتاج، نستخدم التخزين المستمر للأداء
+          store.db = initializeFirestore(store.app, {
+            localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+          });
+        }
       } catch (e) {
-        // إذا فشلنا، نقوم بالتهيئة مع إعدادات الذاكرة المؤقتة الصريحة
-        store.db = initializeFirestore(store.app, {
-          localCache: memoryLocalCache(), // الذاكرة المؤقتة تمنع تعارضات IndexedDB في HMR
-        });
+        // إذا فشلنا في التهيئة المخصصة، نستعيد النسخة الافتراضية
+        console.warn("Firestore custom init failed, falling back to getFirestore:", e);
+        store.db = getFirestore(store.app);
       }
     }
 
@@ -58,18 +67,18 @@ export const initializeFirebase = () => {
 
     return { app: store.app, db: store.db, auth: store.auth };
   } catch (error) {
-    console.error("Firebase Initialization Failure:", error);
-    // حالة استرجاع الطوارئ
-    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    console.error("Critical Firebase Initialization Failure:", error);
+    // حالة استرجاع الطوارئ القصوى
+    const fallbackApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     return {
-      app,
-      db: getFirestore(app),
-      auth: getAuth(app),
+      app: fallbackApp,
+      db: getFirestore(fallbackApp),
+      auth: getAuth(fallbackApp),
     };
   }
 };
 
-// تصدير النسخ المباشرة مع التحقق من البيئة
+// تصدير النسخ المباشرة (للخادم أو الوصول السريع)
 const instances = typeof window !== "undefined" ? initializeFirebase() : { app: null, db: null, auth: null };
 
 export const app = instances.app;

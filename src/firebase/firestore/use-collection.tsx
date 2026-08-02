@@ -12,7 +12,7 @@ import { FirestorePermissionError } from '../errors';
 
 /**
  * الخطاف المطور لجلب المجموعات.
- * يعالج تعارضات ID: ca9 عبر ضمان عدم تكرار المستمعين وتوفير تنظيف صارم.
+ * يعالج تعارضات ID: ca9 عبر ضمان عدم تكرار المستمعين وتوفير تنظيف صارم للمحرك.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -23,7 +23,7 @@ export function useCollection(query: Query | null) {
   const activeQueryRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // 1. فحص الجاهزية والاستقرار
+    // 1. فحص الجاهزية
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -36,7 +36,7 @@ export function useCollection(query: Query | null) {
     const queryKey = query.toString();
     if (activeQueryRef.current === queryKey) return;
 
-    // 2. تنظيف أي مستمع نشط قبل البدء بجديد
+    // 2. تنظيف أي مستمع نشط قبل البدء بجديد لمنع تعارض Virtual Engine
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
@@ -70,7 +70,7 @@ export function useCollection(query: Query | null) {
             errorEmitter.emit('permission-error', permError);
           }
           
-          console.warn("Firestore collection sync issue:", err.message);
+          console.warn("Firestore sync issue:", err.message);
           setError(err);
           setLoading(false);
         }

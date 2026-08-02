@@ -6,7 +6,7 @@ import { FirebaseProvider } from './provider';
 
 /**
  * مزود خدمات Firebase الدفاعي.
- * يمنع انهيار التطبيق (Application Error) ويحمي الـ Virtual Engine من التعارضات.
+ * يمنع انهيار التطبيق (Application Error) ويقضي على خطأ ID: ca9 عبر تثبيت الأغراض.
  */
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -20,18 +20,26 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
     if (typeof window !== 'undefined' && !instancesRef.current) {
       try {
         const { app, db, auth } = initializeFirebase();
-        instancesRef.current = { app, db, auth };
-        setIsReady(true);
+        if (app && db && auth) {
+          instancesRef.current = { app, db, auth };
+          setIsReady(true);
+        } else {
+          // محاولة ثانية في حال فشل Singleton المؤقت
+          setTimeout(() => {
+            const retry = initializeFirebase();
+            instancesRef.current = { app: retry.app, db: retry.db, auth: retry.auth };
+            setIsReady(true);
+          }, 100);
+        }
       } catch (error) {
-        console.error("Critical Firebase Provider Error:", error);
-        setIsReady(true); // الاستمرار لتفعيل Error Boundaries إذا لزم الأمر
+        console.error("Firebase Provider Crash:", error);
+        setIsReady(true);
       }
     } else {
       setIsReady(true);
     }
   }, []);
 
-  // شاشة تحميل ذكية لمنع وميض الواجهة قبل جاهزية قاعدة البيانات
   if (!isReady || !instancesRef.current?.app) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-center text-white">
@@ -40,7 +48,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
           <div className="space-y-2">
             <h2 className="text-white font-black tracking-widest text-xl uppercase">BOUROUISSE</h2>
             <p className="text-white/30 text-[10px] uppercase tracking-widest animate-pulse font-bold">
-              Establishing Secure Connection...
+              Initializing Secure Database Engine...
             </p>
           </div>
         </div>
