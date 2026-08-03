@@ -3,10 +3,9 @@ import {
   initializeFirestore, 
   getFirestore, 
   memoryLocalCache,
-  Firestore,
-  connectFirestoreEmulator
+  Firestore
 } from "firebase/firestore";
-import { getAuth, Auth, connectAuthEmulator } from "firebase/auth";
+import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
@@ -18,7 +17,7 @@ import { firebaseConfig } from "./config";
  * 3. معالجة استباقية لمحاولات إعادة التهيئة عبر try/catch.
  */
 
-const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_V4__";
+const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_PRODUCTION_V1__";
 
 interface FirebaseInstances {
   app: FirebaseApp;
@@ -59,7 +58,8 @@ function getFirebaseInstances(): FirebaseInstances {
       globalScope[FIREBASE_GLOBAL_KEY] = { app, db, auth };
     } catch (error) {
       console.error("Critical Firebase Failure:", error);
-      throw error;
+      // نرجع نُسخ فارغة مؤقتاً بدلاً من طرح خطأ يكسر الواجهة بالكامل
+      return { app: null as any, db: null as any, auth: null as any };
     }
   }
 
