@@ -1,79 +1,56 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { 
   initializeFirestore, 
-  getFirestore, 
-  memoryLocalCache,
-  Firestore
+  memoryLocalCache, 
+  getFirestore 
 } from "firebase/firestore";
-import { getAuth, Auth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
- * @fileOverview الحل التقني النهائي والمستقر لخطأ INTERNAL ASSERTION FAILED (ID: ca9).
- * 
- * المبادئ المتبعة:
- * 1. استخدام Singleton عالمي عبر globalThis لمنع تعارضات Fast Refresh.
- * 2. تعطيل IndexedDB صراحة واستخدام Memory Cache فقط لحل مشكلة قفل البيانات.
- * 3. معالجة استباقية لمحاولات إعادة التهيئة عبر try/catch.
+ * @fileOverview الحل التقني النهائي لخطأ INTERNAL ASSERTION FAILED (ID: ca9).
+ * يعتمد على تعطيل الكاش المستمر واستخدام Memory Cache فقط لتجنب تعارضات Next.js.
  */
 
-const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_V1__";
+// نمط Singleton لمنع إعادة التهيئة المتكررة في بيئة التطوير
+const globalForFirebase = globalThis as unknown as {
+  app: ReturnType<typeof initializeApp>;
+  db: ReturnType<typeof initializeFirestore>;
+  auth: ReturnType<typeof getAuth>;
+};
 
-interface FirebaseInstances {
-  app: FirebaseApp;
-  db: Firestore;
-  auth: Auth;
+// 1. تهيئة تطبيق Firebase
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+// 2. تهيئة Firestore مع إعداد memoryLocalCache (الحل المطلوب)
+let db;
+if (globalForFirebase.db) {
+  db = globalForFirebase.db;
+} else {
+  try {
+    // نستخدم initializeFirestore لإرسال إعدادات الكاش صراحة
+    db = initializeFirestore(app, {
+      localCache: memoryLocalCache(),
+    });
+  } catch (e) {
+    // في حال كان المحرك قيد التشغيل بالفعل، نسترجع النسخة الحالية
+    db = getFirestore(app);
+  }
 }
 
-function getFirebaseInstances(): FirebaseInstances {
-  // الحماية من التنفيذ في جانب السيرفر
-  if (typeof window === "undefined") {
-    return { app: null as any, db: null as any, auth: null as any };
-  }
+// 3. تهيئة خدمة الهوية
+const auth = globalForFirebase.auth ?? getAuth(app);
 
-  const globalScope = globalThis as any;
-
-  // استرجاع النسخة الحالية إذا كانت موجودة (التعامل مع Hot Reload)
-  if (!globalScope[FIREBASE_GLOBAL_KEY]) {
-    try {
-      // 1. تهيئة التطبيق (App)
-      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-      
-      // 2. تهيئة قاعدة البيانات (Firestore) مع تعطيل التخزين المستمر صراحة
-      let db: Firestore;
-      try {
-        // الحل الجذري: إجبار استخدام ذاكرة التخزين المؤقت فقط لمنع خطأ ca9
-        db = initializeFirestore(app, {
-          localCache: memoryLocalCache(),
-        });
-      } catch (e) {
-        // في حال كان المحرك قيد التشغيل بالفعل أو فشلت التهيئة المخصصة، نسترجع النسخة الحالية
-        db = getFirestore(app);
-      }
-
-      // 3. تهيئة خدمة الهوية (Auth)
-      const auth = getAuth(app);
-
-      // حفظ النسخ في النطاق العالمي لضمان ثبات المراجع طوال فترة جلسة المتصفح
-      globalScope[FIREBASE_GLOBAL_KEY] = { app, db, auth };
-    } catch (error) {
-      console.error("Critical Firebase Failure:", error);
-      // نرجع نُسخ فارغة مؤقتاً بدلاً من طرح خطأ يكسر الواجهة بالكامل
-      return { app: null as any, db: null as any, auth: null as any };
-    }
-  }
-
-  return globalScope[FIREBASE_GLOBAL_KEY];
+// حفظ المراجع عالمياً في بيئة التطوير لمنع أخطاء الذاكرة أثناء الـ Hot Reload
+if (process.env.NODE_ENV !== "production") {
+  globalForFirebase.app = app;
+  globalForFirebase.db = db;
+  globalForFirebase.auth = auth;
 }
 
-// استخراج النسخ المستقرة
-const instances = getFirebaseInstances();
-
-export const app = instances.app;
-export const db = instances.db;
-export const auth = instances.auth;
+export { app, db, auth };
 
 /**
- * وظيفة التهيئة الرئيسية للتصدير (Idempotent)
+ * وظيفة التهيئة المتوافقة مع بنية المشروع الحالية
  */
-export const initializeFirebase = () => instances;
+export const initializeFirebase = () => ({ app, db, auth });
