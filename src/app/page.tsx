@@ -29,12 +29,27 @@ import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
+const defaultCategoryImages: Record<string, string> = {
+  'Engine': 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=500',
+  'Gearbox': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=500',
+  'Body': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500',
+  'Electrical': 'https://images.unsplash.com/photo-1558441719-443b34468ed9?w=500',
+  'Suspension': 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=500',
+  'Brakes': 'https://images.unsplash.com/photo-1600793575654-910699b5e4d4?w=500',
+  'Cooling': 'https://images.unsplash.com/photo-1504222490345-c075b6008014?w=500',
+  'Fuel': 'https://images.unsplash.com/photo-1527016016393-d72a785100cc?w=500',
+  'Exhaust': 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=500',
+  'Wheels & Tires': 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=500',
+  'Interior': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=500',
+  'Accessories': 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=500',
+  'Lighting': 'https://images.unsplash.com/photo-1508974239320-0a029497e820?w=500'
+};
+
 export default function Home() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [api, setApi] = useState<CarouselApi>();
   
-  // جلب الصور المخصصة للتصنيفات
   const { data: categoryImagesData } = useCollection(
     firestore ? collection(firestore, "category_images") : null
   );
@@ -124,7 +139,6 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow pt-[190px] md:pt-[210px]">
-        {/* Compact Hero Section */}
         <section className="w-full px-1 mt-1">
           <div className={cn("flex flex-col lg:flex-row gap-1", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
@@ -190,7 +204,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Categories Section (Enhanced Grid Layout) */}
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
@@ -202,7 +215,7 @@ export default function Home() {
           </div>
           <div className="flex flex-row justify-center gap-3 overflow-x-auto pb-4 pt-1 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
             {PART_CATEGORIES.map((cat, i) => {
-              const categoryImage = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
+              const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
                 <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0 group">
                   <div className="flex flex-col items-center gap-2.5">
@@ -220,7 +233,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products Section (Prominent Slider) */}
         <section className="px-1 py-1">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
@@ -254,7 +266,6 @@ export default function Home() {
           </Carousel>
         </section>
 
-        {/* Latest Parts Grid (High Density) */}
         <section className="px-1 py-2 mt-4 bg-white/40">
           <div 
             dir={lang === 'AR' ? "rtl" : "ltr"}
