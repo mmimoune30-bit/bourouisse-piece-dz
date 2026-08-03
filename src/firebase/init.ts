@@ -17,7 +17,7 @@ import { firebaseConfig } from "./config";
  * 3. معالجة استباقية لمحاولات إعادة التهيئة عبر try/catch.
  */
 
-const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_PRODUCTION_V1__";
+const FIREBASE_GLOBAL_KEY = "__BOUR_FIREBASE_STABLE_FINAL_V1__";
 
 interface FirebaseInstances {
   app: FirebaseApp;
