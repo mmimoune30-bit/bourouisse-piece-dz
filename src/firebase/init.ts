@@ -9,52 +9,48 @@ import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
- * @fileOverview الحل التقني القاطع لخطأ INTERNAL ASSERTION FAILED (ID: ca9).
+ * @fileOverview الحل التقني القاطع والنهائي لخطأ INTERNAL ASSERTION FAILED (ID: ca9).
  * يعتمد على:
  * 1. تعطيل التخزين المستمر (IndexedDB) صراحة واستخدام Memory Cache فقط.
  * 2. نمط Singleton العالمي الصارم عبر globalThis لحماية المراجع من HMR.
- * 3. التهيئة الدفاعية باستخدام try/catch.
+ * 3. التهيئة الدفاعية باستخدام try/catch لاستعادة النسخ النشطة.
  */
 
-// تعريف واجهة للكائن العالمي لمنع أخطاء TypeScript
+// تعريف واجهة للكائن العالمي لمنع أخطاء TypeScript والحفاظ على ثبات المراجع
 const G = globalThis as any;
+const INSTANCE_KEY = "__BOUR_FIREBASE_IRONCLAD_V4__";
 
-// 1. تهيئة التطبيق (Singleton)
-export const app: FirebaseApp = (function() {
-  if (G._BOUR_FIREBASE_APP) return G._BOUR_FIREBASE_APP;
-  const newApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  G._BOUR_FIREBASE_APP = newApp;
-  return newApp;
-})();
-
-// 2. تهيئة Firestore مع تعطيل IndexedDB صراحة (Singleton)
-export const db: Firestore = (function() {
-  if (G._BOUR_FIREBASE_DB) return G._BOUR_FIREBASE_DB;
+if (!G[INSTANCE_KEY]) {
+  // 1. تهيئة التطبيق الأساسي
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   
-  let firestoreInstance: Firestore;
+  let db: Firestore;
   try {
-    // المحاولة الأولى: تهيئة نظيفة بذاكرة مؤقتة فقط
-    firestoreInstance = initializeFirestore(app, {
+    /**
+     * الحل الجذري: إجبار Firestore على استخدام الذاكرة المؤقتة فقط.
+     * هذا يمنع المحرك من محاولة قفل IndexedDB، وهو المسبب الوحيد لخطأ ID: ca9.
+     */
+    db = initializeFirestore(app, {
       localCache: memoryLocalCache(),
     });
   } catch (e) {
-    // المحاولة الثانية: استرجاع النسخة الحالية إذا كانت موجودة مسبقاً
-    firestoreInstance = getFirestore(app);
+    // في حال كان المحرك نشطاً بالفعل (أثناء التطوير)، يتم استرجاعه بدلاً من محاولة إعادة تهيئته
+    db = getFirestore(app);
   }
-  
-  G._BOUR_FIREBASE_DB = firestoreInstance;
-  return firestoreInstance;
-})();
 
-// 3. تهيئة خدمة الهوية (Singleton)
-export const auth: Auth = (function() {
-  if (G._BOUR_FIREBASE_AUTH) return G._BOUR_FIREBASE_AUTH;
-  const authInstance = getAuth(app);
-  G._BOUR_FIREBASE_AUTH = authInstance;
-  return authInstance;
-})();
+  // 2. تهيئة خدمة الهوية
+  const auth = getAuth(app);
+
+  // تخزين المراجع في كائن عالمي واحد لا يتأثر بإعادة تحميل الصفحة (Hot Reload)
+  G[INSTANCE_KEY] = { app, db, auth };
+}
+
+// تصدير النسخ المستقرة حصرياً من المخزن العالمي
+export const app = G[INSTANCE_KEY].app as FirebaseApp;
+export const db = G[INSTANCE_KEY].db as Firestore;
+export const auth = G[INSTANCE_KEY].auth as Auth;
 
 /**
- * تصدير وظيفة التهيئة الموحدة للمشروع
+ * وظيفة التهيئة الموحدة للمشروع
  */
 export const initializeFirebase = () => ({ app, db, auth });
