@@ -217,14 +217,22 @@ export default function Home() {
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
-                <div key={i} className="shrink-0 pointer-events-none">
+                <div key={i} className="shrink-0">
                   <div className="flex flex-col items-center gap-2.5">
-                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-[28px] overflow-hidden border-2 border-white shadow-md relative bg-white">
+                    {/* Display Only Image */}
+                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-[28px] overflow-hidden border-2 border-white shadow-md relative bg-white pointer-events-none">
                       <Image src={categoryImage} alt={cat.ar} fill className="object-cover" data-ai-hint={cat.en} />
                     </div>
-                    <span className={cn("text-[11px] md:text-sm text-zinc-800 uppercase tracking-tight text-center max-w-[90px] leading-tight px-1", titleFont)}>
+                    {/* Interactive Title Link */}
+                    <Link 
+                      href={`/catalog?category=${cat.en}`}
+                      className={cn(
+                        "text-[10px] md:text-sm text-zinc-800 uppercase tracking-tight text-center max-w-[90px] leading-tight px-3 py-1.5 rounded-full border border-zinc-200 bg-white hover:bg-secondary hover:text-primary hover:border-secondary transition-all shadow-sm active:scale-95",
+                        titleFont
+                      )}
+                    >
                       {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
-                    </span>
+                    </Link>
                   </div>
                 </div>
               );
