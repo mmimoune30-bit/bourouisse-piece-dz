@@ -31,7 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useFirestore } from "@/firebase";
-import { collection, query, orderBy, limit, getCountFromServer, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, limit, getCountFromServer, getDocs } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -83,28 +83,36 @@ export default function AdminDashboard() {
     if (!transactionsQuery) return;
 
     let isMounted = true;
-    const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
-      if (!isMounted) return;
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const fetchTransactions = async () => {
+      setLoadingTransactions(true);
+      try {
+        const snapshot = await getDocs(transactionsQuery);
+        if (!isMounted) return;
+        
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-      setTransactions(data);
-      setLoadingTransactions(false);
-    }, async (err) => {
-      if (!isMounted) return;
-      const permissionError = new FirestorePermissionError({
-        path: "subscription_requests",
-        operation: 'list',
-      });
-      errorEmitter.emit('permission-error', permissionError);
-      setLoadingTransactions(false);
-    });
+        setTransactions(data);
+        setLoadingTransactions(false);
+      } catch (err: any) {
+        if (!isMounted) return;
+        if (err.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+            path: "subscription_requests",
+            operation: 'list',
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        }
+        setLoadingTransactions(false);
+      }
+    };
+
+    fetchTransactions();
 
     return () => {
       isMounted = false;
-      unsubscribe();
     };
   }, [transactionsQuery]);
 
@@ -189,7 +197,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader className="flex flex-row-reverse items-center justify-between border-b">
-            <CardTitle className="text-xl font-black">آخر عمليات الاشتراك (تحديث لحظي)</CardTitle>
+            <CardTitle className="text-xl font-black">آخر عمليات الاشتراك</CardTitle>
             <Link href="/admin/subscriptions">
               <Button variant="ghost" className="text-secondary font-bold">عرض الكل</Button>
             </Link>

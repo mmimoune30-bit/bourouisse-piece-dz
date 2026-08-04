@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useAuth, useFirestore } from '../provider';
 
+/**
+ * خطاف إدارة هوية المستخدم وملفه الشخصي لمرة واحدة.
+ */
 export function useUser() {
   const { auth } = useAuth();
   const { firestore } = useFirestore();
@@ -13,27 +16,23 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // تأمين: الخروج بصمت إذا لم تكن الخدمات جاهزة
     if (!auth || !firestore || typeof window === 'undefined') {
       return;
     }
 
     let isMounted = true;
-    let unsubscribeProfile: (() => void) | undefined;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
       if (!isMounted) return;
       setUser(u);
       
       if (u) {
         try {
-          unsubscribeProfile = onSnapshot(doc(firestore, "users", u.uid), (snap) => {
-            if (!isMounted) return;
-            setProfile(snap.exists() ? snap.data() : null);
-            setLoading(false);
-          }, (error) => {
-            if (isMounted) setLoading(false);
-          });
+          // جلب الملف الشخصي لمرة واحدة بدلاً من onSnapshot
+          const userDoc = await getDoc(doc(firestore, "users", u.uid));
+          if (!isMounted) return;
+          setProfile(userDoc.exists() ? userDoc.data() : null);
+          setLoading(false);
         } catch (e) {
           if (isMounted) setLoading(false);
         }
@@ -46,7 +45,6 @@ export function useUser() {
     return () => {
       isMounted = false;
       unsubscribeAuth();
-      if (unsubscribeProfile) unsubscribeProfile();
     };
   }, [auth, firestore]);
 

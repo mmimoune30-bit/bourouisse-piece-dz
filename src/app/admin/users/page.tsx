@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react";
@@ -33,7 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore } from "@/firebase";
-import { collection, onSnapshot, updateDoc, deleteDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -62,6 +61,7 @@ export default function UserManagement() {
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
   const [users, setUsers] = useState<SystemUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Customer");
@@ -72,30 +72,33 @@ export default function UserManagement() {
     return collection(firestore, "users");
   }, [firestore]);
 
-  useEffect(() => {
+  const fetchUsers = async () => {
     if (!usersCollectionRef) return;
+    setLoading(true);
+    try {
+      const snapshot = await getDocs(usersCollectionRef);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<SystemUser, "id">),
+      }));
 
-    const unsubscribe = onSnapshot(
-      usersCollectionRef,
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<SystemUser, "id">),
-        }));
-
-        setUsers(data);
-        setMounted(true);
-      },
-      async (err) => {
+      setUsers(data);
+      setMounted(true);
+      setLoading(false);
+    } catch (err: any) {
+      if (err.code === 'permission-denied') {
         const permissionError = new FirestorePermissionError({
           path: "users",
           operation: 'list',
         });
         errorEmitter.emit('permission-error', permissionError);
       }
-    );
+      setLoading(false);
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchUsers();
   }, [usersCollectionRef]);
 
   const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -121,6 +124,7 @@ export default function UserManagement() {
       .then(() => {
         toast({ title: "تم إنشاء السجل", description: "تمت إضافة المستخدم لقاعدة البيانات بنجاح." });
         setIsAddDialogOpen(false);
+        fetchUsers(); // Refresh data
       })
       .catch((err) => {
         toast({ variant: "destructive", title: "فشل الإنشاء", description: "ليس لديك صلاحية لإضافة هذا الدور." });
@@ -132,7 +136,10 @@ export default function UserManagement() {
     const newStatus = currentStatus === "Active" ? "Blocked" : "Active";
     
     updateDoc(doc(firestore, "users", id), { status: newStatus })
-      .then(() => toast({ title: "تم تحديث الحالة", description: `الحساب الآن ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` }))
+      .then(() => {
+        toast({ title: "تم تحديث الحالة", description: `الحساب الآن ${newStatus === 'Active' ? 'نشط' : 'محظور'}.` });
+        fetchUsers(); // Refresh data
+      })
       .catch((err) => {
         toast({ variant: "destructive", title: "خطأ", description: "لا يمكن تعديل حالة هذا المستخدم." });
       });
@@ -141,7 +148,10 @@ export default function UserManagement() {
   const handleUpdateRole = (id: string, newRole: string) => {
     if (!firestore) return;
     updateDoc(doc(firestore, "users", id), { role: newRole })
-      .then(() => toast({ title: "تحديث الصلاحيات", description: `تم تغيير الدور إلى ${newRole}.` }))
+      .then(() => {
+        toast({ title: "تحديث الصلاحيات", description: `تم تغيير الدور إلى ${newRole}.` });
+        fetchUsers(); // Refresh data
+      })
       .catch(() => toast({ variant: "destructive", title: "فشل التعديل", description: "ليس لديك صلاحية تغيير الأدوار." }));
   };
 
@@ -149,8 +159,13 @@ export default function UserManagement() {
     if (!firestore || !confirm("تحذير: سيتم حذف سجل المستخدم نهائياً من Firestore. هل أنت متأكد؟")) return;
     
     deleteDoc(doc(firestore, "users", id))
-      .then(() => toast({ variant: "destructive", title: "تم الحذف", description: "تمت إزالة السجل بالكامل." }))
-      .catch(() => toast({ variant: "destructive", title: "فشل الحذف", description: "فقط Super Admin يمكنه حذف المستخدمين." }));
+      .then(() => {
+        toast({ title: "تم الحذف", description: "تمت إزالة السجل بالكامل." });
+        fetchUsers(); // Refresh data
+      })
+      .catch((err) => {
+        toast({ variant: "destructive", title: "فشل الحذف", description: "فقط Super Admin يمكنه حذف المستخدمين." });
+      });
   };
 
   const filteredUsers = users.filter(u => 
@@ -158,10 +173,10 @@ export default function UserManagement() {
     u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (!mounted) return (
+  if (loading && !mounted) return (
     <div className="h-screen flex flex-col items-center justify-center font-black text-primary animate-pulse">
       <Loader2 className="animate-spin mb-4 text-secondary" size={48} />
-      جاري مزامنة بيانات المستخدمين...
+      جاري تحميل بيانات المستخدمين...
     </div>
   );
 
@@ -172,7 +187,7 @@ export default function UserManagement() {
           <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
             <UserCog size={32} className="text-secondary" /> إدارة الهوية والصلاحيات
           </h1>
-          <p className="text-muted-foreground mt-1">التحكم in أدوار المستخدمين وحالات الحسابات بشكل آمن.</p>
+          <p className="text-muted-foreground mt-1">التحكم في أدوار المستخدمين وحالات الحسابات بشكل آمن.</p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -229,6 +244,7 @@ export default function UserManagement() {
              <ShieldCheck size={20} className="text-secondary" /> 
              {filteredUsers.length} مستخدم مسجل
           </Badge>
+          <Button variant="ghost" onClick={fetchUsers} className="h-12 w-12 rounded-2xl"><Loader2 size={18} className={loading ? "animate-spin" : ""} /></Button>
         </div>
       </div>
 
@@ -329,7 +345,7 @@ export default function UserManagement() {
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-32 text-muted-foreground">
-                  لا توجد بيانات مستخدمين بعد
+                  {loading ? "جاري تحميل البيانات..." : "لا توجد بيانات مستخدمين بعد"}
                 </TableCell>
               </TableRow>
             )}
