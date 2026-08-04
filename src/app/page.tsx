@@ -30,19 +30,19 @@ import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 const defaultCategoryImages: Record<string, string> = {
-  'Engine': 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=500',
-  'Gearbox': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=500',
-  'Body': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500',
-  'Electrical': 'https://images.unsplash.com/photo-1558441719-443b34468ed9?w=500',
-  'Suspension': 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=500',
-  'Brakes': 'https://images.unsplash.com/photo-1600793575654-910699b5e4d4?w=500',
-  'Cooling': 'https://images.unsplash.com/photo-1504222490345-c075b6008014?w=500',
-  'Fuel': 'https://images.unsplash.com/photo-1527016016393-d72a785100cc?w=500',
-  'Exhaust': 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=500',
-  'Wheels & Tires': 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=500',
-  'Interior': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=500',
-  'Accessories': 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=500',
-  'Lighting': 'https://images.unsplash.com/photo-1508974239320-0a029497e820?w=500'
+  'Engine': 'https://picsum.photos/seed/engine/500/500',
+  'Gearbox': 'https://picsum.photos/seed/gearbox/500/500',
+  'Body': 'https://picsum.photos/seed/bodywork/500/500',
+  'Electrical': 'https://picsum.photos/seed/electrical/500/500',
+  'Suspension': 'https://picsum.photos/seed/suspension/500/500',
+  'Brakes': 'https://picsum.photos/seed/brakes/500/500',
+  'Cooling': 'https://picsum.photos/seed/radiator/500/500',
+  'Fuel': 'https://picsum.photos/seed/fuel/500/500',
+  'Exhaust': 'https://picsum.photos/seed/exhaust/500/500',
+  'Wheels & Tires': 'https://picsum.photos/seed/wheels/500/500',
+  'Interior': 'https://picsum.photos/seed/interior/500/500',
+  'Accessories': 'https://picsum.photos/seed/accessories/500/500',
+  'Lighting': 'https://picsum.photos/seed/lighting/500/500'
 };
 
 export default function Home() {
@@ -181,7 +181,7 @@ export default function Home() {
             </div>
 
             <div className="lg:w-1/4 h-[180px] md:h-[240px] relative rounded-lg overflow-hidden bg-zinc-950 border-2 border-primary/5 group">
-              <Image src="https://picsum.photos/seed/auto-hero-premium/1200/800" alt="" fill className="object-cover opacity-30 transition-opacity group-hover:opacity-40" />
+              <Image src="https://picsum.photos/seed/auto-hero-premium/1200/800" alt="" fill priority className="object-cover opacity-30 transition-opacity group-hover:opacity-40" />
               <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 6000 })]} className="h-full relative z-10">
                 <CarouselContent className="h-full">
                   <CarouselItem className="h-full flex flex-col items-center justify-center p-6 space-y-4 text-center">
@@ -217,17 +217,16 @@ export default function Home() {
             {PART_CATEGORIES.map((cat, i) => {
               const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
               return (
-                <Link key={i} href={`/catalog?category=${encodeURIComponent(cat.en)}`} className="shrink-0 group">
+                <div key={i} className="shrink-0 pointer-events-none">
                   <div className="flex flex-col items-center gap-2.5">
-                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-[28px] overflow-hidden border-2 border-white shadow-md group-hover:border-secondary group-hover:shadow-xl transition-all duration-300 relative bg-white">
-                      <Image src={categoryImage} alt={cat.ar} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-[28px] overflow-hidden border-2 border-white shadow-md relative bg-white">
+                      <Image src={categoryImage} alt={cat.ar} fill className="object-cover" data-ai-hint={cat.en} />
                     </div>
                     <span className={cn("text-[11px] md:text-sm text-zinc-800 uppercase tracking-tight text-center max-w-[90px] leading-tight px-1", titleFont)}>
                       {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                     </span>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
