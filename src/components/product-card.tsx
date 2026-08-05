@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -7,7 +6,7 @@ import { Star, ShoppingCart, ShieldCheck, Calendar, Clock, MapPin } from "lucide
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -23,7 +22,8 @@ interface ProductCardProps {
   createdAt?: any;
 }
 
-export default function ProductCard({
+// استخدام memo لمنع إعادة الرسم غير الضرورية
+const ProductCard = memo(function ProductCard({
   id,
   name,
   price,
@@ -68,7 +68,8 @@ export default function ProductCard({
     return condition;
   };
 
-  const finalImageSrc = image && image.trim() !== "" ? image : "https://picsum.photos/seed/placeholder/400/400";
+  // استخدام صور Picsum بأبعاد أصغر لتحسين الأداء
+  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/400`;
 
   return (
     <Card className="group bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full">
@@ -78,7 +79,9 @@ export default function ProductCard({
           alt={name} 
           fill 
           className="object-cover transition-transform duration-500 group-hover:scale-105" 
-          data-ai-hint={hint} 
+          data-ai-hint={hint}
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 300px"
+          loading="lazy"
         />
         <div className={cn("absolute top-2", lang === 'AR' ? "left-2" : "right-2")}>
           <Badge className={cn(
@@ -120,4 +123,6 @@ export default function ProductCard({
       </CardContent>
     </Card>
   );
-}
+});
+
+export default ProductCard;

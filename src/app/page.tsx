@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -31,19 +30,19 @@ import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 const defaultCategoryImages: Record<string, string> = {
-  'Engine': 'https://picsum.photos/seed/engine/500/500',
-  'Gearbox': 'https://picsum.photos/seed/gearbox/500/500',
-  'Body': 'https://picsum.photos/seed/bodywork/500/500',
-  'Electrical': 'https://picsum.photos/seed/electrical/500/500',
-  'Suspension': 'https://picsum.photos/seed/suspension/500/500',
-  'Brakes': 'https://picsum.photos/seed/brakes/500/500',
-  'Cooling': 'https://picsum.photos/seed/radiator/500/500',
-  'Fuel': 'https://picsum.photos/seed/fuel/500/500',
-  'Exhaust': 'https://picsum.photos/seed/exhaust/500/500',
-  'Wheels & Tires': 'https://picsum.photos/seed/wheels/500/500',
-  'Interior': 'https://picsum.photos/seed/interior/500/500',
-  'Accessories': 'https://picsum.photos/seed/accessories/500/500',
-  'Lighting': 'https://picsum.photos/seed/lighting/500/500'
+  'Engine': 'https://picsum.photos/seed/engine/200/200',
+  'Gearbox': 'https://picsum.photos/seed/gearbox/200/200',
+  'Body': 'https://picsum.photos/seed/bodywork/200/200',
+  'Electrical': 'https://picsum.photos/seed/electrical/200/200',
+  'Suspension': 'https://picsum.photos/seed/suspension/200/200',
+  'Brakes': 'https://picsum.photos/seed/brakes/200/200',
+  'Cooling': 'https://picsum.photos/seed/radiator/200/200',
+  'Fuel': 'https://picsum.photos/seed/fuel/200/200',
+  'Exhaust': 'https://picsum.photos/seed/exhaust/200/200',
+  'Wheels & Tires': 'https://picsum.photos/seed/wheels/200/200',
+  'Interior': 'https://picsum.photos/seed/interior/200/200',
+  'Accessories': 'https://picsum.photos/seed/accessories/200/200',
+  'Lighting': 'https://picsum.photos/seed/lighting/200/200'
 };
 
 export default function Home() {
@@ -157,7 +156,14 @@ export default function Home() {
                           <CarouselItem key={i} className="h-full">
                             <Link href={`/catalog?query=${encodeURIComponent(campaign.storeName)}`} onClick={() => handleStoreClick(campaign.id)} className="w-full h-full flex items-center gap-8 px-8 md:px-16 hover:bg-slate-50 transition-colors">
                               <div className="w-24 h-24 md:w-40 md:h-40 rounded-2xl overflow-hidden relative border-4 border-white shadow-lg shrink-0 group">
-                                 <Image src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} alt="" fill className="object-cover transition-transform group-hover:scale-110" />
+                                 <Image 
+                                  src={campaign.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${campaign.storeName}`} 
+                                  alt="" 
+                                  fill 
+                                  className="object-cover transition-transform group-hover:scale-110" 
+                                  sizes="(max-width: 768px) 100px, 200px"
+                                  priority={i === 0}
+                                 />
                               </div>
                               <div className={cn("flex flex-col gap-2", lang === 'AR' ? "text-right" : "text-left")}>
                                  <Badge className="bg-secondary text-primary text-[10px] w-fit font-black rounded-sm">👑 {lang === 'AR' ? 'متجر حصري' : 'EXCLUSIVE'}</Badge>
@@ -176,7 +182,14 @@ export default function Home() {
               </div>
 
               <div className="lg:w-1/4 h-[220px] md:h-[300px] relative rounded-xl overflow-hidden bg-gray-900 border border-gray-100 shadow-sm group">
-                <Image src="https://picsum.photos/seed/auto-hero-premium/1200/800" alt="" fill priority className="object-cover opacity-30 transition-opacity group-hover:opacity-40" />
+                <Image 
+                  src="https://picsum.photos/seed/auto-hero-promo/800/600" 
+                  alt="" 
+                  fill 
+                  priority 
+                  className="object-cover opacity-30 transition-opacity group-hover:opacity-40" 
+                  sizes="(max-width: 1024px) 100vw, 25vw"
+                />
                 <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 6000 })]} className="h-full relative z-10">
                   <CarouselContent className="h-full">
                     <CarouselItem className="h-full flex flex-col items-center justify-center p-8 space-y-6 text-center">
@@ -213,7 +226,14 @@ export default function Home() {
                   <div key={i} className="shrink-0 group">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border border-gray-100 shadow-sm relative bg-white pointer-events-none transition-transform group-hover:scale-105">
-                        <Image src={categoryImage} alt={cat.ar} fill className="object-cover" />
+                        <Image 
+                          src={categoryImage} 
+                          alt={cat.ar} 
+                          fill 
+                          className="object-cover" 
+                          sizes="112px"
+                          loading="lazy"
+                        />
                       </div>
                       <Link 
                         href={`/catalog?category=${cat.en}`}
@@ -240,7 +260,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
               {activeFeaturedProducts && activeFeaturedProducts.length > 0 ? (
-                activeFeaturedProducts.slice(0, 6).map((p, i) => (
+                activeFeaturedProducts.slice(0, 12).map((p, i) => (
                   <ProductCard 
                     key={i}
                     id={p.productId} 
@@ -278,7 +298,7 @@ export default function Home() {
                       id={product.id}
                       name={product.name}
                       price={product.price}
-                      image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
+                      image={product.images?.[0] || `https://picsum.photos/seed/${product.id}/400/400`}
                       category={product.category}
                       seller={product.sellerName}
                       condition={product.condition === 'new' ? 'New' : 'Used'}
