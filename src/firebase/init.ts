@@ -9,37 +9,40 @@ import { getAuth, Auth } from "firebase/auth";
 import { firebaseConfig } from "./config";
 
 /**
- * محرك تهيئة Firebase الحديدي - الإصدار النهائي المستقر.
- * يعالج تعارضات Next.js 15 عبر فصل مراجع الخادم عن العميل.
+ * محرك تهيئة Firebase الدفاعي - النسخة النهائية المستقرة.
+ * يحل مشاكل التحميل اللانهائي وتعريفات المراجع المتكررة.
  */
 
 const G = globalThis as any;
 
 function getFirebaseInstance() {
   const isClient = typeof window !== "undefined";
-  const instanceKey = isClient ? "__BOUR_CLIENT_FB__" : "__BOUR_SERVER_FB__";
+  const instanceKey = isClient ? "__BOUR_STABLE_CLIENT_FB__" : "__BOUR_STABLE_SERVER_FB__";
 
   if (!G[instanceKey]) {
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    
-    let db: Firestore;
-    if (isClient) {
-      // إعداد دفاعي صارم لجهة العميل لمنع خطأ (ID: ca9)
-      try {
+    try {
+      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+      
+      let db: Firestore;
+      if (isClient) {
+        // إعداد العميل: استخدام ذاكرة الرام فقط لمنع تعارضات IndexedDB
         db = initializeFirestore(app, {
           localCache: memoryLocalCache(),
-          experimentalForceLongPolling: true,
+          experimentalForceLongPolling: true, // يضمن الاتصال في البيئات المقيدة
         });
-      } catch (e) {
+      } else {
+        // إعداد الخادم
         db = getFirestore(app);
       }
-    } else {
-      // إعداد جهة الخادم (SSR)
-      db = getFirestore(app);
-    }
 
-    const auth = getAuth(app);
-    G[instanceKey] = { app, db, auth };
+      const auth = getAuth(app);
+      G[instanceKey] = { app, db, auth };
+    } catch (error) {
+      console.error("CRITICAL FIREBASE INIT ERROR:", error);
+      // Fallback instance to prevent total crash
+      const app = getApps()[0] || initializeApp(firebaseConfig);
+      G[instanceKey] = { app, db: getFirestore(app), auth: getAuth(app) };
+    }
   }
 
   return G[instanceKey];

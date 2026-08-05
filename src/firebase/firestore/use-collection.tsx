@@ -9,8 +9,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف دفاعي مستقر ومحسن لجلب المجموعات لمرة واحدة (One-time fetch).
- * يستخدم Caching لمنع تكرار الطلبات غير الضرورية.
+ * خطاف جلب المجموعات المحصن ضد التحميل اللانهائي.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -20,7 +19,6 @@ export function useCollection(query: Query | null) {
   const lastQueryKey = useRef<string | null>(null);
 
   useEffect(() => {
-    // 1. التحقق من جاهزية الاستعلام وبيئة المتصفح
     if (!query || typeof window === 'undefined') {
       if (!query) {
         setData([]);
@@ -29,12 +27,8 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    // 2. منع إعادة الجلب إذا لم يتغير الاستعلام فعلياً
-    // نستخدم toString() كبصمة بسيطة للاستعلام لضمان استقرار الجلب
     const currentQueryKey = query.toString();
-    if (lastQueryKey.current === currentQueryKey) {
-      return;
-    }
+    if (lastQueryKey.current === currentQueryKey) return;
 
     let isMounted = true;
     lastQueryKey.current = currentQueryKey;
@@ -43,7 +37,6 @@ export function useCollection(query: Query | null) {
       setLoading(true);
       try {
         const snapshot = await getDocs(query);
-        
         if (!isMounted) return;
 
         const items = snapshot.docs.map(doc => ({
@@ -52,22 +45,22 @@ export function useCollection(query: Query | null) {
         }));
 
         setData(items);
-        setLoading(false);
         setError(null);
       } catch (err: any) {
         if (!isMounted) return;
         
+        console.error("Firestore Collection Fetch Failed:", err);
+        
         if (err.code === 'permission-denied') {
-          const permError = new FirestorePermissionError({
+          errorEmitter.emit('permission-error', new FirestorePermissionError({
             path: 'collection_query',
             operation: 'list'
-          });
-          errorEmitter.emit('permission-error', permError);
+          }));
         }
         
-        console.error("Firestore Fetch Error:", err);
         setError(err);
-        setLoading(false);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -76,7 +69,7 @@ export function useCollection(query: Query | null) {
     return () => {
       isMounted = false;
     };
-  }, [query]); // يعتمد فقط على مرجع الاستعلام المستقر (useMemo)
+  }, [query]);
 
   return { data, loading, error };
 }
