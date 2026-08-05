@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,19 +11,31 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useCollection } from "@/firebase";
-import { doc, updateDoc, collection, query, where } from "firebase/firestore";
+import { doc, updateDoc, collection, query, limit } from "firebase/firestore";
 
 export default function StoreManagement() {
   const { firestore } = useFirestore();
   const [search, setSearch] = useState("");
 
-  // جلب كافة المستخدمين الذين يحملون دور بائع (Seller)
-  const sellersQuery = useMemo(() => {
+  // استعلام مبسط لجلب كافة المستخدمين (لأغراض استكشاف الأخطاء)
+  const usersQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, "users"), where("role", "==", "Seller"));
+    console.log("🛠️ Admin Stores: Fetching Users...");
+    return query(collection(firestore, "users"), limit(100));
   }, [firestore]);
 
-  const { data: sellers, loading, error } = useCollection(sellersQuery);
+  const { data: allUsers, loading, error } = useCollection(usersQuery);
+
+  // الفلترة في جهة العميل بدلاً من Firestore query
+  const sellers = useMemo(() => {
+    const list = allUsers?.filter(u => u.role === "Seller") || [];
+    console.log(`📊 Found ${list.length} sellers out of ${allUsers?.length || 0} total users.`);
+    return list;
+  }, [allUsers]);
+
+  useEffect(() => {
+    if (error) console.error("❌ Admin Stores Firestore Error:", error);
+  }, [error]);
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     if (!firestore) return;
@@ -43,10 +55,10 @@ export default function StoreManagement() {
   };
 
   const filteredStores = useMemo(() => {
-    return sellers?.filter(s => 
+    return sellers.filter(s => 
       s.name?.toLowerCase().includes(search.toLowerCase()) || 
       s.email?.toLowerCase().includes(search.toLowerCase())
-    ) || [];
+    );
   }, [sellers, search]);
 
   return (
@@ -153,7 +165,7 @@ export default function StoreManagement() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-32 text-muted-foreground font-bold">
-                    لا توجد متاجر مطابقة لبحثك في قاعدة البيانات.
+                    {error ? "حدث خطأ في جلب البيانات. يرجى مراجعة الكونسول." : "لا توجد متاجر مطابقة لبحثك."}
                   </TableCell>
                 </TableRow>
               )}

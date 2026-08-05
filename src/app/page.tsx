@@ -26,13 +26,13 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, limit, getDocs } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview الصفحة الرئيسية - تم تفعيل نظام فحص الاتصال الدفاعي لضمان استقرار الواجهة.
+ * @fileOverview الصفحة الرئيسية - تم تبسيط الاستعلامات لضمان جلب البيانات وفك التعليق.
  */
 
 export default function Home() {
@@ -41,39 +41,34 @@ export default function Home() {
   const [isSafetyTimeoutReached, setIsSafetyTimeoutReached] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // 1. صمام أمان لإنهاء حالة التحميل بعد ثانيتين لفك تعليق الواجهة
+  // صمام أمان لإنهاء حالة التحميل يدوياً إذا تأخر Firestore
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsSafetyTimeoutReached(true);
-    }, 2000);
+    }, 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // التشخيص الأولي للاتصال بـ Firestore
+  // سجلات تتبع الاتصال
   useEffect(() => {
-    const checkConnection = async () => {
-      if (!firestore) return;
-      try {
-        await getDocs(query(collection(firestore, "category_images"), limit(1)));
-        console.log("✅ Firestore Ready.");
-      } catch (e: any) {
-        console.warn("⚠️ Firestore Connection Issue:", e.message);
-      }
-    };
-    checkConnection();
+    if (!firestore) return;
+    console.log("🔍 Checking Firestore Connectivity...");
+    getDocs(collection(firestore, "category_images"))
+      .then(snap => console.log(`✅ category_images connection OK. Found ${snap.docs.length} docs.`))
+      .catch(err => console.error("❌ category_images error:", err));
   }, [firestore]);
 
-  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
+  // استعلامات مبسطة (بدون where أو orderBy لتجنب تعليق الفهارس)
+  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(20)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
-  const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), where("status", "==", "Active"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
+  const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), limit(12)) : null, [firestore]);
 
   const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
   const { data: storeCampaigns = [], loading: loadingStores } = useCollection(featuredStoresQuery);
   const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
   const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
 
-  // حساب حالات التحميل الفعلية بناءً على صمام الأمان
   const isCatsLoading = loadingCats && !isSafetyTimeoutReached;
   const isStoresLoading = loadingStores && !isSafetyTimeoutReached;
   const isFeaturedLoading = loadingFeatured && !isSafetyTimeoutReached;
@@ -81,15 +76,16 @@ export default function Home() {
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
-    (categoryData || []).forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
+    categoryData.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
     return map;
   }, [categoryData]);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   
+  // فلترة المتاجر الحصرية برمجياً لضمان السرعة
   const activeExclusiveStores = useMemo(() => {
-    return (storeCampaigns || []).filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today);
-  }, [storeCampaigns, today]);
+    return storeCampaigns.filter(c => c.tier === "Exclusive" && c.status === "Active");
+  }, [storeCampaigns]);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
@@ -225,7 +221,7 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {isFeaturedLoading ? (
                  Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : featuredProducts && featuredProducts.length > 0 ? (
+               ) : featuredProducts.length > 0 ? (
                  featuredProducts.map((p, i) => (
                    <ProductCard key={i} id={p.productId || p.id} name={p.productName || p.name} price={p.productPrice || p.price} image={p.productImage || (p.images?.[0])} seller={p.sellerName} category={lang === 'AR' ? 'قطعة مميزة' : 'FEATURED'} condition="New" />
                  ))
@@ -246,7 +242,7 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {isLatestLoading ? (
                  Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : latestListings && latestListings.length > 0 ? (
+               ) : latestListings.length > 0 ? (
                  latestListings.map((p) => (
                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price} image={p.images?.[0]} seller={p.sellerName} category={p.category} condition={p.condition === 'new' ? 'New' : 'Used'} createdAt={p.createdAt} />
                  ))
