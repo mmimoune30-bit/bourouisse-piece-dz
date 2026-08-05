@@ -30,19 +30,19 @@ import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 const defaultCategoryImages: Record<string, string> = {
-  'Engine': 'https://picsum.photos/seed/engine/200/200',
-  'Gearbox': 'https://picsum.photos/seed/gearbox/200/200',
-  'Body': 'https://picsum.photos/seed/bodywork/200/200',
-  'Electrical': 'https://picsum.photos/seed/electrical/200/200',
-  'Suspension': 'https://picsum.photos/seed/suspension/200/200',
-  'Brakes': 'https://picsum.photos/seed/brakes/200/200',
-  'Cooling': 'https://picsum.photos/seed/radiator/200/200',
-  'Fuel': 'https://picsum.photos/seed/fuel/200/200',
-  'Exhaust': 'https://picsum.photos/seed/exhaust/200/200',
-  'Wheels & Tires': 'https://picsum.photos/seed/wheels/200/200',
-  'Interior': 'https://picsum.photos/seed/interior/200/200',
-  'Accessories': 'https://picsum.photos/seed/accessories/200/200',
-  'Lighting': 'https://picsum.photos/seed/lighting/200/200'
+  'Engine': 'https://picsum.photos/seed/engine/150/150',
+  'Gearbox': 'https://picsum.photos/seed/gearbox/150/150',
+  'Body': 'https://picsum.photos/seed/bodywork/150/150',
+  'Electrical': 'https://picsum.photos/seed/electrical/150/150',
+  'Suspension': 'https://picsum.photos/seed/suspension/150/150',
+  'Brakes': 'https://picsum.photos/seed/brakes/150/150',
+  'Cooling': 'https://picsum.photos/seed/radiator/150/150',
+  'Fuel': 'https://picsum.photos/seed/fuel/150/150',
+  'Exhaust': 'https://picsum.photos/seed/exhaust/150/150',
+  'Wheels & Tires': 'https://picsum.photos/seed/wheels/150/150',
+  'Interior': 'https://picsum.photos/seed/interior/150/150',
+  'Accessories': 'https://picsum.photos/seed/accessories/150/150',
+  'Lighting': 'https://picsum.photos/seed/lighting/150/150'
 };
 
 export default function Home() {
@@ -183,10 +183,9 @@ export default function Home() {
 
               <div className="lg:w-1/4 h-[220px] md:h-[300px] relative rounded-xl overflow-hidden bg-gray-900 border border-gray-100 shadow-sm group">
                 <Image 
-                  src="https://picsum.photos/seed/auto-hero-promo/800/600" 
+                  src="https://picsum.photos/seed/auto-hero-promo/400/300" 
                   alt="" 
                   fill 
-                  priority 
                   className="object-cover opacity-30 transition-opacity group-hover:opacity-40" 
                   sizes="(max-width: 1024px) 100vw, 25vw"
                 />
@@ -221,7 +220,7 @@ export default function Home() {
             </div>
             <div className="flex flex-row justify-between gap-4 overflow-x-auto pb-4 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
               {PART_CATEGORIES.map((cat, i) => {
-                const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
+                const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
                 return (
                   <div key={i} className="shrink-0 group">
                     <div className="flex flex-col items-center gap-3">
@@ -231,7 +230,7 @@ export default function Home() {
                           alt={cat.ar} 
                           fill 
                           className="object-cover" 
-                          sizes="112px"
+                          sizes="150px"
                           loading="lazy"
                         />
                       </div>
@@ -298,7 +297,7 @@ export default function Home() {
                       id={product.id}
                       name={product.name}
                       price={product.price}
-                      image={product.images?.[0] || `https://picsum.photos/seed/${product.id}/400/400`}
+                      image={product.images?.[0] || `https://picsum.photos/seed/${product.id}/400/300`}
                       category={product.category}
                       seller={product.sellerName}
                       condition={product.condition === 'new' ? 'New' : 'Used'}

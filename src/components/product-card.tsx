@@ -22,7 +22,6 @@ interface ProductCardProps {
   createdAt?: any;
 }
 
-// استخدام memo لمنع إعادة الرسم غير الضرورية
 const ProductCard = memo(function ProductCard({
   id,
   name,
@@ -68,8 +67,7 @@ const ProductCard = memo(function ProductCard({
     return condition;
   };
 
-  // استخدام صور Picsum بأبعاد أصغر لتحسين الأداء
-  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/400`;
+  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/300`;
 
   return (
     <Card className="group bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full">
@@ -80,7 +78,7 @@ const ProductCard = memo(function ProductCard({
           fill 
           className="object-cover transition-transform duration-500 group-hover:scale-105" 
           data-ai-hint={hint}
-          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 300px"
+          sizes="(max-width: 768px) 50vw, 300px"
           loading="lazy"
         />
         <div className={cn("absolute top-2", lang === 'AR' ? "left-2" : "right-2")}>
