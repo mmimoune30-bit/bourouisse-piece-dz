@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -10,10 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VEHICLE_TYPES, BRAND_MODELS, YEARS, PART_CATEGORIES, FUEL_TYPES, type Translation } from "@/lib/vehicle-data";
-import { Filter, Search, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { Filter, Search, RotateCcw, SlidersHorizontal, Loader2 } from "lucide-react";
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
+import { collection, query, orderBy, where, limit } from "firebase/firestore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -29,9 +28,15 @@ function CatalogContent() {
   const [fuelType, setFuelType] = useState<string>(searchParams.get("fuelType") || "");
   const [textSearch, setTextSearch] = useState<string>(searchParams.get("query") || "");
 
+  // استعلام الكتالوج بحد أقصى 40 منتج لضمان السرعة
   const productsQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, "listings"), orderBy("createdAt", "desc"));
+    return query(
+      collection(firestore, "listings"), 
+      where("status", "==", "Active"),
+      orderBy("createdAt", "desc"),
+      limit(40)
+    );
   }, [firestore]);
 
   const { data: dbProducts, loading } = useCollection(productsQuery);
@@ -56,7 +61,7 @@ function CatalogContent() {
       const matchesYear = !year || year === "Any" || p.year === year;
       const matchesFuel = !fuelType || fuelType === "Any" || p.fuelType === fuelType;
       const matchesCategory = !category || category === "Any" || p.category === category;
-      return matchesText && matchesBrand && matchesModel && matchesYear && matchesFuel && matchesCategory && p.status === 'Active';
+      return matchesText && matchesBrand && matchesModel && matchesYear && matchesFuel && matchesCategory;
     });
   }, [dbProducts, textSearch, brand, model, year, fuelType, category]);
 
@@ -94,9 +99,9 @@ function CatalogContent() {
   const FilterPanel = ({ isMobile = false }) => (
     <div className={cn("space-y-4 text-right", !isMobile && "sticky top-[220px]")} dir={lang === 'AR' ? "rtl" : "ltr"}>
       {!isMobile && (
-        <div className={cn("flex items-center justify-between border-b pb-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-          <h3 className={cn("text-lg text-black", titleFont)}>{t.filters[lang]}</h3>
+        <div className={cn("flex items-center justify-between border-b pb-2", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
           <Filter size={18} className="text-secondary" />
+          <h3 className={cn("text-lg text-black", titleFont)}>{t.filters[lang]}</h3>
         </div>
       )}
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>

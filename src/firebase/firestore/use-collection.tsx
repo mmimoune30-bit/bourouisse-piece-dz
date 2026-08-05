@@ -3,15 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { 
   Query, 
-  getDocs, 
-  QuerySnapshot, 
-  DocumentData 
+  getDocs
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * الخطاف الدفاعي المستقر لجلب المجموعات لمرة واحدة.
+ * خطاف دفاعي مستقر ومحسن لجلب المجموعات لمرة واحدة (One-time fetch).
+ * يستخدم Caching لمنع تكرار الطلبات غير الضرورية.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -30,9 +29,12 @@ export function useCollection(query: Query | null) {
       return;
     }
 
-    // 2. منع إعادة الجلب إذا لم يتغير الاستعلام
+    // 2. منع إعادة الجلب إذا لم يتغير الاستعلام فعلياً
+    // نستخدم toString() كبصمة بسيطة للاستعلام لضمان استقرار الجلب
     const currentQueryKey = query.toString();
-    if (lastQueryKey.current === currentQueryKey) return;
+    if (lastQueryKey.current === currentQueryKey) {
+      return;
+    }
 
     let isMounted = true;
     lastQueryKey.current = currentQueryKey;
@@ -63,6 +65,7 @@ export function useCollection(query: Query | null) {
           errorEmitter.emit('permission-error', permError);
         }
         
+        console.error("Firestore Fetch Error:", err);
         setError(err);
         setLoading(false);
       }
@@ -73,7 +76,7 @@ export function useCollection(query: Query | null) {
     return () => {
       isMounted = false;
     };
-  }, [query]);
+  }, [query]); // يعتمد فقط على مرجع الاستعلام المستقر (useMemo)
 
   return { data, loading, error };
 }

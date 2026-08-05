@@ -52,9 +52,13 @@ export default function Home() {
   const [api, setApi] = useState<CarouselApi>();
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const { data: categoryImagesData } = useCollection(
-    firestore ? collection(firestore, "category_images") : null
-  );
+  // استعلام التصنيفات بحد أقصى 15
+  const categoryImagesQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "category_images"), limit(15));
+  }, [firestore]);
+
+  const { data: categoryImagesData } = useCollection(categoryImagesQuery);
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -66,12 +70,12 @@ export default function Home() {
 
   const featuredStoresQuery = useMemo(() => {
     if (!firestore) return null;
-    return collection(firestore, "featured_stores");
+    return query(collection(firestore, "featured_stores"), limit(10));
   }, [firestore]);
 
   const featuredProductsQuery = useMemo(() => {
     if (!firestore) return null;
-    return collection(firestore, "featured_products");
+    return query(collection(firestore, "featured_products"), limit(12));
   }, [firestore]);
 
   const allListingsExploreQuery = useMemo(() => {
@@ -120,7 +124,6 @@ export default function Home() {
     if (scrollRef.current) {
       const { current } = scrollRef;
       const scrollAmount = 280;
-      // In RTL, "next" (moving to left items) means subtracting from scrollLeft
       const multiplier = lang === 'AR' ? -1 : 1;
       const move = direction === 'next' ? scrollAmount : -scrollAmount;
       current.scrollBy({ left: move * multiplier, behavior: 'smooth' });
@@ -224,7 +227,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Categories Section with Horizontal Scroll & Arrows */}
+          {/* Categories Section */}
           <section className="space-y-6">
             <div className={cn("flex items-center justify-between", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 uppercase tracking-tight">
