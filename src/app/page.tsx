@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -22,13 +23,17 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
 import { collection, query, where, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
+
+/**
+ * @fileOverview الصفحة الرئيسية - تم إصلاح مشكلة Fast Refresh بإزالة أي Exports غير متعلقة بـ React.
+ */
 
 export default function Home() {
   const { firestore } = useFirestore();
@@ -124,7 +129,14 @@ export default function Home() {
               </div>
 
               <div className="lg:w-1/4 h-[220px] md:h-[320px] relative rounded-2xl overflow-hidden bg-zinc-900 shadow-xl group">
-                <Image src="https://picsum.photos/seed/promo-dz/400/400" alt="" fill className="object-cover opacity-40 transition-transform group-hover:scale-110" sizes="400px" />
+                <Image 
+                  src="https://picsum.photos/seed/promo-dz/400/400" 
+                  alt="" 
+                  fill 
+                  className="object-cover opacity-40 transition-transform group-hover:scale-110" 
+                  sizes="400px"
+                  priority={true} // تم الإضافة لتحسين LCP
+                />
                 <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
                    <div className="space-y-1">
                       <h3 className="text-xl font-black text-white uppercase">كن محترفاً</h3>
