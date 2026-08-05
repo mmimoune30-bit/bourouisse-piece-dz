@@ -25,13 +25,25 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, updateDoc, doc, increment, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, orderBy, limit } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
-// بيانات بديلة (Fallback Data) في حال فشل الاتصال بقاعدة البيانات
-const FALLBACK_CATEGORIES: Record<string, string> = {
+// --- بيانات بديلة شاملة (Fallback Mock Data) لضمان عمل الواجهة عند فشل الاتصال ---
+const MOCK_EXCLUSIVE_STORES = [
+  { storeName: "Bourouisse Auto Parts", storeLocation: "Chlef, Algeria", storeLogo: "https://picsum.photos/seed/store1/200/200", tier: "Exclusive" },
+  { storeName: "M-M Engine Specialist", storeLocation: "Algiers", storeLogo: "https://picsum.photos/seed/store2/200/200", tier: "Exclusive" }
+];
+
+const MOCK_FEATURED_PRODUCTS = [
+  { productId: "m1", productName: "محرك كامل 1.5 dCi", productPrice: 450000, productImage: "https://picsum.photos/seed/eng1/400/300", sellerName: "Bourouisse" },
+  { productId: "m2", productName: "طقم فرامل Brembo", productPrice: 25000, productImage: "https://picsum.photos/seed/brk1/400/300", sellerName: "MM-Parts" },
+  { productId: "m3", productName: "توربو Renault Clio 4", productPrice: 85000, productImage: "https://picsum.photos/seed/trb1/400/300", sellerName: "Elite Shop" },
+  { productId: "m4", productName: "أضواء أمامية LED", productPrice: 32000, productImage: "https://picsum.photos/seed/light1/400/300", sellerName: "Algeria Parts" }
+];
+
+const FALLBACK_CATEGORY_IMAGES: Record<string, string> = {
   'Engine': 'https://picsum.photos/seed/engine/150/150',
   'Gearbox': 'https://picsum.photos/seed/gearbox/150/150',
   'Body': 'https://picsum.photos/seed/bodywork/150/150',
@@ -39,7 +51,7 @@ const FALLBACK_CATEGORIES: Record<string, string> = {
   'Suspension': 'https://picsum.photos/seed/suspension/150/150',
   'Brakes': 'https://picsum.photos/seed/brakes/150/150',
   'Cooling': 'https://picsum.photos/seed/radiator/150/150',
-  'Fuel': 'https://picsum.photos/seed/fuel/150/150',
+  'Fuel System': 'https://picsum.photos/seed/fuel/150/150',
   'Exhaust': 'https://picsum.photos/seed/exhaust/150/150',
   'Wheels & Tires': 'https://picsum.photos/seed/wheels/150/150',
   'Interior': 'https://picsum.photos/seed/interior/150/150',
@@ -52,7 +64,7 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // استعلامات Firestore المحسنة
+  // استعلامات Firestore الدفاعية
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
@@ -70,7 +82,29 @@ export default function Home() {
   }, [categoryData]);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
-  const activeExclusiveStores = useMemo(() => (storeCampaigns || []).filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today), [storeCampaigns, today]);
+  
+  // دمج البيانات الحقيقية مع الافتراضية عند الضرورة
+  const activeExclusiveStores = useMemo(() => {
+    const real = (storeCampaigns || []).filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today);
+    return real.length > 0 ? real : MOCK_EXCLUSIVE_STORES;
+  }, [storeCampaigns, today]);
+
+  const displayFeaturedProducts = useMemo(() => {
+    return (featuredProductsData && featuredProductsData.length > 0) ? featuredProductsData : MOCK_FEATURED_PRODUCTS;
+  }, [featuredProductsData]);
+
+  const displayLatest = useMemo(() => {
+    return (latestListings && latestListings.length > 0) ? latestListings : MOCK_FEATURED_PRODUCTS.map(p => ({
+        id: p.productId,
+        name: p.productName,
+        price: p.productPrice,
+        images: [p.productImage],
+        sellerName: p.sellerName,
+        category: "قطع غيار",
+        condition: "new",
+        createdAt: new Date()
+    }));
+  }, [latestListings]);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
@@ -111,16 +145,16 @@ export default function Home() {
                    <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
                 </div>
                 <div className="flex-grow relative bg-zinc-50">
-                   {loadingStores ? (
+                   {loadingStores && activeExclusiveStores.length === 0 ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
-                   ) : activeExclusiveStores.length > 0 ? (
+                   ) : (
                      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
                         <CarouselContent className="h-full">
                           {activeExclusiveStores.map((s, i) => (
                             <CarouselItem key={i} className="h-full">
                                <Link href={`/catalog?query=${encodeURIComponent(s.storeName)}`} className="w-full h-full flex items-center gap-6 px-10">
                                   <div className="w-24 h-24 md:w-44 md:h-44 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0">
-                                     <Image src={s.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${s.storeName}`} alt="" fill className="object-cover" priority={i === 0} />
+                                     <Image src={s.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${s.storeName}`} alt="" fill className="object-cover" priority={i === 0} sizes="200px" />
                                   </div>
                                   <div className={cn("flex flex-col gap-1", lang === 'AR' ? "text-right" : "text-left")}>
                                      <Badge className="bg-secondary text-primary font-black mb-1 w-fit">KING STORE</Badge>
@@ -132,11 +166,6 @@ export default function Home() {
                           ))}
                         </CarouselContent>
                      </Carousel>
-                   ) : (
-                     <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-300 gap-2">
-                        <ShoppingBag size={48} className="opacity-10" />
-                        <span className="text-sm font-bold italic">لا توجد متاجر حصرية حالياً</span>
-                     </div>
                    )}
                 </div>
               </div>
@@ -167,7 +196,7 @@ export default function Home() {
             </div>
             <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 no-scrollbar scroll-smooth" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {PART_CATEGORIES.map((cat, i) => {
-                 const img = categoryImagesMap[cat.en] || FALLBACK_CATEGORIES[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
+                 const img = categoryImagesMap[cat.en] || FALLBACK_CATEGORY_IMAGES[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
                  return (
                    <div key={i} className="shrink-0 flex flex-col items-center gap-4 group">
                       <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg relative bg-white pointer-events-none transition-transform group-hover:scale-105">
@@ -189,14 +218,12 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {loadingFeatured ? (
+               {loadingFeatured && displayFeaturedProducts.length === 0 ? (
                  Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : featuredProductsData && featuredProductsData.length > 0 ? (
-                 featuredProductsData.map((p, i) => (
-                   <ProductCard key={i} id={p.productId} name={p.productName} price={p.productPrice} image={p.productImage} seller={p.sellerName} category={lang === 'AR' ? 'قطعة مميزة' : 'FEATURED'} condition="New" />
-                 ))
                ) : (
-                 <div className="col-span-full py-12 text-center text-zinc-400 font-bold italic border-2 border-dashed rounded-3xl">لا توجد منتجات مميزة حالياً</div>
+                 displayFeaturedProducts.map((p, i) => (
+                   <ProductCard key={i} id={p.productId || p.id} name={p.productName || p.name} price={p.productPrice || p.price} image={p.productImage || (p.images?.[0])} seller={p.sellerName} category={lang === 'AR' ? 'قطعة مميزة' : 'FEATURED'} condition="New" />
+                 ))
                )}
             </div>
           </section>
@@ -208,14 +235,12 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {loadingLatest ? (
+               {loadingLatest && displayLatest.length === 0 ? (
                  Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : latestListings && latestListings.length > 0 ? (
-                 latestListings.map((p) => (
+               ) : (
+                 displayLatest.map((p) => (
                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price} image={p.images?.[0]} seller={p.sellerName} category={p.category} condition={p.condition === 'new' ? 'New' : 'Used'} createdAt={p.createdAt} />
                  ))
-               ) : (
-                 <div className="col-span-full py-20 text-center text-zinc-300 font-black uppercase italic">Aucune annonce trouvée</div>
                )}
             </div>
           </section>

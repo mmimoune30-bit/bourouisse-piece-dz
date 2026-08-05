@@ -3,13 +3,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { 
   Query, 
-  getDocs
+  getDocs,
+  QuerySnapshot
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف جلب المجموعات المحصن ضد التحميل اللانهائي.
+ * خطاف جلب المجموعات المحصن ضد التعليق والتحميل اللانهائي.
+ * يتضمن مهلة زمنية (Timeout) لضمان استجابة الواجهة دائماً.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -35,21 +37,33 @@ export function useCollection(query: Query | null) {
 
     const fetchData = async () => {
       setLoading(true);
+      
+      // حارس الوقت: إنهاء التحميل بعد 3 ثوانٍ كحد أقصى
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 3000)
+      );
+
       try {
-        const snapshot = await getDocs(query);
+        const snapshot = await Promise.race([
+          getDocs(query),
+          timeoutPromise
+        ]) as QuerySnapshot;
+
         if (!isMounted) return;
 
-        const items = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        setData(items);
+        if (snapshot) {
+          const items = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setData(items);
+        }
+        
         setError(null);
       } catch (err: any) {
         if (!isMounted) return;
         
-        console.error("Firestore Collection Fetch Failed:", err);
+        console.warn("Firestore Fetch Guard Triggered:", err.message);
         
         if (err.code === 'permission-denied') {
           errorEmitter.emit('permission-error', new FirestorePermissionError({

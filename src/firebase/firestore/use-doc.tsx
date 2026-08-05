@@ -4,13 +4,13 @@ import { useEffect, useState, useRef } from 'react';
 import { 
   DocumentReference, 
   getDoc, 
-  DocumentData 
+  DocumentSnapshot 
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * الخطاف الدفاعي لجلب مستند واحد لمرة واحدة.
+ * الخطاف الدفاعي لجلب مستند واحد بمهلة زمنية لمنع التعليق.
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
@@ -36,16 +36,30 @@ export function useDoc(docRef: DocumentReference | null) {
 
     const fetchData = async () => {
       setLoading(true);
+
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 3000)
+      );
+
       try {
-        const snapshot = await getDoc(docRef);
+        const snapshot = await Promise.race([
+          getDoc(docRef),
+          timeoutPromise
+        ]) as DocumentSnapshot;
         
         if (!isMounted) return;
 
-        setData(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
-        setLoading(false);
+        if (snapshot && snapshot.exists()) {
+          setData({ id: snapshot.id, ...snapshot.data() });
+        } else {
+          setData(null);
+        }
+        
         setError(null);
       } catch (err: any) {
         if (!isMounted) return;
+        
+        console.warn("Firestore Doc Guard Triggered:", err.message);
         
         if (err.code === 'permission-denied') {
           const permError = new FirestorePermissionError({
@@ -56,7 +70,8 @@ export function useDoc(docRef: DocumentReference | null) {
         }
         
         setError(err);
-        setLoading(false);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
