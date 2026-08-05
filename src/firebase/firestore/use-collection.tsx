@@ -10,8 +10,7 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف جلب المجموعات المحصن ضد التعليق والتحميل اللانهائي.
- * يتضمن مهلة زمنية (Timeout) لضمان استجابة الواجهة دائماً.
+ * خطاف جلب المجموعات المباشر من Firestore.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
@@ -38,32 +37,20 @@ export function useCollection(query: Query | null) {
     const fetchData = async () => {
       setLoading(true);
       
-      // حارس الوقت: إنهاء التحميل بعد 3 ثوانٍ كحد أقصى
-      const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), 3000)
-      );
-
       try {
-        const snapshot = await Promise.race([
-          getDocs(query),
-          timeoutPromise
-        ]) as QuerySnapshot;
+        const snapshot = await getDocs(query);
 
         if (!isMounted) return;
 
-        if (snapshot) {
-          const items = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          setData(items);
-        }
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         
+        setData(items);
         setError(null);
       } catch (err: any) {
         if (!isMounted) return;
-        
-        console.warn("Firestore Fetch Guard Triggered:", err.message);
         
         if (err.code === 'permission-denied') {
           errorEmitter.emit('permission-error', new FirestorePermissionError({

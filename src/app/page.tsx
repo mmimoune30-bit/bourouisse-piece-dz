@@ -30,41 +30,11 @@ import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
-// --- بيانات بديلة شاملة (Fallback Mock Data) لضمان عمل الواجهة عند فشل الاتصال ---
-const MOCK_EXCLUSIVE_STORES = [
-  { storeName: "Bourouisse Auto Parts", storeLocation: "Chlef, Algeria", storeLogo: "https://picsum.photos/seed/store1/200/200", tier: "Exclusive" },
-  { storeName: "M-M Engine Specialist", storeLocation: "Algiers", storeLogo: "https://picsum.photos/seed/store2/200/200", tier: "Exclusive" }
-];
-
-const MOCK_FEATURED_PRODUCTS = [
-  { productId: "m1", productName: "محرك كامل 1.5 dCi", productPrice: 450000, productImage: "https://picsum.photos/seed/eng1/400/300", sellerName: "Bourouisse" },
-  { productId: "m2", productName: "طقم فرامل Brembo", productPrice: 25000, productImage: "https://picsum.photos/seed/brk1/400/300", sellerName: "MM-Parts" },
-  { productId: "m3", productName: "توربو Renault Clio 4", productPrice: 85000, productImage: "https://picsum.photos/seed/trb1/400/300", sellerName: "Elite Shop" },
-  { productId: "m4", productName: "أضواء أمامية LED", productPrice: 32000, productImage: "https://picsum.photos/seed/light1/400/300", sellerName: "Algeria Parts" }
-];
-
-const FALLBACK_CATEGORY_IMAGES: Record<string, string> = {
-  'Engine': 'https://picsum.photos/seed/engine/150/150',
-  'Gearbox': 'https://picsum.photos/seed/gearbox/150/150',
-  'Body': 'https://picsum.photos/seed/bodywork/150/150',
-  'Electrical': 'https://picsum.photos/seed/electrical/150/150',
-  'Suspension': 'https://picsum.photos/seed/suspension/150/150',
-  'Brakes': 'https://picsum.photos/seed/brakes/150/150',
-  'Cooling': 'https://picsum.photos/seed/radiator/150/150',
-  'Fuel System': 'https://picsum.photos/seed/fuel/150/150',
-  'Exhaust': 'https://picsum.photos/seed/exhaust/150/150',
-  'Wheels & Tires': 'https://picsum.photos/seed/wheels/150/150',
-  'Interior': 'https://picsum.photos/seed/interior/150/150',
-  'Accessories': 'https://picsum.photos/seed/accessories/150/150',
-  'Lighting': 'https://picsum.photos/seed/lighting/150/150'
-};
-
 export default function Home() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // استعلامات Firestore الدفاعية
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
@@ -72,7 +42,7 @@ export default function Home() {
 
   const { data: categoryData, loading: loadingCats } = useCollection(categoryImagesQuery);
   const { data: storeCampaigns, loading: loadingStores } = useCollection(featuredStoresQuery);
-  const { data: featuredProductsData, loading: loadingFeatured } = useCollection(featuredProductsQuery);
+  const { data: featuredProducts, loading: loadingFeatured } = useCollection(featuredProductsQuery);
   const { data: latestListings, loading: loadingLatest } = useCollection(latestListingsQuery);
 
   const categoryImagesMap = useMemo(() => {
@@ -83,28 +53,9 @@ export default function Home() {
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   
-  // دمج البيانات الحقيقية مع الافتراضية عند الضرورة
   const activeExclusiveStores = useMemo(() => {
-    const real = (storeCampaigns || []).filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today);
-    return real.length > 0 ? real : MOCK_EXCLUSIVE_STORES;
+    return (storeCampaigns || []).filter(c => c.tier === "Exclusive" && c.status === "Active" && c.startDate <= today && c.endDate >= today);
   }, [storeCampaigns, today]);
-
-  const displayFeaturedProducts = useMemo(() => {
-    return (featuredProductsData && featuredProductsData.length > 0) ? featuredProductsData : MOCK_FEATURED_PRODUCTS;
-  }, [featuredProductsData]);
-
-  const displayLatest = useMemo(() => {
-    return (latestListings && latestListings.length > 0) ? latestListings : MOCK_FEATURED_PRODUCTS.map(p => ({
-        id: p.productId,
-        name: p.productName,
-        price: p.productPrice,
-        images: [p.productImage],
-        sellerName: p.sellerName,
-        category: "قطع غيار",
-        condition: "new",
-        createdAt: new Date()
-    }));
-  }, [latestListings]);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
@@ -145,9 +96,9 @@ export default function Home() {
                    <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
                 </div>
                 <div className="flex-grow relative bg-zinc-50">
-                   {loadingStores && activeExclusiveStores.length === 0 ? (
+                   {loadingStores ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
-                   ) : (
+                   ) : activeExclusiveStores.length > 0 ? (
                      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
                         <CarouselContent className="h-full">
                           {activeExclusiveStores.map((s, i) => (
@@ -166,6 +117,8 @@ export default function Home() {
                           ))}
                         </CarouselContent>
                      </Carousel>
+                   ) : (
+                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-bold italic">لا توجد متاجر حصرية حالياً</div>
                    )}
                 </div>
               </div>
@@ -196,7 +149,7 @@ export default function Home() {
             </div>
             <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 no-scrollbar scroll-smooth" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {PART_CATEGORIES.map((cat, i) => {
-                 const img = categoryImagesMap[cat.en] || FALLBACK_CATEGORY_IMAGES[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
+                 const img = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
                  return (
                    <div key={i} className="shrink-0 flex flex-col items-center gap-4 group">
                       <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg relative bg-white pointer-events-none transition-transform group-hover:scale-105">
@@ -218,12 +171,14 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {loadingFeatured && displayFeaturedProducts.length === 0 ? (
+               {loadingFeatured ? (
                  Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : (
-                 displayFeaturedProducts.map((p, i) => (
+               ) : featuredProducts && featuredProducts.length > 0 ? (
+                 featuredProducts.map((p, i) => (
                    <ProductCard key={i} id={p.productId || p.id} name={p.productName || p.name} price={p.productPrice || p.price} image={p.productImage || (p.images?.[0])} seller={p.sellerName} category={lang === 'AR' ? 'قطعة مميزة' : 'FEATURED'} condition="New" />
                  ))
+               ) : (
+                 <div className="col-span-full py-10 text-center text-muted-foreground italic font-bold">لا توجد منتجات مميزة متاحة حالياً</div>
                )}
             </div>
           </section>
@@ -235,12 +190,14 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {loadingLatest && displayLatest.length === 0 ? (
+               {loadingLatest ? (
                  Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
-               ) : (
-                 displayLatest.map((p) => (
+               ) : latestListings && latestListings.length > 0 ? (
+                 latestListings.map((p) => (
                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price} image={p.images?.[0]} seller={p.sellerName} category={p.category} condition={p.condition === 'new' ? 'New' : 'Used'} createdAt={p.createdAt} />
                  ))
+               ) : (
+                 <div className="col-span-full py-10 text-center text-muted-foreground italic font-bold">لا توجد معروضات حديثة حالياً</div>
                )}
             </div>
           </section>
