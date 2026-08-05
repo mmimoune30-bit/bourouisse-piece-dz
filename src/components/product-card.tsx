@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, ShieldCheck, Calendar, Clock, MapPin } from "lucide-react";
+import { Star, ShoppingCart, MapPin, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, memo } from "react";
 import { cn } from "@/lib/utils";
 
@@ -67,45 +66,62 @@ const ProductCard = memo(function ProductCard({
     return condition;
   };
 
-  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/300`;
+  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/400`;
 
   return (
     <Card className="group bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full">
-      <Link href={`/products/${id}`} className="block relative aspect-square overflow-hidden bg-gray-50">
+      {/* Image Container - Ouedkniss Style */}
+      <Link href={`/products/${id}`} className="block relative w-full aspect-square overflow-hidden bg-gray-100 rounded-t-lg">
         <Image 
           src={finalImageSrc} 
           alt={name} 
           fill 
           className="object-cover transition-transform duration-500 group-hover:scale-105" 
           data-ai-hint={hint}
-          sizes="(max-width: 768px) 50vw, 300px"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           loading="lazy"
         />
-        <div className={cn("absolute top-2", lang === 'AR' ? "left-2" : "right-2")}>
+        
+        {/* Condition Badge */}
+        <div className={cn("absolute top-2 z-10", lang === 'AR' ? "left-2" : "right-2")}>
           <Badge className={cn(
-            "text-[8px] px-2 py-0.5 font-bold uppercase",
-            condition === 'New' ? "bg-green-600" : "bg-orange-500"
+            "text-[8px] px-2 py-0.5 font-bold uppercase border-none shadow-sm",
+            condition === 'New' ? "bg-green-600 hover:bg-green-700" : "bg-orange-500 hover:bg-orange-600"
           )}>
             {getConditionText()}
           </Badge>
         </div>
+
+        {/* Image Slider Dots Placeholder */}
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none">
+           <div className="w-1.5 h-1.5 rounded-full bg-white shadow-md opacity-100"></div>
+           <div className="w-1.5 h-1.5 rounded-full bg-white/50 shadow-sm"></div>
+           <div className="w-1.5 h-1.5 rounded-full bg-white/50 shadow-sm"></div>
+        </div>
+        
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
       </Link>
       
-      <CardContent className={cn("p-3 flex-grow flex flex-col gap-1", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-        <div className="text-[9px] uppercase text-secondary font-bold tracking-tight mb-0.5">{category}</div>
+      <CardContent className={cn("p-3 flex-grow flex flex-col gap-1.5", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+        {/* Category Label */}
+        <div className="text-[9px] uppercase text-secondary font-black tracking-tight mb-0.5">{category}</div>
         
+        {/* Product Title */}
         <Link href={`/products/${id}`} className="block">
-          <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-secondary transition-colors uppercase">
+          <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-secondary transition-colors uppercase min-h-[2.5rem]">
             {name}
           </h3>
         </Link>
 
-        <div className="flex items-center gap-1 mt-1">
+        {/* Seller Info */}
+        <div className="flex items-center gap-1 mt-1 opacity-70">
           <MapPin size={10} className="text-gray-400" />
-          <span className="text-[10px] text-gray-500 font-medium truncate">{seller}</span>
+          <span className="text-[10px] text-gray-500 font-bold truncate">{seller}</span>
         </div>
 
-        <div className="mt-auto pt-2 flex items-center justify-between">
+        {/* Price and Date Row */}
+        <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
           <div className="flex flex-col">
             <span className="text-base font-black text-gray-900">
               {mounted ? price.toLocaleString() : price} <span className="text-[10px] font-bold">دج</span>
@@ -113,8 +129,8 @@ const ProductCard = memo(function ProductCard({
           </div>
           
           {formattedDate && (
-            <div className="text-[8px] text-gray-400 font-medium bg-gray-50 px-1.5 py-0.5 rounded">
-              {formattedDate}
+            <div className="text-[8px] text-gray-400 font-bold bg-gray-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Clock size={8} /> {formattedDate}
             </div>
           )}
         </div>
