@@ -26,13 +26,13 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, where, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview الصفحة الرئيسية - تم إصلاح مشكلة Fast Refresh بإزالة أي Exports غير متعلقة بـ React.
+ * @fileOverview الصفحة الرئيسية - تم تفعيل نظام فحص الاتصال الدفاعي لضمان استقرار الواجهة.
  */
 
 export default function Home() {
@@ -40,19 +40,36 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
   
+  // التشخيص الأولي للاتصال بـ Firestore (Long Polling Diagnostic)
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (!firestore) return;
+      try {
+        console.log("🔍 Checking Firestore Connectivity...");
+        // محاولة جلب بسيطة للتحقق من المسار
+        const snap = await getDocs(query(collection(firestore, "category_images"), limit(1)));
+        console.log("✅ Firestore Connection Established. Data Ready.");
+      } catch (e: any) {
+        console.warn("⚠️ Firestore Connectivity Alert:", e.message);
+        console.info("Using cached or empty fallback arrays to keep UI active.");
+      }
+    };
+    checkConnection();
+  }, [firestore]);
+
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
   const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), where("status", "==", "Active"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
 
-  const { data: categoryData, loading: loadingCats } = useCollection(categoryImagesQuery);
-  const { data: storeCampaigns, loading: loadingStores } = useCollection(featuredStoresQuery);
-  const { data: featuredProducts, loading: loadingFeatured } = useCollection(featuredProductsQuery);
-  const { data: latestListings, loading: loadingLatest } = useCollection(latestListingsQuery);
+  const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
+  const { data: storeCampaigns = [], loading: loadingStores } = useCollection(featuredStoresQuery);
+  const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
+  const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
-    categoryData?.forEach(item => { map[item.name_en] = item.imageUrl; });
+    categoryData?.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
     return map;
   }, [categoryData]);
 
@@ -135,7 +152,7 @@ export default function Home() {
                   fill 
                   className="object-cover opacity-40 transition-transform group-hover:scale-110" 
                   sizes="400px"
-                  priority={true} // تم الإضافة لتحسين LCP
+                  priority={true}
                 />
                 <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
                    <div className="space-y-1">
