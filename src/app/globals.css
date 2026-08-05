@@ -6,7 +6,7 @@
 @layer base {
   :root {
     /* Enhanced Pure Black & Gold Theme with High Contrast */
-    --background: 0 0% 100%;
+    --background: 210 40% 98%; /* Light Slate Background */
     --foreground: 0 0% 0%; /* Absolute Black */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
@@ -16,16 +16,16 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 43 100% 50%; /* Vibrant Gold/Yellow Accent */
     --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 15%; /* Darker Gray for readability */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
     --accent: 43 100% 50%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 0 0% 0%;
-    --radius: 1.25rem;
+    --radius: 0.75rem;
   }
 }
 

@@ -61,10 +61,10 @@ export default function Navbar() {
   const boldNavFont = lang === 'AR' ? 'font-black' : 'font-black';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-xl">
       {/* Layer 1: Compact Top Info Bar */}
       <div className="bg-zinc-950 border-b border-white/5 py-1 overflow-hidden">
-        <div className="w-full px-4 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/70 uppercase text-[9px] md:text-[10px]", navFont)}>
@@ -96,7 +96,7 @@ export default function Navbar() {
 
       {/* Layer 2: Main Branding & Global Actions */}
       <div className="bg-white py-3 border-b shadow-sm">
-        <div className="w-full px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-6">
             <Link href="/" className="hover:opacity-90 transition-all shrink-0">
               <SiteLogo className="min-w-[180px] md:min-w-[240px]" showTagline={true} />
@@ -165,7 +165,7 @@ export default function Navbar() {
       {/* Layer 3: Dynamic Search Bar (Compact) */}
       {showSearch && (
         <div className="bg-white/80 backdrop-blur-md py-2 border-b relative">
-          <div className="w-full px-4 max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <AISearchBox />
           </div>
         </div>

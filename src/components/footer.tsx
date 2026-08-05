@@ -44,55 +44,52 @@ export default function Footer() {
     rights: { AR: "BOUROUISSE PIECE DT-DZ. © 2024 جميع الحقوق محفوظة", EN: "BOUROUISSE PIECE DT-DZ. © 2024 ALL RIGHTS RESERVED", FR: "BOUROUISSE PIECE DT-DZ. © 2024 TOUS DROITS RÉSERVÉS" }
   };
 
-  const textFont = lang === 'AR' ? 'font-bold' : 'font-medium';
-  const headFont = lang === 'AR' ? 'font-black' : 'font-semibold';
-
   return (
-    <footer className="bg-primary text-white pt-10 pb-6 border-t-4 border-secondary">
-      <div className="container mx-auto px-4">
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <div className="col-span-1 md:col-span-1 space-y-6">
+    <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-secondary">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-12", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="space-y-6">
             <SiteLogo brandClassName="text-white text-xl" subtextClassName="text-blue-100 text-[9px]" />
-            <div className="flex gap-5 justify-center md:justify-start">
-              <Facebook size={22} className="hover:text-secondary cursor-pointer transition-colors" />
-              <Instagram size={22} className="hover:text-secondary cursor-pointer transition-colors" />
-              <Twitter size={22} className="hover:text-secondary cursor-pointer transition-colors" />
+            <div className="flex gap-4">
+              <Facebook size={20} className="hover:text-secondary cursor-pointer transition-colors" />
+              <Instagram size={20} className="hover:text-secondary cursor-pointer transition-colors" />
+              <Twitter size={20} className="hover:text-secondary cursor-pointer transition-colors" />
             </div>
           </div>
           
           <div className="space-y-4">
-            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.shop[lang]}</h4>
-            <ul className={cn("space-y-2 text-xs md:text-sm text-blue-100/70", textFont)}>
-              <li><Link href="/catalog" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.catalog[lang]}</Link></li>
-              <li><Link href="/catalog" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.categories[lang]}</Link></li>
+            <h4 className="text-sm font-bold uppercase text-secondary tracking-widest">{t.shop[lang]}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><Link href="/catalog" className="hover:text-white transition-colors">{t.catalog[lang]}</Link></li>
+              <li><Link href="/catalog" className="hover:text-white transition-colors">{t.categories[lang]}</Link></li>
             </ul>
           </div>
 
           <div className="space-y-4">
-            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.links[lang]}</h4>
-            <ul className={cn("space-y-2 text-xs md:text-sm text-blue-100/70", textFont)}>
-              <li><Link href="/" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.home[lang]}</Link></li>
-              <li><Link href="/seller/register" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.regSeller[lang]}</Link></li>
-              <li><Link href="/buyer/register" className="hover:text-white flex items-center gap-2 group"><ArrowRight size={12} className={cn("opacity-0 group-hover:opacity-100 transition-all", lang === 'AR' ? "rotate-180" : "")} /> {t.regBuyer[lang]}</Link></li>
-              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary flex items-center gap-2 font-black border-2 border-secondary/20 p-1.5 rounded-lg mt-2"><Lock size={14} /> ADMINISTRATION</Link></li>}
+            <h4 className="text-sm font-bold uppercase text-secondary tracking-widest">{t.links[lang]}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><Link href="/" className="hover:text-white transition-colors">{t.home[lang]}</Link></li>
+              <li><Link href="/seller/register" className="hover:text-white transition-colors">{t.regSeller[lang]}</Link></li>
+              <li><Link href="/buyer/register" className="hover:text-white transition-colors">{t.regBuyer[lang]}</Link></li>
+              {isAdmin && <li><Link href="/admin/dashboard" className="text-secondary font-black">ADMINISTRATION</Link></li>}
             </ul>
           </div>
 
           <div className="space-y-4">
-            <h4 className={cn("text-sm md:text-base uppercase border-secondary border-r-4 pr-3 text-secondary", headFont)}>{t.contact[lang]}</h4>
-            <ul className={cn("space-y-3 text-xs md:text-sm text-blue-100/70", textFont)}>
-              <li className="flex items-center gap-3"><Phone size={16} className="text-secondary shrink-0" /> +213 778 42 89 77</li>
-              <li className="flex items-center gap-3"><Mail size={16} className="text-secondary shrink-0" /> support@bourouisse.com</li>
-              <li className="flex items-center gap-3"><MapPin size={16} className="text-secondary shrink-0" /> Chlef, Algeria</li>
+            <h4 className="text-sm font-bold uppercase text-secondary tracking-widest">{t.contact[lang]}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li className="flex items-center gap-3"><Phone size={16} className="text-secondary" /> +213 778 42 89 77</li>
+              <li className="flex items-center gap-3"><Mail size={16} className="text-secondary" /> support@bourouisse.com</li>
+              <li className="flex items-center gap-3"><MapPin size={16} className="text-secondary" /> Chlef, Algeria</li>
             </ul>
           </div>
         </div>
         
-        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] md:text-xs text-blue-100/40 font-bold uppercase tracking-wider">
-          <p className="text-center md:text-right">{t.rights[lang]}</p>
+        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+          <p>{t.rights[lang]}</p>
           <div className="flex gap-6">
-            <Link href="/terms-of-service" className="hover:text-white transition-colors border-b border-transparent hover:border-white">TOS - الشروط</Link>
-            <Link href="/privacy-policy" className="hover:text-white transition-colors border-b border-transparent hover:border-white">PRIVACY - الخصوصية</Link>
+            <Link href="/terms-of-service" className="hover:text-white">TOS</Link>
+            <Link href="/privacy-policy" className="hover:text-white">PRIVACY</Link>
           </div>
         </div>
       </div>
