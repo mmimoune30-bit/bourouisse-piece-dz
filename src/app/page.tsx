@@ -18,9 +18,10 @@ import {
   ShoppingBag,
   Package,
   LayoutGrid,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
@@ -49,6 +50,7 @@ export default function Home() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [api, setApi] = useState<CarouselApi>();
+  const scrollRef = useRef<HTMLDivElement>(null);
   
   const { data: categoryImagesData } = useCollection(
     firestore ? collection(firestore, "category_images") : null
@@ -112,6 +114,17 @@ export default function Home() {
 
   const handleStoreClick = (campaignId: string) => {
     if (firestore) updateDoc(doc(firestore, "featured_stores", campaignId), { "stats.clicks": increment(1) });
+  };
+
+  const scroll = (direction: 'prev' | 'next') => {
+    if (scrollRef.current) {
+      const { current } = scrollRef;
+      const scrollAmount = 280;
+      // In RTL, "next" (moving to left items) means subtracting from scrollLeft
+      const multiplier = lang === 'AR' ? -1 : 1;
+      const move = direction === 'next' ? scrollAmount : -scrollAmount;
+      current.scrollBy({ left: move * multiplier, behavior: 'smooth' });
+    }
   };
 
   const t = {
@@ -211,20 +224,42 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Categories Section */}
+          {/* Categories Section with Horizontal Scroll & Arrows */}
           <section className="space-y-6">
             <div className={cn("flex items-center justify-between", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 uppercase tracking-tight">
                 {t.categories[lang]} <LayoutGrid size={24} className="text-secondary" />
               </h2>
+              <div className="flex gap-2">
+                 <Button 
+                   variant="outline" 
+                   size="icon" 
+                   className="rounded-full h-9 w-9 border-2 border-zinc-200 bg-white hover:bg-secondary hover:text-primary hover:border-secondary transition-all" 
+                   onClick={() => scroll('prev')}
+                 >
+                    {lang === 'AR' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                 </Button>
+                 <Button 
+                   variant="outline" 
+                   size="icon" 
+                   className="rounded-full h-9 w-9 border-2 border-zinc-200 bg-white hover:bg-secondary hover:text-primary hover:border-secondary transition-all" 
+                   onClick={() => scroll('next')}
+                 >
+                    {lang === 'AR' ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                 </Button>
+              </div>
             </div>
-            <div className="flex flex-row justify-between gap-4 overflow-x-auto pb-4 no-scrollbar" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <div 
+              ref={scrollRef}
+              className="flex flex-row gap-6 overflow-x-auto pb-6 no-scrollbar scroll-smooth" 
+              dir={lang === 'AR' ? "rtl" : "ltr"}
+            >
               {PART_CATEGORIES.map((cat, i) => {
                 const categoryImage = categoryImagesMap[cat.en] || defaultCategoryImages[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
                 return (
                   <div key={i} className="shrink-0 group">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border border-gray-100 shadow-sm relative bg-white pointer-events-none transition-transform group-hover:scale-105">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md relative bg-white pointer-events-none transition-transform group-hover:scale-105">
                         <Image 
                           src={categoryImage} 
                           alt={cat.ar} 
@@ -236,7 +271,7 @@ export default function Home() {
                       </div>
                       <Link 
                         href={`/catalog?category=${cat.en}`}
-                        className="text-sm sm:text-base font-semibold text-gray-800 hover:text-secondary transition-colors text-center uppercase tracking-tight"
+                        className="bg-white border-2 border-zinc-100 hover:border-secondary hover:text-secondary px-4 py-2 rounded-xl text-sm font-bold text-gray-800 transition-all text-center uppercase tracking-tight shadow-sm active:scale-95"
                       >
                         {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
                       </Link>
