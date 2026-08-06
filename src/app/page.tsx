@@ -20,13 +20,14 @@ import {
   Package,
   LayoutGrid,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Sparkles
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, limit, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, limit, orderBy } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
@@ -36,23 +37,18 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // استعلامات لحظية فائقة السرعة مع المزامنة
+  // استعلامات لحظية فائقة السرعة
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(30)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
+  const bannersQuery = useMemo(() => firestore ? query(collection(firestore, "banners"), limit(5)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
   const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
 
   const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
   const { data: storeCampaigns = [], loading: loadingStores } = useCollection(featuredStoresQuery);
+  const { data: siteBanners = [], loading: loadingBanners } = useCollection(bannersQuery);
   const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
   const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
-
-  // نظام تشخيصي للتأكد من وصول البيانات في الكونسول
-  useEffect(() => {
-    if (categoryData.length > 0) {
-      console.log(`✅ Home: Loaded ${categoryData.length} category images from Firestore.`);
-    }
-  }, [categoryData]);
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -70,8 +66,13 @@ export default function Home() {
     if (savedLang) setLang(savedLang);
     const handler = () => setLang(localStorage.getItem("app_lang") as any || "AR");
     window.addEventListener("languageChange", handler);
-    return () => window.removeEventListener("languageChange", handler);
+    return () => window.removeEventListener("languageChange", checkLang);
   }, []);
+
+  const checkLang = () => {
+    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+    if (savedLang) setLang(savedLang);
+  };
 
   const handleScroll = (dir: 'prev' | 'next') => {
     if (scrollRef.current) {
@@ -81,12 +82,20 @@ export default function Home() {
   };
 
   const t = {
-    exclusive: { AR: "متاجر حصرية", EN: "Exclusive Stores", FR: "Boutiques Exclusives" },
+    exclusive: { AR: "متاجر حصرية وعروض", EN: "Exclusive & Ads", FR: "Exclusivités & Pubs" },
     featured: { AR: "منتجات مميزة", EN: "Featured Products", FR: "Produits Vedettes" },
     latest: { AR: "أحدث المعروضات", EN: "Latest Listings", FR: "Dernières Offres" },
     categories: { AR: "تصنيفات قطع الغيار", EN: "Categories", FR: "Catégories" },
     viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" }
   };
+
+  // دمج المتاجر الحصرية والبنرات في مصفوفة واحدة للسلايدر
+  const heroItems = useMemo(() => {
+    const items = [];
+    storeCampaigns.filter(s => s.tier === 'Exclusive').forEach(s => items.push({ type: 'store', data: s }));
+    siteBanners.forEach(b => items.push({ type: 'banner', data: b }));
+    return items;
+  }, [storeCampaigns, siteBanners]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
@@ -95,92 +104,107 @@ export default function Home() {
       <main className="flex-grow pt-[190px] md:pt-[210px] pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          {/* Hero Slider Section */}
+          {/* Hero Slider Section - Dynamic */}
           <section className="w-full">
             <div className={cn("flex flex-col lg:flex-row gap-4", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")}>
-              <div className="lg:w-3/4 h-[220px] md:h-[320px] bg-white rounded-2xl shadow-sm border overflow-hidden relative flex flex-col">
-                <div className="px-6 py-4 border-b flex items-center justify-between z-10 bg-white/90 backdrop-blur-sm">
-                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 uppercase">
-                     <Crown size={20} className="text-secondary" /> {t.exclusive[lang]}
+              <div className="lg:w-3/4 h-[300px] md:h-[400px] bg-white rounded-[32px] shadow-xl border overflow-hidden relative flex flex-col">
+                <div className="px-8 py-4 border-b flex items-center justify-between z-10 bg-white/90 backdrop-blur-sm">
+                   <h2 className="text-xl font-black text-gray-900 flex items-center gap-3 uppercase tracking-tight">
+                     <Crown size={24} className="text-secondary" /> {t.exclusive[lang]}
                    </h2>
-                   <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
+                   <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t.viewAll[lang]}</Link>
                 </div>
                 <div className="flex-grow relative bg-zinc-50">
-                   {loadingStores ? (
-                     <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
-                   ) : storeCampaigns.length > 0 ? (
-                     <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
+                   {loadingStores || loadingBanners ? (
+                     <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>
+                   ) : heroItems.length > 0 ? (
+                     <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 6000 })]} className="h-full">
                         <CarouselContent className="h-full">
-                          {storeCampaigns.filter(s => s.tier === 'Exclusive').map((s, i) => (
+                          {heroItems.map((item, i) => (
                             <CarouselItem key={i} className="h-full">
-                               <Link href={`/catalog?query=${encodeURIComponent(s.storeName)}`} className="w-full h-full flex items-center gap-6 px-10">
-                                  <div className="w-24 h-24 md:w-44 md:h-44 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0">
-                                     <Image src={s.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${s.storeName}`} alt="" fill className="object-cover" priority={i === 0} sizes="200px" />
-                                  </div>
-                                  <div className={cn("flex flex-col gap-1", lang === 'AR' ? "text-right" : "text-left")}>
-                                     <Badge className="bg-secondary text-primary font-bold mb-1 w-fit">KING STORE</Badge>
-                                     <h3 className="text-2xl md:text-5xl font-black text-primary uppercase line-clamp-1">{s.storeName}</h3>
-                                     <p className="text-sm md:text-lg text-zinc-500 font-bold flex items-center gap-1.5"><MapPin size={18} className="text-secondary" /> {s.storeLocation}</p>
-                                  </div>
-                               </Link>
+                               {item.type === 'store' ? (
+                                 <Link href={`/catalog?query=${encodeURIComponent(item.data.storeName)}`} className="w-full h-full flex items-center gap-10 px-12 group">
+                                    <div className="w-32 h-32 md:w-56 md:h-56 rounded-[40px] overflow-hidden relative border-8 border-white shadow-2xl shrink-0 transition-transform group-hover:scale-105">
+                                       <Image src={item.data.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${item.data.storeName}`} alt="" fill className="object-cover" priority={i === 0} sizes="300px" />
+                                    </div>
+                                    <div className={cn("flex flex-col gap-2", lang === 'AR' ? "text-right" : "text-left")}>
+                                       <Badge className="bg-secondary text-primary font-black mb-1 w-fit uppercase px-4 py-1">KING STORE</Badge>
+                                       <h3 className="text-3xl md:text-6xl font-black text-primary uppercase line-clamp-1 tracking-tighter">{item.data.storeName}</h3>
+                                       <p className="text-lg md:text-2xl text-zinc-500 font-bold flex items-center gap-2"><MapPin size={22} className="text-secondary" /> {item.data.storeLocation}</p>
+                                    </div>
+                                 </Link>
+                               ) : (
+                                 <div className="relative w-full h-full group">
+                                    <Image src={item.data.image} alt="" fill className="object-cover" />
+                                    <div className="absolute inset-0 bg-black/50" />
+                                    <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+                                       <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar.title : item.data.en.title}</h3>
+                                       <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar.description : item.data.en.description}</p>
+                                       <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
+                                          {lang === 'AR' ? item.data.ar.button : item.data.en.button}
+                                       </Button>
+                                    </div>
+                                 </div>
+                               )}
                             </CarouselItem>
                           ))}
                         </CarouselContent>
                      </Carousel>
                    ) : (
-                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-bold italic">لا توجد متاجر حصرية متاحة حالياً</div>
+                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-black italic text-xl">لا توجد عروض مميزة متاحة حالياً</div>
                    )}
                 </div>
               </div>
 
-              <div className="lg:w-1/4 h-[220px] md:h-[320px] relative rounded-2xl overflow-hidden bg-zinc-900 shadow-xl group">
+              <div className="lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
                 <Image 
-                  src="https://picsum.photos/seed/promo-dz/400/400" 
+                  src="https://picsum.photos/seed/promo-dz/600/600" 
                   alt="" 
                   fill 
-                  className="object-cover opacity-40 transition-transform group-hover:scale-110" 
+                  className="object-cover opacity-30 transition-transform duration-1000 group-hover:scale-125" 
                   sizes="400px"
                   priority={true}
                 />
-                <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
-                   <div className="space-y-1">
-                      <h3 className="text-xl font-black text-white uppercase">كن بائعاً محترفاً</h3>
-                      <p className="text-xs text-zinc-400 font-bold">افتح متجرك وابدأ البيع الآن</p>
+                <div className="absolute inset-0 z-10 p-10 flex flex-col justify-center items-center text-center space-y-8">
+                   <div className="space-y-2">
+                      <Sparkles className="text-secondary mb-2 mx-auto" size={32} />
+                      <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">كن بائعاً محترفاً</h3>
+                      <p className="text-sm text-zinc-300 font-bold leading-relaxed">افتح متجرك، اعرض قطعك، ووصل لآلاف الزبائن الآن</p>
                    </div>
-                   <Link href="/seller/register" className="w-full"><Button className="w-full h-12 bg-secondary text-primary font-black rounded-xl uppercase shadow-xl hover:bg-white transition-all">ابدأ الآن</Button></Link>
+                   <Link href="/seller/register" className="w-full"><Button className="w-full h-14 bg-secondary text-primary font-black rounded-2xl uppercase shadow-2xl hover:bg-white transition-all text-lg">ابدأ مجاناً</Button></Link>
                 </div>
               </div>
             </div>
           </section>
 
           {/* Categories Carousel Section */}
-          <section className="space-y-6">
+          <section className="space-y-8">
             <div className={cn("flex items-center justify-between", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 uppercase tracking-tight">
-                 {t.categories[lang]} <LayoutGrid size={24} className="text-secondary" />
+               <h2 className="text-2xl sm:text-3xl font-black text-gray-900 flex items-center gap-3 uppercase tracking-tighter">
+                 {t.categories[lang]} <LayoutGrid size={32} className="text-secondary" />
                </h2>
-               <div className="flex gap-2">
-                  <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-2 bg-white" onClick={() => handleScroll('prev')}><ChevronRight size={20} className={lang !== 'AR' ? 'rotate-180' : ''} /></Button>
-                  <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-2 bg-white" onClick={() => handleScroll('next')}><ChevronLeft size={20} className={lang !== 'AR' ? 'rotate-180' : ''} /></Button>
+               <div className="flex gap-3">
+                  <Button variant="outline" size="icon" className="rounded-full h-12 w-12 border-2 bg-white shadow-sm hover:bg-zinc-50" onClick={() => handleScroll('prev')}><ChevronRight size={24} className={lang !== 'AR' ? 'rotate-180' : ''} /></Button>
+                  <Button variant="outline" size="icon" className="rounded-full h-12 w-12 border-2 bg-white shadow-sm hover:bg-zinc-50" onClick={() => handleScroll('next')}><ChevronLeft size={24} className={lang !== 'AR' ? 'rotate-180' : ''} /></Button>
                </div>
             </div>
             
             {loadingCats ? (
-              <div className="flex gap-6 overflow-hidden py-4">
-                {Array.from({ length: 8 }).map((_, i) => <div key={i} className="w-32 h-32 rounded-full bg-zinc-200 animate-pulse shrink-0" />)}
+              <div className="flex gap-8 overflow-hidden py-4">
+                {Array.from({ length: 8 }).map((_, i) => <div key={i} className="w-40 h-40 rounded-full bg-zinc-200 animate-pulse shrink-0" />)}
               </div>
             ) : (
-              <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 no-scrollbar scroll-smooth" dir={lang === 'AR' ? "rtl" : "ltr"}>
+              <div ref={scrollRef} className="flex gap-10 overflow-x-auto pb-6 no-scrollbar scroll-smooth" dir={lang === 'AR' ? "rtl" : "ltr"}>
                  {PART_CATEGORIES.map((cat, i) => {
-                   const img = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
+                   const img = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
                    return (
-                     <div key={i} className="shrink-0 flex flex-col items-center gap-3 group">
-                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg relative bg-white pointer-events-none transition-transform group-hover:scale-105">
-                           <Image src={img} alt="" fill className="object-cover" sizes="150px" />
+                     <div key={i} className="shrink-0 flex flex-col items-center gap-4 group">
+                        <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden shadow-2xl relative bg-white pointer-events-none transition-all duration-500 group-hover:scale-110 group-hover:ring-4 ring-secondary">
+                           <Image src={img} alt="" fill className="object-cover" sizes="200px" />
                         </div>
                         <Link 
                           href={`/catalog?category=${cat.en}`} 
-                          className="text-primary hover:text-secondary text-base md:text-lg font-black transition-all uppercase text-center px-2"
+                          className="text-primary hover:text-secondary text-base md:text-lg font-black transition-all uppercase text-center px-2 tracking-tight"
                         >
                           {lang === 'AR' ? cat.ar : cat.en}
                         </Link>
@@ -192,43 +216,43 @@ export default function Home() {
           </section>
 
           {/* Featured Products Section */}
-          <section className="space-y-6">
+          <section className="space-y-8">
             <div className={cn("flex items-center justify-between", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 uppercase">
-                 <Zap size={24} className="text-secondary fill-secondary" /> {t.featured[lang]}
+               <h2 className="text-2xl sm:text-3xl font-black text-gray-900 flex items-center gap-3 uppercase tracking-tighter">
+                 <Zap size={32} className="text-secondary fill-secondary" /> {t.featured[lang]}
                </h2>
-               <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
+               <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t.viewAll[lang]}</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {loadingFeatured ? (
-                 Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
+                 Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-[24px] animate-pulse border shadow-sm" />)
                ) : featuredProducts.length > 0 ? (
                  featuredProducts.map((p, i) => (
                    <ProductCard key={i} id={p.productId || p.id} name={p.productName || p.name} price={p.productPrice || p.price} image={p.productImage || (p.images?.[0])} seller={p.sellerName} category={lang === 'AR' ? 'قطعة مميزة' : 'FEATURED'} condition="New" />
                  ))
                ) : (
-                 <div className="col-span-full py-10 text-center text-muted-foreground italic font-bold">لا توجد منتجات مميزة متاحة حالياً</div>
+                 <div className="col-span-full py-16 text-center text-muted-foreground italic font-black text-xl bg-white rounded-[32px] border-2 border-dashed">لا توجد منتجات مميزة متاحة حالياً</div>
                )}
             </div>
           </section>
 
           {/* Latest Listings Section */}
-          <section className="space-y-6">
+          <section className="space-y-8">
             <div className={cn("flex items-center justify-between", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 uppercase">
-                 <Package size={24} className="text-secondary" /> {t.latest[lang]}
+               <h2 className="text-2xl sm:text-3xl font-black text-gray-900 flex items-center gap-3 uppercase tracking-tighter">
+                 <Package size={32} className="text-secondary" /> {t.latest[lang]}
                </h2>
-               <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
+               <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t.viewAll[lang]}</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {loadingLatest ? (
-                 Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
+                 Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-[24px] animate-pulse border shadow-sm" />)
                ) : latestListings.length > 0 ? (
                  latestListings.map((p) => (
                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price} image={p.images?.[0]} seller={p.sellerName} category={p.category} condition={p.condition === 'new' ? 'New' : 'Used'} createdAt={p.createdAt} />
                  ))
                ) : (
-                 <div className="col-span-full py-10 text-center text-muted-foreground italic font-bold">لا توجد معروضات حديثة حالياً</div>
+                 <div className="col-span-full py-16 text-center text-muted-foreground italic font-black text-xl bg-white rounded-[32px] border-2 border-dashed">لا توجد معروضات حديثة حالياً</div>
                )}
             </div>
           </section>
@@ -239,3 +263,4 @@ export default function Home() {
     </div>
   );
 }
+
