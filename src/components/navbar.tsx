@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags, Home, User
+  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags, Home, User, Search, Sparkles, MessageCircle, LayoutGrid, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
@@ -95,7 +99,76 @@ export default function Navbar() {
       {/* Layer 2: Main Branding & Global Actions */}
       <div className="bg-white py-3 border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Hamburger Quick Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-xl border-2 border-zinc-100 h-10 w-10 md:h-12 md:w-12 hover:bg-secondary hover:border-secondary transition-all">
+                   <Menu size={24} className="text-primary" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={lang === 'AR' ? 'end' : 'start'} className="w-72 p-2 rounded-2xl shadow-2xl border-2 border-zinc-100" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+                 <DropdownMenuItem asChild>
+                    <Link href="/catalog" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
+                       <div className="p-2 bg-secondary/10 text-secondary rounded-lg"><Sparkles size={18} /></div>
+                       <span>{lang === 'AR' ? 'بحث ذكي' : 'Smart Search'}</span>
+                    </Link>
+                 </DropdownMenuItem>
+                 
+                 <DropdownMenuSeparator className="my-1 opacity-50" />
+                 
+                 <DropdownMenuItem asChild>
+                    <Link href="/login" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
+                       <div className="p-2 bg-primary/10 text-primary rounded-lg"><LogIn size={18} /></div>
+                       <span>{lang === 'AR' ? 'الدخول للحساب' : 'Account Login'}</span>
+                    </Link>
+                 </DropdownMenuItem>
+                 
+                 <DropdownMenuItem asChild>
+                    <Link href="/join" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
+                       <div className="p-2 bg-primary/10 text-primary rounded-lg"><UserPlus size={18} /></div>
+                       <span>{lang === 'AR' ? 'إنشاء حساب' : 'Create Account'}</span>
+                    </Link>
+                 </DropdownMenuItem>
+                 
+                 <DropdownMenuItem asChild>
+                    <Link href="/seller/register" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
+                       <div className="p-2 bg-secondary text-primary rounded-lg"><Store size={18} /></div>
+                       <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}</span>
+                    </Link>
+                 </DropdownMenuItem>
+
+                 <DropdownMenuSeparator className="my-1 opacity-50" />
+
+                 {/* Nested Categories Menu */}
+                 <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
+                       <div className="p-2 bg-zinc-100 text-zinc-600 rounded-lg"><LayoutGrid size={18} /></div>
+                       <span>{lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Part Categories'}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-64 p-2 rounded-2xl shadow-2xl border-2 border-zinc-100" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+                       {PART_CATEGORIES.map((cat) => (
+                         <DropdownMenuItem key={cat.en} asChild>
+                            <Link href={`/catalog?category=${cat.en}`} className="flex items-center justify-between py-2.5 px-4 rounded-xl font-bold text-sm text-zinc-700 cursor-pointer hover:bg-zinc-50 transition-colors">
+                               <span>{lang === 'AR' ? cat.ar : cat.en}</span>
+                               {lang === 'AR' ? <ChevronLeft size={14} className="opacity-30" /> : <ChevronRight size={14} className="opacity-30" />}
+                            </Link>
+                         </DropdownMenuItem>
+                       ))}
+                    </DropdownMenuSubContent>
+                 </DropdownMenuSub>
+
+                 <DropdownMenuSeparator className="my-1 opacity-50" />
+
+                 <DropdownMenuItem asChild>
+                    <Link href="https://wa.me/213778428977" target="_blank" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-green-600 cursor-pointer hover:bg-green-50 transition-colors">
+                       <div className="p-2 bg-green-100 text-green-600 rounded-lg"><MessageCircle size={18} /></div>
+                       <span>{lang === 'AR' ? 'تواصل معنا' : 'Contact Us'}</span>
+                    </Link>
+                 </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Link href="/" className="hover:opacity-90 transition-all shrink-0">
               <SiteLogo className="min-w-[180px] md:min-w-[240px]" showTagline={true} />
             </Link>
