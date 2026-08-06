@@ -105,41 +105,41 @@ function CatalogContent() {
         </div>
       )}
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.brand[lang]}</Label>
+        <Label className={cn("text-base text-black uppercase", labelFont)}>{t.brand[lang]}</Label>
         <Select value={brand} onValueChange={setBrand}>
           <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder={t.allBrands[lang]} /></SelectTrigger>
           <SelectContent>{availableBrands.map(b => <SelectItem key={b} value={b} className="text-xs">{b}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.model[lang]}</Label>
+        <Label className={cn("text-base text-black uppercase", labelFont)}>{t.model[lang]}</Label>
         <Select value={model} onValueChange={setModel} disabled={!brand}>
           <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{availableModels.map(m => <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.year[lang]}</Label>
+        <Label className={cn("text-base text-black uppercase", labelFont)}>{t.year[lang]}</Label>
         <Select value={year} onValueChange={setYear}>
           <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{YEARS.map(y => <SelectItem key={y} value={y} className="text-xs">{y}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.fuel[lang]}</Label>
+        <Label className={cn("text-base text-black uppercase", labelFont)}>{t.fuel[lang]}</Label>
         <Select value={fuelType} onValueChange={setFuelType}>
           <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{FUEL_TYPES.map(f => <SelectItem key={f.en} value={f.en} className="text-xs">{f[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className={cn("space-y-1.5", lang === 'AR' ? "text-right" : "text-left")}>
-        <Label className={cn("text-sm text-black uppercase", labelFont)}>{t.category[lang]}</Label>
+        <Label className={cn("text-base text-black uppercase", labelFont)}>{t.category[lang]}</Label>
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className={cn("h-10 border-2 text-black text-sm", labelFont)}><SelectValue placeholder="-" /></SelectTrigger>
           <SelectContent>{PART_CATEGORIES.map(c => <SelectItem key={c.en} value={c.en} className="text-xs">{c[lang.toLowerCase() as keyof Translation]}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-      <Button className={cn("w-full h-12 gap-1.5 border-none text-sm uppercase mt-2 bg-[#9B2C2C] text-white hover:bg-red-900 shadow-md", buttonFont)} onClick={handleReset}>
+      <Button className={cn("w-full h-12 gap-1.5 border-none text-base uppercase mt-2 bg-[#9B2C2C] text-white hover:bg-red-900 shadow-md", buttonFont)} onClick={handleReset}>
         <RotateCcw size={16} /> {t.reset[lang]}
       </Button>
     </div>
