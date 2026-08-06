@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -25,7 +26,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, limit, orderBy } from "firebase/firestore";
+import { collection, query, limit, orderBy, getDocs } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
@@ -35,20 +36,32 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // استعلامات لحظية فائقة السرعة
-  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(20)) : null, [firestore]);
-  const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(5)) : null, [firestore]);
-  const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(6)) : null, [firestore]);
+  // استعلامات لحظية فائقة السرعة مع المزامنة
+  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(30)) : null, [firestore]);
+  const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
+  const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
   const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
 
-  const { data: categoryData, loading: loadingCats } = useCollection(categoryImagesQuery);
-  const { data: storeCampaigns, loading: loadingStores } = useCollection(featuredStoresQuery);
-  const { data: featuredProducts, loading: loadingFeatured } = useCollection(featuredProductsQuery);
-  const { data: latestListings, loading: loadingLatest } = useCollection(latestListingsQuery);
+  const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
+  const { data: storeCampaigns = [], loading: loadingStores } = useCollection(featuredStoresQuery);
+  const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
+  const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
+
+  // نظام تشخيصي للتأكد من وصول البيانات في الكونسول
+  useEffect(() => {
+    if (categoryData.length > 0) {
+      console.log(`✅ Home: Loaded ${categoryData.length} category images from Firestore.`);
+    }
+  }, [categoryData]);
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
-    categoryData?.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
+    categoryData.forEach(item => { 
+      const key = item.name_en || item.id;
+      if (key && item.imageUrl) {
+        map[key] = item.imageUrl;
+      }
+    });
     return map;
   }, [categoryData]);
 

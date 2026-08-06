@@ -17,7 +17,7 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow read: if true; // السماح برؤية المتاجر للجميع
       allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
     }
 
@@ -41,7 +41,24 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
-    match /categories_metadata/{id} {
+    match /category_images/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /support_tickets/{id} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /notifications/{id} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /purchase_requests/{id} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /site_settings/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }
