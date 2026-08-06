@@ -17,24 +17,26 @@ export default function StoreManagement() {
   const { firestore } = useFirestore();
   const [search, setSearch] = useState("");
 
-  // استعلام مبسط لجلب كافة المستخدمين (لأغراض استكشاف الأخطاء)
+  // استعلام مبسط جداً لجلب كافة المستخدمين (لأغراض التشخيص وفك التعليق)
   const usersQuery = useMemo(() => {
     if (!firestore) return null;
-    console.log("🛠️ Admin Stores: Fetching Users...");
+    console.log("🛠️ Admin Stores Diagnostic: Fetching raw users collection...");
     return query(collection(firestore, "users"), limit(100));
   }, [firestore]);
 
   const { data: allUsers, loading, error } = useCollection(usersQuery);
 
-  // الفلترة في جهة العميل بدلاً من Firestore query
+  // تصفية البائعين (Sellers) برمجياً في جهة العميل بدلاً من Firestore query
   const sellers = useMemo(() => {
     const list = allUsers?.filter(u => u.role === "Seller") || [];
-    console.log(`📊 Found ${list.length} sellers out of ${allUsers?.length || 0} total users.`);
+    console.log(`📊 Diagnostic: Found ${list.length} sellers from ${allUsers?.length || 0} total users fetched.`);
     return list;
   }, [allUsers]);
 
   useEffect(() => {
-    if (error) console.error("❌ Admin Stores Firestore Error:", error);
+    if (error) {
+      console.error("❌ Admin Stores Firestore Fetching Error:", error);
+    }
   }, [error]);
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
@@ -46,6 +48,7 @@ export default function StoreManagement() {
         description: `تم تغيير حالة المتجر بنجاح إلى ${newStatus === 'Active' ? 'معتمد' : 'محظور'}.`,
       });
     } catch (e) {
+      console.error("❌ Status Update Error:", e);
       toast({ variant: "destructive", title: "خطأ", description: "تعذر تحديث حالة المتجر." });
     }
   };
@@ -98,7 +101,7 @@ export default function StoreManagement() {
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-20">
                     <Loader2 className="animate-spin mx-auto text-primary" size={32} />
-                    <p className="mt-2 font-bold text-muted-foreground">جاري جلب المتاجر من السيرفر...</p>
+                    <p className="mt-2 font-bold text-muted-foreground">جاري المزامنة مع قاعدة البيانات...</p>
                   </TableCell>
                 </TableRow>
               ) : filteredStores.length > 0 ? (
@@ -165,7 +168,7 @@ export default function StoreManagement() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-32 text-muted-foreground font-bold">
-                    {error ? "حدث خطأ في جلب البيانات. يرجى مراجعة الكونسول." : "لا توجد متاجر مطابقة لبحثك."}
+                    {error ? "فشل الاتصال: يرجى التحقق من سجلات الكونسول." : "لا توجد متاجر مطابقة لبحثك."}
                   </TableCell>
                 </TableRow>
               )}

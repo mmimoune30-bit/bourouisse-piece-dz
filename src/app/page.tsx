@@ -45,23 +45,38 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsSafetyTimeoutReached(true);
+      console.log("⏱️ Safety Timeout reached for Home Page data.");
     }, 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // سجلات تتبع الاتصال
+  // سجلات تتبع الاتصال والتشخيص
   useEffect(() => {
     if (!firestore) return;
-    console.log("🔍 Checking Firestore Connectivity...");
-    getDocs(collection(firestore, "category_images"))
-      .then(snap => console.log(`✅ category_images connection OK. Found ${snap.docs.length} docs.`))
-      .catch(err => console.error("❌ category_images error:", err));
+    console.log("🔍 Testing Firestore Collections...");
+    
+    const testCollections = async () => {
+      try {
+        const catSnap = await getDocs(collection(firestore, "category_images"));
+        console.log(`✅ category_images: Found ${catSnap.docs.length} docs.`);
+        
+        const listingsSnap = await getDocs(collection(firestore, "listings"));
+        console.log(`✅ listings: Found ${listingsSnap.docs.length} docs.`);
+
+        const featuredSnap = await getDocs(collection(firestore, "featured_stores"));
+        console.log(`✅ featured_stores: Found ${featuredSnap.docs.length} docs.`);
+      } catch (err) {
+        console.error("❌ Firestore Diagnostic Error:", err);
+      }
+    };
+    
+    testCollections();
   }, [firestore]);
 
-  // استعلامات مبسطة (بدون where أو orderBy لتجنب تعليق الفهارس)
-  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(20)) : null, [firestore]);
-  const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
-  const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
+  // استعلامات فائقة البساطة لضمان الجلب السريع دون الحاجة لفهارس معقدة
+  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
+  const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(5)) : null, [firestore]);
+  const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(6)) : null, [firestore]);
   const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), limit(12)) : null, [firestore]);
 
   const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
@@ -69,6 +84,7 @@ export default function Home() {
   const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
   const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
 
+  // التحكم في حالة التحميل البصرية
   const isCatsLoading = loadingCats && !isSafetyTimeoutReached;
   const isStoresLoading = loadingStores && !isSafetyTimeoutReached;
   const isFeaturedLoading = loadingFeatured && !isSafetyTimeoutReached;
@@ -79,13 +95,6 @@ export default function Home() {
     categoryData.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
     return map;
   }, [categoryData]);
-
-  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
-  
-  // فلترة المتاجر الحصرية برمجياً لضمان السرعة
-  const activeExclusiveStores = useMemo(() => {
-    return storeCampaigns.filter(c => c.tier === "Exclusive" && c.status === "Active");
-  }, [storeCampaigns]);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
@@ -130,10 +139,10 @@ export default function Home() {
                 <div className="flex-grow relative bg-zinc-50">
                    {isStoresLoading ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
-                   ) : activeExclusiveStores.length > 0 ? (
+                   ) : storeCampaigns.length > 0 ? (
                      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
                         <CarouselContent className="h-full">
-                          {activeExclusiveStores.map((s, i) => (
+                          {storeCampaigns.filter(s => s.tier === 'Exclusive').map((s, i) => (
                             <CarouselItem key={i} className="h-full">
                                <Link href={`/catalog?query=${encodeURIComponent(s.storeName)}`} className="w-full h-full flex items-center gap-6 px-10">
                                   <div className="w-24 h-24 md:w-44 md:h-44 rounded-3xl overflow-hidden relative border-4 border-white shadow-xl shrink-0">
