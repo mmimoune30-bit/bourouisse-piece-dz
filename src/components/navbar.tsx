@@ -51,7 +51,6 @@ export default function Navbar() {
 
   const getInquiryText = () => lang === 'AR' ? 'للاستفسار:' : lang === 'EN' ? 'Inquiry:' : 'Demande:';
   const getBackHomeText = () => lang === 'AR' ? 'الرجوع الى الرئيسية' : lang === 'EN' ? 'Back Home' : 'Retour';
-  const getCategoriesText = () => lang === 'AR' ? 'قطع الغيار' : lang === 'EN' ? 'Parts' : 'Pièces';
   const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Become Seller' : 'Devenir Vendeur';
   const getJoinNowText = () => lang === 'AR' ? 'إنشاء حساب' : lang === 'EN' ? 'Join Now' : 'Inscription';
   const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
@@ -105,23 +104,6 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center gap-2 pr-4 border-l border-zinc-100 ml-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className={cn("text-primary hover:bg-zinc-50 rounded-xl gap-2 h-10 px-4 text-sm uppercase transition-all", boldNavFont)}>
-                    <Tags size={18} className="text-secondary" /> {getCategoriesText()} <ChevronDown size={14} className="opacity-40" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-zinc-100 overflow-y-auto max-h-[60vh]">
-                  {PART_CATEGORIES.map((cat) => (
-                    <DropdownMenuItem key={cat.en} asChild>
-                      <Link href={`/catalog?category=${cat.en}`} className={cn("justify-end py-2.5 px-4 text-xs text-primary uppercase rounded-xl hover:bg-zinc-50 cursor-pointer", lang === 'AR' ? 'font-black' : 'font-bold')}>
-                        {lang === 'AR' ? cat.ar : lang === 'EN' ? cat.en : cat.fr}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
               <Link href="/seller/register">
                 <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-5 text-xs md:text-sm uppercase shadow-lg shadow-black/5", boldNavFont)}>
                   <Store size={16} className="ml-2" /> {getBecomeSellerText()}
