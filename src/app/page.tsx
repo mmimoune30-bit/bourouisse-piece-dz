@@ -174,11 +174,14 @@ export default function Home() {
                  {PART_CATEGORIES.map((cat, i) => {
                    const img = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/150/150`;
                    return (
-                     <div key={i} className="shrink-0 flex flex-col items-center gap-4 group">
+                     <div key={i} className="shrink-0 flex flex-col items-center gap-3 group">
                         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg relative bg-white pointer-events-none transition-transform group-hover:scale-105">
                            <Image src={img} alt="" fill className="object-cover" sizes="150px" />
                         </div>
-                        <Link href={`/catalog?category=${cat.en}`} className="bg-white border-2 border-zinc-100 hover:border-secondary hover:text-secondary px-5 py-2.5 rounded-2xl text-xs font-bold text-primary transition-all uppercase shadow-sm">
+                        <Link 
+                          href={`/catalog?category=${cat.en}`} 
+                          className="text-primary hover:text-secondary text-base md:text-lg font-black transition-all uppercase text-center px-2"
+                        >
                           {lang === 'AR' ? cat.ar : cat.en}
                         </Link>
                      </div>
