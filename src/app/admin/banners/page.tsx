@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { 
   ImagePlus, Save, Layout, Trash2, 
-  Plus, Eye, MoveUp, MoveDown, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2 
+  Plus, Eye, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -45,7 +45,7 @@ export default function BannerManagement() {
     if (banners.length > 0 && !editingBanner) {
       setEditingBanner(banners[0]);
     }
-  }, [banners]);
+  }, [banners, editingBanner]);
 
   const handleSave = async () => {
     if (!firestore || !editingBanner) return;
@@ -72,7 +72,7 @@ export default function BannerManagement() {
 
   const addBanner = () => {
     const newBanner = {
-      image: "https://picsum.photos/seed/new/1200/400",
+      image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200",
       ar: { title: "عنوان جديد بالعربية", description: "وصف جديد للبانر بالعربية", button: "ابدأ الآن" },
       en: { title: "New English Title", description: "New English description for the banner", button: "Start Now" },
       active: true
@@ -111,7 +111,7 @@ export default function BannerManagement() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Banner List */}
         <div className="xl:col-span-1 space-y-4">
-          <h3 className="font-black text-lg border-r-4 border-secondary pr-3">قائمة البنرات الحالية</h3>
+          <h3 className="font-black text-lg border-r-4 border-secondary pr-3">قائمة البنرات الحالية ({banners.length})</h3>
           {banners.length === 0 ? (
             <Card className="p-10 text-center border-dashed border-2">
                <p className="text-muted-foreground font-bold">لا توجد بنرات مضافة بعد.</p>
@@ -175,8 +175,8 @@ export default function BannerManagement() {
                       <Input 
                         placeholder="أدخل العنوان الجذاب هنا..." 
                         className="h-14 text-xl font-black border-2 rounded-xl" 
-                        value={editingBanner.ar?.title}
-                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, title: e.target.value}})}
+                        value={editingBanner.ar?.title || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...(editingBanner.ar || {}), title: e.target.value}})}
                       />
                     </div>
                     <div className="space-y-2 text-right">
@@ -184,8 +184,8 @@ export default function BannerManagement() {
                       <Textarea 
                         placeholder="شرح موجز للعرض أو الخدمة..." 
                         className="min-h-[120px] text-lg leading-relaxed border-2 rounded-xl font-bold" 
-                        value={editingBanner.ar?.description}
-                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, description: e.target.value}})}
+                        value={editingBanner.ar?.description || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...(editingBanner.ar || {}), description: e.target.value}})}
                       />
                     </div>
                     <div className="space-y-2 text-right">
@@ -193,8 +193,8 @@ export default function BannerManagement() {
                       <Input 
                         placeholder="مثلاً: ابدأ الآن، اشترك معنا..." 
                         className="h-12 font-black border-2 rounded-xl" 
-                        value={editingBanner.ar?.button}
-                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...editingBanner.ar, button: e.target.value}})}
+                        value={editingBanner.ar?.button || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, ar: {...(editingBanner.ar || {}), button: e.target.value}})}
                       />
                     </div>
                   </TabsContent>
@@ -207,8 +207,8 @@ export default function BannerManagement() {
                         placeholder="Enter catchy title..." 
                         className="h-14 text-xl font-black border-2 rounded-xl" 
                         dir="ltr" 
-                        value={editingBanner.en?.title}
-                        onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, title: e.target.value}})}
+                        value={editingBanner.en?.title || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, en: {...(editingBanner.en || {}), title: e.target.value}})}
                       />
                     </div>
                     <div className="space-y-2">
@@ -217,8 +217,8 @@ export default function BannerManagement() {
                         placeholder="Brief explanation of offer..." 
                         className="min-h-[120px] text-lg leading-relaxed border-2 rounded-xl font-bold" 
                         dir="ltr" 
-                        value={editingBanner.en?.description}
-                        onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, description: e.target.value}})}
+                        value={editingBanner.en?.description || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, en: {...(editingBanner.en || {}), description: e.target.value}})}
                       />
                     </div>
                     <div className="space-y-2">
@@ -227,8 +227,8 @@ export default function BannerManagement() {
                         placeholder="e.g. Join Now, Start Here..." 
                         className="h-12 font-black border-2 rounded-xl" 
                         dir="ltr" 
-                        value={editingBanner.en?.button}
-                        onChange={(e) => setEditingBanner({...editingBanner, en: {...editingBanner.en, button: e.target.value}})}
+                        value={editingBanner.en?.button || ""}
+                        onChange={(e) => setEditingBanner({...editingBanner, en: {...(editingBanner.en || {}), button: e.target.value}})}
                       />
                     </div>
                   </TabsContent>
@@ -239,13 +239,13 @@ export default function BannerManagement() {
                     <div className="flex-1 space-y-2 text-right">
                       <Label className="font-black">الصورة الخلفية (URL)</Label>
                       <Input 
-                        value={editingBanner.image} 
+                        value={editingBanner.image || ""} 
                         onChange={(e) => setEditingBanner({...editingBanner, image: e.target.value})}
                         className="h-12 border-2 rounded-xl"
                         placeholder="رابط الصورة (Unsplash أو Picsum)..."
                       />
                       <div className="relative aspect-video rounded-2xl overflow-hidden mt-2 border">
-                         <Image src={editingBanner.image} alt="Preview" fill className="object-cover" />
+                         <Image src={editingBanner.image || "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200"} alt="Preview" fill className="object-cover" />
                       </div>
                     </div>
                     <div className="w-full md:w-64 space-y-4">
@@ -268,11 +268,10 @@ export default function BannerManagement() {
                             </DialogHeader>
                             
                             <div className="space-y-12 py-8">
-                               {/* AR Preview */}
                                <section className="space-y-4">
                                  <Badge className="bg-secondary text-primary font-black">العربية (RTL)</Badge>
                                  <div className="relative h-[350px] w-full rounded-[40px] overflow-hidden flex items-center justify-end px-16 text-right">
-                                    <Image src={editingBanner.image} alt="Preview" fill className="object-cover" />
+                                    <Image src={editingBanner.image || "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200"} alt="Preview" fill className="object-cover" />
                                     <div className="absolute inset-0 bg-black/60" />
                                     <div className="relative z-10 max-w-2xl space-y-6">
                                        <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">{editingBanner.ar?.title}</h2>
@@ -303,8 +302,3 @@ export default function BannerManagement() {
     </div>
   );
 }
-
-function useMemo(arg0: () => import("@firebase/firestore").Query<import("@firebase/firestore").DocumentData, import("@firebase/firestore").DocumentData> | null, arg1: (import("@firebase/firestore").Firestore | null)[]) {
-  return React.useMemo(arg0, arg1);
-}
-

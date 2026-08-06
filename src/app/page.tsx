@@ -40,7 +40,7 @@ export default function Home() {
   // استعلامات لحظية فائقة السرعة
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(30)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
-  const bannersQuery = useMemo(() => firestore ? query(collection(firestore, "banners"), limit(5)) : null, [firestore]);
+  const bannersQuery = useMemo(() => firestore ? query(collection(firestore, "banners"), limit(10)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(12)) : null, [firestore]);
   const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
 
@@ -62,17 +62,14 @@ export default function Home() {
   }, [categoryData]);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-    if (savedLang) setLang(savedLang);
-    const handler = () => setLang(localStorage.getItem("app_lang") as any || "AR");
-    window.addEventListener("languageChange", handler);
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (savedLang) setLang(savedLang);
+    };
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
     return () => window.removeEventListener("languageChange", checkLang);
   }, []);
-
-  const checkLang = () => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-    if (savedLang) setLang(savedLang);
-  };
 
   const handleScroll = (dir: 'prev' | 'next') => {
     if (scrollRef.current) {
@@ -91,9 +88,29 @@ export default function Home() {
 
   // دمج المتاجر الحصرية والبنرات في مصفوفة واحدة للسلايدر
   const heroItems = useMemo(() => {
-    const items = [];
+    const items: any[] = [];
     storeCampaigns.filter(s => s.tier === 'Exclusive').forEach(s => items.push({ type: 'store', data: s }));
     siteBanners.forEach(b => items.push({ type: 'banner', data: b }));
+
+    // بنرات احتياطية في حال كانت القاعدة فارغة لضمان الدوران
+    if (items.length === 0) {
+      items.push({
+        type: 'banner',
+        data: {
+          image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200",
+          ar: { title: "أكبر تجمع لقطع الغيار في الجزائر", description: "ابحث عن أي قطعة لسيارتك بكل سهولة وتواصل مع البائع مباشرة.", button: "ابدأ البحث الآن" },
+          en: { title: "Largest Spare Parts Hub in Algeria", description: "Find any part for your vehicle easily and connect with sellers.", button: "Start Searching" }
+        }
+      });
+      items.push({
+        type: 'banner',
+        data: {
+          image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200",
+          ar: { title: "متاجر معتمدة وموثوقة", description: "نوفر لك قائمة بأفضل المتاجر المتخصصة لضمان جودة القطع.", button: "تصفح المتاجر" },
+          en: { title: "Verified & Trusted Stores", description: "We provide a list of specialized stores to ensure part quality.", button: "Browse Stores" }
+        }
+      });
+    }
     return items;
   }, [storeCampaigns, siteBanners]);
 
@@ -118,7 +135,7 @@ export default function Home() {
                    {loadingStores || loadingBanners ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>
                    ) : heroItems.length > 0 ? (
-                     <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 6000 })]} className="h-full">
+                     <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
                         <CarouselContent className="h-full">
                           {heroItems.map((item, i) => (
                             <CarouselItem key={i} className="h-full">
@@ -135,13 +152,13 @@ export default function Home() {
                                  </Link>
                                ) : (
                                  <div className="relative w-full h-full group">
-                                    <Image src={item.data.image} alt="" fill className="object-cover" />
+                                    <Image src={item.data.image} alt="" fill className="object-cover" priority={i === 0} />
                                     <div className="absolute inset-0 bg-black/50" />
                                     <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-                                       <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar.title : item.data.en.title}</h3>
-                                       <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar.description : item.data.en.description}</p>
+                                       <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
+                                       <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar?.description : item.data.en?.description}</p>
                                        <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
-                                          {lang === 'AR' ? item.data.ar.button : item.data.en.button}
+                                          {lang === 'AR' ? item.data.ar?.button : item.data.en?.button}
                                        </Button>
                                     </div>
                                  </div>
@@ -150,29 +167,50 @@ export default function Home() {
                           ))}
                         </CarouselContent>
                      </Carousel>
-                   ) : (
-                     <div className="absolute inset-0 flex items-center justify-center text-muted-foreground font-black italic text-xl">لا توجد عروض مميزة متاحة حالياً</div>
-                   )}
+                   ) : null}
                 </div>
               </div>
 
+              {/* Side Promo Slider - Dynamic */}
               <div className="lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
-                <Image 
-                  src="https://picsum.photos/seed/promo-dz/600/600" 
-                  alt="" 
-                  fill 
-                  className="object-cover opacity-30 transition-transform duration-1000 group-hover:scale-125" 
-                  sizes="400px"
-                  priority={true}
-                />
-                <div className="absolute inset-0 z-10 p-10 flex flex-col justify-center items-center text-center space-y-8">
-                   <div className="space-y-2">
-                      <Sparkles className="text-secondary mb-2 mx-auto" size={32} />
-                      <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">كن بائعاً محترفاً</h3>
-                      <p className="text-sm text-zinc-300 font-bold leading-relaxed">افتح متجرك، اعرض قطعك، ووصل لآلاف الزبائن الآن</p>
-                   </div>
-                   <Link href="/seller/register" className="w-full"><Button className="w-full h-14 bg-secondary text-primary font-black rounded-2xl uppercase shadow-2xl hover:bg-white transition-all text-lg">ابدأ مجاناً</Button></Link>
-                </div>
+                <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
+                  <CarouselContent className="h-full">
+                    {/* Item 1: Become a Seller */}
+                    <CarouselItem className="h-full">
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src="https://images.unsplash.com/photo-1558441719-23451e281e5f?w=600" 
+                          alt="" 
+                          fill 
+                          className="object-cover opacity-30 transition-transform duration-1000 group-hover:scale-125" 
+                          sizes="400px"
+                          priority
+                        />
+                        <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
+                           <div className="space-y-2">
+                              <Sparkles className="text-secondary mb-2 mx-auto" size={32} />
+                              <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">كن بائعاً محترفاً</h3>
+                              <p className="text-sm text-zinc-300 font-bold leading-relaxed">افتح متجرك الآن ووصل لآلاف الزبائن</p>
+                           </div>
+                           <Link href="/seller/register" className="w-full"><Button className="w-full h-14 bg-secondary text-primary font-black rounded-2xl uppercase shadow-2xl hover:bg-white transition-all text-lg">ابدأ مجاناً</Button></Link>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                    {/* Item 2: Smart Search */}
+                    <CarouselItem className="h-full">
+                      <div className="relative w-full h-full bg-blue-900/40">
+                         <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
+                            <div className="space-y-2">
+                               <Zap className="text-secondary mb-2 mx-auto" size={32} />
+                               <h3 className="text-2xl font-black text-white uppercase">بحث ذكي بالذكاء الاصطناعي</h3>
+                               <p className="text-xs text-blue-100 font-bold">ابحث بالعامية أو بوصف القطعة وسنجدها لك</p>
+                            </div>
+                            <Link href="/catalog" className="w-full"><Button variant="outline" className="w-full h-12 border-2 border-secondary text-secondary font-black rounded-xl hover:bg-secondary hover:text-primary">جرب البحث المتقدم</Button></Link>
+                         </div>
+                      </div>
+                    </CarouselItem>
+                  </CarouselContent>
+                </Carousel>
               </div>
             </div>
           </section>
@@ -263,4 +301,3 @@ export default function Home() {
     </div>
   );
 }
-
