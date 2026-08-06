@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -63,13 +62,13 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-xl">
       {/* Layer 1: Compact Top Info Bar */}
-      <div className="bg-zinc-950 border-b border-white/5 py-1 overflow-hidden">
+      <div className="bg-zinc-950 border-b border-white/5 py-1.5 md:py-2 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          <div className="flex-1 overflow-hidden relative h-5">
+          <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               <div className={cn("flex items-center gap-8 text-white/70 uppercase text-[9px] md:text-[10px]", navFont)}>
+               <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[11px] md:text-[13px]", navFont)}>
                   <span className="text-secondary tracking-widest">{getInquiryText()}</span>
-                  <span className="flex items-center gap-1.5"><Phone size={11} className="text-secondary" /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-1.5"><Phone size={12} className="text-secondary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5 font-mono">support@bourouisse-piecedz.com</span>
                </div>
