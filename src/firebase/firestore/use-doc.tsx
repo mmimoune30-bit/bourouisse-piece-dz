@@ -1,85 +1,59 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   DocumentReference, 
-  getDoc, 
-  DocumentSnapshot 
+  onSnapshot,
+  DocumentSnapshot,
+  FirestoreError 
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * الخطاف الدفاعي لجلب مستند واحد بمهلة زمنية لمنع التعليق.
+ * خطاف المزامنة اللحظية لمستند واحد (Real-time Document Sync).
  */
 export function useDoc(docRef: DocumentReference | null) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  
-  const activePath = useRef<string | null>(null);
+  const [error, setError] = useState<FirestoreError | null>(null);
 
   useEffect(() => {
-    if (!docRef || typeof window === 'undefined') {
-      if (!docRef) {
-        setData(null);
-        setLoading(false);
-      }
+    if (!docRef) {
+      setData(null);
+      setLoading(false);
       return;
     }
 
-    const path = docRef.path;
-    if (activePath.current === path) return;
+    setLoading(true);
 
-    let isMounted = true;
-    activePath.current = path;
-
-    const fetchData = async () => {
-      setLoading(true);
-
-      const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), 3000)
-      );
-
-      try {
-        const snapshot = await Promise.race([
-          getDoc(docRef),
-          timeoutPromise
-        ]) as DocumentSnapshot;
-        
-        if (!isMounted) return;
-
-        if (snapshot && snapshot.exists()) {
+    const unsubscribe = onSnapshot(
+      docRef,
+      (snapshot: DocumentSnapshot) => {
+        if (snapshot.exists()) {
           setData({ id: snapshot.id, ...snapshot.data() });
         } else {
           setData(null);
         }
-        
+        setLoading(false);
         setError(null);
-      } catch (err: any) {
-        if (!isMounted) return;
-        
-        console.warn("Firestore Doc Guard Triggered:", err.message);
+      },
+      (err: FirestoreError) => {
+        console.error("Firestore Doc Sync Error:", err);
         
         if (err.code === 'permission-denied') {
-          const permError = new FirestorePermissionError({
+          errorEmitter.emit('permission-error', new FirestorePermissionError({
             path: docRef.path || 'document',
             operation: 'get'
-          });
-          errorEmitter.emit('permission-error', permError);
+          }));
         }
         
         setError(err);
-      } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
-    };
+    );
 
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => unsubscribe();
   }, [docRef]);
 
   return { data, loading, error };

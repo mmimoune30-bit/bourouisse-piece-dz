@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -26,73 +25,30 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, query, limit, getDocs } from "firebase/firestore";
+import { collection, query, limit, orderBy } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
-/**
- * @fileOverview الصفحة الرئيسية - تم تبسيط الاستعلامات لضمان جلب البيانات وفك التعليق.
- */
-
 export default function Home() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
-  const [isSafetyTimeoutReached, setIsSafetyTimeoutReached] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  
-  // صمام أمان لإنهاء حالة التحميل يدوياً إذا تأخر Firestore
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsSafetyTimeoutReached(true);
-      console.log("⏱️ Safety Timeout reached for Home Page data.");
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
 
-  // سجلات تتبع الاتصال والتشخيص
-  useEffect(() => {
-    if (!firestore) return;
-    console.log("🔍 Testing Firestore Collections...");
-    
-    const testCollections = async () => {
-      try {
-        const catSnap = await getDocs(collection(firestore, "category_images"));
-        console.log(`✅ category_images: Found ${catSnap.docs.length} docs.`);
-        
-        const listingsSnap = await getDocs(collection(firestore, "listings"));
-        console.log(`✅ listings: Found ${listingsSnap.docs.length} docs.`);
-
-        const featuredSnap = await getDocs(collection(firestore, "featured_stores"));
-        console.log(`✅ featured_stores: Found ${featuredSnap.docs.length} docs.`);
-      } catch (err) {
-        console.error("❌ Firestore Diagnostic Error:", err);
-      }
-    };
-    
-    testCollections();
-  }, [firestore]);
-
-  // استعلامات فائقة البساطة لضمان الجلب السريع دون الحاجة لفهارس معقدة
-  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(15)) : null, [firestore]);
+  // استعلامات لحظية فائقة السرعة
+  const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(20)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(5)) : null, [firestore]);
   const featuredProductsQuery = useMemo(() => firestore ? query(collection(firestore, "featured_products"), limit(6)) : null, [firestore]);
-  const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), limit(12)) : null, [firestore]);
+  const latestListingsQuery = useMemo(() => firestore ? query(collection(firestore, "listings"), orderBy("createdAt", "desc"), limit(12)) : null, [firestore]);
 
-  const { data: categoryData = [], loading: loadingCats } = useCollection(categoryImagesQuery);
-  const { data: storeCampaigns = [], loading: loadingStores } = useCollection(featuredStoresQuery);
-  const { data: featuredProducts = [], loading: loadingFeatured } = useCollection(featuredProductsQuery);
-  const { data: latestListings = [], loading: loadingLatest } = useCollection(latestListingsQuery);
-
-  // التحكم في حالة التحميل البصرية
-  const isCatsLoading = loadingCats && !isSafetyTimeoutReached;
-  const isStoresLoading = loadingStores && !isSafetyTimeoutReached;
-  const isFeaturedLoading = loadingFeatured && !isSafetyTimeoutReached;
-  const isLatestLoading = loadingLatest && !isSafetyTimeoutReached;
+  const { data: categoryData, loading: loadingCats } = useCollection(categoryImagesQuery);
+  const { data: storeCampaigns, loading: loadingStores } = useCollection(featuredStoresQuery);
+  const { data: featuredProducts, loading: loadingFeatured } = useCollection(featuredProductsQuery);
+  const { data: latestListings, loading: loadingLatest } = useCollection(latestListingsQuery);
 
   const categoryImagesMap = useMemo(() => {
     const map: Record<string, string> = {};
-    categoryData.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
+    categoryData?.forEach(item => { if(item.name_en) map[item.name_en] = item.imageUrl; });
     return map;
   }, [categoryData]);
 
@@ -137,7 +93,7 @@ export default function Home() {
                    <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
                 </div>
                 <div className="flex-grow relative bg-zinc-50">
-                   {isStoresLoading ? (
+                   {loadingStores ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>
                    ) : storeCampaigns.length > 0 ? (
                      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
@@ -196,7 +152,7 @@ export default function Home() {
                </div>
             </div>
             
-            {isCatsLoading ? (
+            {loadingCats ? (
               <div className="flex gap-6 overflow-hidden py-4">
                 {Array.from({ length: 8 }).map((_, i) => <div key={i} className="w-32 h-32 rounded-full bg-zinc-200 animate-pulse shrink-0" />)}
               </div>
@@ -228,7 +184,7 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {isFeaturedLoading ? (
+               {loadingFeatured ? (
                  Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
                ) : featuredProducts.length > 0 ? (
                  featuredProducts.map((p, i) => (
@@ -249,7 +205,7 @@ export default function Home() {
                <Link href="/catalog" className="text-xs font-bold text-secondary hover:underline uppercase">{t.viewAll[lang]}</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-               {isLatestLoading ? (
+               {loadingLatest ? (
                  Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border" />)
                ) : latestListings.length > 0 ? (
                  latestListings.map((p) => (

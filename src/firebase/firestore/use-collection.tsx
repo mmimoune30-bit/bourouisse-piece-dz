@@ -1,56 +1,47 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Query, 
-  getDocs,
-  QuerySnapshot
+  onSnapshot,
+  QuerySnapshot,
+  FirestoreError
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 /**
- * خطاف جلب المجموعات المباشر من Firestore.
+ * خطاف المزامنة اللحظية للمجموعات (Real-time Collection Sync).
+ * يقوم بتحديث الواجهة فوراً عند تغير أي بيانات في Firestore.
  */
 export function useCollection(query: Query | null) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  
-  const lastQueryKey = useRef<string | null>(null);
+  const [error, setError] = useState<FirestoreError | null>(null);
 
   useEffect(() => {
-    if (!query || typeof window === 'undefined') {
-      if (!query) {
-        setData([]);
-        setLoading(false);
-      }
+    if (!query) {
+      setData([]);
+      setLoading(false);
       return;
     }
 
-    const currentQueryKey = query.toString();
-    if (lastQueryKey.current === currentQueryKey) return;
+    setLoading(true);
 
-    let isMounted = true;
-    lastQueryKey.current = currentQueryKey;
-
-    const fetchData = async () => {
-      setLoading(true);
-      
-      try {
-        const snapshot = await getDocs(query);
-
-        if (!isMounted) return;
-
+    // إنشاء مستمع لحظي (Real-time Listener)
+    const unsubscribe = onSnapshot(
+      query,
+      (snapshot: QuerySnapshot) => {
         const items = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
         setData(items);
+        setLoading(false);
         setError(null);
-      } catch (err: any) {
-        if (!isMounted) return;
+      },
+      (err: FirestoreError) => {
+        console.error("Firestore Sync Error:", err);
         
         if (err.code === 'permission-denied') {
           errorEmitter.emit('permission-error', new FirestorePermissionError({
@@ -60,16 +51,12 @@ export function useCollection(query: Query | null) {
         }
         
         setError(err);
-      } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
-    };
+    );
 
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    // تنظيف المستمع عند إلغاء تحميل المكون
+    return () => unsubscribe();
   }, [query]);
 
   return { data, loading, error };
