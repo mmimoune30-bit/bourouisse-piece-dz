@@ -85,7 +85,7 @@ const ProductCard = memo(function ProductCard({
         {/* Condition Badge */}
         <div className={cn("absolute top-2 z-10", lang === 'AR' ? "left-2" : "right-2")}>
           <Badge className={cn(
-            "text-[8px] px-2 py-0.5 font-bold uppercase border-none shadow-sm",
+            "text-[10px] px-2.5 py-1 font-black uppercase border-none shadow-sm",
             condition === 'New' ? "bg-green-600 hover:bg-green-700" : "bg-orange-500 hover:bg-orange-600"
           )}>
             {getConditionText()}
@@ -103,34 +103,34 @@ const ProductCard = memo(function ProductCard({
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
       </Link>
       
-      <CardContent className={cn("p-3 flex-grow flex flex-col gap-1.5", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-        {/* Category Label */}
-        <div className="text-[9px] uppercase text-secondary font-black tracking-tight mb-0.5">{category}</div>
+      <CardContent className={cn("p-4 flex-grow flex flex-col gap-2", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+        {/* Category Label - Now RED and slightly larger */}
+        <div className="text-[11px] uppercase text-[#9B2C2C] font-black tracking-tight mb-0.5">{category}</div>
         
-        {/* Product Title */}
+        {/* Product Title - Now Larger and Blacker */}
         <Link href={`/products/${id}`} className="block">
-          <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-secondary transition-colors uppercase min-h-[2.5rem]">
+          <h3 className="text-base font-black text-gray-900 line-clamp-2 leading-tight group-hover:text-[#9B2C2C] transition-colors uppercase min-h-[3rem]">
             {name}
           </h3>
         </Link>
 
         {/* Seller Info */}
-        <div className="flex items-center gap-1 mt-1 opacity-70">
-          <MapPin size={10} className="text-gray-400" />
-          <span className="text-[10px] text-gray-500 font-bold truncate">{seller}</span>
+        <div className="flex items-center gap-1 mt-1 opacity-80">
+          <MapPin size={12} className="text-gray-400" />
+          <span className="text-xs text-gray-500 font-bold truncate">{seller}</span>
         </div>
 
-        {/* Price and Date Row */}
-        <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
+        {/* Price and Date Row - Price is now larger */}
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
           <div className="flex flex-col">
-            <span className="text-base font-black text-gray-900">
-              {mounted ? price.toLocaleString() : price} <span className="text-[10px] font-bold">دج</span>
+            <span className="text-lg font-black text-gray-900">
+              {mounted ? price.toLocaleString() : price} <span className="text-xs font-bold">دج</span>
             </span>
           </div>
           
           {formattedDate && (
-            <div className="text-[8px] text-gray-400 font-bold bg-gray-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-              <Clock size={8} /> {formattedDate}
+            <div className="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-1 rounded-md flex items-center gap-1">
+              <Clock size={10} /> {formattedDate}
             </div>
           )}
         </div>
