@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { 
   ImagePlus, Save, Layout, Trash2, 
-  Plus, Eye, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2 
+  Plus, Eye, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2, UploadCloud, Link as LinkIcon
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -30,9 +30,11 @@ import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, query, 
 export default function BannerManagement() {
   const { firestore } = useFirestore();
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // جلب البنرات من Firestore
+  // جلب البنرات من Firestore بمزامنة لحظية
   const bannersQuery = useMemo(() => {
     if (!firestore) return null;
     return query(collection(firestore, "banners"), orderBy("createdAt", "desc"));
@@ -46,6 +48,46 @@ export default function BannerManagement() {
       setEditingBanner(banners[0]);
     }
   }, [banners, editingBanner]);
+
+  // وظيفة ضغط الصورة وتحويلها لـ Base64 لضمان سرعة التحميل وثبات الرابط
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200; // عرض مناسب للبنرات العريضة
+          const width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
+          const height = img.height * (width / img.width);
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.8)); // حفظ بصيغة JPEG مضغوطة
+        };
+      };
+    });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const base64 = await compressImage(file);
+      setEditingBanner({ ...editingBanner, image: base64 });
+      toast({ title: "تم تجهيز الصورة ✅", description: "يمكنك الآن الضغط على حفظ لتطبيق التغيير." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "خطأ", description: "فشل معالجة الصورة المرفوعة." });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!firestore || !editingBanner) return;
@@ -64,7 +106,7 @@ export default function BannerManagement() {
       }
       toast({ title: "تم الحفظ بنجاح ✅", description: "تم تحديث البنرات في الصفحة الرئيسية." });
     } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "تعذر حفظ البيانات." });
+      toast({ variant: "destructive", title: "خطأ", description: "تعذر حفظ البيانات في Firestore." });
     } finally {
       setLoading(false);
     }
@@ -236,18 +278,50 @@ export default function BannerManagement() {
 
                 <div className="mt-10 pt-6 border-t space-y-6">
                   <div className="flex flex-col md:flex-row-reverse gap-6">
-                    <div className="flex-1 space-y-2 text-right">
-                      <Label className="font-black">الصورة الخلفية (URL)</Label>
-                      <Input 
-                        value={editingBanner.image || ""} 
-                        onChange={(e) => setEditingBanner({...editingBanner, image: e.target.value})}
-                        className="h-12 border-2 rounded-xl"
-                        placeholder="رابط الصورة (Unsplash أو Picsum)..."
-                      />
-                      <div className="relative aspect-video rounded-2xl overflow-hidden mt-2 border">
+                    <div className="flex-1 space-y-4 text-right">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <Label className="font-black text-lg">صورة الخلفية</Label>
+                        <div className="flex gap-2">
+                           <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            accept="image/*" 
+                            onChange={handleFileUpload}
+                           />
+                           <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2 font-bold rounded-xl border-secondary text-primary hover:bg-secondary"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                           >
+                             {uploadingImage ? <Loader2 className="animate-spin h-4 w-4" /> : <UploadCloud size={16} />} 
+                             رفع من الجهاز
+                           </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                         <Label className="text-xs font-bold text-muted-foreground flex items-center gap-1 justify-end">
+                           <LinkIcon size={12} /> أو أدخل رابط الصورة يدوياً
+                         </Label>
+                         <Input 
+                          value={editingBanner.image || ""} 
+                          onChange={(e) => setEditingBanner({...editingBanner, image: e.target.value})}
+                          className="h-12 border-2 rounded-xl"
+                          placeholder="https://images.unsplash.com/..."
+                        />
+                      </div>
+
+                      <div className="relative aspect-video rounded-3xl overflow-hidden mt-4 border shadow-inner group">
                          <Image src={editingBanner.image || "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200"} alt="Preview" fill className="object-cover" />
+                         <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Badge className="bg-white/90 text-primary font-black">معاينة حية</Badge>
+                         </div>
                       </div>
                     </div>
+
                     <div className="w-full md:w-64 space-y-4">
                       <div className="p-6 bg-zinc-900 rounded-[24px] text-white text-right space-y-4 shadow-2xl">
                         <h4 className="font-black text-secondary border-b border-white/10 pb-2 uppercase tracking-widest text-xs">خيارات الحفظ</h4>
