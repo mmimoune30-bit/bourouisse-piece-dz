@@ -64,23 +64,17 @@ export default function Navbar() {
     window.dispatchEvent(new Event("languageChange"));
   };
 
-  const getInquiryText = () => lang === 'AR' ? 'للاستفسار:' : lang === 'EN' ? 'Inquiry:' : 'Demande:';
-  const getBackHomeText = () => lang === 'AR' ? 'الرئيسية' : lang === 'EN' ? 'Home' : 'Accueil';
-  const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Become Seller' : 'Vendre';
-  const getJoinNowText = () => lang === 'AR' ? 'إنشاء حساب' : lang === 'EN' ? 'Join' : 'S\'inscrire';
-  const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
-
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
-      {/* Top Bar */}
-      <div className="bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden">
+    <nav className="fixed top-0 left-0 right-0 z-[60] flex flex-col pointer-events-none">
+      {/* Top Bar - Interactive Wrapper */}
+      <div className="bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[11px] md:text-[13px]", navFont)}>
-                  <span className="text-secondary tracking-widest">{getInquiryText()}</span>
+                  <span className="text-secondary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
                   <span className="flex items-center gap-1.5"><Phone size={12} className="text-secondary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5 font-mono">support@bourouisse.com</span>
@@ -96,7 +90,7 @@ export default function Navbar() {
                   <ChevronDown size={10} className="opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-28 bg-zinc-900 border-white/10 text-white p-1">
+              <DropdownMenuContent align="end" className="w-28 bg-zinc-900 border-white/10 text-white p-1 z-[70]">
                 <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black text-xs cursor-pointer">العربية</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold text-xs cursor-pointer">English</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-bold text-xs cursor-pointer">Français</DropdownMenuItem>
@@ -106,18 +100,22 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Branding Bar */}
-      <div className="bg-white py-3 border-b shadow-md relative z-20">
+      {/* Branding Bar - Primary Interaction Layer */}
+      <div className="bg-white py-3 border-b shadow-md relative z-[65] pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-2 md:gap-4">
-            {/* New Sheet Navigation */}
+            {/* Hamburger Sheet Menu */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-xl border-2 border-zinc-100 h-10 w-10 md:h-12 md:w-12 hover:bg-secondary hover:border-secondary transition-all">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-xl border-2 border-zinc-100 h-10 w-10 md:h-12 md:w-12 hover:bg-secondary hover:border-secondary transition-all active:scale-95"
+                >
                   <Menu size={24} className="text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[320px] p-0 overflow-y-auto" dir={lang === 'AR' ? "rtl" : "ltr"}>
+              <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[320px] p-0 overflow-y-auto z-[100]" dir={lang === 'AR' ? "rtl" : "ltr"}>
                 <SheetHeader className="p-6 bg-zinc-950 text-white">
                   <SheetTitle className="text-right text-secondary font-black">القائمة السريعة</SheetTitle>
                 </SheetHeader>
@@ -178,33 +176,33 @@ export default function Navbar() {
               </SheetContent>
             </Sheet>
 
-            <Link href="/" className="hover:opacity-90 transition-all shrink-0">
+            <Link href="/" className="hover:opacity-90 transition-all shrink-0 relative z-[70]">
               <SiteLogo className="min-w-[160px] md:min-w-[240px]" showTagline={true} />
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Desktop Navigation */}
+          {/* Desktop Navigation - Higher Z-Index */}
+          <div className="flex items-center gap-3 relative z-[70]">
             <div className="hidden lg:flex items-center gap-3">
               <Link href="/seller/register">
-                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-6 uppercase shadow-lg", navFont)}>
-                  <Store size={16} className="ml-2" /> {getBecomeSellerText()}
+                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-6 uppercase shadow-lg active:scale-95", navFont)}>
+                  <Store size={16} className="ml-2" /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
                 </Button>
               </Link>
               <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border">
                 <Link href="/join">
-                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase", navFont)}>{getJoinNowText()}</Button>
+                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase active:scale-95", navFont)}>{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Button>
                 </Link>
                 <Link href="/login">
-                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase", navFont)}>{getLoginText()}</Button>
+                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase shadow-sm active:scale-95", navFont)}>{lang === 'AR' ? 'دخول' : 'Login'}</Button>
                 </Link>
               </div>
             </div>
 
             {isNotHome && (
               <Link href="/">
-                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-4 gap-2 hover:bg-zinc-50 border-none", navFont)}>
-                   <Home size={18} className="text-secondary" /> <span className="hidden sm:inline">{getBackHomeText()}</span>
+                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95", navFont)}>
+                   <Home size={18} className="text-secondary" /> <span className="hidden sm:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
                 </Button>
               </Link>
             )}
@@ -212,9 +210,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Dynamic Search Bar */}
+      {/* Dynamic Search Bar Layer */}
       {showSearch && (
-        <div className="bg-white/80 backdrop-blur-md py-2 border-b relative z-10 shadow-sm">
+        <div className="bg-white/80 backdrop-blur-md py-2 border-b relative z-[60] shadow-sm pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
