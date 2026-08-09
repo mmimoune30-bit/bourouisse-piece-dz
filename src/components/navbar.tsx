@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Mail, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Tags, Home, User, Search, Sparkles, MessageCircle, LayoutGrid, ChevronLeft, ChevronRight
+  Phone, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Home, Sparkles, MessageCircle, LayoutGrid, ChevronLeft, ChevronRight, Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +12,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
@@ -31,20 +40,22 @@ const WhatsAppIcon = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
   const isNotHome = pathname !== "/";
 
   useEffect(() => {
-    const checkLang = () => {
-      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-      if (savedLang) setLang(savedLang);
+    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+    if (savedLang) setLang(savedLang);
+
+    const handleLangUpdate = () => {
+      const current = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (current) setLang(current);
     };
-    checkLang();
-    window.addEventListener("languageChange", checkLang);
-    return () => window.removeEventListener("languageChange", checkLang);
+    window.addEventListener("languageChange", handleLangUpdate);
+    return () => window.removeEventListener("languageChange", handleLangUpdate);
   }, []);
 
   const toggleLang = (newLang: "AR" | "EN" | "FR") => {
@@ -54,198 +65,159 @@ export default function Navbar() {
   };
 
   const getInquiryText = () => lang === 'AR' ? 'للاستفسار:' : lang === 'EN' ? 'Inquiry:' : 'Demande:';
-  const getBackHomeText = () => lang === 'AR' ? 'الرجوع الى الرئيسية' : lang === 'EN' ? 'Back Home' : 'Retour';
-  const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Become Seller' : 'Devenir Vendeur';
-  const getJoinNowText = () => lang === 'AR' ? 'إنشاء حساب' : lang === 'EN' ? 'Join Now' : 'Inscription';
+  const getBackHomeText = () => lang === 'AR' ? 'الرئيسية' : lang === 'EN' ? 'Home' : 'Accueil';
+  const getBecomeSellerText = () => lang === 'AR' ? 'كن بائعاً معنا' : lang === 'EN' ? 'Become Seller' : 'Vendre';
+  const getJoinNowText = () => lang === 'AR' ? 'إنشاء حساب' : lang === 'EN' ? 'Join' : 'S\'inscrire';
   const getLoginText = () => lang === 'AR' ? 'دخول' : lang === 'EN' ? 'Login' : 'Connexion';
 
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
-  const boldNavFont = lang === 'AR' ? 'font-black' : 'font-black';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col shadow-xl">
-      {/* Layer 1: Compact Top Info Bar */}
-      <div className="bg-zinc-950 border-b border-white/5 py-1.5 md:py-2 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
+      {/* Top Bar */}
+      <div className="bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[11px] md:text-[13px]", navFont)}>
                   <span className="text-secondary tracking-widest">{getInquiryText()}</span>
                   <span className="flex items-center gap-1.5"><Phone size={12} className="text-secondary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
-                  <span className="flex items-center gap-1.5 font-mono">support@bourouisse-piecedz.com</span>
+                  <span className="flex items-center gap-1.5 font-mono">support@bourouisse.com</span>
                </div>
             </div>
           </div>
           <div className="shrink-0 pl-3 border-l border-white/10 flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 hover:text-white gap-1.5 h-6 px-2 rounded-lg", navFont)}>
+                <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg", navFont)}>
                   <Globe size={12} className="text-secondary" />
-                  <span className="text-[10px] md:text-xs">{lang === 'AR' ? 'AR' : lang === 'EN' ? 'EN' : 'FR'}</span>
+                  <span className="text-[10px] md:text-xs">{lang}</span>
                   <ChevronDown size={10} className="opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-28 p-1 rounded-xl shadow-2xl bg-zinc-900 border-white/10 text-white">
-                <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black text-xs cursor-pointer hover:bg-white/10">العربية</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold text-xs cursor-pointer hover:bg-white/10">English</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-bold text-xs cursor-pointer hover:bg-white/10">Français</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-28 bg-zinc-900 border-white/10 text-white p-1">
+                <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black text-xs cursor-pointer">العربية</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold text-xs cursor-pointer">English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-bold text-xs cursor-pointer">Français</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </div>
 
-      {/* Layer 2: Main Branding & Global Actions */}
-      <div className="bg-white py-3 border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+      {/* Branding Bar */}
+      <div className="bg-white py-3 border-b shadow-md relative z-20">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Hamburger Quick Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            {/* New Sheet Navigation */}
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-xl border-2 border-zinc-100 h-10 w-10 md:h-12 md:w-12 hover:bg-secondary hover:border-secondary transition-all">
-                   <Menu size={24} className="text-primary" />
+                  <Menu size={24} className="text-primary" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align={lang === 'AR' ? 'end' : 'start'} className="w-72 p-2 rounded-2xl shadow-2xl border-2 border-zinc-100" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-                 <DropdownMenuItem asChild>
-                    <Link href="/catalog" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
-                       <div className="p-2 bg-secondary/10 text-secondary rounded-lg"><Sparkles size={18} /></div>
-                       <span>{lang === 'AR' ? 'بحث ذكي' : 'Smart Search'}</span>
-                    </Link>
-                 </DropdownMenuItem>
-                 
-                 <DropdownMenuSeparator className="my-1 opacity-50" />
-                 
-                 <DropdownMenuItem asChild>
-                    <Link href="/login" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
-                       <div className="p-2 bg-primary/10 text-primary rounded-lg"><LogIn size={18} /></div>
-                       <span>{lang === 'AR' ? 'الدخول للحساب' : 'Account Login'}</span>
-                    </Link>
-                 </DropdownMenuItem>
-                 
-                 <DropdownMenuItem asChild>
-                    <Link href="/join" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
-                       <div className="p-2 bg-primary/10 text-primary rounded-lg"><UserPlus size={18} /></div>
-                       <span>{lang === 'AR' ? 'إنشاء حساب' : 'Create Account'}</span>
-                    </Link>
-                 </DropdownMenuItem>
-                 
-                 <DropdownMenuItem asChild>
-                    <Link href="/seller/register" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
-                       <div className="p-2 bg-secondary text-primary rounded-lg"><Store size={18} /></div>
-                       <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become a Seller'}</span>
-                    </Link>
-                 </DropdownMenuItem>
+              </SheetTrigger>
+              <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[320px] p-0 overflow-y-auto" dir={lang === 'AR' ? "rtl" : "ltr"}>
+                <SheetHeader className="p-6 bg-zinc-950 text-white">
+                  <SheetTitle className="text-right text-secondary font-black">القائمة السريعة</SheetTitle>
+                </SheetHeader>
+                
+                <div className="p-4 space-y-2">
+                  <Link href="/catalog" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-3 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
+                    <div className="p-2 bg-secondary/10 text-secondary rounded-lg"><Sparkles size={20} /></div>
+                    <span>{lang === 'AR' ? 'بحث ذكي' : 'Smart Search'}</span>
+                  </Link>
 
-                 <DropdownMenuSeparator className="my-1 opacity-50" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href="/login" onClick={() => setIsSheetOpen(false)} className="flex flex-col items-center gap-2 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
+                      <LogIn size={24} className="text-primary" />
+                      <span className="text-xs">{lang === 'AR' ? 'دخول' : 'Login'}</span>
+                    </Link>
+                    <Link href="/join" onClick={() => setIsSheetOpen(false)} className="flex flex-col items-center gap-2 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
+                      <UserPlus size={24} className="text-primary" />
+                      <span className="text-xs">{lang === 'AR' ? 'حساب جديد' : 'Sign Up'}</span>
+                    </Link>
+                  </div>
 
-                 {/* Nested Categories Menu */}
-                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-primary cursor-pointer hover:bg-zinc-50 transition-colors">
-                       <div className="p-2 bg-zinc-100 text-zinc-600 rounded-lg"><LayoutGrid size={18} /></div>
-                       <span>{lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Part Categories'}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="w-64 p-2 rounded-2xl shadow-2xl border-2 border-zinc-100" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-                       {PART_CATEGORIES.map((cat) => (
-                         <DropdownMenuItem key={cat.en} asChild>
-                            <Link href={`/catalog?category=${cat.en}`} className="flex items-center justify-between py-2.5 px-4 rounded-xl font-bold text-sm text-zinc-700 cursor-pointer hover:bg-zinc-50 transition-colors">
-                               <span>{lang === 'AR' ? cat.ar : cat.en}</span>
-                               {lang === 'AR' ? <ChevronLeft size={14} className="opacity-30" /> : <ChevronRight size={14} className="opacity-30" />}
+                  <Link href="/seller/register" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-3 p-4 rounded-xl font-black text-white bg-primary hover:bg-zinc-800 transition-colors">
+                    <Store size={20} className="text-secondary" />
+                    <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Sell with Us'}</span>
+                  </Link>
+
+                  <div className="pt-4">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="categories" className="border-none">
+                        <AccordionTrigger className="flex items-center gap-3 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100 no-underline hover:no-underline">
+                          <div className="flex items-center gap-3">
+                            <LayoutGrid size={20} className="text-zinc-400" />
+                            <span>{lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 px-2 grid grid-cols-1 gap-1">
+                          {PART_CATEGORIES.map((cat) => (
+                            <Link 
+                              key={cat.en} 
+                              href={`/catalog?category=${cat.en}`} 
+                              onClick={() => setIsSheetOpen(false)}
+                              className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 font-bold text-sm text-zinc-600"
+                            >
+                              <span>{lang === 'AR' ? cat.ar : cat.en}</span>
+                              <ChevronLeft size={14} className="opacity-30" />
                             </Link>
-                         </DropdownMenuItem>
-                       ))}
-                    </DropdownMenuSubContent>
-                 </DropdownMenuSub>
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
 
-                 <DropdownMenuSeparator className="my-1 opacity-50" />
-
-                 <DropdownMenuItem asChild>
-                    <Link href="https://wa.me/213778428977" target="_blank" className="flex items-center gap-3 py-3 px-4 rounded-xl font-black text-green-600 cursor-pointer hover:bg-green-50 transition-colors">
-                       <div className="p-2 bg-green-100 text-green-600 rounded-lg"><MessageCircle size={18} /></div>
-                       <span>{lang === 'AR' ? 'تواصل معنا' : 'Contact Us'}</span>
-                    </Link>
-                 </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <Link href="https://wa.me/213778428977" target="_blank" className="flex items-center gap-3 p-4 rounded-xl font-black text-green-600 bg-green-50 mt-4">
+                    <MessageCircle size={20} />
+                    <span>{lang === 'AR' ? 'تواصل مباشر عبر واتساب' : 'WhatsApp Us'}</span>
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
 
             <Link href="/" className="hover:opacity-90 transition-all shrink-0">
-              <SiteLogo className="min-w-[180px] md:min-w-[240px]" showTagline={true} />
+              <SiteLogo className="min-w-[160px] md:min-w-[240px]" showTagline={true} />
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-2 pr-4 border-l border-zinc-100 ml-4">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-3">
               <Link href="/seller/register">
-                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-5 text-xs md:text-sm uppercase shadow-lg shadow-black/5", boldNavFont)}>
+                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-6 uppercase shadow-lg", navFont)}>
                   <Store size={16} className="ml-2" /> {getBecomeSellerText()}
                 </Button>
               </Link>
-
-              <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border border-zinc-100">
+              <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border">
                 <Link href="/join">
-                  <Button variant="ghost" className={cn("text-primary hover:bg-white hover:shadow-sm rounded-xl h-9 px-4 text-xs md:text-sm uppercase transition-all", boldNavFont)}>
-                    {getJoinNowText()}
-                  </Button>
+                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase", navFont)}>{getJoinNowText()}</Button>
                 </Link>
                 <Link href="/login">
-                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 text-xs md:text-sm uppercase shadow-sm", boldNavFont)}>
-                    <LogIn size={16} className="ml-2" /> {getLoginText()}
-                  </Button>
+                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase", navFont)}>{getLoginText()}</Button>
                 </Link>
               </div>
             </div>
 
-            {/* Back Home Button (Mobile/Subpages) */}
             {isNotHome && (
               <Link href="/">
-                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-4 gap-2 hover:bg-zinc-50 text-xs md:text-sm uppercase border-none shadow-none", boldNavFont)}>
-                   <Home size={18} className="text-secondary" /> {getBackHomeText()}
+                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-4 gap-2 hover:bg-zinc-50 border-none", navFont)}>
+                   <Home size={18} className="text-secondary" /> <span className="hidden sm:inline">{getBackHomeText()}</span>
                 </Button>
               </Link>
             )}
-
-            {/* Mobile Menu Toggle */}
-            <div className="lg:hidden">
-              <Button variant="outline" size="icon" className="rounded-xl w-10 h-10 border-2 border-zinc-100" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-              </Button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Layer 3: Dynamic Search Bar (Compact) */}
+      {/* Dynamic Search Bar */}
       {showSearch && (
-        <div className="bg-white/80 backdrop-blur-md py-2 border-b relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white/80 backdrop-blur-md py-2 border-b relative z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
-        </div>
-      )}
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-[0_30px_60px_rgba(0,0,0,0.15)] py-6 px-6 space-y-3 flex flex-col z-[100]" dir={lang === 'AR' ? "rtl" : "ltr"}>
-           <div className="p-2 bg-zinc-50 rounded-2xl mb-4 border border-zinc-100">
-             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-2">التصنيفات</p>
-             <div className="grid grid-cols-2 gap-2">
-                {PART_CATEGORIES.slice(0, 4).map(cat => (
-                  <Link key={cat.en} href={`/catalog?category=${cat.en}`} onClick={() => setIsMobileMenuOpen(false)} className="bg-white p-3 rounded-xl border border-zinc-100 text-[11px] font-black text-primary text-center">
-                    {lang === 'AR' ? cat.ar : cat.en}
-                  </Link>
-                ))}
-             </div>
-           </div>
-           
-           <Link href="/seller/register" onClick={() => setIsMobileMenuOpen(false)}><Button className={cn("w-full bg-primary text-secondary h-14 rounded-2xl text-sm uppercase shadow-xl", boldNavFont)}><Store size={18} className="ml-2" /> {getBecomeSellerText()}</Button></Link>
-           <div className="grid grid-cols-2 gap-3">
-             <Link href="/join" onClick={() => setIsMobileMenuOpen(false)}><Button variant="outline" className={cn("w-full border-2 border-zinc-200 text-primary h-14 rounded-2xl text-sm uppercase", boldNavFont)}>{getJoinNowText()}</Button></Link>
-             <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}><Button className={cn("w-full bg-secondary text-primary h-14 rounded-2xl text-sm uppercase shadow-lg", boldNavFont)}>{getLoginText()}</Button></Link>
-           </div>
-           
-           {isNotHome && <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="w-full"><Button variant="ghost" className={cn("w-full h-14 rounded-2xl text-sm uppercase border-none text-zinc-400", boldNavFont)}><Home size={18} className="ml-2" /> {getBackHomeText()}</Button></Link>}
         </div>
       )}
     </nav>
