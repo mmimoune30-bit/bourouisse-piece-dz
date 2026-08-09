@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImagePlus, Save, Globe, Loader2, Trash2, Eye } from "lucide-react";
+import { ImagePlus, Save, Globe, Loader2, Trash2, Eye, UploadCloud } from "lucide-react";
 import { useFirestore, useDoc } from "@/firebase";
 import { doc, setDoc, updateDoc, deleteField } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
@@ -47,7 +47,7 @@ export default function AdminSettings() {
     try {
       const base64 = await compressImage(e.target.files[0]);
       await setDoc(settingsRef, { logoUrl: base64 }, { merge: true });
-      toast({ title: "تم تحديث الشعار", description: "سيتم تطبيق الشعار الجديد فوراً لجميع المستخدمين." });
+      toast({ title: "تم تحديث الشعار بنجاح ✅", description: "سيظهر الشعار الجديد الآن في أعلى الموقع لجميع الزوار." });
     } catch (e) {
       toast({ variant: "destructive", title: "خطأ", description: "فشل تحديث الشعار." });
     } finally {
@@ -88,65 +88,82 @@ export default function AdminSettings() {
         <h1 className="text-3xl font-black text-primary flex items-center justify-end gap-3">
           إعدادات النظام والشعار <Globe size={32} className="text-secondary" />
         </h1>
-        <p className="text-muted-foreground mt-1">تخصيص المعالم البصرية والمعايير العالمية للمنصة.</p>
+        <p className="text-muted-foreground mt-1">تخصيص الهوية البصرية والمعايير العالمية للمنصة.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Logo Management Section */}
-        <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
+        <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-white">
           <CardHeader className="bg-primary text-white p-6">
             <CardTitle className="text-xl flex items-center justify-end gap-2 font-black">
-               إدارة شعار المنصة <ImagePlus size={20} className="text-secondary" />
+               إدارة شعار الموقع الرئيسي <ImagePlus size={20} className="text-secondary" />
             </CardTitle>
-            <CardDescription className="text-blue-100 text-right">تحكم في الشعار الرئيسي الذي يظهر في أعلى الموقع.</CardDescription>
+            <CardDescription className="text-blue-100 text-right">ارفع شعار متجرك هنا ليظهر في شريط التنقل العلوي.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 space-y-8">
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Current Dynamic Logo */}
-                <div className="space-y-3">
-                   <Label className="font-black text-xs text-muted-foreground block text-center uppercase">الشعار الحالي</Label>
-                   <div className="relative aspect-video bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 flex items-center justify-center overflow-hidden group">
+             <div className="flex flex-col items-center justify-center gap-6">
+                
+                {/* Visual Preview Area */}
+                <div className="w-full space-y-3">
+                   <Label className="font-black text-xs text-muted-foreground block text-center uppercase">معاينة الشعار المطبق حالياً</Label>
+                   <div className="relative w-full h-40 bg-zinc-50 rounded-[24px] border-4 border-dashed border-zinc-200 flex items-center justify-center overflow-hidden">
                       {settings?.logoUrl ? (
-                        <Image src={settings.logoUrl} alt="Logo" width={200} height={80} className="object-contain max-h-[80%]" />
+                        <div className="relative w-full h-full flex items-center justify-center p-4">
+                           <Image src={settings.logoUrl} alt="Logo" width={300} height={120} className="object-contain max-h-full" />
+                        </div>
                       ) : (
                         <div className="text-center text-zinc-300">
-                          <Eye size={32} className="mx-auto mb-1 opacity-20" />
-                          <p className="text-[10px] font-bold">يتم استخدام الافتراضي</p>
+                          <Eye size={48} className="mx-auto mb-2 opacity-20" />
+                          <p className="font-bold text-sm">لا يوجد شعار مخصص (يستخدم النص الافتراضي)</p>
                         </div>
                       )}
                       
                       {uploading && (
                         <div className="absolute inset-0 bg-white/90 flex items-center justify-center z-20">
-                          <Loader2 className="animate-spin text-primary" />
+                          <div className="flex flex-col items-center gap-2">
+                             <Loader2 className="animate-spin text-primary" size={32} />
+                             <span className="font-black text-xs text-primary">جاري الرفع...</span>
+                          </div>
                         </div>
                       )}
-
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 px-4">
-                         <Label className="cursor-pointer bg-white text-black h-10 px-4 rounded-full font-black text-xs flex items-center gap-2 hover:bg-secondary transition-all">
-                           تغيير <ImagePlus size={14} />
-                           <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
-                         </Label>
-                         {settings?.logoUrl && (
-                           <Button variant="destructive" size="icon" className="rounded-full h-10 w-10 shadow-lg" onClick={removeLogo}>
-                              <Trash2 size={16} />
-                           </Button>
-                         )}
-                      </div>
                    </div>
                 </div>
 
-                {/* System Default Comparison */}
-                <div className="space-y-3">
-                   <Label className="font-black text-xs text-muted-foreground block text-center uppercase">الشعار الافتراضي (نصي)</Label>
-                   <div className="aspect-video bg-white rounded-2xl border-2 border-zinc-100 flex items-center justify-center overflow-hidden pointer-events-none opacity-50 grayscale">
-                      <SiteLogo showTagline={false} className="scale-75" />
+                {/* Explicit Action Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                   <div className="relative">
+                      <input 
+                        type="file" 
+                        id="logo-upload" 
+                        className="hidden" 
+                        accept="image/*" 
+                        onChange={handleLogoUpload} 
+                        disabled={uploading} 
+                      />
+                      <Label 
+                        htmlFor="logo-upload" 
+                        className="flex items-center justify-center gap-3 h-14 bg-secondary text-primary font-black rounded-2xl cursor-pointer hover:bg-yellow-400 transition-all shadow-lg active:scale-95"
+                      >
+                         <UploadCloud size={24} /> رفع صورة شعار جديدة
+                      </Label>
                    </div>
+                   
+                   {settings?.logoUrl && (
+                     <Button 
+                       variant="outline" 
+                       className="h-14 border-2 border-destructive text-destructive font-black rounded-2xl hover:bg-destructive hover:text-white transition-all gap-2"
+                       onClick={removeLogo}
+                     >
+                        <Trash2 size={20} /> حذف الشعار والعودة للافتراضي
+                     </Button>
+                   )}
                 </div>
              </div>
 
-             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-                <p className="text-[10px] text-amber-800 leading-relaxed font-bold text-center">
-                  * يفضل استخدام شعار بخلفية شفافة (PNG) وبأبعاد عرضية (مثل 400x120 بكسل). سيقوم النظام بضغط الصورة تلقائياً لضمان سرعة التصفح.
+             <div className="bg-amber-50 p-5 rounded-2xl border-2 border-amber-100">
+                <h4 className="font-black text-amber-900 text-sm mb-1">💡 ملاحظة تقنية:</h4>
+                <p className="text-[11px] text-amber-800 leading-relaxed font-bold">
+                  يفضل رفع الشعار بصيغة **PNG بخلفية شفافة**. سيقوم النظام تلقائياً بضغط الصورة وتحسين أبعادها لتناسب الهيدر العلوي دون التأثير على سرعة الموقع.
                 </p>
              </div>
           </CardContent>
@@ -154,10 +171,10 @@ export default function AdminSettings() {
 
         {/* General Settings Section */}
         <form onSubmit={handleSaveGeneral}>
-          <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
+          <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-white">
             <CardHeader className="bg-zinc-50 border-b p-6">
               <CardTitle className="text-xl flex items-center justify-end gap-2 font-black text-primary">
-                الإعدادات العامة <Globe size={20} className="text-secondary" />
+                الإعدادات العامة للمنصة <Globe size={20} className="text-secondary" />
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8 space-y-6">
