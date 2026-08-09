@@ -98,6 +98,7 @@ export default function Home() {
         type: 'banner',
         data: {
           image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200",
+          link: "/catalog",
           ar: { title: "أكبر تجمع لقطع الغيار في الجزائر", description: "ابحث عن أي قطعة لسيارتك بكل سهولة وتواصل مع البائع مباشرة.", button: "ابدأ البحث الآن" },
           en: { title: "Largest Spare Parts Hub in Algeria", description: "Find any part for your vehicle easily and connect with sellers.", button: "Start Searching" }
         }
@@ -106,6 +107,7 @@ export default function Home() {
         type: 'banner',
         data: {
           image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200",
+          link: "/join",
           ar: { title: "متاجر معتمدة وموثوقة", description: "نوفر لك قائمة بأفضل المتاجر المتخصصة لضمان جودة القطع.", button: "تصفح المتاجر" },
           en: { title: "Verified & Trusted Stores", description: "We provide a list of specialized stores to ensure part quality.", button: "Browse Stores" }
         }
@@ -157,9 +159,11 @@ export default function Home() {
                                     <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
                                        <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
                                        <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar?.description : item.data.en?.description}</p>
-                                       <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
-                                          {lang === 'AR' ? item.data.ar?.button : item.data.en?.button}
-                                       </Button>
+                                       <Link href={item.data.link || "/catalog"}>
+                                         <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
+                                            {lang === 'AR' ? item.data.ar?.button : item.data.en?.button}
+                                         </Button>
+                                       </Link>
                                     </div>
                                  </div>
                                )}

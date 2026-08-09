@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { 
   ImagePlus, Save, Layout, Trash2, 
-  Plus, Eye, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2, UploadCloud, Link as LinkIcon
+  Plus, Eye, AlertCircle, Sparkles, ArrowLeft, ChevronRight, Loader2, UploadCloud, Link as LinkIcon, ExternalLink
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -115,6 +115,7 @@ export default function BannerManagement() {
   const addBanner = () => {
     const newBanner = {
       image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200",
+      link: "/catalog",
       ar: { title: "عنوان جديد بالعربية", description: "وصف جديد للبانر بالعربية", button: "ابدأ الآن" },
       en: { title: "New English Title", description: "New English description for the banner", button: "Start Now" },
       active: true
@@ -275,6 +276,19 @@ export default function BannerManagement() {
                     </div>
                   </TabsContent>
                 </Tabs>
+
+                <div className="mt-6 p-4 bg-zinc-50 rounded-2xl border-2 space-y-4">
+                  <div className="space-y-2 text-right">
+                    <Label className="font-black flex items-center justify-end gap-2">رابط التوجيه عند الضغط على الزر <ExternalLink size={14} className="text-secondary" /></Label>
+                    <Input 
+                      placeholder="مثلاً: /catalog أو رابط صفحة المتجر..." 
+                      className="h-12 border-2 rounded-xl" 
+                      value={editingBanner.link || ""}
+                      onChange={(e) => setEditingBanner({...editingBanner, link: e.target.value})}
+                    />
+                    <p className="text-[10px] text-muted-foreground font-bold">يمكنك وضع رابط داخلي مثل /catalog أو رابط كامل لصفحة متجر معينة.</p>
+                  </div>
+                </div>
 
                 <div className="mt-10 pt-6 border-t space-y-6">
                   <div className="flex flex-col md:flex-row-reverse gap-6">
