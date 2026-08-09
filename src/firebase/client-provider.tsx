@@ -12,10 +12,8 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // ننتظر فقط التأكد من أننا في بيئة المتصفح
-    if (typeof window !== 'undefined') {
-      setIsReady(true);
-    }
+    // ننتظر فقط التأكد من أننا في بيئة المتصفح لضمان استقرار الاتصال
+    setIsReady(true);
   }, []);
 
   if (!isReady) {
@@ -26,7 +24,7 @@ export function FirebaseClientProvider({ children }: { children: React.ReactNode
           <div className="space-y-2">
             <h2 className="text-white font-black tracking-widest text-xl uppercase">BOUROUISSE</h2>
             <p className="text-white/30 text-[10px] uppercase tracking-widest animate-pulse font-bold">
-              Initializing Stable Engine...
+              Loading Stable Engine...
             </p>
           </div>
         </div>
