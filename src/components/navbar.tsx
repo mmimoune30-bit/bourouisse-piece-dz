@@ -52,9 +52,9 @@ export default function Navbar() {
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-none">
       {/* 1. Top Ticker Bar */}
-      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -69,7 +69,7 @@ export default function Navbar() {
           <div className="shrink-0 pl-3 border-l border-white/10">
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg", navFont)}>
+                <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg cursor-pointer", navFont)}>
                   <Globe size={12} className="text-secondary" />
                   <span className="text-[10px] mx-1">{lang}</span>
                   <ChevronDown size={10} className="opacity-50" />
@@ -86,9 +86,9 @@ export default function Navbar() {
       </div>
 
       {/* 2. Main Branding & Auth Bar */}
-      <div className="w-full bg-white py-3 border-b shadow-md">
+      <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <Link href="/" className="hover:opacity-90 transition-all shrink-0">
+          <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer">
             <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
           </Link>
 
@@ -134,7 +134,7 @@ export default function Navbar() {
 
       {/* 3. Search Bar Layer */}
       {showSearch && (
-        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
