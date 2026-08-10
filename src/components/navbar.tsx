@@ -74,6 +74,7 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-3 border-l border-white/10">
+            {/* modal={false} is critical to prevent body locking */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg cursor-pointer", navFont)}>
@@ -96,7 +97,7 @@ export default function Navbar() {
       <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-4">
-             {/* Quick Menu Sheet */}
+             {/* Quick Menu Sheet - modal={false} to keep page active */}
              <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
@@ -155,7 +156,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Home Button - Visible and Clickable Always */}
+            {/* Home Button - Force interaction availability */}
             <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
               <Link href="/">
                 <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>

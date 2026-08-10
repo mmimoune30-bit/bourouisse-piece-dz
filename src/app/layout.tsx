@@ -1,12 +1,32 @@
+'use client';
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
-export const metadata: Metadata = {
-  title: 'BOUROUISSE PIECE DT-DZ | لقطع غيارات المركبات الجديدة و المستعملة',
-  description: 'Find genuine and high-quality auto parts in Algeria. Connect with verified sellers across the nation (M-M CHLEF).',
-};
+/**
+ * Interaction Cleaner Component
+ * Ensures document.body always has pointer-events: auto to fix Radix UI lock issues.
+ */
+function PointerEventsCleaner() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // Force interaction release on every navigation or mount
+    document.body.style.pointerEvents = 'auto';
+    
+    const timeout = setTimeout(() => {
+      document.body.style.pointerEvents = 'auto';
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [pathname]);
+
+  return null;
+}
 
 export default function RootLayout({
   children,
@@ -22,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased min-h-screen" suppressHydrationWarning>
         <FirebaseClientProvider>
+          <PointerEventsCleaner />
           {children}
           <Toaster />
         </FirebaseClientProvider>
