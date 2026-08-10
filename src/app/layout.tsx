@@ -1,6 +1,5 @@
 'use client';
 
-import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
@@ -17,22 +16,25 @@ function PointerEventsCleaner() {
   useEffect(() => {
     const release = () => {
       if (typeof document !== 'undefined') {
+        // تحرير الجسم من أي نمط يمنع النقر
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
         document.documentElement.style.pointerEvents = 'auto';
+        
+        // البحث عن أي حاويات حماية وإخفائها
+        const guards = document.querySelectorAll('[data-radix-focus-guard]');
+        guards.forEach(g => (g as HTMLElement).style.display = 'none');
       }
     };
 
     release();
     
-    // مراقبة مكثفة خلال الثواني الأولى من تحميل أي صفحة
+    // مراقبة مكثفة: تشغيل التنظيف عند التحميل وبفترات زمنية لضمان الاستمرارية
     const timer = setTimeout(release, 100);
-    const timer2 = setTimeout(release, 500);
     const interval = setInterval(release, 1000);
 
     return () => {
       clearTimeout(timer);
-      clearTimeout(timer2);
       clearInterval(interval);
     };
   }, [pathname]);

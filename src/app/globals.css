@@ -32,17 +32,19 @@
     @apply border-border;
   }
   
-  /* إصلاح جذري: منع مكتبات UI من قفل التفاعل مع الصفحة */
-  body {
-    @apply bg-background text-foreground font-body antialiased;
+  /* حل نهائي: فرض التفاعل على الصفحة ومنع أي حجب برمجى من المكتبات */
+  html, body {
+    @apply font-body antialiased;
     pointer-events: auto !important;
-    overflow-y: auto !important;
-    position: relative !important;
+    overflow: auto !important;
+    user-select: auto !important;
+    touch-action: auto !important;
   }
 
-  /* إزالة أي طبقات حماية شفافة تعترض النقرات */
-  [data-radix-focus-guard],
-  [data-radix-portal] > div[style*="pointer-events: none"] {
+  /* إخفاء ومنع حواجز التركيز التي تزرعها مكتبة Radix */
+  [data-radix-focus-guard], 
+  [data-radix-portal],
+  div[style*="pointer-events: none"] {
     display: none !important;
     pointer-events: none !important;
   }

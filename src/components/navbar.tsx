@@ -33,7 +33,7 @@ const WhatsAppIcon = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
@@ -60,10 +60,10 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-auto">
-      {/* 1. الشريط العلوي (Ticker) */}
+      {/* 1. Ticker Bar */}
       <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl relative z-[101]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
-          <div className="flex-1 overflow-hidden relative h-5 pointer-events-none">
+          <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[10px] md:text-[12px]", navFont)}>
                   <span className="text-secondary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
@@ -92,14 +92,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 2. شريط العلامة التجارية والتوثيق */}
+      {/* 2. Main Branding Bar */}
       <div className="w-full bg-white py-3 border-b shadow-md relative z-[100]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-4">
-             {/* القائمة السريعة - استخدام modal={false} لمنع قفل التفاعل */}
-             <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
+             {/* القائمة السريعة - استخدام modal={false} ضروري لمنع القفل التفاعلي */}
+             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen} modal={false}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
+                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 cursor-pointer">
                   <Menu className="text-primary" />
                 </Button>
               </SheetTrigger>
@@ -110,26 +110,26 @@ export default function Navbar() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="p-4 space-y-2 mt-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
                     <Link href="/">
                       <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={18} /></div>
                       <span>{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
                     <Link href="/catalog">
                       <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={18} /></div>
                       <span>{lang === 'AR' ? 'الكتالوج' : 'Catalog'}</span>
                     </Link>
                   </Button>
                   <div className="h-px bg-zinc-100 my-2 mx-4" />
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
                     <Link href="/seller/register">
                       <div className="w-10 h-10 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={18} /></div>
                       <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}</span>
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
                     <Link href="/login">
                       <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
                       <span>{lang === 'AR' ? 'الدخول' : 'Login'}</span>
@@ -172,7 +172,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 3. شريط البحث */}
+      {/* 3. Search Bar */}
       {showSearch && (
         <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm relative z-[99]">
           <div className="max-w-7xl mx-auto px-4">
