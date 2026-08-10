@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus, Menu, X, Info, ShoppingBag, MessageCircle
+  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus, Menu, ShoppingBag, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,6 @@ export default function Navbar() {
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
-  const isNotHome = pathname !== "/";
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
@@ -180,20 +179,12 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Mobile View Buttons */}
-            <div className="sm:hidden flex gap-2">
-              <Button asChild size="sm" className="bg-secondary text-primary h-9 w-9 rounded-xl p-0 cursor-pointer">
-                <Link href="/login"><LogIn size={18} /></Link>
-              </Button>
-            </div>
-
-            {isNotHome && (
-              <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
-                <Link href="/">
-                  <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{t.home[lang]}</span>
-                </Link>
-              </Button>
-            )}
+            {/* زر الرئيسية - مفعل وظاهر دائماً */}
+            <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
+              <Link href="/">
+                <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{t.home[lang]}</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
