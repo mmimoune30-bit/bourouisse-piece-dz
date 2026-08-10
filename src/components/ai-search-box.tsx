@@ -63,7 +63,6 @@ export default function AISearchBox() {
   return (
     <div className="w-full max-w-4xl mx-auto px-0.5">
       <div className="relative p-0.5 rounded-2xl overflow-hidden shadow-lg group transition-all">
-        {/* خلفية ثابتة وبسيطة لضمان عدم تداخل أحداث النقر */}
         <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
         
         <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10 z-10", lang !== 'AR' && "flex-row-reverse")}>
