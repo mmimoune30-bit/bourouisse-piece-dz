@@ -8,25 +8,26 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 /**
- * Interaction Cleaner Component
- * Forcibly removes pointer-events blocks injected by Radix UI or other libraries.
+ * مكون منظف أحداث النقر (Pointer Events Cleaner)
+ * يقوم برفع القفل البرمجي الذي قد تضعه المكتبات الخارجية على عنصر body.
  */
 function PointerEventsCleaner() {
   const pathname = usePathname();
 
   useEffect(() => {
     const releaseInteraction = () => {
+      // إجبار المتصفح على تحرير التفاعل مع الصفحة
       document.body.style.pointerEvents = 'auto';
       document.body.style.overflow = 'auto';
     };
 
-    // Run immediately
+    // التنفيذ الفوري
     releaseInteraction();
 
-    // Run again after a short delay to catch late injections
-    const timer = setTimeout(releaseInteraction, 500);
+    // التنفيذ بعد تأخير بسيط للتأكد من استقرار المكونات
+    const timer = setTimeout(releaseInteraction, 300);
     
-    // Interval check for the first 5 seconds of mount/navigation
+    // مراقبة دورية خلال الـ 5 ثواني الأولى من التحميل
     const interval = setInterval(releaseInteraction, 1000);
     const stopInterval = setTimeout(() => clearInterval(interval), 5000);
 

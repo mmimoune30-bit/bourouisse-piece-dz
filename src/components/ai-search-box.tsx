@@ -5,6 +5,10 @@ import { useRouter, usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * مكون البحث المبسط
+ * تم تعطيل المقترحات الذكية مؤقتاً لضمان عدم تداخل الطبقات الشفافة.
+ */
 export default function AISearchBox() {
   const [value, setValue] = useState("");
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");

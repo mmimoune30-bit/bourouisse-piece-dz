@@ -32,14 +32,14 @@
     @apply border-border;
   }
   
-  /* CRITICAL GLOBAL INTERACTION FIX */
+  /* إصلاح عالمي لمنع قفل النقرات من قبل مكتبة Radix UI */
   body {
     @apply bg-background text-foreground font-body antialiased;
     pointer-events: auto !important;
     overflow: auto !important;
   }
   
-  /* Remove Radix focus guards that block clicks */
+  /* إخفاء عناصر حماية التركيز التي تمنع النقر خارج المكونات المفتوحة */
   [data-radix-focus-guard], 
   [data-radix-portal] > div[style*="pointer-events: none"] {
     display: none !important;

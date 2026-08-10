@@ -59,9 +59,9 @@ export default function Navbar() {
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-none">
-      {/* 1. Top Ticker Bar */}
-      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-auto">
+      {/* 1. الشريط العلوي (Ticker) */}
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -74,6 +74,7 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-3 border-l border-white/10">
+            {/* تعطيل modal لمنع قفل النقرات */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg cursor-pointer", navFont)}>
@@ -92,11 +93,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 2. Main Branding & Auth Bar */}
-      <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
+      {/* 2. شريط العلامة التجارية والتوثيق */}
+      <div className="w-full bg-white py-3 border-b shadow-md">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-4">
-             {/* Quick Menu Sheet */}
+             {/* القائمة السريعة - تعطيل modal لضمان بقاء الأزرار فعالة */}
              <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
@@ -164,9 +165,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 3. Search Bar Layer */}
+      {/* 3. شريط البحث */}
       {showSearch && (
-        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
