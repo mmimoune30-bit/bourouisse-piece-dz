@@ -8,7 +8,7 @@ import { generateSearchSuggestions } from "@/ai/flows/ai-powered-search-suggesti
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
+  PopoverAnchor,
 } from "@/components/ui/popover";
 
 export default function AISearchBox() {
@@ -104,10 +104,12 @@ export default function AISearchBox() {
   return (
     <div className="w-full max-w-4xl mx-auto px-0.5">
       <Popover open={open && suggestions.length > 0} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger asChild>
+        {/* تم تغيير PopoverTrigger إلى PopoverAnchor لمنع اعتراض أحداث النقر */}
+        <PopoverAnchor asChild>
           <div className="relative p-0.5 rounded-2xl overflow-hidden shadow-lg group transition-all">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary animate-spin-slow opacity-30 group-hover:opacity-70" style={{ animationDuration: '8s' }} />
-            <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10", lang !== 'AR' && "flex-row-reverse")}>
+            {/* إضافة pointer-events-none لمنع الخلفية المتحركة من حجب النقرات */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary animate-spin-slow opacity-30 group-hover:opacity-70 pointer-events-none" style={{ animationDuration: '8s' }} />
+            <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10 z-10", lang !== 'AR' && "flex-row-reverse")}>
               <div className="flex-grow relative h-full">
                 <input
                   value={value}
@@ -116,20 +118,21 @@ export default function AISearchBox() {
                   className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4 cursor-text", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
                   dir={lang === 'AR' ? "rtl" : "ltr"}
                 />
-                <Search className={cn("absolute top-1/2 -translate-y-1/2 text-primary w-5 h-5", lang === 'AR' ? "right-4" : "left-4")} />
+                <Search className={cn("absolute top-1/2 -translate-y-1/2 text-primary w-5 h-5 pointer-events-none", lang === 'AR' ? "right-4" : "left-4")} />
               </div>
-              <button type="submit" className={cn("h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer", lang === 'AR' ? "border-l" : "border-r")}>
+              <button type="submit" className={cn("h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer shrink-0", lang === 'AR' ? "border-l" : "border-r")}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="text-secondary" />}
                 <span className={cn("text-sm md:text-base hidden sm:inline uppercase font-black")}>{getBtnText()}</span>
               </button>
             </form>
           </div>
-        </PopoverTrigger>
+        </PopoverAnchor>
         
         <PopoverContent 
           className="p-2 w-[var(--radix-popover-trigger-width)] bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-2xl z-[60]" 
           align={lang === 'AR' ? 'end' : 'start'}
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <div className="space-y-1" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
              <div className="px-3 py-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
@@ -139,7 +142,7 @@ export default function AISearchBox() {
                <button
                  key={i}
                  onClick={() => handleSearch(s)}
-                 className="w-full text-right px-4 py-3 hover:bg-primary hover:text-white transition-all rounded-xl text-sm font-bold flex items-center justify-between group"
+                 className="w-full text-right px-4 py-3 hover:bg-primary hover:text-white transition-all rounded-xl text-sm font-bold flex items-center justify-between group cursor-pointer"
                >
                  <span className={lang !== 'AR' ? 'order-1' : ''}>{s}</span>
                  <Search size={14} className="opacity-20 group-hover:opacity-100" />
