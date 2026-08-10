@@ -39,15 +39,13 @@ export default function Navbar() {
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-    if (savedLang) setLang(savedLang);
-
-    const handleLangUpdate = () => {
-      const current = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
-      if (current) setLang(current);
+    const checkLang = () => {
+      const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
+      if (savedLang) setLang(savedLang);
     };
-    window.addEventListener("languageChange", handleLangUpdate);
-    return () => window.removeEventListener("languageChange", handleLangUpdate);
+    checkLang();
+    window.addEventListener("languageChange", checkLang);
+    return () => window.removeEventListener("languageChange", checkLang);
   }, []);
 
   const toggleLang = (newLang: "AR" | "EN" | "FR") => {
@@ -70,9 +68,9 @@ export default function Navbar() {
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-none">
       {/* 1. Top Ticker Bar */}
-      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -93,7 +91,7 @@ export default function Navbar() {
                   <ChevronDown size={10} className="opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-28 bg-zinc-900 border-white/10 text-white p-1 z-50">
+              <DropdownMenuContent align="end" className="w-28 bg-zinc-900 border-white/10 text-white p-1 z-[60]">
                 <DropdownMenuItem onClick={() => toggleLang("AR")} className="justify-end font-black text-xs cursor-pointer">العربية</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toggleLang("EN")} className="justify-end font-bold text-xs cursor-pointer">English</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toggleLang("FR")} className="justify-end font-bold text-xs cursor-pointer">Français</DropdownMenuItem>
@@ -104,17 +102,17 @@ export default function Navbar() {
       </div>
 
       {/* 2. Main Branding & Auth Bar */}
-      <div className="w-full bg-white py-3 border-b shadow-md">
+      <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-2">
             {/* Quick Menu Button */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
                   <Menu className="text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white">
+              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white z-[100]" onPointerDownOutside={(e) => setIsOpen(false)}>
                 <SheetHeader className="p-6 bg-primary text-white text-right">
                   <SheetTitle className="text-white font-black text-xl flex items-center justify-end gap-2">
                     {t.menuTitle[lang]} <ShoppingBag className="text-secondary" />
@@ -142,15 +140,6 @@ export default function Navbar() {
                     <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
                     <span>{t.login[lang]}</span>
                   </Link>
-                  <div className="h-px bg-zinc-100 my-2 mx-4" />
-                  <div className="p-4 space-y-4 bg-zinc-50 rounded-3xl mt-4">
-                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center">{t.contact[lang]}</p>
-                     <div className="flex justify-center gap-4">
-                        <Button size="icon" variant="outline" className="rounded-full border-2"><Phone size={18} /></Button>
-                        <Button size="icon" variant="outline" className="rounded-full border-2"><WhatsAppIcon /></Button>
-                        <Button size="icon" variant="outline" className="rounded-full border-2"><MessageCircle size={18} /></Button>
-                     </div>
-                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -191,7 +180,7 @@ export default function Navbar() {
 
       {/* 3. Search Bar Layer */}
       {showSearch && (
-        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
