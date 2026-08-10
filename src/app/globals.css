@@ -4,16 +4,15 @@
 
 @layer base {
   :root {
-    /* Enhanced Pure Black & Gold Theme with High Contrast */
-    --background: 210 40% 98%; /* Light Slate Background */
-    --foreground: 0 0% 0%; /* Absolute Black */
+    --background: 210 40% 98%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%; /* Absolute Black Elements */
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 43 100% 50%; /* Vibrant Gold/Yellow Accent */
+    --secondary: 43 100% 50%;
     --secondary-foreground: 0 0% 0%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
@@ -33,14 +32,18 @@
     @apply border-border;
   }
   
-  /* CRITICAL FIX: Prevent Radix UI from locking interactions */
+  /* CRITICAL GLOBAL INTERACTION FIX */
   body {
     @apply bg-background text-foreground font-body antialiased;
     pointer-events: auto !important;
+    overflow: auto !important;
   }
   
-  [data-radix-focus-guard] {
+  /* Remove Radix focus guards that block clicks */
+  [data-radix-focus-guard], 
+  [data-radix-portal] > div[style*="pointer-events: none"] {
     display: none !important;
+    pointer-events: none !important;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -48,37 +51,9 @@
   }
 }
 
-@keyframes ken-burns {
-  0% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.1) translate(-1%, -1%); }
-  100% { transform: scale(1) translate(0, 0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 @keyframes ticker-ltr {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
-}
-
-.animate-ken-burns {
-  animation: ken-burns 20s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: spin-slow 12s linear infinite;
 }
 
 .animate-ticker-ltr {
@@ -93,7 +68,6 @@
   scrollbar-width: none;
 }
 
-/* Custom Scrollbar for modern look */
 ::-webkit-scrollbar {
   width: 6px;
 }

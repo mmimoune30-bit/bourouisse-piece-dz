@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Search, Loader2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AISearchBox() {
@@ -25,10 +25,6 @@ export default function AISearchBox() {
     const params = new URLSearchParams(window.location.search);
     setValue(params.get("query") || "");
   }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
 
   const handleSearch = (query: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -62,14 +58,12 @@ export default function AISearchBox() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-0.5">
-      <div className="relative p-0.5 rounded-2xl overflow-hidden shadow-lg group transition-all">
-        <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
-        
+      <div className="relative p-0.5 rounded-2xl overflow-hidden shadow-lg transition-all">
         <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10 z-10", lang !== 'AR' && "flex-row-reverse")}>
           <div className="flex-grow relative h-full">
             <input
               value={value}
-              onChange={handleInputChange}
+              onChange={(e) => setValue(e.target.value)}
               placeholder={getPlaceholder()}
               className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4 cursor-text", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
               dir={lang === 'AR' ? "rtl" : "ltr"}

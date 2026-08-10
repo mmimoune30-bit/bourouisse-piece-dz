@@ -9,20 +9,32 @@ import { useEffect } from 'react';
 
 /**
  * Interaction Cleaner Component
- * Ensures document.body always has pointer-events: auto to fix Radix UI lock issues.
+ * Forcibly removes pointer-events blocks injected by Radix UI or other libraries.
  */
 function PointerEventsCleaner() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Force interaction release on every navigation or mount
-    document.body.style.pointerEvents = 'auto';
-    
-    const timeout = setTimeout(() => {
+    const releaseInteraction = () => {
       document.body.style.pointerEvents = 'auto';
-    }, 500);
+      document.body.style.overflow = 'auto';
+    };
 
-    return () => clearTimeout(timeout);
+    // Run immediately
+    releaseInteraction();
+
+    // Run again after a short delay to catch late injections
+    const timer = setTimeout(releaseInteraction, 500);
+    
+    // Interval check for the first 5 seconds of mount/navigation
+    const interval = setInterval(releaseInteraction, 1000);
+    const stopInterval = setTimeout(() => clearInterval(interval), 5000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+      clearTimeout(stopInterval);
+    };
   }, [pathname]);
 
   return null;
