@@ -32,15 +32,16 @@
     @apply border-border;
   }
   
-  /* إصلاح عالمي لمنع قفل النقرات من قبل مكتبة Radix UI */
+  /* إصلاح جذري: منع مكتبات UI من قفل التفاعل مع الصفحة */
   body {
     @apply bg-background text-foreground font-body antialiased;
     pointer-events: auto !important;
-    overflow: auto !important;
+    overflow-y: auto !important;
+    position: relative !important;
   }
-  
-  /* إخفاء عناصر حماية التركيز التي تمنع النقر خارج المكونات المفتوحة */
-  [data-radix-focus-guard], 
+
+  /* إزالة أي طبقات حماية شفافة تعترض النقرات */
+  [data-radix-focus-guard],
   [data-radix-portal] > div[style*="pointer-events: none"] {
     display: none !important;
     pointer-events: none !important;

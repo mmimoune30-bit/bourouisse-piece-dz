@@ -8,33 +8,32 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 /**
- * مكون منظف أحداث النقر (Pointer Events Cleaner)
- * يقوم برفع القفل البرمجي الذي قد تضعه المكتبات الخارجية على عنصر body.
+ * مكون منظف أحداث النقر (Aggressive Pointer Events Cleaner)
+ * يقوم برفع أي قفل برمجي يوضع على الـ body بشكل دوري لضمان بقاء الأزرار فعالة.
  */
 function PointerEventsCleaner() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const releaseInteraction = () => {
-      // إجبار المتصفح على تحرير التفاعل مع الصفحة
-      document.body.style.pointerEvents = 'auto';
-      document.body.style.overflow = 'auto';
+    const release = () => {
+      if (typeof document !== 'undefined') {
+        document.body.style.pointerEvents = 'auto';
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
+      }
     };
 
-    // التنفيذ الفوري
-    releaseInteraction();
-
-    // التنفيذ بعد تأخير بسيط للتأكد من استقرار المكونات
-    const timer = setTimeout(releaseInteraction, 300);
+    release();
     
-    // مراقبة دورية خلال الـ 5 ثواني الأولى من التحميل
-    const interval = setInterval(releaseInteraction, 1000);
-    const stopInterval = setTimeout(() => clearInterval(interval), 5000);
+    // مراقبة مكثفة خلال الثواني الأولى من تحميل أي صفحة
+    const timer = setTimeout(release, 100);
+    const timer2 = setTimeout(release, 500);
+    const interval = setInterval(release, 1000);
 
     return () => {
       clearTimeout(timer);
+      clearTimeout(timer2);
       clearInterval(interval);
-      clearTimeout(stopInterval);
     };
   }, [pathname]);
 

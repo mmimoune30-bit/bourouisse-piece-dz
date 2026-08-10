@@ -5,10 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/**
- * مكون البحث المبسط
- * تم تعطيل المقترحات الذكية مؤقتاً لضمان عدم تداخل الطبقات الشفافة.
- */
 export default function AISearchBox() {
   const [value, setValue] = useState("");
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
@@ -61,31 +57,29 @@ export default function AISearchBox() {
   const textFont = lang === 'AR' ? 'font-bold' : 'font-medium';
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-0.5">
-      <div className="relative p-0.5 rounded-2xl overflow-hidden shadow-lg transition-all">
-        <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10 z-10", lang !== 'AR' && "flex-row-reverse")}>
-          <div className="flex-grow relative h-full">
-            <input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={getPlaceholder()}
-              className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4 cursor-text", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
-              dir={lang === 'AR' ? "rtl" : "ltr"}
-            />
-            <Search className={cn("absolute top-1/2 -translate-y-1/2 text-primary w-5 h-5 pointer-events-none", lang === 'AR' ? "right-4" : "left-4")} />
-          </div>
-          <button 
-            type="submit" 
-            className={cn(
-              "h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer shrink-0", 
-              lang === 'AR' ? "border-l" : "border-r"
-            )}
-          >
-            <Search size={18} />
-            <span className={cn("text-sm md:text-base hidden sm:inline uppercase font-black")}>{getBtnText()}</span>
-          </button>
-        </form>
-      </div>
+    <div className="w-full max-w-4xl mx-auto px-0.5 relative z-[100]">
+      <form onSubmit={handleSubmit} className={cn("relative bg-white rounded-xl overflow-hidden flex items-center h-12 border-2 border-primary/10 shadow-lg group", lang !== 'AR' && "flex-row-reverse")}>
+        <div className="flex-grow relative h-full">
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={getPlaceholder()}
+            className={cn("w-full h-full bg-transparent focus:outline-none text-primary placeholder:text-zinc-400 text-base px-4 cursor-text", lang === 'AR' ? "text-right pr-10" : "text-left pl-10", textFont)}
+            dir={lang === 'AR' ? "rtl" : "ltr"}
+          />
+          <Search className={cn("absolute top-1/2 -translate-y-1/2 text-primary w-5 h-5 pointer-events-none", lang === 'AR' ? "right-4" : "left-4")} />
+        </div>
+        <button 
+          type="submit" 
+          className={cn(
+            "h-full bg-primary text-secondary px-6 flex items-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer shrink-0 border-none", 
+            lang === 'AR' ? "ml-[-1px]" : "mr-[-1px]"
+          )}
+        >
+          <Search size={18} />
+          <span className={cn("text-sm md:text-base hidden sm:inline uppercase font-black")}>{getBtnText()}</span>
+        </button>
+      </form>
     </div>
   );
 }

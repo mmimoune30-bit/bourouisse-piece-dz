@@ -61,9 +61,9 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-auto">
       {/* 1. الشريط العلوي (Ticker) */}
-      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl relative z-[101]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
-          <div className="flex-1 overflow-hidden relative h-5">
+          <div className="flex-1 overflow-hidden relative h-5 pointer-events-none">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[10px] md:text-[12px]", navFont)}>
                   <span className="text-secondary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
@@ -74,7 +74,6 @@ export default function Navbar() {
             </div>
           </div>
           <div className="shrink-0 pl-3 border-l border-white/10">
-            {/* تعطيل modal لمنع قفل النقرات */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg cursor-pointer", navFont)}>
@@ -94,50 +93,58 @@ export default function Navbar() {
       </div>
 
       {/* 2. شريط العلامة التجارية والتوثيق */}
-      <div className="w-full bg-white py-3 border-b shadow-md">
+      <div className="w-full bg-white py-3 border-b shadow-md relative z-[100]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-4">
-             {/* القائمة السريعة - تعطيل modal لضمان بقاء الأزرار فعالة */}
+             {/* القائمة السريعة - استخدام modal={false} لمنع قفل التفاعل */}
              <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
                   <Menu className="text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white z-[120]">
+              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white z-[120] shadow-2xl">
                 <SheetHeader className="p-6 bg-primary text-white text-right">
                   <SheetTitle className="text-white font-black text-xl flex items-center justify-end gap-2">
                     {lang === 'AR' ? 'القائمة السريعة' : 'Quick Menu'} <ShoppingBag className="text-secondary" />
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="p-4 space-y-2 mt-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-                  <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={18} /></div>
-                    <span>{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
-                  </Link>
-                  <Link href="/catalog" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={18} /></div>
-                    <span>{lang === 'AR' ? 'الكتالوج' : 'Catalog'}</span>
-                  </Link>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                    <Link href="/">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={18} /></div>
+                      <span>{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                    <Link href="/catalog">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={18} /></div>
+                      <span>{lang === 'AR' ? 'الكتالوج' : 'Catalog'}</span>
+                    </Link>
+                  </Button>
                   <div className="h-px bg-zinc-100 my-2 mx-4" />
-                  <Link href="/seller/register" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={18} /></div>
-                    <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}</span>
-                  </Link>
-                  <Link href="/login" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
-                    <span>{lang === 'AR' ? 'الدخول' : 'Login'}</span>
-                  </Link>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                    <Link href="/seller/register">
+                      <div className="w-10 h-10 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={18} /></div>
+                      <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsOpen(false)}>
+                    <Link href="/login">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
+                      <span>{lang === 'AR' ? 'الدخول' : 'Login'}</span>
+                    </Link>
+                  </Button>
                 </nav>
               </SheetContent>
             </Sheet>
 
-            <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer">
+            <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer block relative z-[102]">
               <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2 md:gap-3 relative z-[102]">
             <div className="hidden sm:flex items-center gap-2 md:gap-3">
               <Button asChild className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
                 <Link href="/seller/register">
@@ -167,7 +174,7 @@ export default function Navbar() {
 
       {/* 3. شريط البحث */}
       {showSearch && (
-        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm relative z-[99]">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
