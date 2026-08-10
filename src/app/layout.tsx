@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 /**
- * مكون منظف أحداث النقر (Aggressive Pointer Events Cleaner)
+ * مكون منظف أحداث النقر (Pointer Events Cleaner)
  * يقوم برفع أي قفل برمجي يوضع على الـ body بشكل دوري لضمان بقاء الأزرار فعالة.
  */
 function PointerEventsCleaner() {
@@ -16,7 +16,7 @@ function PointerEventsCleaner() {
   useEffect(() => {
     const release = () => {
       if (typeof document !== 'undefined') {
-        // تحرير الجسم من أي نمط يمنع النقر
+        // تحرير الجسم من أي نمط يمنع النقر فوراً
         document.body.style.pointerEvents = 'auto';
         document.body.style.overflow = 'auto';
         document.documentElement.style.pointerEvents = 'auto';

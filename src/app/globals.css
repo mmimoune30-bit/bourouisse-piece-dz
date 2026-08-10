@@ -32,7 +32,7 @@
     @apply border-border;
   }
   
-  /* حل نهائي: فرض التفاعل على الصفحة ومنع أي حجب برمجى من المكتبات */
+  /* حل نهائي وجذري: فرض التفاعل على الصفحة ومنع أي حجب برمجى */
   html, body {
     @apply font-body antialiased;
     pointer-events: auto !important;
@@ -41,7 +41,7 @@
     touch-action: auto !important;
   }
 
-  /* إخفاء ومنع حواجز التركيز التي تزرعها مكتبة Radix */
+  /* إخفاء ومنع حواجز التركيز التي تزرعها مكتبة Radix وتعطل النقرات */
   [data-radix-focus-guard], 
   [data-radix-portal],
   div[style*="pointer-events: none"] {
