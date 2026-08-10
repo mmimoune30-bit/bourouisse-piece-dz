@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Globe, ChevronDown, Store, LogIn, Home, Sparkles
+  Phone, Globe, ChevronDown, Store, LogIn, Home, Sparkles, UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,26 +53,26 @@ export default function Navbar() {
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <div className="contents">
-      {/* 1. Top Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[70] bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-none">
+      {/* 1. Top Ticker Bar */}
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
-          <div className="flex-1 overflow-hidden relative h-6">
+          <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
-               <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[11px] md:text-[13px]", navFont)}>
+               <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[10px] md:text-[12px]", navFont)}>
                   <span className="text-secondary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
-                  <span className="flex items-center gap-1.5"><Phone size={12} className="text-secondary" /> +213 778 42 89 77</span>
+                  <span className="flex items-center gap-1.5"><Phone size={10} className="text-secondary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5 font-mono">support@bourouisse.com</span>
                </div>
             </div>
           </div>
-          <div className="shrink-0 pl-3 border-l border-white/10 flex items-center gap-4">
-            <DropdownMenu>
+          <div className="shrink-0 pl-3 border-l border-white/10">
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className={cn("text-white/80 hover:bg-white/10 h-6 px-2 rounded-lg", navFont)}>
                   <Globe size={12} className="text-secondary" />
-                  <span className="text-[10px] md:text-xs mx-1">{lang}</span>
+                  <span className="text-[10px] mx-1">{lang}</span>
                   <ChevronDown size={10} className="opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -85,36 +86,44 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 2. Branding Bar */}
-      <div className="fixed top-[37px] left-0 right-0 z-[65] bg-white py-3 border-b shadow-md pointer-events-auto">
+      {/* 2. Main Branding & Auth Bar */}
+      <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-2 md:gap-4">
-            <Link href="/" className="hover:opacity-90 transition-all shrink-0">
-              <SiteLogo className="min-w-[160px] md:min-w-[240px]" showTagline={true} />
-            </Link>
-          </div>
+          <Link href="/" className="hover:opacity-90 transition-all shrink-0">
+            <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
+          </Link>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden lg:flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden sm:flex items-center gap-2 md:gap-3">
               <Link href="/seller/register">
-                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-6 uppercase shadow-lg active:scale-95", navFont)}>
-                  <Store size={16} className="ml-2" /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
+                <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-[10px] md:text-xs", navFont)}>
+                  <Store size={14} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
                 </Button>
               </Link>
-              <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border">
+              <div className="flex items-center gap-1.5 md:gap-2 bg-zinc-50 p-1 rounded-2xl border">
                 <Link href="/join">
-                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase active:scale-95", navFont)}>{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Button>
+                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-3 md:px-4 uppercase active:scale-95 text-[10px] md:text-xs", navFont)}>{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Button>
                 </Link>
                 <Link href="/login">
-                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase shadow-sm active:scale-95", navFont)}>{lang === 'AR' ? 'دخول' : 'Login'}</Button>
+                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-4 md:px-5 uppercase shadow-sm active:scale-95 text-[10px] md:text-xs", navFont)}>{lang === 'AR' ? 'دخول' : 'Login'}</Button>
                 </Link>
               </div>
             </div>
 
+            {/* Mobile View Toggle or Home Button */}
+            <div className="sm:hidden flex gap-2">
+              <Link href="/login">
+                <Button size="sm" className="bg-secondary text-primary h-9 w-9 rounded-xl p-0"><LogIn size={18} /></Button>
+              </Link>
+              <Link href="/join">
+                <Button size="sm" variant="outline" className="h-9 w-9 rounded-xl p-0"><UserPlus size={18} /></Button>
+              </Link>
+            </div>
+
             {isNotHome && (
               <Link href="/">
-                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95", navFont)}>
-                   <Home size={18} className="text-secondary" /> <span className="hidden sm:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
+                <Button variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs", navFont)}>
+                   <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
                 </Button>
               </Link>
             )}
@@ -124,12 +133,12 @@ export default function Navbar() {
 
       {/* 3. Search Bar Layer */}
       {showSearch && (
-        <div className="fixed top-[110px] left-0 right-0 z-[60] bg-white/80 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
         </div>
       )}
-    </div>
+    </header>
   );
 }
