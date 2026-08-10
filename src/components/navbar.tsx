@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus
+  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus, Menu, X, Info, ShoppingBag, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
 import { cn } from "@/lib/utils";
@@ -26,6 +33,7 @@ const WhatsAppIcon = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
+  const [isOpen, setIsOpen] = useState(false);
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
@@ -49,17 +57,28 @@ export default function Navbar() {
     window.dispatchEvent(new Event("languageChange"));
   };
 
+  const t = {
+    inquiry: { AR: "للاستفسار:", EN: "Inquiry:", FR: "Contact:" },
+    becomeSeller: { AR: "كن بائعاً معنا", EN: "Become Seller", FR: "Vendre" },
+    join: { AR: "إنشاء حساب", EN: "Join", FR: "S'inscrire" },
+    login: { AR: "دخول", EN: "Login", FR: "Connexion" },
+    home: { AR: "الرئيسية", EN: "Home", FR: "Accueil" },
+    catalog: { AR: "الكتالوج الشامل", EN: "Full Catalog", FR: "Catalogue" },
+    menuTitle: { AR: "القائمة السريعة", EN: "Quick Menu", FR: "Menu Rapide" },
+    contact: { AR: "تواصل معنا", EN: "Contact Us", FR: "Contact" }
+  };
+
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
       {/* 1. Top Ticker Bar */}
-      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
+      <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-5">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
                <div className={cn("flex items-center gap-8 text-white/90 uppercase text-[10px] md:text-[12px]", navFont)}>
-                  <span className="text-secondary tracking-widest">{lang === 'AR' ? 'للاستفسار:' : 'Inquiry:'}</span>
+                  <span className="text-secondary tracking-widest">{t.inquiry[lang]}</span>
                   <span className="flex items-center gap-1.5"><Phone size={10} className="text-secondary" /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5"><WhatsAppIcon /> +213 778 42 89 77</span>
                   <span className="flex items-center gap-1.5 font-mono">support@bourouisse.com</span>
@@ -86,27 +105,77 @@ export default function Navbar() {
       </div>
 
       {/* 2. Main Branding & Auth Bar */}
-      <div className="w-full bg-white py-3 border-b shadow-md pointer-events-auto">
+      <div className="w-full bg-white py-3 border-b shadow-md">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer">
-            <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
-          </Link>
+          <div className="flex items-center gap-2">
+            {/* Quick Menu Button */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 transition-all cursor-pointer">
+                  <Menu className="text-primary" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white">
+                <SheetHeader className="p-6 bg-primary text-white text-right">
+                  <SheetTitle className="text-white font-black text-xl flex items-center justify-end gap-2">
+                    {t.menuTitle[lang]} <ShoppingBag className="text-secondary" />
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="p-4 space-y-2 mt-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+                  <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={18} /></div>
+                    <span>{t.home[lang]}</span>
+                  </Link>
+                  <Link href="/catalog" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={18} /></div>
+                    <span>{t.catalog[lang]}</span>
+                  </Link>
+                  <div className="h-px bg-zinc-100 my-2 mx-4" />
+                  <Link href="/seller/register" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={18} /></div>
+                    <span>{t.becomeSeller[lang]}</span>
+                  </Link>
+                  <Link href="/buyer/register" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><UserPlus size={18} /></div>
+                    <span>{t.join[lang]}</span>
+                  </Link>
+                  <Link href="/login" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 hover:bg-zinc-50 rounded-2xl font-bold transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
+                    <span>{t.login[lang]}</span>
+                  </Link>
+                  <div className="h-px bg-zinc-100 my-2 mx-4" />
+                  <div className="p-4 space-y-4 bg-zinc-50 rounded-3xl mt-4">
+                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center">{t.contact[lang]}</p>
+                     <div className="flex justify-center gap-4">
+                        <Button size="icon" variant="outline" className="rounded-full border-2"><Phone size={18} /></Button>
+                        <Button size="icon" variant="outline" className="rounded-full border-2"><WhatsAppIcon /></Button>
+                        <Button size="icon" variant="outline" className="rounded-full border-2"><MessageCircle size={18} /></Button>
+                     </div>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer">
+              <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2 md:gap-3">
             <div className="hidden sm:flex items-center gap-2 md:gap-3">
               <Button asChild className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
                 <Link href="/seller/register">
-                  <Store size={14} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
+                  <Store size={14} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {t.becomeSeller[lang]}
                 </Link>
               </Button>
 
               <div className="flex items-center gap-1.5 md:gap-2 bg-zinc-50 p-1 rounded-2xl border">
                 <Button asChild variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-3 md:px-4 uppercase active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
-                  <Link href="/join">{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Link>
+                  <Link href="/join">{t.join[lang]}</Link>
                 </Button>
 
                 <Button asChild className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-4 md:px-5 uppercase shadow-sm active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
-                  <Link href="/login">{lang === 'AR' ? 'دخول' : 'Login'}</Link>
+                  <Link href="/login">{t.login[lang]}</Link>
                 </Button>
               </div>
             </div>
@@ -116,15 +185,12 @@ export default function Navbar() {
               <Button asChild size="sm" className="bg-secondary text-primary h-9 w-9 rounded-xl p-0 cursor-pointer">
                 <Link href="/login"><LogIn size={18} /></Link>
               </Button>
-              <Button asChild size="sm" variant="outline" className="h-9 w-9 rounded-xl p-0 cursor-pointer">
-                <Link href="/join"><UserPlus size={18} /></Link>
-              </Button>
             </div>
 
             {isNotHome && (
               <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
                 <Link href="/">
-                  <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
+                  <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{t.home[lang]}</span>
                 </Link>
               </Button>
             )}
@@ -134,7 +200,7 @@ export default function Navbar() {
 
       {/* 3. Search Bar Layer */}
       {showSearch && (
-        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
+        <div className="w-full bg-white/90 backdrop-blur-md py-2 border-b shadow-sm">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
