@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Globe, ChevronDown, Store, UserPlus, LogIn, Menu, X, Home, Sparkles, MessageCircle, LayoutGrid, ChevronLeft, ChevronRight, Search
+  Phone, Globe, ChevronDown, Store, LogIn, Home, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,22 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
-import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { cn } from "@/lib/utils";
 
 const WhatsAppIcon = () => (
@@ -40,7 +26,6 @@ const WhatsAppIcon = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
   const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
@@ -68,8 +53,8 @@ export default function Navbar() {
 
   return (
     <div className="contents">
-      {/* 1. Top Bar - Independent Layer */}
-      <div className="fixed top-0 left-0 right-0 z-[70] bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl">
+      {/* 1. Top Bar */}
+      <div className="fixed top-0 left-0 right-0 z-[70] bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -100,81 +85,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 2. Branding Bar - Independent Layer */}
-      <div className="fixed top-[37px] left-0 right-0 z-[65] bg-white py-3 border-b shadow-md">
+      {/* 2. Branding Bar */}
+      <div className="fixed top-[37px] left-0 right-0 z-[65] bg-white py-3 border-b shadow-md pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
           <div className="flex items-center gap-2 md:gap-4">
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-xl border-2 border-zinc-100 h-10 w-10 md:h-12 md:w-12 hover:bg-secondary hover:border-secondary transition-all active:scale-95"
-                >
-                  <Menu size={24} className="text-primary" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side={lang === 'AR' ? "right" : "left"} className="w-[320px] p-0 overflow-y-auto" dir={lang === 'AR' ? "rtl" : "ltr"}>
-                <SheetHeader className="p-6 bg-zinc-950 text-white">
-                  <SheetTitle className="text-right text-secondary font-black">القائمة السريعة</SheetTitle>
-                </SheetHeader>
-                
-                <div className="p-4 space-y-2">
-                  <Link href="/catalog" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-3 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
-                    <div className="p-2 bg-secondary/10 text-secondary rounded-lg"><Sparkles size={20} /></div>
-                    <span>{lang === 'AR' ? 'بحث ذكي' : 'Smart Search'}</span>
-                  </Link>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link href="/login" onClick={() => setIsSheetOpen(false)} className="flex flex-col items-center gap-2 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
-                      <LogIn size={24} className="text-primary" />
-                      <span className="text-xs">{lang === 'AR' ? 'دخول' : 'Login'}</span>
-                    </Link>
-                    <Link href="/join" onClick={() => setIsSheetOpen(false)} className="flex flex-col items-center gap-2 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100">
-                      <UserPlus size={24} className="text-primary" />
-                      <span className="text-xs">{lang === 'AR' ? 'حساب جديد' : 'Sign Up'}</span>
-                    </Link>
-                  </div>
-
-                  <Link href="/seller/register" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-3 p-4 rounded-xl font-black text-white bg-primary hover:bg-zinc-800 transition-colors">
-                    <Store size={20} className="text-secondary" />
-                    <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Sell with Us'}</span>
-                  </Link>
-
-                  <div className="pt-4">
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="categories" className="border-none">
-                        <AccordionTrigger className="flex items-center gap-3 p-4 rounded-xl font-black text-primary hover:bg-zinc-50 border border-zinc-100 no-underline hover:no-underline">
-                          <div className="flex items-center gap-3">
-                            <LayoutGrid size={20} className="text-zinc-400" />
-                            <span>{lang === 'AR' ? 'تصنيفات قطع الغيار' : 'Categories'}</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-2 px-2 grid grid-cols-1 gap-1">
-                          {PART_CATEGORIES.map((cat) => (
-                            <Link 
-                              key={cat.en} 
-                              href={`/catalog?category=${cat.en}`} 
-                              onClick={() => setIsSheetOpen(false)}
-                              className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 font-bold text-sm text-zinc-600"
-                            >
-                              <span>{lang === 'AR' ? cat.ar : cat.en}</span>
-                              <ChevronLeft size={14} className="opacity-30" />
-                            </Link>
-                          ))}
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
-
-                  <Link href="https://wa.me/213778428977" target="_blank" className="flex items-center gap-3 p-4 rounded-xl font-black text-green-600 bg-green-50 mt-4">
-                    <MessageCircle size={20} />
-                    <span>{lang === 'AR' ? 'تواصل مباشر عبر واتساب' : 'WhatsApp Us'}</span>
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-
             <Link href="/" className="hover:opacity-90 transition-all shrink-0">
               <SiteLogo className="min-w-[160px] md:min-w-[240px]" showTagline={true} />
             </Link>
@@ -208,9 +122,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 3. Search Bar Layer - Independent Layer */}
+      {/* 3. Search Bar Layer */}
       {showSearch && (
-        <div className="fixed top-[110px] left-0 right-0 z-[60] bg-white/80 backdrop-blur-md py-2 border-b shadow-sm">
+        <div className="fixed top-[110px] left-0 right-0 z-[60] bg-white/80 backdrop-blur-md py-2 border-b shadow-sm pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4">
             <AISearchBox />
           </div>
