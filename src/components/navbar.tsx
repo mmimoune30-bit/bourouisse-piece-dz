@@ -67,9 +67,9 @@ export default function Navbar() {
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[60] flex flex-col pointer-events-auto">
-      {/* Top Bar */}
-      <div className="bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden relative z-[65]">
+    <nav className="fixed top-0 left-0 right-0 z-[60] flex flex-col pointer-events-none">
+      {/* Top Bar - Black Ticker */}
+      <div className="bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden relative z-[65] pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-hidden relative h-6">
             <div className="flex items-center gap-8 whitespace-nowrap animate-ticker-ltr absolute top-0">
@@ -100,11 +100,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Branding Bar */}
+      {/* Branding Bar - Logo & Main Actions */}
       <div className="bg-white py-3 border-b shadow-md relative z-[64] pointer-events-auto">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-2 md:gap-4 relative z-50">
-            {/* Hamburger Sheet Menu - Explicitly non-modal to keep other buttons clickable */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Hamburger Sheet Menu */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen} modal={false}>
               <SheetTrigger asChild>
                 <Button 
@@ -182,19 +182,19 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="flex items-center gap-3 relative z-50 pointer-events-auto">
+          <div className="flex items-center gap-3">
             <div className="hidden lg:flex items-center gap-3">
               <Link href="/seller/register">
                 <Button className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-6 uppercase shadow-lg active:scale-95 relative z-50", navFont)}>
                   <Store size={16} className="ml-2" /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
                 </Button>
               </Link>
-              <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border relative z-50">
+              <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-2xl border">
                 <Link href="/join">
-                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase active:scale-95", navFont)}>{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Button>
+                  <Button variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-4 uppercase active:scale-95 relative z-50", navFont)}>{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Button>
                 </Link>
                 <Link href="/login">
-                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase shadow-sm active:scale-95", navFont)}>{lang === 'AR' ? 'دخول' : 'Login'}</Button>
+                  <Button className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-5 uppercase shadow-sm active:scale-95 relative z-50", navFont)}>{lang === 'AR' ? 'دخول' : 'Login'}</Button>
                 </Link>
               </div>
             </div>
