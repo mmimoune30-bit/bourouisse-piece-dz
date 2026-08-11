@@ -146,26 +146,26 @@ export default function Navbar() {
 
           <div className="flex items-center gap-2 md:gap-3 relative z-[102]">
             <div className="hidden sm:flex items-center gap-2 md:gap-3">
-              <Button asChild className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-10 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
+              <Button asChild className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-11 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
                 <Link href="/seller/register">
-                  <Store size={14} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
+                  <Store size={16} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
                 </Link>
               </Button>
 
               <div className="flex items-center gap-1.5 md:gap-2 bg-zinc-50 p-1 rounded-2xl border">
-                <Button asChild variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-9 px-3 md:px-4 uppercase active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
+                <Button asChild variant="ghost" className={cn("text-primary hover:bg-white rounded-xl h-10 px-4 md:px-5 uppercase active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
                   <Link href="/join">{lang === 'AR' ? 'إنشاء حساب' : 'Join'}</Link>
                 </Button>
 
-                <Button asChild className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-9 px-4 md:px-5 uppercase shadow-sm active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
+                <Button asChild className={cn("bg-secondary text-primary hover:bg-yellow-500 rounded-xl h-10 px-5 md:px-6 uppercase shadow-sm active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
                   <Link href="/login">{lang === 'AR' ? 'دخول' : 'Login'}</Link>
                 </Button>
               </div>
             </div>
 
-            <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-3 md:px-4 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-[10px] md:text-xs cursor-pointer", navFont)}>
+            <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-11 px-4 md:px-5 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
               <Link href="/">
-                <Home size={16} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
+                <Home size={18} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
               </Link>
             </Button>
           </div>
