@@ -37,7 +37,7 @@ export default function Home() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // استعلامات لحظية فائقة السرعة
+  // استعلامات لحظية
   const categoryImagesQuery = useMemo(() => firestore ? query(collection(firestore, "category_images"), limit(30)) : null, [firestore]);
   const featuredStoresQuery = useMemo(() => firestore ? query(collection(firestore, "featured_stores"), limit(10)) : null, [firestore]);
   const bannersQuery = useMemo(() => firestore ? query(collection(firestore, "banners"), limit(10)) : null, [firestore]);
@@ -86,14 +86,12 @@ export default function Home() {
     viewAll: { AR: "عرض الكل", EN: "View All", FR: "Voir Tout" }
   };
 
-  // دمج المتاجر الحصرية والبنرات في مصفوفة واحدة للسلايدر
   const heroItems = useMemo(() => {
     const items: any[] = [];
     storeCampaigns.filter(s => s.tier === 'Exclusive').forEach(s => items.push({ type: 'store', data: s }));
     siteBanners.forEach(b => items.push({ type: 'banner', data: b }));
 
-    // بنرات احتياطية في حال كانت القاعدة فارغة لضمان الدوران
-    if (items.length === 0) {
+    if (items.length === 0 && !loadingStores && !loadingBanners) {
       items.push({
         type: 'banner',
         data: {
@@ -103,18 +101,9 @@ export default function Home() {
           en: { title: "Largest Spare Parts Hub in Algeria", description: "Find any part for your vehicle easily and connect with sellers.", button: "Start Searching" }
         }
       });
-      items.push({
-        type: 'banner',
-        data: {
-          image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200",
-          link: "/join",
-          ar: { title: "متاجر معتمدة وموثوقة", description: "نوفر لك قائمة بأفضل المتاجر المتخصصة لضمان جودة القطع.", button: "تصفح المتاجر" },
-          en: { title: "Verified & Trusted Stores", description: "We provide a list of specialized stores to ensure part quality.", button: "Browse Stores" }
-        }
-      });
     }
     return items;
-  }, [storeCampaigns, siteBanners]);
+  }, [storeCampaigns, siteBanners, loadingStores, loadingBanners]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
@@ -123,7 +112,7 @@ export default function Home() {
       <main className="flex-grow pt-[190px] md:pt-[210px] pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          {/* Hero Slider Section - Dynamic */}
+          {/* Hero Slider Section - Dynamic & Fixed Autoplay */}
           <section className="w-full">
             <div className={cn("flex flex-col lg:flex-row gap-4", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")}>
               <div className="lg:w-3/4 h-[300px] md:h-[400px] bg-white rounded-[32px] shadow-xl border overflow-hidden relative flex flex-col">
@@ -137,7 +126,12 @@ export default function Home() {
                    {loadingStores || loadingBanners ? (
                      <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>
                    ) : heroItems.length > 0 ? (
-                     <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
+                     <Carousel 
+                        key={`hero-${heroItems.length}`} // إجبار المكون على إعادة التهيئة عند وصول البيانات
+                        opts={{ loop: true }} 
+                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
+                        className="h-full"
+                     >
                         <CarouselContent className="h-full">
                           {heroItems.map((item, i) => (
                             <CarouselItem key={i} className="h-full">
@@ -175,11 +169,14 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Side Promo Slider - Dynamic */}
+              {/* Side Promo Slider */}
               <div className="lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
-                <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 5000 })]} className="h-full">
+                <Carousel 
+                  opts={{ loop: true }} 
+                  plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
+                  className="h-full"
+                >
                   <CarouselContent className="h-full">
-                    {/* Item 1: Become a Seller */}
                     <CarouselItem className="h-full">
                       <div className="relative w-full h-full">
                         <Image 
@@ -188,7 +185,6 @@ export default function Home() {
                           fill 
                           className="object-cover opacity-30 transition-transform duration-1000 group-hover:scale-125" 
                           sizes="400px"
-                          priority
                         />
                         <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
                            <div className="space-y-2">
@@ -200,14 +196,13 @@ export default function Home() {
                         </div>
                       </div>
                     </CarouselItem>
-                    {/* Item 2: Smart Search */}
                     <CarouselItem className="h-full">
                       <div className="relative w-full h-full bg-blue-900/40">
                          <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
                             <div className="space-y-2">
                                <Zap className="text-secondary mb-2 mx-auto" size={32} />
-                               <h3 className="text-2xl font-black text-white uppercase">بحث ذكي بالذكاء الاصطناعي</h3>
-                               <p className="text-xs text-blue-100 font-bold">ابحث بالعامية أو بوصف القطعة وسنجدها لك</p>
+                               <h3 className="text-2xl font-black text-white uppercase">بحث ذكي</h3>
+                               <p className="text-xs text-blue-100 font-bold">ابحث بوصف القطعة وسنجدها لك</p>
                             </div>
                             <Link href="/catalog" className="w-full"><Button variant="outline" className="w-full h-12 border-2 border-secondary text-secondary font-black rounded-xl hover:bg-secondary hover:text-primary">جرب البحث المتقدم</Button></Link>
                          </div>
