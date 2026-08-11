@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +10,16 @@ import { useFirestore, useDoc } from "@/firebase";
 import { doc, setDoc, updateDoc, deleteField } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
-import SiteLogo from "@/components/site-logo";
 
 export default function AdminSettings() {
   const { firestore } = useFirestore();
-  const settingsRef = firestore ? doc(firestore, "site_settings", "global") : null;
+  
+  // استخدام useMemo لمنع إعادة إنشاء المرجع في كل Render
+  const settingsRef = useMemo(() => {
+    if (!firestore) return null;
+    return doc(firestore, "site_settings", "global");
+  }, [firestore]);
+
   const { data: settings, loading: loadingSettings } = useDoc(settingsRef);
   const [uploading, setUploading] = useState(false);
 
@@ -92,7 +96,6 @@ export default function AdminSettings() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Logo Management Section */}
         <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-white">
           <CardHeader className="bg-primary text-white p-6">
             <CardTitle className="text-xl flex items-center justify-end gap-2 font-black">
@@ -102,8 +105,6 @@ export default function AdminSettings() {
           </CardHeader>
           <CardContent className="p-8 space-y-8">
              <div className="flex flex-col items-center justify-center gap-6">
-                
-                {/* Visual Preview Area */}
                 <div className="w-full space-y-3">
                    <Label className="font-black text-xs text-muted-foreground block text-center uppercase">معاينة الشعار المطبق حالياً</Label>
                    <div className="relative w-full h-40 bg-zinc-50 rounded-[24px] border-4 border-dashed border-zinc-200 flex items-center justify-center overflow-hidden">
@@ -117,7 +118,6 @@ export default function AdminSettings() {
                           <p className="font-bold text-sm">لا يوجد شعار مخصص (يستخدم النص الافتراضي)</p>
                         </div>
                       )}
-                      
                       {uploading && (
                         <div className="absolute inset-0 bg-white/90 flex items-center justify-center z-20">
                           <div className="flex flex-col items-center gap-2">
@@ -128,48 +128,23 @@ export default function AdminSettings() {
                       )}
                    </div>
                 </div>
-
-                {/* Explicit Action Buttons */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                    <div className="relative">
-                      <input 
-                        type="file" 
-                        id="logo-upload" 
-                        className="hidden" 
-                        accept="image/*" 
-                        onChange={handleLogoUpload} 
-                        disabled={uploading} 
-                      />
-                      <Label 
-                        htmlFor="logo-upload" 
-                        className="flex items-center justify-center gap-3 h-14 bg-secondary text-primary font-black rounded-2xl cursor-pointer hover:bg-yellow-400 transition-all shadow-lg active:scale-95"
-                      >
+                      <input type="file" id="logo-upload" className="hidden" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+                      <Label htmlFor="logo-upload" className="flex items-center justify-center gap-3 h-14 bg-secondary text-primary font-black rounded-2xl cursor-pointer hover:bg-yellow-400 transition-all shadow-lg active:scale-95">
                          <UploadCloud size={24} /> رفع صورة شعار جديدة
                       </Label>
                    </div>
-                   
                    {settings?.logoUrl && (
-                     <Button 
-                       variant="outline" 
-                       className="h-14 border-2 border-destructive text-destructive font-black rounded-2xl hover:bg-destructive hover:text-white transition-all gap-2"
-                       onClick={removeLogo}
-                     >
+                     <Button variant="outline" className="h-14 border-2 border-destructive text-destructive font-black rounded-2xl hover:bg-destructive hover:text-white transition-all gap-2" onClick={removeLogo}>
                         <Trash2 size={20} /> حذف الشعار والعودة للافتراضي
                      </Button>
                    )}
                 </div>
              </div>
-
-             <div className="bg-amber-50 p-5 rounded-2xl border-2 border-amber-100">
-                <h4 className="font-black text-amber-900 text-sm mb-1">💡 ملاحظة تقنية:</h4>
-                <p className="text-[11px] text-amber-800 leading-relaxed font-bold">
-                  يفضل رفع الشعار بصيغة **PNG بخلفية شفافة**. سيقوم النظام تلقائياً بضغط الصورة وتحسين أبعادها لتناسب الهيدر العلوي دون التأثير على سرعة الموقع.
-                </p>
-             </div>
           </CardContent>
         </Card>
 
-        {/* General Settings Section */}
         <form onSubmit={handleSaveGeneral}>
           <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-white">
             <CardHeader className="bg-zinc-50 border-b p-6">

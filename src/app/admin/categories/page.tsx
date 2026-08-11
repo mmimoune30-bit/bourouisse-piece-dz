@@ -1,26 +1,27 @@
-
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ImagePlus, Save, LayoutGrid, Loader2, CheckCircle, RotateCcw } from "lucide-react";
+import { ImagePlus, Save, LayoutGrid, Loader2 } from "lucide-react";
 import { PART_CATEGORIES } from "@/lib/vehicle-data";
 import { useFirestore, useCollection } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 export default function CategoryImageManagement() {
   const { firestore } = useFirestore();
   const [uploading, setUploading] = useState<string | null>(null);
 
-  // جلب الصور الحالية من Firestore
-  const { data: categoryData, loading: loadingData } = useCollection(
-    firestore ? collection(firestore, "category_images") : null
-  );
+  // استخدام useMemo لمنع الـ Loop
+  const collectionRef = useMemo(() => {
+    if (!firestore) return null;
+    return collection(firestore, "category_images");
+  }, [firestore]);
+
+  const { data: categoryData, loading: loadingData } = useCollection(collectionRef);
 
   const imagesMap = useMemo(() => {
     const map: Record<string, string> = {};

@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -23,7 +22,14 @@ export default function SiteLogo({
 }: SiteLogoProps) {
   const [isArabic, setIsArabic] = useState(false);
   const { firestore } = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, "site_settings", "global") : null);
+
+  // تثبيت مرجع المستند لمنع الـ Loop
+  const settingsRef = useMemo(() => {
+    if (!firestore) return null;
+    return doc(firestore, "site_settings", "global");
+  }, [firestore]);
+
+  const { data: settings } = useDoc(settingsRef);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,7 +41,6 @@ export default function SiteLogo({
   return (
     <Link href="/" className={cn("flex flex-col items-center gap-0 min-w-[180px] md:min-w-[220px] group transition-all", className)}>
       <div className="relative w-full h-[32px] md:h-[42px] flex items-center justify-center">
-        {/* Dynamic Image Logo from Admin Dashboard */}
         {settings?.logoUrl ? (
           <div className="relative w-full h-full flex items-center justify-center transition-transform group-hover:scale-105">
             <Image 
@@ -48,14 +53,11 @@ export default function SiteLogo({
             />
           </div>
         ) : (
-          /* System Default Text-based Animated Logo */
           <div className="relative w-full h-full">
-            <div 
-              className={cn(
+            <div className={cn(
                 "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
                 isArabic ? "-translate-x-full opacity-0 pointer-events-none" : "translate-x-0 opacity-100"
-              )}
-            >
+              )}>
               <span className={cn("text-[18px] md:text-[22px] font-black tracking-tighter uppercase whitespace-nowrap", brandClassName || "text-black")}>
                 BOUROUISSE PIECE
               </span>
@@ -64,12 +66,10 @@ export default function SiteLogo({
               </span>
             </div>
 
-            <div 
-              className={cn(
+            <div className={cn(
                 "absolute inset-0 flex flex-col items-center justify-center leading-none transition-all duration-1000 ease-in-out",
                 isArabic ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
-              )}
-            >
+              )}>
               <span className={cn("text-[17px] md:text-[21px] font-black tracking-tight whitespace-nowrap", brandClassName || "text-black")} dir="rtl">
                 بورويس لقطع الغيار
               </span>
@@ -78,7 +78,6 @@ export default function SiteLogo({
         )}
       </div>
       
-      {/* Tagline / Subtext - Kept for professional look even with custom logo */}
       {showTagline && (
         <div className="flex flex-col items-center mt-1 w-full border-t border-black/5 pt-1">
           <span className={cn("text-[9px] md:text-[10px] font-black text-center leading-none whitespace-nowrap", subtextClassName || "text-black/70")} dir="rtl">
