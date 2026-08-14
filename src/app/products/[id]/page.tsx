@@ -173,6 +173,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                    </div>
                  ))}
               </div>
+            </div>
 
             {/* Right: Product Details */}
             <div className="space-y-4 order-1 lg:order-2">
