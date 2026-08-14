@@ -159,10 +159,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-[190px] md:pt-[210px] pb-12">
+      <main className="flex-grow pt-24 md:pt-28 pb-8">
         <div className="container mx-auto px-4 max-w-7xl">
           
-          <div className="mb-3 text-center space-y-1">
+          <div className="mb-2 text-center space-y-1">
             <h1 className={cn("text-xl md:text-3xl text-zinc-800 tracking-tight leading-relaxed uppercase px-4", titleFont)}>
               {product.name}
             </h1>
@@ -171,16 +171,16 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          <div className={cn("grid grid-cols-1 lg:grid-cols-4 gap-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className={cn("grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
-            <div className="lg:col-span-1 space-y-4">
+            <div className="space-y-4 order-2 lg:order-1">
               <Card className="border-orange-500 border-2 shadow-xl rounded-2xl overflow-hidden bg-white">
                 <CardContent className="p-4 md:p-6 flex flex-col items-center text-center gap-3">
                    <div className={cn("text-3xl md:text-4xl text-orange-600", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} <span className="text-sm">دج</span></div>
                    <div className={cn("text-zinc-600 text-sm flex items-center gap-2", normalFont)}>
                      <Truck size={18} className="text-orange-500" /> {t.delivery[lang]}
                    </div>
-                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full mt-1">
+                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full mt-0.5">
                      <Button 
                       className={cn("flex-1 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full gap-2 text-sm shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
                       onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
@@ -234,11 +234,11 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </Card>
             </div>
 
-            <div className="lg:col-span-3 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-4 order-1 lg:order-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
                  {product.images?.map((img: string, i: number) => (
-                   <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white group">
-                      <Image src={img} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority={i === 0} />
+                   <div key={i} className="relative w-full h-[280px] md:h-[360px] max-h-[450px] rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white group">
+                      <Image src={img} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-2 transition-transform duration-700 group-hover:scale-105" priority={i === 0} />
                    </div>
                  ))}
               </div>

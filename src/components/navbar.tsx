@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
-  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus, Menu, ShoppingBag
+  Phone, Globe, ChevronDown, Store, LogIn, Home, UserPlus, Menu, ShoppingBag,
+  LayoutGrid, Folder, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import AISearchBox from "@/components/ai-search-box";
 import SiteLogo from "@/components/site-logo";
 import { cn } from "@/lib/utils";
+import { PART_CATEGORIES } from "@/lib/vehicle-data";
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
@@ -56,6 +59,9 @@ export default function Navbar() {
   };
 
   const navFont = lang === 'AR' ? 'font-black' : 'font-bold';
+  const quickMenuStyle = { fontFamily: "'Cairo', 'Tajawal', 'Inter', sans-serif" };
+  const categoryLabel = (category: { ar: string; en: string; fr: string }) => lang === 'AR' ? category.ar : lang === 'EN' ? category.en : category.fr;
+  const categoriesLabel = lang === 'AR' ? 'تصنيفات قطع الغيار' : lang === 'EN' ? 'Parts Categories' : 'Catégories de pièces';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-auto">
@@ -102,35 +108,63 @@ export default function Navbar() {
                   <Menu className="text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white z-[120] shadow-2xl">
-                <SheetHeader className="p-6 bg-primary text-white text-right">
-                  <SheetTitle className="text-white font-black text-xl flex items-center justify-end gap-2">
+              <SheetContent side={lang === 'AR' ? 'right' : 'left'} className="w-[300px] p-0 border-none bg-white z-[120] shadow-2xl" style={quickMenuStyle}>
+                <SheetHeader className="p-5 bg-primary text-white text-right">
+                  <SheetTitle className="text-white font-semibold text-xl flex items-center justify-end gap-2" style={quickMenuStyle}>
                     {lang === 'AR' ? 'القائمة السريعة' : 'Quick Menu'} <ShoppingBag className="text-secondary" />
                   </SheetTitle>
                 </SheetHeader>
-                <nav className="p-4 space-y-2 mt-4" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
-                    <Link href="/">
-                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={18} /></div>
+                <nav className="p-3 space-y-2 mt-2" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-zinc-50 rounded-xl font-medium transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/" className="flex items-center gap-3 w-full">
+                      <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><Home size={17} /></div>
                       <span>{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
-                    <Link href="/catalog">
-                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={18} /></div>
+
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-zinc-50 rounded-xl font-medium transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/catalog" className="flex items-center gap-3 w-full">
+                      <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ShoppingBag size={17} /></div>
                       <span>{lang === 'AR' ? 'الكتالوج' : 'Catalog'}</span>
                     </Link>
                   </Button>
-                  <div className="h-px bg-zinc-100 my-2 mx-4" />
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
-                    <Link href="/seller/register">
-                      <div className="w-10 h-10 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={18} /></div>
+
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="categories" className="border-none rounded-xl bg-zinc-50/80">
+                      <AccordionTrigger className="w-full gap-3 px-3 py-2.5 rounded-xl hover:bg-zinc-100 font-medium text-sm data-[state=open]:bg-zinc-100 [&>svg]:ml-0 [&>svg]:mr-0">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center"><LayoutGrid size={17} /></div>
+                          <span className="flex-1 text-right">{categoriesLabel}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-2 pb-2 pt-1">
+                        <div className="space-y-1.5 text-sm">
+                          {PART_CATEGORIES.map((category) => (
+                            <Button key={category.en} asChild variant="ghost" className="w-full justify-start rounded-lg px-2 py-1.5 h-auto hover:bg-white font-medium border-none" onClick={() => setIsSheetOpen(false)}>
+                              <Link href={`/catalog?category=${encodeURIComponent(category.en)}`} className="flex items-center justify-between w-full gap-2">
+                                <span className="flex items-center gap-2">
+                                  <Folder size={14} className="text-secondary" />
+                                  <span>{categoryLabel(category)}</span>
+                                </span>
+                                <ChevronRight size={14} className="text-zinc-400" />
+                              </Link>
+                            </Button>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  <div className="h-px bg-zinc-100 my-1 mx-2" />
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-zinc-50 rounded-xl font-medium transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/seller/register" className="flex items-center gap-3 w-full">
+                      <div className="w-9 h-9 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={17} /></div>
                       <span>{lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}</span>
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" className="w-full justify-start gap-3 p-6 h-auto hover:bg-zinc-50 rounded-2xl font-bold transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
-                    <Link href="/login">
-                      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={18} /></div>
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-zinc-50 rounded-xl font-medium transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/login" className="flex items-center gap-3 w-full">
+                      <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><LogIn size={17} /></div>
                       <span>{lang === 'AR' ? 'الدخول' : 'Login'}</span>
                     </Link>
                   </Button>

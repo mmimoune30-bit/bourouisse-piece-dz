@@ -18,6 +18,7 @@ import { useAuth, useFirestore } from "@/firebase";
 import { registerUser } from "@/services/auth-service";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { getDirection, getStoredLanguage, sellerRegisterDictionary, type AppLanguage } from "@/lib/i18n";
 
 export default function SellerRegister() {
   const router = useRouter();
@@ -28,9 +29,18 @@ export default function SellerRegister() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [selectedWilaya, setSelectedWilaya] = useState<string>("");
   const [storeId, setStoreId] = useState("");
+  const [lang, setLang] = useState<AppLanguage>("AR");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // CRITICAL: Defer ID generation and client checks to useEffect to prevent Hydration Mismatch
+  const t = sellerRegisterDictionary[lang];
+  const dir = getDirection(lang);
+
+  useEffect(() => {
+    const syncLanguage = () => setLang(getStoredLanguage());
+    syncLanguage();
+    window.addEventListener("languageChange", syncLanguage);
+    return () => window.removeEventListener("languageChange", syncLanguage);
+  }, []);
+
   useEffect(() => {
     setStoreId(`BR-S-${Math.floor(1000 + Math.random() * 9000)}`);
   }, []);
@@ -73,7 +83,7 @@ export default function SellerRegister() {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        toast({ variant: "destructive", title: "خطأ في الحجم", description: "يجب أن يكون حجم الصورة أقل من 10 ميجابايت." });
+        toast({ variant: "destructive", title: t.toast.fileSizeErrorTitle, description: t.toast.fileSizeErrorDescription });
         return;
       }
       setLoading(true);
@@ -81,7 +91,7 @@ export default function SellerRegister() {
         const compressed = await compressImage(file);
         setLogoPreview(compressed);
       } catch (err) {
-        toast({ variant: "destructive", title: "خطأ", description: "فشل معالجة الشعار." });
+        toast({ variant: "destructive", title: t.toast.fileProcessErrorTitle, description: t.toast.fileProcessErrorDescription });
       } finally {
         setLoading(false);
       }
@@ -91,7 +101,7 @@ export default function SellerRegister() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!agreed) {
-      toast({ variant: "destructive", title: "تنبيه", description: "يجب الموافقة على الشروط والأحكام أولاً." });
+      toast({ variant: "destructive", title: t.toast.termsTitle, description: t.toast.termsDescription });
       return;
     }
 
@@ -102,12 +112,12 @@ export default function SellerRegister() {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!email && !phone) {
-      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى إدخال رقم الهاتف أو البريد الإلكتروني على الأقل." });
+      toast({ variant: "destructive", title: t.toast.formMissingTitle, description: t.toast.formMissingDescription });
       return;
     }
 
     if (password !== confirmPassword) {
-      toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
+      toast({ variant: "destructive", title: t.toast.passwordMismatchTitle, description: t.toast.passwordMismatchDescription });
       return;
     }
 
@@ -125,40 +135,43 @@ export default function SellerRegister() {
         commune: formData.get("commune") as string
       }, password);
 
-      toast({ title: "تم إنشاء المتجر", description: `معرف متجرك هو ${storeId}. يمكنك استخدامه للدخول.` });
+      toast({ title: t.toast.successTitle, description: `${t.toast.successDescription} ${storeId}.` });
       router.push("/seller/dashboard");
     } catch (err: any) {
-      toast({ variant: "destructive", title: "فشل التسجيل", description: err.message });
+      toast({ variant: "destructive", title: t.toast.failureTitle, description: err.message });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col" dir={dir}>
       <Navbar />
       <main className="flex-grow pt-32 pb-6">
-        <div className="container mx-auto px-4 max-w-5xl text-right" dir="rtl">
+        <div className={cn("container mx-auto px-4 max-w-5xl", lang === "AR" ? "text-right" : "text-left")} dir={dir}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-4">
               <h1 className="text-3xl md:text-4xl text-primary font-black leading-tight uppercase">
-                حول عملك إلى <span className="text-secondary">احترافي</span>
+                {t.headingStart} <span className="text-secondary">{t.headingAccent}</span>
               </h1>
-              <p className="text-muted-foreground font-bold">افتح متجرك الآن واحصل على معرف رقمي فوري يسهل عليك إدارة مبيعاتك.</p>
-              
+              <p className="text-muted-foreground font-bold">{t.subtitle}</p>
+
               <div className="p-5 bg-primary rounded-2xl text-white shadow-xl">
-                 <h3 className="text-lg mb-3 flex items-center gap-2 text-secondary justify-end font-black">
-                   <ShieldCheck /> مميزات متجر بورويس
+                 <h3 className={cn("text-lg mb-3 flex items-center gap-2 text-secondary font-black", lang === "AR" ? "justify-end" : "justify-start")}>
+                   <ShieldCheck /> {t.featureTitle}
                  </h3>
-                 <ul className="space-y-3 text-sm font-bold">
-                   <li className="flex items-center justify-end gap-2">تأكيد فوري للقطع <Zap size={14} className="text-secondary" /></li>
-                   <li className="flex items-center justify-end gap-2">إحصائيات حية لمبيعاتك <Zap size={14} className="text-secondary" /></li>
-                   <li className="flex items-center justify-end gap-2">دعم فني خاص بالبائعين <Zap size={14} className="text-secondary" /></li>
+                 <ul className={cn("space-y-3 text-sm font-bold", lang === "AR" ? "text-right" : "text-left")}>
+                   {t.featureItems.map((text, index) => (
+                     <li key={text} className={cn("flex items-center gap-2", lang === "AR" ? "justify-end" : "justify-start")}>
+                       <Zap size={14} className="text-secondary" />
+                       <span>{text}</span>
+                     </li>
+                   ))}
                  </ul>
               </div>
 
               <div className="p-4 border-2 border-dashed border-primary/20 rounded-2xl text-center">
-                 <p className="text-[10px] text-muted-foreground uppercase mb-1 font-black">معرفك الرقمي الجديد</p>
+                 <p className="text-[10px] text-muted-foreground uppercase mb-1 font-black">{t.storeId}</p>
                  <div className="text-2xl font-black text-primary tracking-widest bg-zinc-100 p-3 rounded-lg border-2 border-white font-mono">
                     {storeId || '...'}
                  </div>
@@ -166,50 +179,50 @@ export default function SellerRegister() {
             </div>
 
             <Card className="lg:col-span-2 border-none shadow-2xl bg-white rounded-3xl overflow-hidden">
-              <CardHeader className="bg-primary text-white p-6 text-right">
-                <CardTitle className="text-2xl flex items-center justify-end gap-3 font-black">
-                  فتح متجر جديد <Store size={28} />
+              <CardHeader className={cn("bg-primary text-white p-6", lang === "AR" ? "text-right" : "text-left")}>
+                <CardTitle className={cn("text-2xl flex items-center gap-3 font-black", lang === "AR" ? "justify-end" : "justify-start")}>
+                  {t.cardHeader} <Store size={28} />
                 </CardTitle>
-                <CardDescription className="text-blue-100 font-bold">يرجى ملء كافة البيانات بدقة لتوثيق المتجر</CardDescription>
+                <CardDescription className="text-blue-100 font-bold">{t.cardDescription}</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" dir={dir}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-bold">اسم المتجر</Label>
-                      <Input name="storeName" placeholder="مثلاً: بوزيد لقطع الغيار" className="h-11 border-2 rounded-xl" required />
+                      <Label className="font-bold">{t.storeName}</Label>
+                      <Input name="storeName" placeholder={t.placeholders.storeName} className="h-11 border-2 rounded-xl" required />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-bold">اسم صاحب المتجر</Label>
-                      <Input name="ownerName" placeholder="الاسم واللقب" className="h-11 border-2 rounded-xl" required />
+                      <Label className="font-bold">{t.ownerName}</Label>
+                      <Input name="ownerName" placeholder={t.placeholders.ownerName} className="h-11 border-2 rounded-xl" required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-bold">رقم الهاتف</Label>
-                      <Input name="phone" placeholder="05/06/07..." className="h-11 border-2 rounded-xl" />
+                      <Label className="font-bold">{t.phone}</Label>
+                      <Input name="phone" placeholder={t.placeholders.phone} className="h-11 border-2 rounded-xl" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-bold">WhatsApp</Label>
-                      <Input name="whatsapp" placeholder="05/06/07..." className="h-11 border-2 rounded-xl" />
+                      <Label className="font-bold">{t.whatsapp}</Label>
+                      <Input name="whatsapp" placeholder={t.placeholders.whatsapp} className="h-11 border-2 rounded-xl" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-bold">البريد الإلكتروني</Label>
-                      <Input name="email" type="email" placeholder="email@example.com" className="h-11 border-2 rounded-xl" />
+                      <Label className="font-bold">{t.email}</Label>
+                      <Input name="email" type="email" placeholder={t.placeholders.email} className="h-11 border-2 rounded-xl" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-bold">الولاية</Label>
+                      <Label className="font-bold">{t.wilaya}</Label>
                       <Select name="wilaya" required onValueChange={setSelectedWilaya}>
                         <SelectTrigger className="h-11 border-2 rounded-xl"><SelectValue placeholder="-" /></SelectTrigger>
                         <SelectContent>{Object.keys(WILAYAS_DATA).sort().map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-bold">البلدية</Label>
+                      <Label className="font-bold">{t.commune}</Label>
                       <Select name="commune" required disabled={!selectedWilaya}>
                         <SelectTrigger className="h-11 border-2 rounded-xl"><SelectValue placeholder="-" /></SelectTrigger>
                         <SelectContent>{communesList.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
@@ -219,17 +232,17 @@ export default function SellerRegister() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label className="font-bold">كلمة المرور</Label>
-                      <Input name="password" type="password" placeholder="••••••••" className="h-11 border-2 rounded-xl" required />
+                      <Label className="font-bold">{t.password}</Label>
+                      <Input name="password" type="password" placeholder={t.placeholders.password} className="h-11 border-2 rounded-xl" required />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-bold">تأكيد كلمة المرور</Label>
-                      <Input name="confirmPassword" type="password" placeholder="••••••••" className="h-11 border-2 rounded-xl" required />
+                      <Label className="font-bold">{t.confirmPassword}</Label>
+                      <Input name="confirmPassword" type="password" placeholder={t.placeholders.password} className="h-11 border-2 rounded-xl" required />
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="font-bold">شعار المتجر (Logo)</Label>
+                    <Label className="font-bold">{t.logoLabel}</Label>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoChange} />
                     <div onClick={() => !loading && fileInputRef.current?.click()} className={cn(
                       "border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-muted-foreground hover:bg-zinc-50 transition-all cursor-pointer group relative overflow-hidden min-h-[160px]",
@@ -243,19 +256,19 @@ export default function SellerRegister() {
                        ) : (
                          <>
                            <ImagePlus size={32} className="mb-2 group-hover:scale-110 transition-transform text-primary/40" />
-                           <span className="text-primary font-bold">انقر لرفع شعار متجرك</span>
+                           <span className="text-primary font-bold">{t.logoPlaceholder}</span>
                          </>
                        )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 py-1 justify-end">
-                    <Label htmlFor="terms-seller" className="text-xs cursor-pointer font-bold">أوافق على الشروط والأحكام وسياسة الخصوصية.</Label>
+                  <div className={cn("flex items-center gap-2 py-1", lang === "AR" ? "justify-end" : "justify-start")}>
+                    <Label htmlFor="terms-seller" className="text-xs cursor-pointer font-bold">{t.legalText}</Label>
                     <Checkbox id="terms-seller" checked={agreed} onCheckedChange={(val) => setAgreed(!!val)} />
                   </div>
 
                   <Button type="submit" className="w-full h-14 text-lg shadow-xl rounded-2xl gap-3 bg-primary text-white font-black" disabled={loading || !agreed}>
-                    {loading ? <Loader2 className="animate-spin" /> : "تسجيل وتفعيل المتجر"}
+                    {loading ? <Loader2 className="animate-spin" /> : t.registerButton}
                   </Button>
                 </form>
               </CardContent>
