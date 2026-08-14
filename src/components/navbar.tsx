@@ -129,6 +129,13 @@ export default function Navbar() {
                     </Link>
                   </Button>
 
+                  <Button asChild variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-zinc-50 rounded-xl font-medium transition-all group border-none" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/stores" className="flex items-center gap-3 w-full">
+                      <div className="w-9 h-9 rounded-xl bg-secondary/20 text-primary flex items-center justify-center group-hover:bg-secondary transition-all"><Store size={17} /></div>
+                      <span>{lang === 'AR' ? 'قائمة المتاجر المعتمدة' : 'Approved Stores'}</span>
+                    </Link>
+                  </Button>
+
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="categories" className="border-none rounded-xl bg-zinc-50/80">
                       <AccordionTrigger className="w-full gap-3 px-3 py-2.5 rounded-xl hover:bg-zinc-100 font-medium text-sm data-[state=open]:bg-zinc-100 [&>svg]:ml-0 [&>svg]:mr-0">

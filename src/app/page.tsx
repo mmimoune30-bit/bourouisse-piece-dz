@@ -21,7 +21,8 @@ import {
   LayoutGrid,
   ChevronRight,
   ChevronLeft,
-  Sparkles
+  Sparkles,
+  Store
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
@@ -153,11 +154,19 @@ export default function Home() {
                                     <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
                                        <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
                                        <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar?.description : item.data.en?.description}</p>
-                                       <Link href={item.data.link || "/catalog"}>
-                                         <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
-                                            {lang === 'AR' ? item.data.ar?.button : item.data.en?.button}
-                                         </Button>
-                                       </Link>
+                                       <div className="flex flex-wrap gap-3">
+                                         <Link href={item.data.link || "/catalog"}>
+                                           <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
+                                              {lang === 'AR' ? item.data.ar?.button : item.data.en?.button}
+                                           </Button>
+                                         </Link>
+                                         <Link href="/stores">
+                                           <Button variant="outline" className="border-2 border-white/80 bg-white/10 text-white hover:bg-white hover:text-primary font-black h-14 px-6 rounded-2xl text-lg shadow-xl uppercase backdrop-blur-sm">
+                                             <Store size={18} className="ml-2" />
+                                             {lang === 'AR' ? 'قائمة المتاجر المعتمدة' : 'Approved Stores'}
+                                           </Button>
+                                         </Link>
+                                       </div>
                                     </div>
                                  </div>
                                )}
