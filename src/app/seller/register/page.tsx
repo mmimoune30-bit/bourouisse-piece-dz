@@ -147,7 +147,7 @@ export default function SellerRegister() {
   return (
     <div className="min-h-screen bg-background flex flex-col" dir={dir}>
       <Navbar />
-      <main className="flex-grow pt-32 pb-6">
+      <main className="flex-grow pt-4 pb-6">
         <div className={cn("container mx-auto px-4 max-w-5xl", lang === "AR" ? "text-right" : "text-left")} dir={dir}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-4">

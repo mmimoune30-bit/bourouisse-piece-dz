@@ -57,7 +57,7 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen" suppressHydrationWarning>
         <FirebaseClientProvider>
           <PointerEventsCleaner />
-          {children}
+          <div className="pt-[120px]">{children}</div>
           <Toaster />
         </FirebaseClientProvider>
       </body>
