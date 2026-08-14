@@ -35,8 +35,7 @@ export default function Navbar() {
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const HIDDEN_SEARCH_ROUTES = ["/login", "/join", "/buyer/register", "/seller/register", "/setup-admin"];
-  const showSearch = !HIDDEN_SEARCH_ROUTES.includes(pathname);
+  const showSearch = pathname === "/";
 
   useEffect(() => {
     const savedLang = localStorage.getItem("app_lang") as "AR" | "EN" | "FR";
