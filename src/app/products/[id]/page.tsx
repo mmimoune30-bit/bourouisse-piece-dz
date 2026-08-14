@@ -159,93 +159,98 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-24 md:pt-28 pb-8">
+      <main className="flex-grow pt-4 pb-8">
         <div className="container mx-auto px-4 max-w-7xl">
           
-          <div className="mb-2 text-center space-y-1">
-            <h1 className={cn("text-xl md:text-3xl text-zinc-800 tracking-tight leading-relaxed uppercase px-4", titleFont)}>
-              {product.name}
-            </h1>
-            <div className={cn("flex items-center justify-center gap-2", lang === 'AR' ? "flex-row-reverse" : "flex-row")}>
-               <span className={cn("text-orange-500 text-2xl md:text-3xl", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} {lang === 'AR' ? 'دج' : 'DZD'}</span>
-            </div>
-          </div>
-
-          <div className={cn("grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className={cn("grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-6 lg:gap-8", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             
+            {/* Left: Product Images - Now Larger */}
             <div className="space-y-4 order-2 lg:order-1">
-              <Card className="border-orange-500 border-2 shadow-xl rounded-2xl overflow-hidden bg-white">
-                <CardContent className="p-4 md:p-6 flex flex-col items-center text-center gap-3">
-                   <div className={cn("text-3xl md:text-4xl text-orange-600", lang === 'AR' ? 'font-black' : 'font-semibold')}>{formattedPrice} <span className="text-sm">دج</span></div>
-                   <div className={cn("text-zinc-600 text-sm flex items-center gap-2", normalFont)}>
-                     <Truck size={18} className="text-orange-500" /> {t.delivery[lang]}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                 {product.images?.map((img: string, i: number) => (
+                   <div key={i} className="relative w-full h-[360px] md:h-[500px] rounded-3xl overflow-hidden bg-white shadow-lg border-4 border-white group">
+                      <Image src={img} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-3 transition-transform duration-700 group-hover:scale-110" priority={i === 0} />
                    </div>
-                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full mt-0.5">
-                     <Button 
-                      className={cn("flex-1 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-full gap-2 text-sm shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
-                      onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
-                     >
-                        <ShoppingCart size={18} /> {t.cart[lang]}
-                     </Button>
-                     <Link href={`/products/${product.id}/purchase`} className="flex-1">
-                        <Button 
-                          className={cn("w-full bg-zinc-900 hover:bg-black text-white h-12 px-8 rounded-full text-sm shadow-lg gap-2 uppercase", lang === 'AR' ? 'font-black' : 'font-medium')}
-                        >
-                          <Zap size={18} className="text-secondary" /> {t.buyNow[lang]}
-                        </Button>
-                     </Link>
-                   </div>
-                </CardContent>
-              </Card>
+                 ))}
+              </div>
 
-              <Card className="border-none shadow-sm rounded-2xl bg-white">
-                <CardContent className="p-4 space-y-4">
-                   <div className={cn("flex items-center gap-4 text-zinc-700 border-b pb-3", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
-                      <div className={lang === 'AR' ? "text-right" : "text-left"}>
-                         <span className={cn("text-base block uppercase", titleFont)}>{product.sellerName}</span>
-                         <span className={cn("text-xs text-muted-foreground", normalFont)}>{product.wilaya || t.trusted[lang]}</span>
+            {/* Right: Product Details */}
+            <div className="space-y-4 order-1 lg:order-2">
+              {/* Title and Price */}
+              <div className="space-y-3 mb-6">
+                <h1 className={cn("text-2xl md:text-4xl text-zinc-800 leading-snug uppercase", titleFont)}>
+                  {product.name}
+                </h1>
+                <div className="flex items-baseline gap-2">
+                  <span className={cn("text-4xl md:text-5xl text-orange-600", lang === 'AR' ? 'font-black' : 'font-bold')}>{formattedPrice}</span>
+                  <span className={cn("text-xl md:text-2xl text-orange-500", lang === 'AR' ? 'font-black' : 'font-semibold')}>دج</span>
+                </div>
+                <div className={cn("flex items-center gap-2 text-zinc-600", normalFont)}>
+                  <Truck size={20} className="text-orange-500" /> {t.delivery[lang]}
+                </div>
+              </div>
+
+              {/* Seller Card */}
+              <Card className="border-2 border-orange-200 shadow-md rounded-3xl bg-gradient-to-br from-orange-50 to-white overflow-hidden">
+                <CardContent className="p-5 md:p-6 space-y-4">
+                   <div className={cn("flex items-center gap-4", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center text-white text-2xl font-black shrink-0">
+                        {product.sellerName?.charAt(0) || 'B'}
                       </div>
-                      <MapPin size={22} className="text-orange-500 shrink-0" />
+                      <div className={lang === 'AR' ? "text-right" : "text-left"}>
+                         <span className={cn("text-lg block uppercase", titleFont)}>{product.sellerName}</span>
+                         <span className={cn("text-sm text-orange-600 flex items-center gap-1", normalFont)}>
+                           <MapPin size={14} /> {product.wilaya || t.trusted[lang]}
+                         </span>
+                      </div>
                    </div>
 
-                   <div className="grid grid-cols-3 gap-2">
-                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('viber')}>
+                   <div className="grid grid-cols-3 gap-2 pt-2">
+                      <Button variant="outline" className={cn("h-12 rounded-2xl bg-[#7360f2] text-white hover:bg-[#6250d1] border-none text-xs shadow-md uppercase", lang === 'AR' ? 'font-black' : 'font-bold')} onClick={() => handleContact('viber')}>
                          <ViberIcon /> {t.viber[lang]}
                       </Button>
-                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('whatsapp')}>
-                         <MessageCircle size={16} /> {t.whatsapp[lang]}
+                      <Button variant="outline" className={cn("h-12 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd57] border-none text-xs shadow-md uppercase", lang === 'AR' ? 'font-black' : 'font-bold')} onClick={() => handleContact('whatsapp')}>
+                         <MessageCircle size={18} /> {t.whatsapp[lang]}
                       </Button>
-                      <Button variant="outline" className={cn("h-10 rounded-xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-[10px] shadow-sm uppercase", lang === 'AR' ? 'font-black' : 'font-medium')} onClick={() => handleContact('telegram')}>
+                      <Button variant="outline" className={cn("h-12 rounded-2xl bg-[#0088cc] text-white hover:bg-[#0077b5] border-none text-xs shadow-md uppercase", lang === 'AR' ? 'font-black' : 'font-bold')} onClick={() => handleContact('telegram')}>
                          <TelegramIcon /> {t.telegram[lang]}
                       </Button>
                    </div>
 
-                   <Button className={cn("w-full h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl gap-3 text-lg shadow-xl", lang === 'AR' ? 'font-black' : 'font-semibold')} onClick={() => handleContact('phone')}>
-                      <Phone size={20} /> {product.phone || t.callNow[lang]}
+                   <Button className={cn("w-full h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl gap-3 text-base shadow-lg", lang === 'AR' ? 'font-black' : 'font-bold')} onClick={() => handleContact('phone')}>
+                      <Phone size={22} /> {product.phone || t.callNow[lang]}
                    </Button>
 
-                   <div className={cn("flex gap-2 items-start p-3 bg-zinc-50 rounded-2xl", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
-                      <AlertCircle className="text-zinc-400 shrink-0 mt-0.5" size={14} />
-                      <p className={cn("text-[10px] text-zinc-500 leading-relaxed", normalFont, lang === 'AR' ? "text-right" : "text-left")}>
+                   <div className={cn("flex gap-3 items-start p-4 bg-white/70 rounded-2xl border-2 border-orange-100", lang === 'AR' ? "flex-row" : "flex-row-reverse")}>
+                      <AlertCircle className="text-orange-500 shrink-0 mt-0.5" size={16} />
+                      <p className={cn("text-xs text-zinc-600 leading-relaxed", normalFont, lang === 'AR' ? "text-right" : "text-left")}>
                          {t.disclaimer[lang]}
                       </p>
                    </div>
                 </CardContent>
               </Card>
-            </div>
 
-            <div className="space-y-4 order-1 lg:order-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
-                 {product.images?.map((img: string, i: number) => (
-                   <div key={i} className="relative w-full h-[280px] md:h-[360px] max-h-[450px] rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white group">
-                      <Image src={img} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-2 transition-transform duration-700 group-hover:scale-105" priority={i === 0} />
-                   </div>
-                 ))}
+              {/* Purchase Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button 
+                  className={cn("flex-1 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl gap-3 text-base shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-bold')}
+                  onClick={() => toast({ title: t.cart[lang], description: t.addedToCart[lang] })}
+                >
+                  <ShoppingCart size={22} /> {t.cart[lang]}
+                </Button>
+                <Link href={`/products/${product.id}/purchase`} className="flex-1">
+                  <Button 
+                    className={cn("w-full h-14 bg-zinc-900 hover:bg-black text-white rounded-2xl gap-3 text-base shadow-lg uppercase", lang === 'AR' ? 'font-black' : 'font-bold')}
+                  >
+                    <Zap size={22} className="text-secondary" /> {t.buyNow[lang]}
+                  </Button>
+                </Link>
               </div>
 
-              <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
-                <CardContent className="p-6 md:p-8 space-y-4">
-                   <h2 className={cn("text-xl md:text-2xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-8 pr-4" : "border-l-8 pl-4")}>
+              {/* Technical Specs */}
+              <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
+                <CardContent className="p-6 md:p-7 space-y-4">
+                   <h2 className={cn("text-lg md:text-xl text-primary border-orange-500 uppercase", titleFont, lang === 'AR' ? "border-r-4 pr-4" : "border-l-4 pl-4")}>
                       {t.specs[lang]}
                    </h2>
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 text-sm">
