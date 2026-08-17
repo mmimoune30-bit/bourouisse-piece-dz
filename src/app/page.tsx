@@ -110,7 +110,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
       <Navbar />
 
-      <main className="flex-grow pt-[190px] md:pt-[210px] pb-12">
+      <main className="flex-grow pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           {/* Hero Slider Section - Dynamic & Fixed Autoplay */}

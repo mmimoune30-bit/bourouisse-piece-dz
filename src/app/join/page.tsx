@@ -42,7 +42,7 @@ export default function JoinSelectionPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-32 pb-12 flex items-center">
+      <main className="flex-grow pb-12 flex items-center">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
              <h1 className="text-3xl md:text-4xl font-black text-primary mb-4 uppercase">{t.title[lang]}</h1>

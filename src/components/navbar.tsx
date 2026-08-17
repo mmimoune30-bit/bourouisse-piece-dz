@@ -64,7 +64,7 @@ export default function Navbar() {
   const categoriesLabel = lang === 'AR' ? 'تصنيفات قطع الغيار' : lang === 'EN' ? 'Parts Categories' : 'Catégories de pièces';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] flex flex-col pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-col pointer-events-auto">
       {/* 1. Ticker Bar */}
       <div className="w-full bg-zinc-950 border-b border-white/5 py-1.5 overflow-hidden shadow-2xl relative z-[101]">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">

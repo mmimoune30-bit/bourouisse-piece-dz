@@ -68,7 +68,7 @@ export default function StoresPage() {
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
 
-      <main className="flex-grow pt-4 pb-10">
+      <main className="flex-grow pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4" dir={lang === "AR" ? "rtl" : "ltr"}>
             <div className={cn("space-y-1", lang === "AR" ? "text-right" : "text-left")}>
