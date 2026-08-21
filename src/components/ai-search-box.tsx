@@ -28,8 +28,9 @@ export default function AISearchBox() {
 
   const handleSearch = (query: string) => {
     const params = new URLSearchParams(window.location.search);
-    if (query.trim()) {
-      params.set("query", query.trim());
+    const normalizedQuery = typeof query === "string" ? query.trim() : "";
+    if (normalizedQuery) {
+      params.set("query", normalizedQuery);
     } else {
       params.delete("query");
     }

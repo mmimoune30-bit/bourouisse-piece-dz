@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, MapPin, Calendar, Clock } from "lucide-react";
+import { Star, ShoppingCart, MapPin, Calendar, Clock, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect, memo } from "react";
@@ -35,6 +35,7 @@ const ProductCard = memo(function ProductCard({
 }: ProductCardProps) {
   const [mounted, setMounted] = useState(false);
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -66,21 +67,31 @@ const ProductCard = memo(function ProductCard({
     return condition;
   };
 
-  const finalImageSrc = image && image.trim() !== "" ? image : `https://picsum.photos/seed/${id}/400/400`;
+  const safeImage = typeof image === "string" ? image.trim() : "";
+  const hasSellerImage = safeImage !== "" && !imageFailed;
 
   return (
     <Card className="group bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full">
       {/* Image Container - Ouedkniss Style */}
       <Link href={`/products/${id}`} className="block relative w-full aspect-square overflow-hidden bg-gray-100 rounded-t-lg">
-        <Image 
-          src={finalImageSrc} 
-          alt={name} 
-          fill 
-          className="object-cover transition-transform duration-500 group-hover:scale-105" 
-          data-ai-hint={hint}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          loading="lazy"
-        />
+        {hasSellerImage ? (
+          <Image 
+            src={safeImage} 
+            alt={name} 
+            fill 
+            className="object-cover transition-transform duration-500 group-hover:scale-105" 
+            data-ai-hint={hint}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="lazy"
+            unoptimized={safeImage.includes("api.dicebear.com")}
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-400">
+            <ImageOff size={32} />
+            <span className="text-xs font-bold">{lang === "AR" ? "لا توجد صورة" : lang === "EN" ? "No image" : "Aucune image"}</span>
+          </div>
+        )}
         
         {/* Condition Badge */}
         <div className={cn("absolute top-2 z-10", lang === 'AR' ? "left-2" : "right-2")}>

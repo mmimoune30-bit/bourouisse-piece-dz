@@ -24,7 +24,12 @@ import {
   Calendar,
   Hash,
   ChevronLeft,
-  PackageSearch
+  ChevronRight,
+  PackageSearch,
+  X,
+  ZoomIn,
+  ZoomOut,
+  ImageOff
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
@@ -46,6 +51,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const { firestore } = useFirestore();
   const [mounted, setMounted] = useState(false);
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [failedImages, setFailedImages] = useState<string[]>([]);
 
   const productRef = useMemo(() => {
     if (!firestore || !resolvedParams.id) return null;
@@ -53,6 +62,23 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   }, [firestore, resolvedParams.id]);
 
   const { data: product, loading } = useDoc(productRef);
+  const productImages = Array.isArray(product?.images)
+    ? product.images.filter((image: unknown): image is string => typeof image === "string" && image.trim().length > 0)
+    : [];
+  const galleryImages = productImages.filter((image: string) => !failedImages.includes(image));
+
+  useEffect(() => {
+    if (!isLightboxOpen || galleryImages.length === 0) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsLightboxOpen(false);
+      if (event.key === "ArrowLeft") setSelectedImage((current) => (current + 1) % galleryImages.length);
+      if (event.key === "ArrowRight") setSelectedImage((current) => (current - 1 + galleryImages.length) % galleryImages.length);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, galleryImages.length]);
 
   const sellerListingsQuery = useMemo(() => {
     if (!firestore || !product?.sellerId) return null;
@@ -154,6 +180,16 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   const titleFont = lang === 'AR' ? 'font-black' : 'font-semibold';
   const normalFont = lang === 'AR' ? 'font-bold' : 'font-medium';
+  const selectImage = (index: number) => {
+    setSelectedImage(index);
+    setIsZoomed(false);
+  };
+  const showPreviousImage = () => selectImage((selectedImage - 1 + galleryImages.length) % galleryImages.length);
+  const showNextImage = () => selectImage((selectedImage + 1) % galleryImages.length);
+  const handleImageError = (image: string) => {
+    setFailedImages((current) => current.includes(image) ? current : [...current, image]);
+    setSelectedImage(0);
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
@@ -297,30 +333,24 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
             <div className="order-2 md:order-1">
               <div className="rounded-2xl border border-zinc-200 bg-gray-50 p-2 shadow-sm">
-                <div className="relative w-full h-[320px] md:h-[380px] max-h-[380px] overflow-hidden rounded-2xl bg-white border border-zinc-200">
-                  <Image
-                    src={product.images?.[0] || "https://picsum.photos/seed/placeholder/1200/1200"}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-[1.02]"
-                    priority
-                  />
-                </div>
-
-                {product.images && product.images.length > 1 && (
-                  <div className="mt-3 grid grid-cols-4 gap-2">
-                    {product.images.slice(0, 4).map((img: string, i: number) => (
-                      <div key={i} className="relative h-20 overflow-hidden rounded-xl border border-zinc-200 bg-white">
-                        <Image
-                          src={img}
-                          alt={`${product.name} ${i + 1}`}
-                          fill
-                          sizes="80px"
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
+                {galleryImages.length > 0 ? (
+                  <>
+                    <button type="button" className="group relative block aspect-square h-[320px] w-full overflow-hidden rounded-2xl bg-white" onClick={() => setIsLightboxOpen(true)} aria-label={lang === 'AR' ? "فتح معرض الصور" : lang === 'EN' ? "Open image gallery" : "Ouvrir la galerie d'images"}>
+                      <Image src={galleryImages[selectedImage]} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" priority unoptimized={galleryImages[selectedImage].includes("api.dicebear.com")} onError={() => handleImageError(galleryImages[selectedImage])} />
+                      <span className="absolute bottom-3 left-3 rounded-full bg-black/65 p-2 text-white"><ZoomIn size={16} /></span>
+                    </button>
+                    <div className="mt-3 flex gap-2 overflow-x-auto pb-1" role="list" aria-label="Product thumbnails">
+                      {galleryImages.map((image: string, index: number) => (
+                        <button key={`${image}-${index}`} type="button" onClick={() => selectImage(index)} className={cn("relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 bg-white", selectedImage === index ? "border-secondary" : "border-zinc-200")} aria-label={`${lang === 'AR' ? "الصورة" : "Image"} ${index + 1}`}>
+                          <Image src={image} alt="" fill sizes="64px" className="object-cover" unoptimized={image.includes("api.dicebear.com")} onError={() => handleImageError(image)} />
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-[320px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white text-zinc-400">
+                    <ImageOff size={40} />
+                    <span className="text-sm font-bold">{lang === 'AR' ? "لا توجد صورة متاحة" : lang === 'EN' ? "No image available" : "Aucune image disponible"}</span>
                   </div>
                 )}
               </div>
@@ -349,7 +379,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                       id={item.id}
                       name={item.name}
                       price={item.price}
-                      image={item.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"}
+                      image={Array.isArray(item.images) ? item.images[0] || "" : ""}
                       category={item.category}
                       seller={item.sellerName}
                       condition={item.condition === 'new' ? 'New' : 'Used'}
@@ -361,6 +391,27 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           )}
         </div>
       </main>
+
+      {isLightboxOpen && galleryImages.length > 0 && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md" role="dialog" aria-modal="true" onClick={() => setIsLightboxOpen(false)}>
+          <div className="relative flex h-full w-full max-w-6xl items-center justify-center" onClick={(event) => event.stopPropagation()}>
+            <button type="button" onClick={() => setIsLightboxOpen(false)} className="absolute right-2 top-2 z-20 rounded-full bg-white p-2 text-black shadow-lg" aria-label="Close gallery"><X size={22} /></button>
+            <button type="button" onClick={showPreviousImage} className="absolute left-2 z-20 rounded-full bg-white p-2 text-black shadow-lg" aria-label="Previous image"><ChevronLeft size={24} /></button>
+            <button type="button" onClick={showNextImage} className="absolute right-2 z-20 rounded-full bg-white p-2 text-black shadow-lg" aria-label="Next image"><ChevronRight size={24} /></button>
+            <button type="button" onClick={() => setIsZoomed((current) => !current)} className="absolute bottom-24 right-2 z-20 rounded-full bg-white p-2 text-black shadow-lg" aria-label="Toggle zoom">{isZoomed ? <ZoomOut size={22} /> : <ZoomIn size={22} />}</button>
+            <div className="relative h-[78vh] w-full overflow-auto rounded-xl">
+              <Image src={galleryImages[selectedImage]} alt={product.name} fill sizes="100vw" className={cn("object-contain transition-transform duration-300", isZoomed ? "scale-150 cursor-zoom-out" : "cursor-zoom-in")} unoptimized={galleryImages[selectedImage].includes("api.dicebear.com")} onError={() => handleImageError(galleryImages[selectedImage])} />
+            </div>
+            <div className="absolute bottom-3 left-1/2 flex max-w-[90vw] -translate-x-1/2 gap-2 overflow-x-auto rounded-xl bg-black/60 p-2">
+              {galleryImages.map((image: string, index: number) => (
+                <button key={`${image}-lightbox-${index}`} type="button" onClick={() => selectImage(index)} className={cn("relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2", selectedImage === index ? "border-secondary" : "border-white/40")} aria-label={`Select image ${index + 1}`}>
+                  <Image src={image} alt="" fill sizes="56px" className="object-cover" unoptimized={image.includes("api.dicebear.com")} onError={() => handleImageError(image)} />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

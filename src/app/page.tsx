@@ -96,7 +96,6 @@ export default function Home() {
       items.push({
         type: 'banner',
         data: {
-          image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=1200",
           link: "/catalog",
           ar: { title: "أكبر تجمع لقطع الغيار في الجزائر", description: "ابحث عن أي قطعة لسيارتك بكل سهولة وتواصل مع البائع مباشرة.", button: "ابدأ البحث الآن" },
           en: { title: "Largest Spare Parts Hub in Algeria", description: "Find any part for your vehicle easily and connect with sellers.", button: "Start Searching" }
@@ -149,7 +148,11 @@ export default function Home() {
                                  </Link>
                                ) : (
                                  <div className="relative w-full h-full group">
-                                    <Image src={item.data.image} alt="" fill className="object-cover" priority={i === 0} />
+                                    {typeof item.data.image === 'string' && item.data.image.trim() ? (
+                                      <Image src={item.data.image} alt="" fill className="object-cover" priority={i === 0} />
+                                    ) : (
+                                      <div className="absolute inset-0 bg-primary" aria-hidden="true" />
+                                    )}
                                     <div className="absolute inset-0 bg-black/50" />
                                     <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
                                        <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
@@ -188,13 +191,7 @@ export default function Home() {
                   <CarouselContent className="h-full">
                     <CarouselItem className="h-full">
                       <div className="relative w-full h-full">
-                        <Image 
-                          src="https://images.unsplash.com/photo-1558441719-23451e281e5f?w=600" 
-                          alt="" 
-                          fill 
-                          className="object-cover opacity-30 transition-transform duration-1000 group-hover:scale-125" 
-                          sizes="400px"
-                        />
+                        <div className="absolute inset-0 bg-primary opacity-90 transition-transform duration-1000 group-hover:scale-105" aria-hidden="true" />
                         <div className="absolute inset-0 z-10 p-8 flex flex-col justify-center items-center text-center space-y-6">
                            <div className="space-y-2">
                               <Sparkles className="text-secondary mb-2 mx-auto" size={32} />
@@ -242,11 +239,11 @@ export default function Home() {
             ) : (
               <div ref={scrollRef} className="flex gap-10 overflow-x-auto pb-6 no-scrollbar scroll-smooth" dir={lang === 'AR' ? "rtl" : "ltr"}>
                  {PART_CATEGORIES.map((cat, i) => {
-                   const img = categoryImagesMap[cat.en] || `https://picsum.photos/seed/cat-${i}/200/200`;
+                   const img = categoryImagesMap[cat.en] || "";
                    return (
                      <div key={i} className="shrink-0 flex flex-col items-center gap-4 group">
                         <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden shadow-2xl relative bg-white pointer-events-none transition-all duration-500 group-hover:scale-110 group-hover:ring-4 ring-secondary">
-                           <Image src={img} alt="" fill className="object-cover" sizes="200px" />
+                           {img ? <Image src={img} alt="" fill className="object-cover" sizes="200px" /> : <Tags className="absolute inset-0 m-auto text-zinc-300" size={42} />}
                         </div>
                         <Link 
                           href={`/catalog?category=${cat.en}`} 

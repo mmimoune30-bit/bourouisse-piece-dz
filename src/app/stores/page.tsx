@@ -36,7 +36,7 @@ export default function StoresPage() {
   }, []);
 
   const filteredStores = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = typeof search === "string" ? search.trim().toLowerCase() : "";
     if (!q) return stores;
     return stores.filter((store) => {
       const values = [

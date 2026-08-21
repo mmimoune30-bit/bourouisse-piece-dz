@@ -33,7 +33,7 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      let finalEmail = emailOrId.trim();
+      let finalEmail = typeof emailOrId === "string" ? emailOrId.trim() : "";
 
       if (loginMethod === "id") {
         const usersRef = collection(firestore, "users");
@@ -112,53 +112,53 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-32 pb-12 flex items-center justify-center">
+      <main className="flex-grow -mt-[130px] md:-mt-[150px] pt-[136px] md:pt-[156px] pb-6 flex items-start justify-center">
         <div className="container mx-auto px-4 max-w-md">
           <Card className="border-none shadow-2xl overflow-hidden rounded-[32px] bg-white">
-            <CardHeader className="bg-primary text-white p-8 text-center">
+            <CardHeader className="bg-primary text-white p-6 text-center">
                <ShieldCheck className="mx-auto w-16 h-16 bg-white/20 rounded-2xl p-3 mb-4" />
                <CardTitle className="text-3xl font-black">بوابة الدخول</CardTitle>
                <CardDescription className="text-blue-100">سجل دخولك لإدارة حسابك</CardDescription>
             </CardHeader>
             <CardContent className="p-8">
-               <Tabs defaultValue="email" onValueChange={setLoginMethod} className="w-full">
-                  <TabsList className="grid grid-cols-2 mb-8 bg-zinc-100 p-1 h-12 rounded-xl">
+              <Tabs defaultValue="email" onValueChange={setLoginMethod} className="w-full">
+                <TabsList className="grid grid-cols-2 mb-4 bg-zinc-100 p-1 h-10 rounded-xl">
                     <TabsTrigger value="email" className="font-bold">البريد</TabsTrigger>
                     <TabsTrigger value="id" className="font-bold">المعرف</TabsTrigger>
                   </TabsList>
                   
-                  <form onSubmit={handleLogin} className="space-y-6 text-right" dir="rtl">
-                    <div className="space-y-2">
+                  <form onSubmit={handleLogin} className="space-y-4 text-right" dir="rtl">
+                    <div className="space-y-1">
                       <Label className="font-bold">{loginMethod === 'email' ? 'البريد الإلكتروني' : 'معرف الحساب (BR-ID)'}</Label>
                       <Input 
                         value={emailOrId}
                         onChange={(e) => setEmailOrId(e.target.value)}
                         placeholder={loginMethod === 'email' ? 'email@example.com' : 'مثلاً: BR-S-1001'} 
-                        className="h-14 border-2 rounded-xl text-right" 
+                        className="h-11 border-2 rounded-xl text-right" 
                         required
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <Label className="font-bold">كلمة المرور</Label>
                       <Input 
                         type="password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••" 
-                        className="h-14 border-2 rounded-xl text-right" 
+                        className="h-11 border-2 rounded-xl text-right" 
                         required
                       />
                     </div>
 
-                    <Button className="w-full h-14 text-lg font-black gap-2 shadow-xl rounded-xl bg-primary text-white" disabled={loading}>
+                    <Button className="w-full h-12 text-base font-black gap-2 shadow-xl rounded-xl bg-primary text-white" disabled={loading}>
                        {loading ? <Loader2 className="animate-spin" /> : <LogIn size={20} />}
                        {loading ? "جاري التحقق..." : "دخول آمن"}
                     </Button>
 
-                    <div className="pt-4 text-center">
+                    <div className="pt-1 text-center">
                        <Link href="/join">
-                          <Button variant="outline" className="w-full h-12 font-bold gap-2 border-2 rounded-xl">
+                          <Button variant="outline" className="w-full h-10 font-bold gap-2 border-2 rounded-xl">
                              إنشاء حساب جديد <ArrowLeft size={18} />
                           </Button>
                        </Link>
