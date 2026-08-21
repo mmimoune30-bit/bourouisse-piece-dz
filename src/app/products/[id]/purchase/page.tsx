@@ -187,7 +187,7 @@ export default function PurchasePage({ params }: { params: Promise<{ id: string 
                        <User size={18} className="text-secondary" /> {text.buyer}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-right" dir="rtl">
+                  <CardContent className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-3 text-right" dir={direction}>
                       <div className="space-y-1">
                         <Label className="font-black">{text.fullName}</Label>
                         <Input name="buyerName" placeholder={text.namePlaceholder} required className="h-9 border-2" />

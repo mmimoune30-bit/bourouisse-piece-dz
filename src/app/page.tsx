@@ -115,7 +115,7 @@ export default function Home() {
           {/* Hero Slider Section - Dynamic & Fixed Autoplay */}
           <section className="w-full">
             <div className={cn("flex flex-col lg:flex-row gap-4", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")}>
-              <div className="lg:w-3/4 h-[300px] md:h-[400px] bg-white rounded-[32px] shadow-xl border overflow-hidden relative flex flex-col">
+              <div className="w-full lg:w-3/4 h-[300px] md:h-[400px] bg-white rounded-[32px] shadow-xl border overflow-hidden relative flex flex-col">
                 <div className="px-8 py-4 border-b flex items-center justify-between z-10 bg-white/90 backdrop-blur-sm">
                    <h2 className="text-xl font-black text-gray-900 flex items-center gap-3 uppercase tracking-tight">
                      <Crown size={24} className="text-secondary" /> {t.exclusive[lang]}
@@ -136,14 +136,14 @@ export default function Home() {
                           {heroItems.map((item, i) => (
                             <CarouselItem key={i} className="h-full">
                                {item.type === 'store' ? (
-                                 <Link href={`/catalog?query=${encodeURIComponent(item.data.storeName)}`} className="w-full h-full flex items-center gap-10 px-12 group">
-                                    <div className="w-32 h-32 md:w-56 md:h-56 rounded-[40px] overflow-hidden relative border-8 border-white shadow-2xl shrink-0 transition-transform group-hover:scale-105">
+                                <Link href={`/catalog?query=${encodeURIComponent(item.data.storeName)}`} className="w-full h-full flex items-center gap-4 sm:gap-8 px-4 sm:px-8 md:px-12 group">
+                                  <div className="w-20 h-20 sm:w-32 sm:h-32 md:w-56 md:h-56 rounded-2xl sm:rounded-[40px] overflow-hidden relative border-4 sm:border-8 border-white shadow-2xl shrink-0 transition-transform group-hover:scale-105">
                                        <Image src={item.data.storeLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${item.data.storeName}`} alt="" fill className="object-cover" priority={i === 0} sizes="300px" />
                                     </div>
                                     <div className={cn("flex flex-col gap-2", lang === 'AR' ? "text-right" : "text-left")}>
                                        <Badge className="bg-secondary text-primary font-black mb-1 w-fit uppercase px-4 py-1">KING STORE</Badge>
-                                       <h3 className="text-3xl md:text-6xl font-black text-primary uppercase line-clamp-1 tracking-tighter">{item.data.storeName}</h3>
-                                       <p className="text-lg md:text-2xl text-zinc-500 font-bold flex items-center gap-2"><MapPin size={22} className="text-secondary" /> {item.data.storeLocation}</p>
+                                       <h3 className="text-xl sm:text-3xl md:text-6xl font-black text-primary uppercase line-clamp-2 tracking-tighter">{item.data.storeName}</h3>
+                                       <p className="text-sm sm:text-lg md:text-2xl text-zinc-500 font-bold flex items-center gap-2"><MapPin size={18} className="text-secondary" /> {item.data.storeLocation}</p>
                                     </div>
                                  </Link>
                                ) : (
@@ -154,9 +154,9 @@ export default function Home() {
                                       <div className="absolute inset-0 bg-primary" aria-hidden="true" />
                                     )}
                                     <div className="absolute inset-0 bg-black/50" />
-                                    <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-16 max-w-2xl gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
-                                       <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
-                                       <p className="text-zinc-200 text-lg md:text-xl font-bold line-clamp-2">{lang === 'AR' ? item.data.ar?.description : item.data.en?.description}</p>
+                                    <div className={cn("absolute inset-0 z-10 flex flex-col justify-center px-5 sm:px-10 md:px-16 max-w-2xl gap-3 sm:gap-4", lang === 'AR' ? "text-right items-end ml-auto" : "text-left items-start mr-auto")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+                                      <h3 className="text-xl sm:text-3xl md:text-5xl font-black text-white leading-tight">{lang === 'AR' ? item.data.ar?.title : item.data.en?.title}</h3>
+                                      <p className="text-sm sm:text-lg md:text-xl text-zinc-200 font-bold line-clamp-2">{lang === 'AR' ? item.data.ar?.description : item.data.en?.description}</p>
                                        <div className="flex flex-wrap gap-3">
                                          <Link href={item.data.link || "/catalog"}>
                                            <Button className="bg-secondary text-primary font-black h-14 px-10 rounded-2xl text-lg shadow-xl hover:bg-white transition-all uppercase">
@@ -182,7 +182,7 @@ export default function Home() {
               </div>
 
               {/* Side Promo Slider */}
-              <div className="lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
+              <div className="w-full lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
                 <Carousel 
                   opts={{ loop: true }} 
                   plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
@@ -266,7 +266,7 @@ export default function Home() {
                </h2>
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t.viewAll[lang]}</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {loadingFeatured ? (
                  Array.from({ length: 6 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-[24px] animate-pulse border shadow-sm" />)
                ) : featuredProducts.length > 0 ? (
@@ -287,7 +287,7 @@ export default function Home() {
                </h2>
                <Link href="/catalog" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t.viewAll[lang]}</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6" dir={lang === 'AR' ? "rtl" : "ltr"}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
                {loadingLatest ? (
                  Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square bg-white rounded-[24px] animate-pulse border shadow-sm" />)
                ) : latestListings.length > 0 ? (

@@ -173,10 +173,10 @@ function CatalogContent() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <aside className="hidden lg:block lg:col-span-1"><Card className="border shadow-sm"><CardContent className="p-3"><FilterPanel /></CardContent></Card></aside>
             <div className="lg:col-span-3">
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                  {loading ? Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-60 bg-zinc-100 animate-pulse rounded-lg" />)
                  : filteredProducts.length > 0 ? filteredProducts.map((product) => (
-                     <ProductCard key={product.id} id={product.id} name={product.name} price={product.price} image={product.images?.[0] || "https://picsum.photos/seed/placeholder/400/400"} category={product.category} seller={product.sellerName} condition={product.condition === 'new' ? 'New' : 'Used'} createdAt={product.createdAt} />
+                     <ProductCard key={product.id} id={product.id} name={product.name} price={product.price} image={product.images?.[0] || ""} category={product.category} seller={product.sellerName} condition={product.condition === 'new' ? 'New' : 'Used'} createdAt={product.createdAt} />
                    )) : (
                    <div className="col-span-full py-16 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
                       <Search size={32} className="opacity-10 mb-2" />

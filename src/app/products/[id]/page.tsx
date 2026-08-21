@@ -198,7 +198,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       <main className="flex-grow pb-8">
         <div className="container mx-auto px-4 max-w-7xl">
           
-          <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-6 items-start", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-start", lang === 'AR' ? "text-right" : "text-left")} dir={lang === 'AR' ? "rtl" : "ltr"}>
             <div className="order-1 md:order-2 space-y-3">
               <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
                 <div className="space-y-3">
@@ -335,7 +335,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               <div className="rounded-2xl border border-zinc-200 bg-gray-50 p-2 shadow-sm">
                 {galleryImages.length > 0 ? (
                   <>
-                    <button type="button" className="group relative block aspect-square h-[320px] w-full overflow-hidden rounded-2xl bg-white" onClick={() => setIsLightboxOpen(true)} aria-label={lang === 'AR' ? "فتح معرض الصور" : lang === 'EN' ? "Open image gallery" : "Ouvrir la galerie d'images"}>
+                    <button type="button" className="group relative block aspect-square w-full overflow-hidden rounded-2xl bg-white" onClick={() => setIsLightboxOpen(true)} aria-label={lang === 'AR' ? "فتح معرض الصور" : lang === 'EN' ? "Open image gallery" : "Ouvrir la galerie d'images"}>
                       <Image src={galleryImages[selectedImage]} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" priority unoptimized={galleryImages[selectedImage].includes("api.dicebear.com")} onError={() => handleImageError(galleryImages[selectedImage])} />
                       <span className="absolute bottom-3 left-3 rounded-full bg-black/65 p-2 text-white"><ZoomIn size={16} /></span>
                     </button>

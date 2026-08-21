@@ -99,8 +99,8 @@ export default function Navbar() {
 
       {/* 2. Main Branding Bar */}
       <div className="w-full bg-white py-3 border-b shadow-md relative z-[100]">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between gap-2 sm:gap-4" dir={lang === 'AR' ? "rtl" : "ltr"}>
+          <div className="flex items-center gap-1 sm:gap-4 min-w-0">
              {/* القائمة السريعة - استخدام modal={false} ضروري لمنع القفل التفاعلي */}
              <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen} modal={false}>
               <SheetTrigger asChild>
@@ -180,12 +180,12 @@ export default function Navbar() {
             </Sheet>
 
             <Link href="/" className="hover:opacity-90 transition-all shrink-0 cursor-pointer block relative z-[102]">
-              <SiteLogo className="min-w-[150px] md:min-w-[220px]" showTagline={true} />
+              <SiteLogo className="min-w-0 w-[130px] sm:w-[170px] md:min-w-[220px]" showTagline={true} />
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3 relative z-[102]">
-            <div className="hidden sm:flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 relative z-[102] shrink-0">
+            <div className="hidden lg:flex items-center gap-2 md:gap-3">
               <Button asChild className={cn("bg-primary text-secondary hover:bg-black rounded-xl h-11 px-4 md:px-6 uppercase shadow-lg active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
                 <Link href="/seller/register">
                   <Store size={16} className={lang === 'AR' ? "ml-2" : "mr-2"} /> {lang === 'AR' ? 'كن بائعاً معنا' : 'Become Seller'}
@@ -203,9 +203,9 @@ export default function Navbar() {
               </div>
             </div>
 
-            <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-11 px-4 md:px-5 gap-2 hover:bg-zinc-50 border-none active:scale-95 text-sm md:text-base cursor-pointer", navFont)}>
+            <Button asChild variant="ghost" size="sm" className={cn("text-primary rounded-xl h-10 px-2 sm:px-4 md:px-5 gap-1 sm:gap-2 hover:bg-zinc-50 border-none active:scale-95 text-xs sm:text-sm md:text-base cursor-pointer", navFont)}>
               <Link href="/">
-                <Home size={18} className="text-secondary" /> <span className="hidden md:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
+                <Home size={18} className="text-secondary" /> <span className="hidden lg:inline">{lang === 'AR' ? 'الرئيسية' : 'Home'}</span>
               </Link>
             </Button>
           </div>
