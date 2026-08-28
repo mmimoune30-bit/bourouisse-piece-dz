@@ -182,7 +182,7 @@ export default function Home() {
               </div>
 
               {/* Side Promo Slider */}
-              <div className="w-full lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-2xl group border-4 border-white">
+              <div className="w-full lg:w-1/4 h-[300px] md:h-[400px] relative rounded-[32px] overflow-hidden bg-zinc-900 shadow-none group border border-slate-200">
                 <Carousel 
                   opts={{ loop: true }} 
                   plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]} 
