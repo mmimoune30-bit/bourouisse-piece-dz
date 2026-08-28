@@ -21,6 +21,10 @@ function CatalogContent() {
   const { firestore } = useFirestore();
   const [lang, setLang] = useState<"AR" | "EN" | "FR">("AR");
 
+  // قراءة معلمات المتجر والبائع من الرابط (URL Params)
+  const sellerIdParam = searchParams.get("sellerId") || "";
+  const storeParam = searchParams.get("store") || "";
+
   const [brand, setBrand] = useState<string>(searchParams.get("brand") || "");
   const [model, setModel] = useState<string>(searchParams.get("model") || "");
   const [year, setYear] = useState<string>(searchParams.get("year") || "");
@@ -28,14 +32,14 @@ function CatalogContent() {
   const [fuelType, setFuelType] = useState<string>(searchParams.get("fuelType") || "");
   const [textSearch, setTextSearch] = useState<string>(searchParams.get("query") || "");
 
-  // استعلام الكتالوج بحد أقصى 40 منتج لضمان السرعة
+  // استعلام الكتالوج من مجموعة listings
   const productsQuery = useMemo(() => {
     if (!firestore) return null;
     return query(
       collection(firestore, "listings"), 
       where("status", "==", "Active"),
       orderBy("createdAt", "desc"),
-      limit(40)
+      limit(100)
     );
   }, [firestore]);
 
@@ -53,7 +57,26 @@ function CatalogContent() {
 
   const filteredProducts = useMemo(() => {
     if (!dbProducts) return [];
-    return dbProducts.filter(p => {
+    return dbProducts.filter((p: any) => {
+      // 1. التصفية حسب معرّف البائع والمتجر عند التوجيه من قائمة المتاجر
+      if (sellerIdParam || storeParam) {
+        const matchesSellerId = sellerIdParam && (
+          p.sellerId === sellerIdParam || 
+          p.userId === sellerIdParam || 
+          p.storeId === sellerIdParam
+        );
+
+        const matchesStoreName = storeParam && (
+          p.sellerName?.toLowerCase().includes(storeParam.toLowerCase()) || 
+          p.storeName?.toLowerCase().includes(storeParam.toLowerCase())
+        );
+
+        if (!matchesSellerId && !matchesStoreName) {
+          return false;
+        }
+      }
+
+      // 2. الفلاتر العامة (البحث بالنص، الماركة، الموديل، إلخ)
       const q = textSearch.toLowerCase();
       const matchesText = !textSearch || p.name?.toLowerCase().includes(q) || p.brand?.toLowerCase().includes(q) || p.model?.toLowerCase().includes(q);
       const matchesBrand = !brand || brand === "Any" || p.brand === brand;
@@ -61,9 +84,10 @@ function CatalogContent() {
       const matchesYear = !year || year === "Any" || p.year === year;
       const matchesFuel = !fuelType || fuelType === "Any" || p.fuelType === fuelType;
       const matchesCategory = !category || category === "Any" || p.category === category;
+
       return matchesText && matchesBrand && matchesModel && matchesYear && matchesFuel && matchesCategory;
     });
-  }, [dbProducts, textSearch, brand, model, year, fuelType, category]);
+  }, [dbProducts, sellerIdParam, storeParam, textSearch, brand, model, year, fuelType, category]);
 
   const availableBrands = useMemo(() => {
     const allBrands = new Set<string>();
@@ -87,7 +111,7 @@ function CatalogContent() {
     category: { AR: "تصنيف القطعة", EN: "Category", FR: "Catégorie" },
     reset: { AR: "مسح الفلاتر", EN: "Reset", FR: "Effacer" },
     title: { AR: "الكتالوج الشامل", EN: "Catalog", FR: "Catalogue" },
-    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts.", FR: "Parcurir et filtrer des milliers de pièces." },
+    subtitle: { AR: "تصفح وفلتر آلاف القطع المتوفرة حالياً.", EN: "Browse and filter thousands of parts.", FR: "Parcourir et filtrer des milliers de pièces." },
     results: { AR: "النتائج:", EN: "Results:", FR: "Résultats:" },
     allBrands: { AR: "الماركات", EN: "All Brands", FR: "Marques" },
   };
@@ -178,9 +202,9 @@ function CatalogContent() {
                  : filteredProducts.length > 0 ? filteredProducts.map((product) => (
                      <ProductCard key={product.id} id={product.id} name={product.name} price={product.price} image={product.images?.[0] || ""} category={product.category} seller={product.sellerName} condition={product.condition === 'new' ? 'New' : 'Used'} createdAt={product.createdAt} />
                    )) : (
-                   <div className="col-span-full py-16 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-300">
-                      <Search size={32} className="opacity-10 mb-2" />
-                      <p className={cn("text-xs text-black uppercase", titleFont)}>No results</p>
+                   <div className="col-span-full py-16 bg-white rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-400">
+                      <Search size={32} className="opacity-20 mb-2" />
+                      <p className={cn("text-xs text-black uppercase font-bold", titleFont)}>لا توجد منتجات تطابق هذا المتجر أو الفلتر</p>
                    </div>
                  )}
               </div>

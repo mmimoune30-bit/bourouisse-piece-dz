@@ -113,7 +113,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           {/* Hero Slider Section - Dynamic & Fixed Autoplay */}
-          <section className="w-full">
+          <section className="w-full mt-12 md:mt-16 pt-6">
             <div className={cn("flex flex-col lg:flex-row gap-4", lang === 'AR' ? "lg:flex-row-reverse" : "lg:flex-row")}>
               <div className="w-full lg:w-3/4 h-[300px] md:h-[400px] bg-white rounded-[32px] shadow-xl border overflow-hidden relative flex flex-col">
                 <div className="px-8 py-4 border-b flex items-center justify-between z-10 bg-white/90 backdrop-blur-sm">

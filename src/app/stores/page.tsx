@@ -20,7 +20,12 @@ export default function StoresPage() {
 
   const sellersQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, "users"), where("role", "==", "Seller"), where("status", "==", "Active"), limit(100));
+    return query(
+      collection(firestore, "users"), 
+      where("role", "==", "Seller"), 
+      where("status", "==", "Active"), 
+      limit(100)
+    );
   }, [firestore]);
 
   const { data: stores = [], loading } = useCollection(sellersQuery);
@@ -60,7 +65,7 @@ export default function StoresPage() {
     search: { AR: "بحث عن متجر", EN: "Search for a store", FR: "Rechercher une boutique" },
     owner: { AR: "المالك", EN: "Owner", FR: "Propriétaire" },
     location: { AR: "الموقع", EN: "Location", FR: "Localisation" },
-    preview: { AR: "معاينة", EN: "Preview", FR: "Aperçu" },
+    preview: { AR: "معاينة المنتجات", EN: "Preview Products", FR: "Voir les produits" },
     noStores: { AR: "لا توجد متاجر مسجلة حالياً.", EN: "No stores are currently registered.", FR: "Aucune boutique n'est actuellement enregistrée." },
   };
 
@@ -92,7 +97,7 @@ export default function StoresPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20 text-zinc-500">
               <Loader2 className="animate-spin mr-2" size={28} />
-              <span className="font-bold">Loading...</span>
+              <span className="font-bold">جاري تحميل المتاجر...</span>
             </div>
           ) : filteredStores.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-zinc-300 bg-white py-20 text-center text-zinc-500 font-bold">
@@ -100,50 +105,59 @@ export default function StoresPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" dir={lang === "AR" ? "rtl" : "ltr"}>
-              {filteredStores.map((store) => (
-                <Card key={store.id} className="overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
-                  <CardContent className="p-0">
-                    <div className="bg-gradient-to-r from-primary to-zinc-900 p-4 text-white">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
-                            <Store size={22} className="text-secondary" />
-                          </div>
-                          <div>
-                            <h2 className="text-lg font-black line-clamp-1">{store.name || "Unnamed Store"}</h2>
-                            <Badge className="bg-secondary text-primary text-[10px] font-black mt-1 rounded-full px-2 py-0.5">Approved</Badge>
+              {filteredStores.map((store) => {
+                // التأكد من استخراج معرّف البائع المضمون (id أو userId)
+                const sellerIdentifier = store.id || store.userId;
+
+                return (
+                  <Card key={store.id} className="overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
+                    <CardContent className="p-0">
+                      <div className="bg-gradient-to-r from-primary to-zinc-900 p-4 text-white">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                              <Store size={22} className="text-secondary" />
+                            </div>
+                            <div>
+                              <h2 className="text-lg font-black line-clamp-1">{store.name || "متجر بدون اسم"}</h2>
+                              <Badge className="bg-secondary text-primary text-[10px] font-black mt-1 rounded-full px-2 py-0.5">Approved</Badge>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-zinc-700">
-                        <User size={16} className="text-secondary" />
-                        <span className="text-sm font-bold">{t.owner[lang]}:</span>
-                        <span className="text-sm">{store.ownerName || store.name || "Unknown"}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-zinc-700">
-                        <MapPin size={16} className="text-secondary" />
-                        <span className="text-sm font-bold">{t.location[lang]}:</span>
-                        <span className="text-sm">{store.wilaya || "غير محدد"}</span>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
-                        <div className="text-xs text-zinc-500">
-                          {store.email ? store.email : store.phone || "No contact"}
+                      <div className="p-4 space-y-3">
+                        <div className="flex items-center gap-2 text-zinc-700">
+                          <User size={16} className="text-secondary" />
+                          <span className="text-sm font-bold">{t.owner[lang]}:</span>
+                          <span className="text-sm">{store.ownerName || store.name || "غير محدد"}</span>
                         </div>
-                        <Button asChild size="sm" className="bg-primary text-white hover:bg-black rounded-xl h-9 px-3">
-                          <Link href={`/catalog?query=${encodeURIComponent(store.name || "")}`} className="inline-flex items-center gap-2 font-bold">
-                            <ExternalLink size={14} /> {t.preview[lang]}
-                          </Link>
-                        </Button>
+
+                        <div className="flex items-center gap-2 text-zinc-700">
+                          <MapPin size={16} className="text-secondary" />
+                          <span className="text-sm font-bold">{t.location[lang]}:</span>
+                          <span className="text-sm">{store.wilaya || "غير محدد"}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                          <div className="text-xs text-zinc-500">
+                            {store.email ? store.email : store.phone || "لا يوجد اتصال"}
+                          </div>
+                          {/* رابط التوجيه المحدث لجلب كافة منتجات المتجر مباشرة عن طريق sellerId و storeId */}
+                          <Button asChild size="sm" className="bg-primary text-white hover:bg-black rounded-xl h-9 px-3">
+                            <Link 
+                              href={`/catalog?sellerId=${encodeURIComponent(sellerIdentifier)}&store=${encodeURIComponent(store.name || "")}`} 
+                              className="inline-flex items-center gap-2 font-bold"
+                            >
+                              <ExternalLink size={14} /> {t.preview[lang]}
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>

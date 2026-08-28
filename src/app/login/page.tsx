@@ -25,10 +25,14 @@ export default function LoginPage() {
   const [loginMethod, setLoginMethod] = useState("email");
   const [emailOrId, setEmailOrId] = useState("");
   const [password, setPassword] = useState("");
+  const firebaseReady = Boolean(auth && firestore);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth || !firestore) return;
+    if (!firebaseReady || !auth || !firestore) {
+      toast({ variant: "destructive", title: "الخدمة غير متاحة", description: "يرجى الانتظار لحظات ثم المحاولة مجدداً." });
+      return;
+    }
 
     setLoading(true);
     
@@ -99,7 +103,7 @@ export default function LoginPage() {
 
     } catch (error: any) {
       console.error("LOGIN ERROR", error);
-      let errorMessage = error.message;
+      let errorMessage = typeof error?.message === "string" ? error.message : "تعذر إتمام تسجيل الدخول. حاول مرة أخرى.";
       if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
         errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
@@ -151,7 +155,7 @@ export default function LoginPage() {
                       />
                     </div>
 
-                    <Button className="w-full h-12 text-base font-black gap-2 shadow-xl rounded-xl bg-primary text-white" disabled={loading}>
+                    <Button className="w-full h-12 text-base font-black gap-2 shadow-xl rounded-xl bg-primary text-white" disabled={loading || !firebaseReady}>
                        {loading ? <Loader2 className="animate-spin" /> : <LogIn size={20} />}
                        {loading ? "جاري التحقق..." : "دخول آمن"}
                     </Button>
